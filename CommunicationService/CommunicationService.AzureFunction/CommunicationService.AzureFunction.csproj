@@ -4,6 +4,7 @@
 		<AzureFunctionsVersion>v2</AzureFunctionsVersion>
 	</PropertyGroup>
 	<ItemGroup>
+		<PackageReference Include="AzureFunctions.Extensions.Swashbuckle" Version="1.4.4" />
 		<PackageReference Include="Microsoft.Azure.Functions.Extensions" Version="1.0.0" />
 		<PackageReference Include="AutoMapper.Extensions.Microsoft.DependencyInjection" Version="7.0.0" />
 		<PackageReference Include="MediatR" Version="8.0.1" />
@@ -15,13 +16,13 @@
 	</ItemGroup>
 	<ItemGroup>
 		<ProjectReference ReplaceParameters="true" Include="..\CommunicationService.Handlers\CommunicationService.Handlers.csproj">
-			<Name >CommunicationService.Handlers</Name>
+			<Name>CommunicationService.Handlers</Name>
 		</ProjectReference>
 		<ProjectReference ReplaceParameters="true" Include="..\CommunicationService.Mappers\CommunicationService.Mappers.csproj">
-			<Name >CommunicationService.Mappers</Name>
+			<Name>CommunicationService.Mappers</Name>
 		</ProjectReference>
 		<ProjectReference ReplaceParameters="true" Include="..\CommunicationService.Repo\CommunicationService.Repo.csproj">
-			<Name >CommunicationService.Repo</Name>
+			<Name>CommunicationService.Repo</Name>
 		</ProjectReference>
 	</ItemGroup>
 	<ItemGroup>
