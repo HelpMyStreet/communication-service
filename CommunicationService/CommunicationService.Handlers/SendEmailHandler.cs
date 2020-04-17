@@ -1,26 +1,30 @@
 ﻿using CommunicationService.Core.Domains.Entities;
 using CommunicationService.Core.Interfaces.Repositories;
+using CommunicationService.Core.Interfaces.Services;
 using MediatR;
-using System;
-using System.Collections.Generic;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
 namespace CommunicationService.Handlers
 {
-    public class SendEmailHandler : IRequestHandler<SendEmailRequest>
+    public class SendEmailHandler : IRequestHandler<SendEmailRequest,SendEmailResponse>
     {
-        private readonly IRepository _repository;
+        private readonly IRepository _repository;        
+        private readonly ISendEmailService _sendEmailService;
 
-        public SendEmailHandler(IRepository repository)
+        public SendEmailHandler(IRepository repository, ISendEmailService sendEmailService)
         {
-            _repository = repository;
+            _repository = repository;            
+            _sendEmailService = sendEmailService;            
         }
 
-        public Task<Unit> Handle(SendEmailRequest request, CancellationToken cancellationToken)
+        public async Task<SendEmailResponse> Handle(SendEmailRequest request, CancellationToken cancellationToken)
         {
-            return Unit.Task;
+            System.Net.HttpStatusCode response = await _sendEmailService.SendEmail(request);
+            return new SendEmailResponse()
+            {
+                StatusCode = response
+            };
         }
     }
 }

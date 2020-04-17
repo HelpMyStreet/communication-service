@@ -15,6 +15,7 @@
 		<PackageReference Include="Microsoft.NET.Sdk.Functions" Version="1.0.28" />
 	</ItemGroup>
 	<ItemGroup>
+		<ProjectReference Include="..\CommunicationService.EmailService\CommunicationService.EmailService.csproj" />
 		<ProjectReference ReplaceParameters="true" Include="..\CommunicationService.Handlers\CommunicationService.Handlers.csproj">
 			<Name>CommunicationService.Handlers</Name>
 		</ProjectReference>

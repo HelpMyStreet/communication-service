@@ -10,7 +10,7 @@
 	</ItemGroup>
 	<ItemGroup>
 		<ProjectReference ReplaceParameters="true" Include="..\CommunicationService.Core\CommunicationService.Core.csproj">
-			<Name >CommunicationService.Core</Name>
+			<Name>CommunicationService.Core</Name>
 		</ProjectReference>
 	</ItemGroup>
 </Project>
