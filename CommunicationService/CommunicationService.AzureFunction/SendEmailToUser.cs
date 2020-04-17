@@ -6,29 +6,33 @@ using Microsoft.Extensions.Logging;
 using MediatR;
 using System;
 using CommunicationService.Core.Domains.Entities;
+using System.Net;
+using AzureFunctions.Extensions.Swashbuckle.Attribute;
 
 namespace CommunicationService.AzureFunction
 {
-    public class FunctionB
+    public class SendEmailToUser
     {
         private readonly IMediator _mediator;
 
-        public FunctionB(IMediator mediator)
+        public SendEmailToUser(IMediator mediator)
         {
             _mediator = mediator;
         }
 
-        [FunctionName("FunctionB")]
+        [FunctionName("SendEmailToUser")]
+        [ProducesResponseType((int)HttpStatusCode.NoContent)]
         public async Task<IActionResult> Run(
-            [HttpTrigger(AuthorizationLevel.Function, "get", "post", Route = null)] FunctionBRequest req,
+            [HttpTrigger(AuthorizationLevel.Function, "post", Route = null)]
+            [RequestBodyType(typeof(SendEmailToUserRequest), "product request")] SendEmailToUserRequest req,
             ILogger log)
         {
             try
             {
                 log.LogInformation("C# HTTP trigger function processed a request.");
 
-                FunctionBResponse response = await _mediator.Send(req);
-                return new OkObjectResult(response);
+                await _mediator.Send(req);
+                return new NoContentResult();
             }
             catch (Exception exc)
             {
