@@ -1,6 +1,8 @@
 ﻿using AutoMapper;
 using CommunicationService.Core.Configuration;
 using CommunicationService.Core.Interfaces.Repositories;
+using CommunicationService.Core.Interfaces.Services;
+using CommunicationService.EmailService;
 using CommunicationService.Handlers;
 using CommunicationService.Mappers;
 using CommunicationService.Repo;
@@ -37,6 +39,7 @@ namespace CommunicationService.AzureFunction
 
             builder.Services.AddMediatR(typeof(SendEmailHandler).Assembly);
             builder.Services.AddAutoMapper(typeof(AddressDetailsProfile).Assembly);
+            builder.Services.AddSingleton<ISendEmailService, SendEmailService>();
 
             builder.Services.AddDbContext<ApplicationDbContext>(options =>
                    options.UseInMemoryDatabase(databaseName: "CommunicationService.AzureFunction"));
