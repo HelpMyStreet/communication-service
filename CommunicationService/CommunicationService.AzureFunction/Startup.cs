@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using CommunicationService.Core.Configuration;
 using CommunicationService.Core.Interfaces.Repositories;
 using CommunicationService.Handlers;
 using CommunicationService.Mappers;
@@ -28,6 +29,11 @@ namespace CommunicationService.AzureFunction
                 .SetBasePath(currentDirectory)
                 .AddJsonFile("local.settings.json", optional: true, reloadOnChange: true)
                 .AddEnvironmentVariables();
+
+            IConfigurationRoot config = configBuilder.Build();
+
+            IConfigurationSection sendGridConfigSettings = config.GetSection("SendGridConfig");
+            builder.Services.Configure<SendGridConfig>(sendGridConfigSettings);
 
             builder.Services.AddMediatR(typeof(SendEmailHandler).Assembly);
             builder.Services.AddAutoMapper(typeof(AddressDetailsProfile).Assembly);
