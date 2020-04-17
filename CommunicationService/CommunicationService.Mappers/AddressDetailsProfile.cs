@@ -1,9 +1,4 @@
 ﻿using AutoMapper;
-using CommunicationService.Core.Dto;
-using CommunicationService.Repo.EntityFramework.Entities;
-using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace CommunicationService.Mappers
 {
@@ -11,8 +6,8 @@ namespace CommunicationService.Mappers
     {
         public AddressDetailsProfile()
         {
-            CreateMap<AddressDetails, AddressDetailsDTO>();
-            CreateMap<AddressDetailsDTO, AddressDetails>();
+            //CreateMap<AddressDetails, AddressDetailsDTO>();
+            //CreateMap<AddressDetailsDTO, AddressDetails>();
         }
     }
 }
