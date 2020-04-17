@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace CommunicationService.Handlers
 {
-    public class SendEmailHandler : IRequestHandler<SendEmailRequest>
+    public class SendEmailHandler : IRequestHandler<SendEmailRequest,SendEmailResponse>
     {
         private readonly IRepository _repository;        
         private readonly ISendEmailService _sendEmailService;
@@ -18,10 +18,13 @@ namespace CommunicationService.Handlers
             _sendEmailService = sendEmailService;            
         }
 
-        public async Task<Unit> Handle(SendEmailRequest request, CancellationToken cancellationToken)
+        public async Task<SendEmailResponse> Handle(SendEmailRequest request, CancellationToken cancellationToken)
         {
-            await _sendEmailService.SendEmail(request);
-            return Unit.Value;
+            System.Net.HttpStatusCode response = await _sendEmailService.SendEmail(request);
+            return new SendEmailResponse()
+            {
+                StatusCode = response
+            };
         }
     }
 }

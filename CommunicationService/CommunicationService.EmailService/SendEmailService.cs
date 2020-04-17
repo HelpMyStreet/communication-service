@@ -5,6 +5,7 @@ using Microsoft.Extensions.Options;
 using SendGrid;
 using SendGrid.Helpers.Mail;
 using System;
+using System.Net;
 using System.Threading.Tasks;
 
 namespace CommunicationService.EmailService
@@ -18,7 +19,7 @@ namespace CommunicationService.EmailService
             _sendGridConfig = sendGridConfig;
         }
 
-        public async Task<bool> SendEmail(SendEmailRequest sendEmailRequest)
+        public async Task<HttpStatusCode> SendEmail(SendEmailRequest sendEmailRequest)
         {
             var apiKey = _sendGridConfig.Value.ApiKey;
             if (apiKey == string.Empty)
@@ -34,9 +35,9 @@ namespace CommunicationService.EmailService
                 PlainTextContent = sendEmailRequest.BodyText,
                 HtmlContent = sendEmailRequest.BodyHTML
             };
-            eml.AddTo(new EmailAddress(sendEmailRequest.ToAddress, sendEmailRequest.ToName));           
-            var response = await client.SendEmailAsync(eml);
-            return response.StatusCode == System.Net.HttpStatusCode.OK ? true : false;
+            eml.AddTo(new EmailAddress(sendEmailRequest.ToAddress, sendEmailRequest.ToName));
+            Response response = await client.SendEmailAsync(eml);
+            return response.StatusCode;
         }
     }
 }
