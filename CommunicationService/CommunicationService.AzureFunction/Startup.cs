@@ -8,6 +8,7 @@ using CommunicationService.EmailService;
 using CommunicationService.Handlers;
 using CommunicationService.Mappers;
 using CommunicationService.Repo;
+using CommunicationService.UserService;
 using MediatR;
 using Microsoft.Azure.Functions.Extensions.DependencyInjection;
 using Microsoft.Azure.WebJobs.Host.Bindings;
@@ -72,6 +73,7 @@ namespace CommunicationService.AzureFunction
             builder.Services.AddMediatR(typeof(SendEmailHandler).Assembly);
             builder.Services.AddAutoMapper(typeof(AddressDetailsProfile).Assembly);
             builder.Services.AddSingleton<ISendEmailService, SendEmailService>();
+            builder.Services.AddSingleton<IConnectUserService, ConnectUserService>();
 
             builder.Services.AddDbContext<ApplicationDbContext>(options =>
                    options.UseInMemoryDatabase(databaseName: "CommunicationService.AzureFunction"));

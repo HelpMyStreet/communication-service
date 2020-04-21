@@ -13,7 +13,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CommunicationService.Mapper
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CommunicationService.Repo", "CommunicationService\CommunicationService.Repo\CommunicationService.Repo.csproj", "{F4CB1DDA-698D-4957-A576-105B3BAB8AB7}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CommunicationService.EmailService", "CommunicationService\CommunicationService.EmailService\CommunicationService.EmailService.csproj", "{49DE34EC-7A61-4353-9531-C2DB66625480}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CommunicationService.EmailService", "CommunicationService\CommunicationService.EmailService\CommunicationService.EmailService.csproj", "{49DE34EC-7A61-4353-9531-C2DB66625480}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CommunicationService.UserService", "CommunicationService\CommunicationService.UserService\CommunicationService.UserService.csproj", "{2A0222BF-4177-4499-8ACD-006F0B9963A1}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -45,6 +47,10 @@ Global
 		{49DE34EC-7A61-4353-9531-C2DB66625480}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{49DE34EC-7A61-4353-9531-C2DB66625480}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{49DE34EC-7A61-4353-9531-C2DB66625480}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2A0222BF-4177-4499-8ACD-006F0B9963A1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2A0222BF-4177-4499-8ACD-006F0B9963A1}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2A0222BF-4177-4499-8ACD-006F0B9963A1}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2A0222BF-4177-4499-8ACD-006F0B9963A1}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

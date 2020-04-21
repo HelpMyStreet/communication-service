@@ -5,7 +5,7 @@ using System.Text;
 
 namespace CommunicationService.Core.Domains.Entities
 {
-    public class SendEmailToUserRequest : IRequest
+    public class SendEmailToUserRequest : IRequest<SendEmailResponse>
     {
         public int ToUserID { get; set; }        
         public string Subject { get; set; }

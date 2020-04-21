@@ -20,10 +20,10 @@ namespace CommunicationService.Handlers
 
         public async Task<SendEmailResponse> Handle(SendEmailRequest request, CancellationToken cancellationToken)
         {
-            System.Net.HttpStatusCode response = await _sendEmailService.SendEmail(request);
+            bool response = await _sendEmailService.SendEmail(request);
             return new SendEmailResponse()
             {
-                StatusCode = response
+                Success = response
             };
         }
     }
