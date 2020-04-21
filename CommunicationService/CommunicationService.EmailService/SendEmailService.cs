@@ -53,14 +53,14 @@ namespace CommunicationService.EmailService
         {
             List<int> UserIds = new List<int>();
 
-            if(sendEmailToUsersRequest.ToUserIDs?.UserIds.Count()>0)
-                UserIds.AddRange(sendEmailToUsersRequest.ToUserIDs.UserIds);
+            if(sendEmailToUsersRequest.Recipients.ToUserIDs?.Count()>0)
+                UserIds.AddRange(sendEmailToUsersRequest.Recipients.ToUserIDs);
 
-            if (sendEmailToUsersRequest.CCUserIDs?.UserIds.Count() > 0)
-                UserIds.AddRange(sendEmailToUsersRequest.CCUserIDs.UserIds);
+            if (sendEmailToUsersRequest.Recipients.CCUserIDs?.Count() > 0)
+                UserIds.AddRange(sendEmailToUsersRequest.Recipients.CCUserIDs);
 
-            if (sendEmailToUsersRequest.BCCUserIDs?.UserIds.Count() > 0)
-                UserIds.AddRange(sendEmailToUsersRequest.BCCUserIDs.UserIds);
+            if (sendEmailToUsersRequest.Recipients.BCCUserIDs?.Count() > 0)
+                UserIds.AddRange(sendEmailToUsersRequest.Recipients.BCCUserIDs);
 
 
             var DistinctUsers = UserIds.Distinct().ToList();
@@ -90,9 +90,9 @@ namespace CommunicationService.EmailService
                 HtmlContent = sendEmailToUsersRequest.BodyHTML
             };
 
-            if (sendEmailToUsersRequest.ToUserIDs?.UserIds.Count() > 0)
+            if (sendEmailToUsersRequest.Recipients.ToUserIDs?.Count() > 0)
             {
-                foreach (int userId in sendEmailToUsersRequest.ToUserIDs?.UserIds)
+                foreach (int userId in sendEmailToUsersRequest.Recipients.ToUserIDs)
                 {
                     var User = Users.Where(w => w.ID == userId).FirstOrDefault();
                     if (User != null && User.UserPersonalDetails != null)
@@ -102,9 +102,9 @@ namespace CommunicationService.EmailService
                 }
             }
 
-            if (sendEmailToUsersRequest.CCUserIDs?.UserIds.Count() > 0)
+            if (sendEmailToUsersRequest.Recipients.CCUserIDs?.Count() > 0)
             {
-                foreach (int userId in sendEmailToUsersRequest.CCUserIDs?.UserIds)
+                foreach (int userId in sendEmailToUsersRequest.Recipients.CCUserIDs)
                 {
                     var User = Users.Where(w => w.ID == userId).FirstOrDefault();
                     if (User != null && User.UserPersonalDetails != null)
@@ -114,9 +114,9 @@ namespace CommunicationService.EmailService
                 }
             }
 
-            if (sendEmailToUsersRequest.BCCUserIDs?.UserIds.Count() > 0)
+            if (sendEmailToUsersRequest.Recipients.BCCUserIDs?.Count() > 0)
             {
-                foreach (int userId in sendEmailToUsersRequest.BCCUserIDs?.UserIds)
+                foreach (int userId in sendEmailToUsersRequest.Recipients.BCCUserIDs)
                 {
                     var User = Users.Where(w => w.ID == userId).FirstOrDefault();
                     if (User != null && User.UserPersonalDetails != null)
