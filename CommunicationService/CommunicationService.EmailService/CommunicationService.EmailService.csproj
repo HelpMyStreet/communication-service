@@ -11,6 +11,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\CommunicationService.Core\CommunicationService.Core.csproj" />
+    <ProjectReference Include="..\CommunicationService.UserService\CommunicationService.UserService.csproj" />
   </ItemGroup>
 
 </Project>

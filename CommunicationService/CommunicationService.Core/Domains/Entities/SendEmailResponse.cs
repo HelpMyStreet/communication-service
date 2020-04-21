@@ -8,6 +8,6 @@ namespace CommunicationService.Core.Domains.Entities
 {
     public class SendEmailResponse
     {
-        public HttpStatusCode StatusCode { get; set; }        
+        public bool Success { get; set; }
     }
 }

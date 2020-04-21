@@ -26,6 +26,7 @@
 		<ProjectReference ReplaceParameters="true" Include="..\CommunicationService.Repo\CommunicationService.Repo.csproj">
 			<Name>CommunicationService.Repo</Name>
 		</ProjectReference>
+		<ProjectReference Include="..\CommunicationService.UserService\CommunicationService.UserService.csproj" />
 	</ItemGroup>
 	<ItemGroup>
 		<None Update="local.settings.json">

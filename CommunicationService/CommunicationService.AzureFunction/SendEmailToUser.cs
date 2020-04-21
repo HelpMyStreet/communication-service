@@ -21,7 +21,7 @@ namespace CommunicationService.AzureFunction
         }
 
         [FunctionName("SendEmailToUser")]
-        [ProducesResponseType((int)HttpStatusCode.NoContent)]
+        [ProducesResponseType((int)HttpStatusCode.OK, Type = typeof(SendEmailResponse))]        
         public async Task<IActionResult> Run(
             [HttpTrigger(AuthorizationLevel.Function, "post", Route = null)]
             [RequestBodyType(typeof(SendEmailToUserRequest), "product request")] SendEmailToUserRequest req,
@@ -31,8 +31,8 @@ namespace CommunicationService.AzureFunction
             {
                 log.LogInformation("C# HTTP trigger function processed a request.");
 
-                await _mediator.Send(req);
-                return new NoContentResult();
+                SendEmailResponse response = await _mediator.Send(req);
+                return new OkObjectResult(response);
             }
             catch (Exception exc)
             {

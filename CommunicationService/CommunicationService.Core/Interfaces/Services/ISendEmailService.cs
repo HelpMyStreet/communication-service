@@ -9,6 +9,10 @@ namespace CommunicationService.Core.Interfaces.Services
 {
     public interface ISendEmailService
     {
-        Task<HttpStatusCode> SendEmail(SendEmailRequest sendEmailRequest);
+        Task<bool> SendEmail(SendEmailRequest sendEmailRequest);
+
+        Task<bool> SendEmailToUser(SendEmailToUserRequest sendEmailToUserRequest);
+
+        Task<bool> SendEmailToUsers(SendEmailToUsersRequest sendEmailToUsersRequest);        
     }
 }
