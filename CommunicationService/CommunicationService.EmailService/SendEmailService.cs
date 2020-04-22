@@ -1,7 +1,7 @@
 ﻿using CommunicationService.Core.Configuration;
-using CommunicationService.Core.Domains.Entities;
 using CommunicationService.Core.Interfaces.Services;
 using CommunicationService.UserService;
+using HelpMyStreet.Contracts.CommunicationService.Request;
 using HelpMyStreet.Utils.Models;
 using Microsoft.Extensions.Options;
 using SendGrid;
@@ -74,7 +74,7 @@ namespace CommunicationService.EmailService
         }
 
         private async Task<bool> SendEmail(SendEmailToUsersRequest sendEmailToUsersRequest, List<User> Users)
-        {
+        {            
             var apiKey = _sendGridConfig.Value.ApiKey;
             if (apiKey == string.Empty)
             {
@@ -135,7 +135,7 @@ namespace CommunicationService.EmailService
 
 
         private async Task<bool> SendEmail(string toAddress, string toName, string subject, string bodyText, string bodyHtml)
-        {
+        {            
             var apiKey = _sendGridConfig.Value.ApiKey;
             if (apiKey == string.Empty)
             {
