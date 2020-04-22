@@ -1,4 +1,5 @@
-﻿using CommunicationService.Core.Domains.Entities;
+﻿
+using HelpMyStreet.Contracts.CommunicationService.Request;
 using System;
 using System.Collections.Generic;
 using System.Net;

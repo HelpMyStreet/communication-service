@@ -5,9 +5,12 @@ using Microsoft.Azure.WebJobs.Extensions.Http;
 using Microsoft.Extensions.Logging;
 using MediatR;
 using System;
-using CommunicationService.Core.Domains.Entities;
 using System.Net;
 using AzureFunctions.Extensions.Swashbuckle.Attribute;
+using HelpMyStreet.Contracts.CommunicationService.Response;
+using HelpMyStreet.Contracts.CommunicationService.Request;
+using HelpMyStreet.Contracts.Shared;
+using Microsoft.AspNetCore.Http;
 
 namespace CommunicationService.AzureFunction
 {
@@ -32,11 +35,12 @@ namespace CommunicationService.AzureFunction
                 log.LogInformation("C# HTTP trigger function processed a request.");
 
                 SendEmailResponse response = await _mediator.Send(req);
-                return new OkObjectResult(response);
+                return new OkObjectResult(ResponseWrapper<SendEmailResponse, CommunicationServiceErrorCode>.CreateSuccessfulResponse(response));
             }
             catch (Exception exc)
             {
-                return new BadRequestObjectResult(exc);
+                log.LogError("Exception occured in Send Email To User", exc);
+                return new ObjectResult(ResponseWrapper<SendEmailResponse, CommunicationServiceErrorCode>.CreateUnsuccessfulResponse(CommunicationServiceErrorCode.InternalServerError, "Internal Error")) { StatusCode = StatusCodes.Status500InternalServerError };
             }
         }
     }

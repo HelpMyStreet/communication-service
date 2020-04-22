@@ -1,5 +1,6 @@
-﻿using CommunicationService.Core.Domains.Entities;
-using CommunicationService.Core.Interfaces.Services;
+﻿using CommunicationService.Core.Interfaces.Services;
+using HelpMyStreet.Contracts.CommunicationService.Request;
+using HelpMyStreet.Contracts.CommunicationService.Response;
 using MediatR;
 using System.Threading;
 using System.Threading.Tasks;
