@@ -7,10 +7,13 @@ using CommunicationService.Core.Utils;
 using CommunicationService.EmailService;
 using CommunicationService.Handlers;
 using CommunicationService.Mappers;
+using CommunicationService.MessageService;
 using CommunicationService.Repo;
+using CommunicationService.RequestService;
 using CommunicationService.UserService;
 using MediatR;
 using Microsoft.Azure.Functions.Extensions.DependencyInjection;
+using Microsoft.Azure.ServiceBus;
 using Microsoft.Azure.WebJobs.Host.Bindings;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -72,8 +75,12 @@ namespace CommunicationService.AzureFunction
             builder.Services.AddTransient<IHttpClientWrapper, HttpClientWrapper>();
             builder.Services.AddMediatR(typeof(SendEmailHandler).Assembly);
             builder.Services.AddAutoMapper(typeof(AddressDetailsProfile).Assembly);
+            builder.Services.AddSingleton<IQueueClient>(new QueueClient("Endpoint=sb://helpmystreet-dev.servicebus.windows.net/;SharedAccessKeyName=RootManageSharedAccessKey;SharedAccessKey=8+WjZcHI5bCgKfYeyZoLsr6+KxbGad90k/wdT7bb5vw=", "recipient"));
+
+            builder.Services.AddSingleton<IMessageFactory, MessageFactory>();
             builder.Services.AddSingleton<ISendEmailService, SendEmailService>();
             builder.Services.AddSingleton<IConnectUserService, ConnectUserService>();
+            builder.Services.AddSingleton<IConnectRequestService, ConnectRequestService>();
 
             builder.Services.AddDbContext<ApplicationDbContext>(options =>
                    options.UseInMemoryDatabase(databaseName: "CommunicationService.AzureFunction"));

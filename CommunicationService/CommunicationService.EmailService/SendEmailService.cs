@@ -1,6 +1,5 @@
 ﻿using CommunicationService.Core.Configuration;
 using CommunicationService.Core.Interfaces.Services;
-using CommunicationService.UserService;
 using HelpMyStreet.Contracts.CommunicationService.Request;
 using HelpMyStreet.Utils.Models;
 using Microsoft.Extensions.Options;
@@ -27,7 +26,7 @@ namespace CommunicationService.EmailService
 
         public async Task<bool> SendEmailToUser(SendEmailToUserRequest sendEmailToUserRequest)
         {
-            System.Collections.Generic.List<HelpMyStreet.Utils.Models.User> users = _connectUserService.PostUsersForListOfUserID(new System.Collections.Generic.List<int>()
+            List<User> users = _connectUserService.PostUsersForListOfUserID(new List<int>()
             {
                 sendEmailToUserRequest.ToUserID
             }).Result;
@@ -66,11 +65,43 @@ namespace CommunicationService.EmailService
             var DistinctUsers = UserIds.Distinct().ToList();
 
 
-            System.Collections.Generic.List<HelpMyStreet.Utils.Models.User> Users = _connectUserService
+            List<User> Users = _connectUserService
                 .PostUsersForListOfUserID(DistinctUsers)
                 .Result;
 
             return await SendEmail(sendEmailToUsersRequest, Users);  
+        }
+
+        public async Task<bool> SendDynamicEmail(string templateId,object templateData)
+        {
+            var apiKey = _sendGridConfig.Value.ApiKey;
+            if (apiKey == string.Empty)
+            {
+                throw new Exception("SendGrid Api Key missing.");
+            }
+            var client = new SendGridClient(apiKey);
+            Personalization personalization = new Personalization()
+            {
+                Tos = new List<EmailAddress>() { new EmailAddress("jawwad.mukhtar@gmail.com") },
+                Subject = "Test",
+                TemplateData = templateData
+            };
+
+            var eml = new SendGridMessage()
+            {
+                From = new EmailAddress(_sendGridConfig.Value.FromEmail, _sendGridConfig.Value.FromName),
+                TemplateId = templateId,
+                Personalizations = new List<Personalization>()
+                {
+                    personalization
+                }
+            };
+
+            Response response = await client.SendEmailAsync(eml);
+            if (response.StatusCode == HttpStatusCode.OK || response.StatusCode == HttpStatusCode.Accepted)
+                return true;
+            else
+                return false;
         }
 
         private async Task<bool> SendEmail(SendEmailToUsersRequest sendEmailToUsersRequest, List<User> Users)

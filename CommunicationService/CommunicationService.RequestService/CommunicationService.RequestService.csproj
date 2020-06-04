@@ -5,10 +5,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="HelpMyStreet.Contracts" Version="1.1.168" />
-  </ItemGroup>
-
-  <ItemGroup>
     <ProjectReference Include="..\CommunicationService.Core\CommunicationService.Core.csproj" />
   </ItemGroup>
 
