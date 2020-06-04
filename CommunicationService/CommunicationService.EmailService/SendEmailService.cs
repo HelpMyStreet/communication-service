@@ -1,4 +1,5 @@
 ﻿using CommunicationService.Core.Configuration;
+using CommunicationService.Core.Domains;
 using CommunicationService.Core.Interfaces.Services;
 using HelpMyStreet.Contracts.CommunicationService.Request;
 using HelpMyStreet.Utils.Models;
@@ -72,19 +73,19 @@ namespace CommunicationService.EmailService
             return await SendEmail(sendEmailToUsersRequest, Users);  
         }
 
-        public async Task<bool> SendDynamicEmail(string templateId,object templateData)
+        public async Task<bool> SendDynamicEmail(string templateId,SendGridData sendGridData)
         {
             var apiKey = _sendGridConfig.Value.ApiKey;
             if (apiKey == string.Empty)
             {
                 throw new Exception("SendGrid Api Key missing.");
             }
+            sendGridData.EmailToAddress = "jawwad.mukhtar@gmail.com";
             var client = new SendGridClient(apiKey);
             Personalization personalization = new Personalization()
             {
-                Tos = new List<EmailAddress>() { new EmailAddress("jawwad.mukhtar@gmail.com") },
-                Subject = "Test",
-                TemplateData = templateData
+                Tos = new List<EmailAddress>() { new EmailAddress(sendGridData.EmailToAddress,sendGridData.EmailToName) },
+                TemplateData = sendGridData.BaseDynamicData
             };
 
             var eml = new SendGridMessage()

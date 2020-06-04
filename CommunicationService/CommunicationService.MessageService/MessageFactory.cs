@@ -1,4 +1,5 @@
 ﻿using CommunicationService.Core.Domains.Entities.Request;
+using CommunicationService.Core.Interfaces;
 using CommunicationService.Core.Interfaces.Services;
 using Microsoft.Azure.ServiceBus;
 using Newtonsoft.Json;
@@ -14,8 +15,6 @@ namespace CommunicationService.MessageService
     {
         private readonly IConnectUserService _connectUserService;
         private readonly IConnectRequestService _connectRequestService;
-        const string ServiceBusConnectionString = "Endpoint=sb://helpmystreet-dev.servicebus.windows.net/;SharedAccessKeyName=RootManageSharedAccessKey;SharedAccessKey=8+WjZcHI5bCgKfYeyZoLsr6+KxbGad90k/wdT7bb5vw=";
-        const string QueueName = "recipient";
         private readonly IQueueClient _queueClient;
 
         public MessageFactory(IConnectUserService connectUserService, IConnectRequestService connectRequestService, IQueueClient queueClient)

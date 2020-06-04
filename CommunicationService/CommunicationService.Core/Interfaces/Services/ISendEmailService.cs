@@ -1,9 +1,6 @@
 ﻿
+using CommunicationService.Core.Domains;
 using HelpMyStreet.Contracts.CommunicationService.Request;
-using System;
-using System.Collections.Generic;
-using System.Net;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace CommunicationService.Core.Interfaces.Services
@@ -16,6 +13,6 @@ namespace CommunicationService.Core.Interfaces.Services
 
         Task<bool> SendEmailToUsers(SendEmailToUsersRequest sendEmailToUsersRequest);
 
-        Task<bool> SendDynamicEmail(string templateId,object templateData);
+        Task<bool> SendDynamicEmail(string templateId,SendGridData sendGridData);
     }
 }

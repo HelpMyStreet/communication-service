@@ -1,6 +1,8 @@
 using System;
 using System.Collections.Generic;
+using CommunicationService.Core.Domains;
 using CommunicationService.Core.Domains.Entities.Request;
+using CommunicationService.Core.Interfaces;
 using CommunicationService.Core.Interfaces.Services;
 using CommunicationService.MessageService;
 using Microsoft.Azure.WebJobs;
@@ -26,8 +28,8 @@ namespace CommunicationService.AzureFunction
         {
             SendCommunicationRequest sendCommunicationRequest = JsonConvert.DeserializeObject<SendCommunicationRequest>(myQueueItem);
             IMessage message = _messageFactory.Create(sendCommunicationRequest);
-            var templateData = message.PrepareTemplateData(sendCommunicationRequest.RecipientUserID, sendCommunicationRequest.JobID, sendCommunicationRequest.GroupID).Result;
-            _sendEmailService.SendDynamicEmail(message.GetTemplateId(),templateData);
+            SendGridData sendGridData = message.PrepareTemplateData(sendCommunicationRequest.RecipientUserID, sendCommunicationRequest.JobID, sendCommunicationRequest.GroupID).Result;
+            _sendEmailService.SendDynamicEmail(message.GetTemplateId(), sendGridData);
             log.LogInformation($"C# ServiceBus queue trigger function processed message: {myQueueItem}");
         }
     }

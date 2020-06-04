@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using CommunicationService.Core.Domains.Entities.Request;
+using CommunicationService.Core.Interfaces;
 using CommunicationService.Core.Interfaces.Services;
 using CommunicationService.MessageService;
 using Microsoft.Azure.WebJobs;
@@ -27,17 +28,17 @@ namespace CommunicationService.AzureFunction
             SendCommunicationRequest sendCommunicationRequest = JsonConvert.DeserializeObject<SendCommunicationRequest>(myQueueItem);
             IMessage message = _messageFactory.Create(sendCommunicationRequest);
             List<int> recipients = message.IdentifyRecipients(sendCommunicationRequest.RecipientUserID, sendCommunicationRequest.JobID, sendCommunicationRequest.GroupID);
-            
-            //foreach(int i in recipients)
-            //{
+
+            foreach (int i in recipients)
+            {
                 _messageFactory.AddToRecipientQueueAsync(new SendCommunicationRequest()
                 {
                     EmailTemplate = sendCommunicationRequest.EmailTemplate,
-                    RecipientUserID = recipients.First(),
+                    RecipientUserID = i,
                     JobID = sendCommunicationRequest.JobID,
                     GroupID = sendCommunicationRequest.GroupID
                 });
-            //}
+            }
             
             log.LogInformation($"C# ServiceBus queue trigger function processed message: {myQueueItem}");
         }

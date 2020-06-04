@@ -1,4 +1,6 @@
-﻿using CommunicationService.Core.Interfaces.Services;
+﻿using CommunicationService.Core.Domains;
+using CommunicationService.Core.Interfaces;
+using CommunicationService.Core.Interfaces.Services;
 using CommunicationService.MessageService.Substitution;
 using Newtonsoft.Json;
 using System;
@@ -23,20 +25,20 @@ namespace CommunicationService.MessageService
                 recipientUserId.Value
             };
         }
-        public async Task<object> PrepareTemplateData(int? recipientUserId, int? jobId, int? groupId)
+        public async Task<SendGridData> PrepareTemplateData(int? recipientUserId, int? jobId, int? groupId)
         {
             var user = await _connectUserService.GetUserByIdAsync(recipientUserId.Value);
 
             if (user != null)
             {
-                return new Welcome(user.UserPersonalDetails.FirstName, user.UserPersonalDetails.LastName);
+                return new SendGridData()
+                {
+                    BaseDynamicData = new Welcome(user.UserPersonalDetails.FirstName, user.UserPersonalDetails.LastName),
+                    EmailToAddress = user.UserPersonalDetails.EmailAddress,
+                    EmailToName = user.UserPersonalDetails.DisplayName
+                };
             }
             throw new Exception("unable to retrive user details");
-        }
-
-        public Task<string> PrepareJSON(int? recipientUserId, int? jobId, int? groupId)
-        {
-            throw new NotImplementedException();
         }
 
         public string GetTemplateId()
