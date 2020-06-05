@@ -31,6 +31,8 @@ namespace CommunicationService.AzureFunction
                 log.LogInformation("C# HTTP trigger function processed a request.");
 
                 string requestBody = await new StreamReader(req.Body).ReadToEndAsync();
+                log.LogInformation(requestBody);
+                
                 dynamic data  = JsonConvert.DeserializeObject<ExpandoObject>(requestBody);
                 data.id = Guid.NewGuid();
                 await _cosmosDbService.AddItemAsync(data);
@@ -39,6 +41,10 @@ namespace CommunicationService.AzureFunction
             catch (Exception exc)
             {
                 log.LogError($"Exception occured in SendGridWebHook {exc}");
+                dynamic data = JsonConvert.DeserializeObject<ExpandoObject>("Error");
+                data.id = Guid.NewGuid();
+                await _cosmosDbService.AddItemAsync(data);
+
                 return new BadRequestObjectResult(exc);
             }
         }
