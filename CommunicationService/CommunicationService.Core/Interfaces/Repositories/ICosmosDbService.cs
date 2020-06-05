@@ -1,7 +1,4 @@
-﻿using CommunicationService.Core.Domains;
-using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace CommunicationService.Core.Interfaces.Repositories
