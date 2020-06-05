@@ -15,7 +15,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CommunicationService.Repo",
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CommunicationService.EmailService", "CommunicationService\CommunicationService.EmailService\CommunicationService.EmailService.csproj", "{49DE34EC-7A61-4353-9531-C2DB66625480}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CommunicationService.UserService", "CommunicationService\CommunicationService.UserService\CommunicationService.UserService.csproj", "{2A0222BF-4177-4499-8ACD-006F0B9963A1}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CommunicationService.UserService", "CommunicationService\CommunicationService.UserService\CommunicationService.UserService.csproj", "{2A0222BF-4177-4499-8ACD-006F0B9963A1}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

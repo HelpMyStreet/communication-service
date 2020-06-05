@@ -2,6 +2,7 @@
 using CommunicationService.Core.Interfaces.Repositories;
 using Microsoft.Azure.Cosmos;
 using System.Collections.Generic;
+using System.Dynamic;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -24,6 +25,10 @@ namespace CommunicationService.Repo
             await this._container.CreateItemAsync(item);
         }
 
+        public async Task AddItemAsync(ExpandoObject item)
+        {
+            await this._container.CreateItemAsync(item);
+        }
 
         public async Task<object> GetItemAsync(string id)
         {

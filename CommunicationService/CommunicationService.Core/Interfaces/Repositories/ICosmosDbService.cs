@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Dynamic;
 using System.Threading.Tasks;
 
 namespace CommunicationService.Core.Interfaces.Repositories
@@ -8,5 +9,7 @@ namespace CommunicationService.Core.Interfaces.Repositories
         Task<IEnumerable<object>> GetItemsAsync(string query);
         Task<object> GetItemAsync(string id);
         Task AddItemAsync(CosmosData item);
+        Task AddItemAsync(ExpandoObject item);
+        
     }
 }
