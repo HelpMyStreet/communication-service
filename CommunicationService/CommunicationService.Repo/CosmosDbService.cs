@@ -24,8 +24,6 @@ namespace CommunicationService.Repo
 
         public async Task AddItemAsync(dynamic item)
         {
-            //await this._container.CreateItemAsync(item);
-
             await this._container.CreateItemAsync(item);
         }
 
