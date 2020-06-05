@@ -38,7 +38,7 @@ namespace CommunicationService.AzureFunction
             }
             catch (Exception exc)
             {
-                log.LogError("Exception occured in SendGridWebHook", exc.ToString());
+                log.LogError($"Exception occured in SendGridWebHook {exc}");
                 return new BadRequestObjectResult(exc);
             }
         }
