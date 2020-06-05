@@ -9,6 +9,7 @@ using CommunicationService.Core.Interfaces.Repositories;
 using Newtonsoft.Json;
 using System.IO;
 using System.Dynamic;
+using CommunicationService.Core;
 
 namespace CommunicationService.AzureFunction
 {
@@ -29,21 +30,26 @@ namespace CommunicationService.AzureFunction
             try
             {
                 log.LogInformation("C# HTTP trigger function processed a request.");
-
                 string requestBody = await new StreamReader(req.Body).ReadToEndAsync();
                 log.LogInformation(requestBody);
-                
-                dynamic data  = JsonConvert.DeserializeObject<ExpandoObject>(requestBody);
-                data.id = Guid.NewGuid();
-                await _cosmosDbService.AddItemAsync(data);
+
+                CosmosData cosmosData = new CosmosData()
+                {
+                    id = Guid.NewGuid(),
+                    data = "test"
+                };
+
+                //dynamic data  = JsonConvert.DeserializeObject<ExpandoObject>(requestBody);
+                //data.id = Guid.NewGuid();
+                await _cosmosDbService.AddItemAsync(cosmosData);
                 return new OkObjectResult(true);
             }
             catch (Exception exc)
             {
                 log.LogError($"Exception occured in SendGridWebHook {exc}");
-                dynamic data = JsonConvert.DeserializeObject<ExpandoObject>("Error");
-                data.id = Guid.NewGuid();
-                await _cosmosDbService.AddItemAsync(data);
+                //dynamic data = JsonConvert.DeserializeObject<ExpandoObject>("Error");
+                //data.id = Guid.NewGuid();
+                //await _cosmosDbService.AddItemAsync(data);
 
                 return new BadRequestObjectResult(exc);
             }

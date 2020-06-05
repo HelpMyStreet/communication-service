@@ -7,6 +7,6 @@ namespace CommunicationService.Core.Interfaces.Repositories
     {
         Task<IEnumerable<object>> GetItemsAsync(string query);
         Task<object> GetItemAsync(string id);
-        Task AddItemAsync(dynamic item);
+        Task AddItemAsync(CosmosData item);
     }
 }
