@@ -7,5 +7,6 @@ namespace CommunicationService.Core.Configuration
     public enum HttpClientConfigName
     {
         UserService = 1,
+        RequestService = 2,
     }
 }
