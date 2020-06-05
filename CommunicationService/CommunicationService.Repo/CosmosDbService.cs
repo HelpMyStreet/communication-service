@@ -1,11 +1,7 @@
-﻿using CommunicationService.Core.Domains;
-using CommunicationService.Core.Interfaces.Repositories;
+﻿using CommunicationService.Core.Interfaces.Repositories;
 using Microsoft.Azure.Cosmos;
-using NewRelic.Api.Agent;
-using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace CommunicationService.Repo
