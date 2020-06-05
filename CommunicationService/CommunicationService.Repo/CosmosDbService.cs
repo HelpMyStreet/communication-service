@@ -1,4 +1,5 @@
-﻿using CommunicationService.Core.Interfaces.Repositories;
+﻿using CommunicationService.Core;
+using CommunicationService.Core.Interfaces.Repositories;
 using Microsoft.Azure.Cosmos;
 using System.Collections.Generic;
 using System.Linq;
@@ -18,7 +19,7 @@ namespace CommunicationService.Repo
             this._container = dbClient.GetContainer(databaseName, containerName);
         }
 
-        public async Task AddItemAsync(dynamic item)
+        public async Task AddItemAsync(CosmosData item)
         {
             await this._container.CreateItemAsync(item);
         }
