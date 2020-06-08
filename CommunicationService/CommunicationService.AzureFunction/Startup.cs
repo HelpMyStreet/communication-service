@@ -25,6 +25,7 @@ using System.Net;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Reflection;
+using System.Threading.Tasks;
 
 [assembly: FunctionsStartup(typeof(CommunicationService.AzureFunction.Startup))]
 namespace CommunicationService.AzureFunction
@@ -85,6 +86,23 @@ namespace CommunicationService.AzureFunction
             builder.Services.AddDbContext<ApplicationDbContext>(options =>
                    options.UseInMemoryDatabase(databaseName: "CommunicationService.AzureFunction"));
             builder.Services.AddTransient<IRepository, Repository>();
+
+            CosmosConfig cosmosConfig = config.GetSection("CosmosConfig").Get<CosmosConfig>();
+            builder.Services.AddSingleton<ICosmosDbService>(InitializeCosmosClientInstance(cosmosConfig));
+
+        }
+
+        private static CosmosDbService InitializeCosmosClientInstance(CosmosConfig cosmosConfig)
+        {
+            Microsoft.Azure.Cosmos.Fluent.CosmosClientBuilder clientBuilder = new Microsoft.Azure.Cosmos.Fluent.CosmosClientBuilder(cosmosConfig.ConnectionString);
+            Microsoft.Azure.Cosmos.CosmosClient client = clientBuilder
+                                .WithConnectionModeDirect()
+                                .Build();
+            CosmosDbService cosmosDbService = new CosmosDbService(client, cosmosConfig.DatabaseName, cosmosConfig.ContainerName);
+            //Microsoft.Azure.Cosmos.DatabaseResponse database = await client.CreateDatabaseIfNotExistsAsync(databaseName);
+            //await database.Database.CreateContainerIfNotExistsAsync(containerName, "/id");
+
+            return cosmosDbService;
         }
     }
 }
