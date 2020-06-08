@@ -1,35 +1,32 @@
-﻿using CommunicationService.Core.Interfaces.Repositories;
-using HelpMyStreet.Contracts.CommunicationService.Request;
+﻿using HelpMyStreet.Contracts.CommunicationService.Request;
 using HelpMyStreet.Contracts.CommunicationService.Response;
 using MediatR;
 using Microsoft.Azure.ServiceBus;
 using Newtonsoft.Json;
-using System;
-using System.Dynamic;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
-using System.Collections.Generic;
-using MediatR.Pipeline;
+using Microsoft.Extensions.Options;
+using CommunicationService.Core.Configuration;
+using CommunicationService.Core.Interfaces.Services;
 
 namespace CommunicationService.Handlers
 {
     public class SendCommunicationHandler : IRequestHandler<SendCommunicationRequest,SendCommunicationResponse>
     {
-        const string ServiceBusConnectionString = "Endpoint=sb://helpmystreet-dev.servicebus.windows.net/;SharedAccessKeyName=RootManageSharedAccessKey;SharedAccessKey=8+WjZcHI5bCgKfYeyZoLsr6+KxbGad90k/wdT7bb5vw=";
-        const string QueueName = "job";
         static IQueueClient _queueClient;
-        private readonly ICosmosDbService _cosmosDbService;
+        private readonly IOptions<ServiceBusConfig> _serviceBusConfig;
 
-        public SendCommunicationHandler(IQueueClient queueClient, ICosmosDbService cosmosDbService)
+        public SendCommunicationHandler(IQueueClient queueClient, IOptions<ServiceBusConfig> serviceBusConfig)
         {
             _queueClient = queueClient;
-            _cosmosDbService = cosmosDbService;
+            _serviceBusConfig = serviceBusConfig;
+            _queueClient = new QueueClient(_serviceBusConfig.Value.ConnectionString, _serviceBusConfig.Value.JobQueueName);
+
         }
 
         public async Task<SendCommunicationResponse> Handle(SendCommunicationRequest request, CancellationToken cancellationToken)
         {
-            _queueClient = new QueueClient(ServiceBusConnectionString, QueueName);
             await SendMessagesAsync(request);
             return new SendCommunicationResponse()
             {
