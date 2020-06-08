@@ -1,11 +1,11 @@
-﻿using CommunicationService.Core.Domains.Entities.Request;
+﻿using CommunicationService.Core.Domains;
 using CommunicationService.Core.Interfaces;
 using CommunicationService.Core.Interfaces.Services;
+using HelpMyStreet.Contracts.CommunicationService.Request;
+using HelpMyStreet.Contracts.RequestService.Response;
 using Microsoft.Azure.ServiceBus;
 using Newtonsoft.Json;
 using System;
-using System.Collections.Generic;
-using System.Dynamic;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -25,20 +25,35 @@ namespace CommunicationService.MessageService
         }
         public IMessage Create(SendCommunicationRequest sendCommunicationRequest)
         {
-            switch (sendCommunicationRequest.EmailTemplate.EmailTypes)
+            switch (sendCommunicationRequest.CommunicationJob.CommunicationJobType)
             {
-                case EmailTypes.Welcome:
+                case CommunicationJobTypes.SendWelcomeMessage:
                     return new WelcomeMessage(_connectUserService);
-                case EmailTypes.TaskNotification:
+                case CommunicationJobTypes.SendNewTaskNotification:
                     return new NewTaskNotificationMessage(_connectUserService,_connectRequestService);
                 default:
                     throw new Exception("Unknown Email Type");
 
             }
         }
-        public async Task AddToRecipientQueueAsync(SendCommunicationRequest sendCommunicationRequest)
+
+        public IMessage Create(SendMessageRequest sendMessageRequest)
         {
-            string messageBody = JsonConvert.SerializeObject(sendCommunicationRequest);
+            switch (sendMessageRequest.CommunicationJobType)
+            {
+                case CommunicationJobTypes.SendWelcomeMessage:
+                    return new WelcomeMessage(_connectUserService);
+                case CommunicationJobTypes.SendNewTaskNotification:
+                    return new NewTaskNotificationMessage(_connectUserService, _connectRequestService);
+                default:
+                    throw new Exception("Unknown Email Type");
+
+            }
+        }
+
+        public async Task AddToMessageQueueAsync(SendMessageRequest sendMessageRequest)
+        {
+            string messageBody = JsonConvert.SerializeObject(sendMessageRequest);
             var message = new Message(Encoding.UTF8.GetBytes(messageBody));
 
             // Send the message to the queue

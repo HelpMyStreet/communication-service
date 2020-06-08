@@ -13,6 +13,6 @@ namespace CommunicationService.Core.Interfaces.Services
 
         Task<bool> SendEmailToUsers(SendEmailToUsersRequest sendEmailToUsersRequest);
 
-        Task<bool> SendDynamicEmail(string templateId,SendGridData sendGridData);
+        Task<bool> SendDynamicEmail(string templateId,EmailBuildData sendGridData);
     }
 }

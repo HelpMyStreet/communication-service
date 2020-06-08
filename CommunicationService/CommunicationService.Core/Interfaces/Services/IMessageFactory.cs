@@ -1,7 +1,5 @@
-﻿using CommunicationService.Core.Domains.Entities.Request;
-using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using CommunicationService.Core.Domains;
+using HelpMyStreet.Contracts.CommunicationService.Request;
 using System.Threading.Tasks;
 
 namespace CommunicationService.Core.Interfaces.Services
@@ -10,7 +8,9 @@ namespace CommunicationService.Core.Interfaces.Services
 	{
 		IMessage Create(SendCommunicationRequest sendCommunicationRequest);
 
-		Task AddToRecipientQueueAsync(SendCommunicationRequest sendCommunicationRequest);
+		IMessage Create(SendMessageRequest sendMessageRequest);
+
+		Task AddToMessageQueueAsync(SendMessageRequest sendMessageRequest);
 	}
 
 }

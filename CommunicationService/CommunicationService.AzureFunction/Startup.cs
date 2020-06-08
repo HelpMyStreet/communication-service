@@ -76,7 +76,7 @@ namespace CommunicationService.AzureFunction
             builder.Services.AddTransient<IHttpClientWrapper, HttpClientWrapper>();
             builder.Services.AddMediatR(typeof(SendEmailHandler).Assembly);
             builder.Services.AddAutoMapper(typeof(AddressDetailsProfile).Assembly);
-            builder.Services.AddSingleton<IQueueClient>(new QueueClient("Endpoint=sb://helpmystreet-dev.servicebus.windows.net/;SharedAccessKeyName=RootManageSharedAccessKey;SharedAccessKey=8+WjZcHI5bCgKfYeyZoLsr6+KxbGad90k/wdT7bb5vw=", "recipient"));
+            builder.Services.AddSingleton<IQueueClient>(new QueueClient("Endpoint=sb://helpmystreet-dev.servicebus.windows.net/;SharedAccessKeyName=RootManageSharedAccessKey;SharedAccessKey=8+WjZcHI5bCgKfYeyZoLsr6+KxbGad90k/wdT7bb5vw=", "message"));
 
             builder.Services.AddSingleton<IMessageFactory, MessageFactory>();
             builder.Services.AddSingleton<ISendEmailService, SendEmailService>();

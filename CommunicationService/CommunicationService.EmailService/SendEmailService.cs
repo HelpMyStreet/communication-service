@@ -73,7 +73,7 @@ namespace CommunicationService.EmailService
             return await SendEmail(sendEmailToUsersRequest, Users);  
         }
 
-        public async Task<bool> SendDynamicEmail(string templateId,SendGridData sendGridData)
+        public async Task<bool> SendDynamicEmail(string templateId,EmailBuildData sendGridData)
         {
             var apiKey = _sendGridConfig.Value.ApiKey;
             if (apiKey == string.Empty)

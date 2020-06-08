@@ -2,11 +2,9 @@
 using CommunicationService.Core.Interfaces;
 using CommunicationService.Core.Interfaces.Services;
 using CommunicationService.MessageService.Substitution;
-using Newtonsoft.Json;
+using HelpMyStreet.Contracts.UserService.Response;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -22,14 +20,17 @@ namespace CommunicationService.MessageService
             _connectRequestService = connectRequestService;
         }
 
-        public string GetTemplateId()
+        public string TemplateId
         {
-            return "d-14a35071720e4a9fa0619c6891b3f108";
+            get
+            {
+                return "d-14a35071720e4a9fa0619c6891b3f108";
+            }
         }
 
-        public List<int> IdentifyRecipients(int? recipientUserId, int? jobId, int? groupId)
+        public Dictionary<int,string> IdentifyRecipients(int? recipientUserId, int? jobId, int? groupId)
         {
-            List<int> recipients = new List<int>();
+            Dictionary<int,string> recipients = new Dictionary<int, string>();
             var job = _connectRequestService.GetJobDetailsAsync(jobId.Value).Result;
             List<HelpMyStreet.Utils.Enums.SupportActivities> supportActivities = new List<HelpMyStreet.Utils.Enums.SupportActivities>();
             if (job != null)
@@ -39,19 +40,23 @@ namespace CommunicationService.MessageService
 
                 if (volunteers != null)
                 {
-                    recipients.AddRange(volunteers.Volunteers.Select(x => x.UserID).ToList());
+                    foreach(VolunteerSummary vs in volunteers.Volunteers)
+                    {
+                        recipients.Add(vs.UserID, TemplateId);
+                    }
                 }
             }
             return recipients;
         }
-        public async Task<SendGridData> PrepareTemplateData(int? recipientUserId, int? jobId, int? groupId)
+
+        public async Task<EmailBuildData> PrepareTemplateData(int? recipientUserId, int? jobId, int? groupId)
         {
             var job = _connectRequestService.GetJobDetailsAsync(jobId.Value).Result;
             var user = await _connectUserService.GetUserByIdAsync(recipientUserId.Value);
 
             if (user != null && job != null)
             {
-                return new SendGridData()
+                return new EmailBuildData()
                 {
                     BaseDynamicData = new NewTaskNotification(recipientUserId.Value, user.UserPersonalDetails.FirstName, user.UserPersonalDetails.LastName, job.SupportActivity),
                     EmailToAddress = user.UserPersonalDetails.EmailAddress,

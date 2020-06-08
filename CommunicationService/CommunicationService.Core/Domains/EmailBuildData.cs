@@ -2,7 +2,7 @@
 
 namespace CommunicationService.Core.Domains
 {
-    public class SendGridData 
+    public class EmailBuildData 
     {
         public BaseDynamicData BaseDynamicData { get; set; }
         public string EmailToAddress { get; set; }

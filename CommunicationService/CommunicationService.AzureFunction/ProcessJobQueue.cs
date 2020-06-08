@@ -1,12 +1,10 @@
-using System;
 using System.Collections.Generic;
-using System.Linq;
-using CommunicationService.Core.Domains.Entities.Request;
+using CommunicationService.Core.Domains;
 using CommunicationService.Core.Interfaces;
 using CommunicationService.Core.Interfaces.Services;
-using CommunicationService.MessageService;
+using HelpMyStreet.Contracts.CommunicationService.Request;
+using HelpMyStreet.Utils.Enums;
 using Microsoft.Azure.WebJobs;
-using Microsoft.Azure.WebJobs.Host;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 
@@ -27,19 +25,19 @@ namespace CommunicationService.AzureFunction
 
             SendCommunicationRequest sendCommunicationRequest = JsonConvert.DeserializeObject<SendCommunicationRequest>(myQueueItem);
             IMessage message = _messageFactory.Create(sendCommunicationRequest);
-            List<int> recipients = message.IdentifyRecipients(sendCommunicationRequest.RecipientUserID, sendCommunicationRequest.JobID, sendCommunicationRequest.GroupID);
+            Dictionary<int, string> recipients = message.IdentifyRecipients(sendCommunicationRequest.RecipientUserID, sendCommunicationRequest.JobID, sendCommunicationRequest.GroupID);
 
-            foreach (int i in recipients)
+            foreach (var item in recipients)
             {
-                _messageFactory.AddToRecipientQueueAsync(new SendCommunicationRequest()
+                _messageFactory.AddToMessageQueueAsync(new SendMessageRequest()
                 {
-                    EmailTemplate = sendCommunicationRequest.EmailTemplate,
-                    RecipientUserID = i,
-                    JobID = sendCommunicationRequest.JobID,
-                    GroupID = sendCommunicationRequest.GroupID
+                    CommunicationJobType = sendCommunicationRequest.CommunicationJob.CommunicationJobType,
+                    TemplateID = item.Value,
+                    RecipientUserID = item.Key,
+                    MessageType = MessageTypes.Email
                 });
             }
-            
+
             log.LogInformation($"C# ServiceBus queue trigger function processed message: {myQueueItem}");
         }
 

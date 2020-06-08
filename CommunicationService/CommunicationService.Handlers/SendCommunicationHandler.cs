@@ -1,16 +1,16 @@
-﻿using CommunicationService.Core.Domains.Entities.Request;
-using CommunicationService.Core.Domains.Entities.Response;
-using CommunicationService.Core.Interfaces.Repositories;
-using CommunicationService.Core.Interfaces.Services;
+﻿using CommunicationService.Core.Interfaces.Repositories;
 using HelpMyStreet.Contracts.CommunicationService.Request;
 using HelpMyStreet.Contracts.CommunicationService.Response;
 using MediatR;
 using Microsoft.Azure.ServiceBus;
 using Newtonsoft.Json;
 using System;
+using System.Dynamic;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Collections.Generic;
+using MediatR.Pipeline;
 
 namespace CommunicationService.Handlers
 {
@@ -19,10 +19,12 @@ namespace CommunicationService.Handlers
         const string ServiceBusConnectionString = "Endpoint=sb://helpmystreet-dev.servicebus.windows.net/;SharedAccessKeyName=RootManageSharedAccessKey;SharedAccessKey=8+WjZcHI5bCgKfYeyZoLsr6+KxbGad90k/wdT7bb5vw=";
         const string QueueName = "job";
         static IQueueClient _queueClient;
+        private readonly ICosmosDbService _cosmosDbService;
 
-        public SendCommunicationHandler(IQueueClient queueClient)
+        public SendCommunicationHandler(IQueueClient queueClient, ICosmosDbService cosmosDbService)
         {
-            _queueClient = queueClient;            
+            _queueClient = queueClient;
+            _cosmosDbService = cosmosDbService;
         }
 
         public async Task<SendCommunicationResponse> Handle(SendCommunicationRequest request, CancellationToken cancellationToken)
@@ -34,7 +36,6 @@ namespace CommunicationService.Handlers
                 Success = true
             };
         }
-
 
         private async Task SendMessagesAsync(SendCommunicationRequest sendCommunicationRequest)
         {

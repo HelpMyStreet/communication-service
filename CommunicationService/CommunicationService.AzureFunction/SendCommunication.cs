@@ -11,8 +11,6 @@ using HelpMyStreet.Contracts.CommunicationService.Response;
 using HelpMyStreet.Contracts.CommunicationService.Request;
 using HelpMyStreet.Contracts.Shared;
 using Microsoft.AspNetCore.Http;
-using CommunicationService.Core.Domains.Entities.Response;
-using CommunicationService.Core.Domains.Entities.Request;
 
 namespace CommunicationService.AzureFunction
 {
