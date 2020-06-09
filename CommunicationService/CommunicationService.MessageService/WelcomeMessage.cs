@@ -34,9 +34,10 @@ namespace CommunicationService.MessageService
             {
                 return new EmailBuildData()
                 {
-                    BaseDynamicData = new Welcome(user.UserPersonalDetails.FirstName, user.UserPersonalDetails.LastName),
+                    BaseDynamicData = new WelcomeData(user.UserPersonalDetails.FirstName, user.UserPersonalDetails.LastName),
                     EmailToAddress = user.UserPersonalDetails.EmailAddress,
-                    EmailToName = user.UserPersonalDetails.DisplayName
+                    EmailToName = user.UserPersonalDetails.DisplayName,
+                    RecipientUserID = recipientUserId.Value
                 };
             }
             else

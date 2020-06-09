@@ -20,7 +20,7 @@ namespace CommunicationService.AzureFunction
         }
 
         [FunctionName("ProcessJobQueue")]
-        public void Run([ServiceBusTrigger("job", Connection = "AzureWebJobsStorage")]string myQueueItem, ILogger log)
+        public void Run([ServiceBusTrigger("job", Connection = "ServiceBus")]string myQueueItem, ILogger log)
         {
 
             SendCommunicationRequest sendCommunicationRequest = JsonConvert.DeserializeObject<SendCommunicationRequest>(myQueueItem);
@@ -31,6 +31,7 @@ namespace CommunicationService.AzureFunction
             {
                 _messageFactory.AddToMessageQueueAsync(new SendMessageRequest()
                 {
+                    MessageID = "",
                     CommunicationJobType = sendCommunicationRequest.CommunicationJob.CommunicationJobType,
                     TemplateID = item.Value,
                     RecipientUserID = item.Key,

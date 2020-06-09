@@ -100,5 +100,19 @@ namespace CommunicationService.UserService
             }
             return result;
         }
+
+        public async Task<GetIncompleteRegistrationStatusResponse> GetIncompleteRegistrationStatusAsync()
+        {
+            string path = $"api/GetIncompleteRegistrationStatus";
+            GetIncompleteRegistrationStatusResponse incompleteRegistrationStatusResponse;
+            
+            using (HttpResponseMessage response = await _httpClientWrapper.GetAsync(HttpClientConfigName.UserService, path,CancellationToken.None).ConfigureAwait(false))
+            {
+                response.EnsureSuccessStatusCode();
+                string content = await response.Content.ReadAsStringAsync();
+                incompleteRegistrationStatusResponse = JsonConvert.DeserializeObject<GetIncompleteRegistrationStatusResponse>(content);
+            }
+            return incompleteRegistrationStatusResponse;
+        }
     }
 }

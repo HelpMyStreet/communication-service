@@ -58,9 +58,10 @@ namespace CommunicationService.MessageService
             {
                 return new EmailBuildData()
                 {
-                    BaseDynamicData = new NewTaskNotification(recipientUserId.Value, user.UserPersonalDetails.FirstName, user.UserPersonalDetails.LastName, job.SupportActivity),
+                    BaseDynamicData = new NewTaskNotificationData(recipientUserId.Value, user.UserPersonalDetails.FirstName, user.UserPersonalDetails.LastName, job.SupportActivity),
                     EmailToAddress = user.UserPersonalDetails.EmailAddress,
-                    EmailToName = user.UserPersonalDetails.DisplayName
+                    EmailToName = user.UserPersonalDetails.DisplayName,
+                    RecipientUserID = recipientUserId.Value
                 };
             }
             throw new Exception("unable to retrive user details");

@@ -73,19 +73,19 @@ namespace CommunicationService.EmailService
             return await SendEmail(sendEmailToUsersRequest, Users);  
         }
 
-        public async Task<bool> SendDynamicEmail(string templateId,EmailBuildData sendGridData)
+        public async Task<bool> SendDynamicEmail(string templateId,EmailBuildData emailBuildData)
         {
             var apiKey = _sendGridConfig.Value.ApiKey;
             if (apiKey == string.Empty)
             {
                 throw new Exception("SendGrid Api Key missing.");
             }
-            sendGridData.EmailToAddress = "jawwad.mukhtar@gmail.com";
+            emailBuildData.EmailToAddress = "jawwad.mukhtar@gmail.com";
             var client = new SendGridClient(apiKey);
             Personalization personalization = new Personalization()
             {
-                Tos = new List<EmailAddress>() { new EmailAddress(sendGridData.EmailToAddress,sendGridData.EmailToName) },
-                TemplateData = sendGridData.BaseDynamicData
+                Tos = new List<EmailAddress>() { new EmailAddress(emailBuildData.EmailToAddress,emailBuildData.EmailToName) },
+                TemplateData = emailBuildData.BaseDynamicData
             };
 
             var eml = new SendGridMessage()
@@ -95,6 +95,11 @@ namespace CommunicationService.EmailService
                 Personalizations = new List<Personalization>()
                 {
                     personalization
+                },
+                CustomArgs = new Dictionary<string, string>
+                {
+                    { "TemplateId", templateId },
+                    { "RecipientUserID",emailBuildData.RecipientUserID.ToString() }
                 }
             };
 

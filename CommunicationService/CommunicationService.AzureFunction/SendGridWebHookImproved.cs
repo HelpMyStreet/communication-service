@@ -9,10 +9,7 @@ using CommunicationService.Core.Interfaces.Repositories;
 using Newtonsoft.Json;
 using System.IO;
 using System.Dynamic;
-using CommunicationService.Core;
 using System.Collections.Generic;
-using System.Linq;
-using Microsoft.Azure.Cosmos.Linq;
 
 namespace CommunicationService.AzureFunction
 {

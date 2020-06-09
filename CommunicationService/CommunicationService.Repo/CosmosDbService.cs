@@ -20,11 +20,6 @@ namespace CommunicationService.Repo
             this._container = dbClient.GetContainer(databaseName, containerName);
         }
 
-        public async Task AddItemAsync(CosmosData item)
-        {
-            await this._container.CreateItemAsync(item);
-        }
-
         public async Task AddItemAsync(ExpandoObject item)
         {
             await this._container.CreateItemAsync(item);

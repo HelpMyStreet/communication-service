@@ -31,6 +31,8 @@ namespace CommunicationService.MessageService
                     return new WelcomeMessage(_connectUserService);
                 case CommunicationJobTypes.SendNewTaskNotification:
                     return new NewTaskNotificationMessage(_connectUserService,_connectRequestService);
+                case CommunicationJobTypes.SendRegistrationChasers:
+                    return new RegistrationChasers(_connectUserService);
                 default:
                     throw new Exception("Unknown Email Type");
 
@@ -45,6 +47,8 @@ namespace CommunicationService.MessageService
                     return new WelcomeMessage(_connectUserService);
                 case CommunicationJobTypes.SendNewTaskNotification:
                     return new NewTaskNotificationMessage(_connectUserService, _connectRequestService);
+                case CommunicationJobTypes.SendRegistrationChasers:
+                    return new RegistrationChasers(_connectUserService);
                 default:
                     throw new Exception("Unknown Email Type");
 
