@@ -20,6 +20,14 @@ namespace CommunicationService.MessageService
             }
         }
 
+        public string MessageId
+        {
+            get
+            {
+                return "2";
+            }
+        }
+
         public WelcomeMessage(IConnectUserService connectUserService)
         {
             _connectUserService = connectUserService;

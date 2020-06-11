@@ -12,7 +12,5 @@ namespace CommunicationService.Core.Interfaces.Services
         Task<bool> SendEmailToUser(SendEmailToUserRequest sendEmailToUserRequest);
 
         Task<bool> SendEmailToUsers(SendEmailToUsersRequest sendEmailToUsersRequest);
-
-        Task<bool> SendDynamicEmail(string templateId,EmailBuildData sendGridData);
     }
 }

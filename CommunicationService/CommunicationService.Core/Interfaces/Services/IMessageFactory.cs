@@ -6,7 +6,7 @@ namespace CommunicationService.Core.Interfaces.Services
 {
 	public interface IMessageFactory
 	{
-		IMessage Create(SendCommunicationRequest sendCommunicationRequest);
+		IMessage Create(RequestCommunicationRequest requestCommunicationRequest);
 
 		IMessage Create(SendMessageRequest sendMessageRequest);
 

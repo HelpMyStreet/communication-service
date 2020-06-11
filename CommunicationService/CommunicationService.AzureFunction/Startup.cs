@@ -1,5 +1,4 @@
 ﻿using AutoMapper;
-using CommunicationService.Core;
 using CommunicationService.Core.Configuration;
 using CommunicationService.Core.Interfaces.Repositories;
 using CommunicationService.Core.Interfaces.Services;
@@ -10,6 +9,7 @@ using CommunicationService.Mappers;
 using CommunicationService.MessageService;
 using CommunicationService.Repo;
 using CommunicationService.RequestService;
+using CommunicationService.SendGridService;
 using CommunicationService.UserService;
 using MediatR;
 using Microsoft.Azure.Functions.Extensions.DependencyInjection;
@@ -24,8 +24,6 @@ using System.Collections.Generic;
 using System.Net;
 using System.Net.Http;
 using System.Net.Http.Headers;
-using System.Reflection;
-using System.Threading.Tasks;
 
 [assembly: FunctionsStartup(typeof(CommunicationService.AzureFunction.Startup))]
 namespace CommunicationService.AzureFunction
@@ -83,9 +81,11 @@ namespace CommunicationService.AzureFunction
             builder.Services.AddSingleton<IQueueClient>(new QueueClient(serviceBusConfig.ConnectionString, serviceBusConfig.MessageQueueName));
 
             builder.Services.AddSingleton<IMessageFactory, MessageFactory>();
+            //builder.Services.AddSingleton<IConnectSendGridService, SendGridService>();
             builder.Services.AddSingleton<ISendEmailService, SendEmailService>();
             builder.Services.AddSingleton<IConnectUserService, ConnectUserService>();
             builder.Services.AddSingleton<IConnectRequestService, ConnectRequestService>();
+            builder.Services.AddSingleton<IConnectSendGridService, ConnectSendGridService>();
 
             builder.Services.AddDbContext<ApplicationDbContext>(options =>
                    options.UseInMemoryDatabase(databaseName: "CommunicationService.AzureFunction"));

@@ -10,8 +10,7 @@ namespace CommunicationService.Core.Domains
     {
         public CommunicationJobTypes CommunicationJobType { get; set; }
         public MessageTypes MessageType { get; set; }
-        public string MessageID { get; set; }
-        public string TemplateID { get; set; }
+        public string TemplateName { get; set; }
         public int RecipientUserID { get; set; }
         public int? JobID { get; set; }
         public int? GroupID { get; set; }

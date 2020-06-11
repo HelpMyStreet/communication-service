@@ -73,43 +73,6 @@ namespace CommunicationService.EmailService
             return await SendEmail(sendEmailToUsersRequest, Users);  
         }
 
-        public async Task<bool> SendDynamicEmail(string templateId,EmailBuildData emailBuildData)
-        {
-            var apiKey = _sendGridConfig.Value.ApiKey;
-            if (apiKey == string.Empty)
-            {
-                throw new Exception("SendGrid Api Key missing.");
-            }
-            emailBuildData.EmailToAddress = "jawwad.mukhtar@gmail.com";
-            var client = new SendGridClient(apiKey);
-            Personalization personalization = new Personalization()
-            {
-                Tos = new List<EmailAddress>() { new EmailAddress(emailBuildData.EmailToAddress,emailBuildData.EmailToName) },
-                TemplateData = emailBuildData.BaseDynamicData
-            };
-
-            var eml = new SendGridMessage()
-            {
-                From = new EmailAddress(_sendGridConfig.Value.FromEmail, _sendGridConfig.Value.FromName),
-                TemplateId = templateId,
-                Personalizations = new List<Personalization>()
-                {
-                    personalization
-                },
-                CustomArgs = new Dictionary<string, string>
-                {
-                    { "TemplateId", templateId },
-                    { "RecipientUserID",emailBuildData.RecipientUserID.ToString() }
-                }
-            };
-
-            Response response = await client.SendEmailAsync(eml);
-            if (response.StatusCode == HttpStatusCode.OK || response.StatusCode == HttpStatusCode.Accepted)
-                return true;
-            else
-                return false;
-        }
-
         private async Task<bool> SendEmail(SendEmailToUsersRequest sendEmailToUsersRequest, List<User> Users)
         {            
             var apiKey = _sendGridConfig.Value.ApiKey;

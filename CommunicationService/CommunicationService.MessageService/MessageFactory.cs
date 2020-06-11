@@ -1,11 +1,13 @@
 ﻿using CommunicationService.Core.Domains;
 using CommunicationService.Core.Interfaces;
+using CommunicationService.Core.Interfaces.Repositories;
 using CommunicationService.Core.Interfaces.Services;
 using HelpMyStreet.Contracts.CommunicationService.Request;
 using HelpMyStreet.Contracts.RequestService.Response;
 using Microsoft.Azure.ServiceBus;
 using Newtonsoft.Json;
 using System;
+using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -16,39 +18,35 @@ namespace CommunicationService.MessageService
         private readonly IConnectUserService _connectUserService;
         private readonly IConnectRequestService _connectRequestService;
         private readonly IQueueClient _queueClient;
+        private readonly ICosmosDbService _cosmosDbService;
 
-        public MessageFactory(IConnectUserService connectUserService, IConnectRequestService connectRequestService, IQueueClient queueClient)
+        public MessageFactory(IConnectUserService connectUserService, IConnectRequestService connectRequestService, IQueueClient queueClient, ICosmosDbService cosmosDbService)
         {
             _connectUserService = connectUserService;
             _connectRequestService = connectRequestService;
             _queueClient = queueClient;
+            _cosmosDbService = cosmosDbService;
         }
-        public IMessage Create(SendCommunicationRequest sendCommunicationRequest)
+        public IMessage Create(RequestCommunicationRequest sendCommunicationRequest)
         {
-            switch (sendCommunicationRequest.CommunicationJob.CommunicationJobType)
-            {
-                case CommunicationJobTypes.SendWelcomeMessage:
-                    return new WelcomeMessage(_connectUserService);
-                case CommunicationJobTypes.SendNewTaskNotification:
-                    return new NewTaskNotificationMessage(_connectUserService,_connectRequestService);
-                case CommunicationJobTypes.SendRegistrationChasers:
-                    return new RegistrationChasers(_connectUserService);
-                default:
-                    throw new Exception("Unknown Email Type");
-
-            }
+            return GetMessage(sendCommunicationRequest.CommunicationJob.CommunicationJobType);
         }
 
         public IMessage Create(SendMessageRequest sendMessageRequest)
         {
-            switch (sendMessageRequest.CommunicationJobType)
+            return GetMessage(sendMessageRequest.CommunicationJobType);
+        }
+
+        private IMessage GetMessage(CommunicationJobTypes communicationJobTypes)
+        {
+            switch (communicationJobTypes)
             {
                 case CommunicationJobTypes.SendWelcomeMessage:
                     return new WelcomeMessage(_connectUserService);
                 case CommunicationJobTypes.SendNewTaskNotification:
                     return new NewTaskNotificationMessage(_connectUserService, _connectRequestService);
                 case CommunicationJobTypes.SendRegistrationChasers:
-                    return new RegistrationChasers(_connectUserService);
+                    return new RegistrationChasers(_connectUserService,_cosmosDbService);
                 default:
                     throw new Exception("Unknown Email Type");
 

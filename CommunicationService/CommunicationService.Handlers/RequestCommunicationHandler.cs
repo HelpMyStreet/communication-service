@@ -12,29 +12,28 @@ using CommunicationService.Core.Interfaces.Services;
 
 namespace CommunicationService.Handlers
 {
-    public class SendCommunicationHandler : IRequestHandler<SendCommunicationRequest,SendCommunicationResponse>
+    public class RequestCommunicationHandler : IRequestHandler<RequestCommunicationRequest,RequestCommunicationResponse>
     {
         static IQueueClient _queueClient;
         private readonly IOptions<ServiceBusConfig> _serviceBusConfig;
 
-        public SendCommunicationHandler(IQueueClient queueClient, IOptions<ServiceBusConfig> serviceBusConfig)
+        public RequestCommunicationHandler(IQueueClient queueClient, IOptions<ServiceBusConfig> serviceBusConfig)
         {
             _queueClient = queueClient;
             _serviceBusConfig = serviceBusConfig;
             _queueClient = new QueueClient(_serviceBusConfig.Value.ConnectionString, _serviceBusConfig.Value.JobQueueName);
-
         }
 
-        public async Task<SendCommunicationResponse> Handle(SendCommunicationRequest request, CancellationToken cancellationToken)
+        public async Task<RequestCommunicationResponse> Handle(RequestCommunicationRequest request, CancellationToken cancellationToken)
         {
             await SendMessagesAsync(request);
-            return new SendCommunicationResponse()
+            return new RequestCommunicationResponse()
             {
                 Success = true
             };
         }
 
-        private async Task SendMessagesAsync(SendCommunicationRequest sendCommunicationRequest)
+        private async Task SendMessagesAsync(RequestCommunicationRequest sendCommunicationRequest)
         {
             string messageBody = JsonConvert.SerializeObject(sendCommunicationRequest);
             var message = new Message(Encoding.UTF8.GetBytes(messageBody));

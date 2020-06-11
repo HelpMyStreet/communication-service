@@ -1,11 +1,13 @@
 ﻿using CommunicationService.Core.Domains;
 using CommunicationService.Core.Interfaces;
+using CommunicationService.Core.Interfaces.Repositories;
 using CommunicationService.Core.Interfaces.Services;
 using CommunicationService.MessageService.Substitution;
 using HelpMyStreet.Contracts.UserService.Response;
 using Polly.Caching;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -14,19 +16,15 @@ namespace CommunicationService.MessageService
     public class RegistrationChasers : IMessage
     {
         private readonly IConnectUserService _connectUserService;
+        private readonly ICosmosDbService _cosmosDbService;
         private const int REGISTRATION_STEP4 = 4;
-        private const string TEMPLATEID_PLEASEVERIFY = "d-c720b30757354dc0b2cb6f02195afcaa";
+        private const string TEMPLATENAME_PLEASEVERIFY = "PleaseVerify";
+        private const string TEMPLATENAME_INCOMPLETEREGISTRATION = "IncompleteRegistration";
 
-        public RegistrationChasers(IConnectUserService connectUserService)
+        public RegistrationChasers(IConnectUserService connectUserService, ICosmosDbService cosmosDbService)
         {
             _connectUserService = connectUserService;
-        }
-        public string TemplateId
-        {
-            get
-            {
-                return "d-0a0f3568847142d4ace58330522a6cf6";
-            }
+            _cosmosDbService = cosmosDbService;
         }
 
         public Dictionary<int, string> IdentifyRecipients(int? recipientUserId, int? jobId, int? groupId)
@@ -38,13 +36,28 @@ namespace CommunicationService.MessageService
             {
                 foreach(UserRegistrationStep u in users.Users)
                 {
-                    if(u.RegistrationStep==REGISTRATION_STEP4)
-                    {
-                        if (result.Count < 2)
+                    //if (u.RegistrationStep==REGISTRATION_STEP4)
+                    //{
+                    //    if (result.Count < 1)
+                    //    {
+                    //        List<EmailHistory> history = _cosmosDbService.GetEmailHistory(TEMPLATENAME_PLEASEVERIFY, u.UserId.ToString()).Result;
+                    //        if (history.Count == 0)
+                    //        {
+                    //            result.Add(u.UserId, TEMPLATENAME_PLEASEVERIFY);
+                    //        }
+                    //    }
+                    //}
+                    //else
+                    //{
+                        if (result.Count < 1)
                         {
-                            result.Add(u.UserId, TEMPLATEID_PLEASEVERIFY);
+                            List<EmailHistory> history = _cosmosDbService.GetEmailHistory(TEMPLATENAME_INCOMPLETEREGISTRATION, u.UserId.ToString()).Result;
+                            if (history.Count == 0)
+                            {
+                                result.Add(u.UserId, TEMPLATENAME_INCOMPLETEREGISTRATION);
+                            }
                         }
-                    }
+                    //}
                 }
             }
             return result;

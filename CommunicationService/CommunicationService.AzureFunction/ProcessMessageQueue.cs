@@ -2,7 +2,6 @@ using CommunicationService.Core.Domains;
 using CommunicationService.Core.Interfaces;
 using CommunicationService.Core.Interfaces.Repositories;
 using CommunicationService.Core.Interfaces.Services;
-using HelpMyStreet.Contracts.CommunicationService.Request;
 using Microsoft.Azure.WebJobs;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
@@ -14,14 +13,14 @@ namespace CommunicationService.AzureFunction
     public class ProcessMessageQueue
     {
         private readonly IMessageFactory _messageFactory;
-        private readonly ISendEmailService _sendEmailService;
         private readonly ICosmosDbService _cosmosDbService;
+        private readonly IConnectSendGridService _connectSendGridService;
 
-        public ProcessMessageQueue(IMessageFactory messageFactory, ISendEmailService sendEmailService, ICosmosDbService cosmosDbService)
+        public ProcessMessageQueue(IMessageFactory messageFactory,ICosmosDbService cosmosDbService, IConnectSendGridService connectSendGridService)
         {
             _messageFactory = messageFactory;
-            _sendEmailService = sendEmailService;
             _cosmosDbService = cosmosDbService;
+            _connectSendGridService = connectSendGridService;
         }
 
         [FunctionName("ProcessMessageQueue")]
@@ -29,25 +28,31 @@ namespace CommunicationService.AzureFunction
         {
             SendMessageRequest sendMessageRequest = JsonConvert.DeserializeObject<SendMessageRequest>(myQueueItem);
             IMessage message = _messageFactory.Create(sendMessageRequest);
-            EmailBuildData sendGridData = message.PrepareTemplateData(sendMessageRequest.RecipientUserID, sendMessageRequest.JobID, sendMessageRequest.GroupID).Result;
-
-            _sendEmailService.SendDynamicEmail(sendMessageRequest.TemplateID, sendGridData);
+            EmailBuildData emailBuildData = message.PrepareTemplateData(sendMessageRequest.RecipientUserID, sendMessageRequest.JobID, sendMessageRequest.GroupID).Result;
+            _connectSendGridService.SendDynamicEmail(sendMessageRequest.TemplateName, emailBuildData);
             AddCommunicationRequestToCosmos(sendMessageRequest);
             log.LogInformation($"C# ServiceBus queue trigger function processed message: {myQueueItem}");
         }
 
         private void AddCommunicationRequestToCosmos(SendMessageRequest sendMessageRequest)
         {
-            dynamic message;
+            try
+            {
+                dynamic message;
 
-            message = new ExpandoObject();
-            message.id = Guid.NewGuid();
-            message.TemplateId = sendMessageRequest.TemplateID;
-            message.RecipientUserID = sendMessageRequest.RecipientUserID;
-            message.JobID = sendMessageRequest.JobID;
-            message.GroupID = sendMessageRequest.GroupID;
-            message.CommunicationJob = sendMessageRequest.CommunicationJobType;
-            _cosmosDbService.AddItemAsync(message);
+                message = new ExpandoObject();
+                message.id = Guid.NewGuid();
+                message.TemplateName = sendMessageRequest.TemplateName;
+                message.RecipientUserID = sendMessageRequest.RecipientUserID;
+                message.JobID = sendMessageRequest.JobID;
+                message.GroupID = sendMessageRequest.GroupID;
+                message.CommunicationJob = sendMessageRequest.CommunicationJobType;
+                _cosmosDbService.AddItemAsync(message);
+            }
+            catch(Exception exc)
+            {
+                string m = exc.ToString();
+            }
         }
     }
 }

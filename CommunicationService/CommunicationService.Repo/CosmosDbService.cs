@@ -1,4 +1,5 @@
 ﻿using CommunicationService.Core;
+using CommunicationService.Core.Domains;
 using CommunicationService.Core.Interfaces.Repositories;
 using Microsoft.Azure.Cosmos;
 using System.Collections.Generic;
@@ -43,6 +44,22 @@ namespace CommunicationService.Repo
         {
             var query = this._container.GetItemQueryIterator<object>(new QueryDefinition(queryString));
             List<object> results = new List<object>();
+            while (query.HasMoreResults)
+            {
+                var response = await query.ReadNextAsync();
+
+                results.AddRange(response.ToList());
+            }
+
+            return results;
+        }
+
+        public async Task<List<EmailHistory>> GetEmailHistory(string templateName, string recipientId)
+        {
+            //string queryString = $"SELECT udf.convertTime(c._ts) as LastSent FROM c where c.TemplateId = '{templateId}' and c.RecipientUserID = '{recipientId}'";
+            string queryString = $"SELECT udf.convertTime(c._ts) as LastSent FROM c where c.TemplateName = '{templateName}' and c.RecipientUserID = {recipientId}";
+            var query = this._container.GetItemQueryIterator<EmailHistory>(new QueryDefinition(queryString));
+            List<EmailHistory> results = new List<EmailHistory>();
             while (query.HasMoreResults)
             {
                 var response = await query.ReadNextAsync();

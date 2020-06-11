@@ -22,8 +22,7 @@ namespace CommunicationService.AzureFunction
         [FunctionName("ProcessJobQueue")]
         public void Run([ServiceBusTrigger("job", Connection = "ServiceBus")]string myQueueItem, ILogger log)
         {
-
-            SendCommunicationRequest sendCommunicationRequest = JsonConvert.DeserializeObject<SendCommunicationRequest>(myQueueItem);
+            RequestCommunicationRequest sendCommunicationRequest = JsonConvert.DeserializeObject<RequestCommunicationRequest>(myQueueItem);
             IMessage message = _messageFactory.Create(sendCommunicationRequest);
             Dictionary<int, string> recipients = message.IdentifyRecipients(sendCommunicationRequest.RecipientUserID, sendCommunicationRequest.JobID, sendCommunicationRequest.GroupID);
 
@@ -31,9 +30,8 @@ namespace CommunicationService.AzureFunction
             {
                 _messageFactory.AddToMessageQueueAsync(new SendMessageRequest()
                 {
-                    MessageID = "",
                     CommunicationJobType = sendCommunicationRequest.CommunicationJob.CommunicationJobType,
-                    TemplateID = item.Value,
+                    TemplateName = item.Value,
                     RecipientUserID = item.Key,
                     MessageType = MessageTypes.Email
                 });

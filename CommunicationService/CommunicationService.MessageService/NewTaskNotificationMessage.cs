@@ -28,6 +28,14 @@ namespace CommunicationService.MessageService
             }
         }
 
+        public string MessageId
+        {
+            get
+            {
+                return "2";
+            }
+        }
+
         public Dictionary<int,string> IdentifyRecipients(int? recipientUserId, int? jobId, int? groupId)
         {
             Dictionary<int,string> recipients = new Dictionary<int, string>();

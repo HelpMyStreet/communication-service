@@ -14,33 +14,33 @@ using Microsoft.AspNetCore.Http;
 
 namespace CommunicationService.AzureFunction
 {
-    public class SendCommunication
+    public class RequestCommunication
     {
         private readonly IMediator _mediator;
 
-        public SendCommunication(IMediator mediator)
+        public RequestCommunication(IMediator mediator)
         {
             _mediator = mediator;
         }
 
-        [FunctionName("SendCommunication")]
-        [ProducesResponseType((int)HttpStatusCode.OK, Type = typeof(SendCommunicationResponse))]
+        [FunctionName("RequestCommunication")]
+        [ProducesResponseType((int)HttpStatusCode.OK, Type = typeof(RequestCommunicationResponse))]
         public async Task<IActionResult> Run(
             [HttpTrigger(AuthorizationLevel.Function, "post", Route = null)]
-            [RequestBodyType(typeof(SendCommunicationRequest), "product request")] SendCommunicationRequest req,
+            [RequestBodyType(typeof(RequestCommunicationRequest), "product request")] RequestCommunicationRequest req,
             ILogger log)
         {
             try
             {
                 log.LogInformation("C# HTTP trigger function processed a request.");
 
-                SendCommunicationResponse response = await _mediator.Send(req);
-                return new OkObjectResult(ResponseWrapper<SendCommunicationResponse, CommunicationServiceErrorCode>.CreateSuccessfulResponse(response));
+                RequestCommunicationResponse response = await _mediator.Send(req);
+                return new OkObjectResult(ResponseWrapper<RequestCommunicationResponse, CommunicationServiceErrorCode>.CreateSuccessfulResponse(response));
             }
             catch (Exception exc)
             {
-                log.LogError("Exception occured in Send Email", exc);
-                return new ObjectResult(ResponseWrapper<SendCommunicationResponse, CommunicationServiceErrorCode>.CreateUnsuccessfulResponse(CommunicationServiceErrorCode.InternalServerError, "Internal Error")) { StatusCode = StatusCodes.Status500InternalServerError };
+                log.LogError("Exception occured in Request Communication", exc);
+                return new ObjectResult(ResponseWrapper<RequestCommunicationResponse, CommunicationServiceErrorCode>.CreateUnsuccessfulResponse(CommunicationServiceErrorCode.InternalServerError, "Internal Error")) { StatusCode = StatusCodes.Status500InternalServerError };
             }
         }
     }
