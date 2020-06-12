@@ -1,7 +1,6 @@
 ﻿using CommunicationService.Core.Domains;
 using CommunicationService.Core.Interfaces.Repositories;
 using CommunicationService.Repo;
-using CommunicationService.SendGridManagement.Models;
 using Newtonsoft.Json;
 using System.Collections.Generic;
 using System.IO;
@@ -12,6 +11,7 @@ using SendGrid;
 using System.Net;
 using System.Dynamic;
 using System.Threading.Tasks;
+using CommunicationService.Core.Domains.SendGrid;
 
 namespace CommunicationService.SendGridManagement
 {

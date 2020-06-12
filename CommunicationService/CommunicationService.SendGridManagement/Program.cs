@@ -1,14 +1,6 @@
-﻿using CommunicationService.Core.Domains;
-using CommunicationService.Core.Interfaces.Repositories;
-using CommunicationService.Repo;
-using CommunicationService.SendGridManagement.Configuration;
-using CommunicationService.SendGridManagement.Models;
+﻿using CommunicationService.SendGridManagement.Configuration;
 using Microsoft.Extensions.Configuration;
-using Newtonsoft.Json;
 using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
 using System.Threading.Tasks;
 
 namespace CommunicationService.SendGridManagement

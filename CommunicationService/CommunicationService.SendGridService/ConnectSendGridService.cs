@@ -1,7 +1,7 @@
 ﻿using CommunicationService.Core.Configuration;
 using CommunicationService.Core.Domains;
+using CommunicationService.Core.Domains.SendGrid;
 using CommunicationService.Core.Interfaces.Services;
-using CommunicationService.SendGridService.Models;
 using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
 using SendGrid;

@@ -5,31 +5,11 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <None Remove="Emails\IncompleteRegistration.html" />
-    <None Remove="Emails\PleaseVerify.html" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <EmbeddedResource Include="Emails\IncompleteRegistration.html">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Emails\PleaseVerify.html">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </EmbeddedResource>
-  </ItemGroup>
-
-  <ItemGroup>
     <PackageReference Include="SendGrid" Version="9.14.0" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\CommunicationService.Core\CommunicationService.Core.csproj" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <None Update="Migrations\20200612_084300_InitialCreate.json">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
   </ItemGroup>
 
 </Project>
