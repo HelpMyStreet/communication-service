@@ -2,9 +2,8 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace CommunicationService.SendGridService.Models
+namespace CommunicationService.Core.Domains.SendGrid
 {
-
     public class Template
     {
         public string id { get; set; }

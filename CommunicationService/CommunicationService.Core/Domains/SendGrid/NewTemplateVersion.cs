@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace CommunicationService.SendGridManagement.Models
+namespace CommunicationService.Core.Domains.SendGrid
 {
     public class NewTemplateVersion
     {

@@ -6,10 +6,18 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Remove="Emails\IncompleteRegistration.html" />
+    <None Remove="Emails\PleaseVerify.html" />
     <None Remove="Emails\Test.html" />
   </ItemGroup>
 
   <ItemGroup>
+    <EmbeddedResource Include="Emails\IncompleteRegistration.html">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Emails\PleaseVerify.html">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </EmbeddedResource>
     <EmbeddedResource Include="Emails\Test.html">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </EmbeddedResource>
