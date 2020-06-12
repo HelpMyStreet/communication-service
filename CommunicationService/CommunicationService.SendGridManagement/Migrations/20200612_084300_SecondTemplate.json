@@ -1,0 +1,9 @@
+﻿{
+  "Templates": [
+    {
+      "name": "Test",
+      "subject": "NO ACTION REQUIRED: TestEmail",
+      "generation": "dynamic"
+    }
+  ]
+}

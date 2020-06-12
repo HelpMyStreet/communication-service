@@ -26,4 +26,10 @@
     <ProjectReference Include="..\CommunicationService.Core\CommunicationService.Core.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <None Update="Migrations\20200612_084300_InitialCreate.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
 </Project>

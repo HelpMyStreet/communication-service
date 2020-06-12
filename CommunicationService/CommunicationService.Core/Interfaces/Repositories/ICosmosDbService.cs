@@ -11,5 +11,6 @@ namespace CommunicationService.Core.Interfaces.Repositories
         Task<object> GetItemAsync(string id);
         Task AddItemAsync(ExpandoObject item);
         Task<List<EmailHistory>> GetEmailHistory(string templateId, string recipientId);
+        Task<List<MigrationHistory>> GetMigrationHistory();
     }
 }
