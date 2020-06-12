@@ -36,28 +36,24 @@ namespace CommunicationService.MessageService
             {
                 foreach(UserRegistrationStep u in users.Users)
                 {
-                    //if (u.RegistrationStep==REGISTRATION_STEP4)
-                    //{
-                    //    if (result.Count < 1)
-                    //    {
-                    //        List<EmailHistory> history = _cosmosDbService.GetEmailHistory(TEMPLATENAME_PLEASEVERIFY, u.UserId.ToString()).Result;
-                    //        if (history.Count == 0)
-                    //        {
-                    //            result.Add(u.UserId, TEMPLATENAME_PLEASEVERIFY);
-                    //        }
-                    //    }
-                    //}
-                    //else
-                    //{
-                        if (result.Count < 1)
+                    if (u.RegistrationStep == REGISTRATION_STEP4)
+                    {
+                        List<EmailHistory> history = _cosmosDbService.GetEmailHistory(TEMPLATENAME_PLEASEVERIFY, u.UserId.ToString()).Result;
+                        if (history.Count == 0)
                         {
-                            List<EmailHistory> history = _cosmosDbService.GetEmailHistory(TEMPLATENAME_INCOMPLETEREGISTRATION, u.UserId.ToString()).Result;
-                            if (history.Count == 0)
-                            {
-                                result.Add(u.UserId, TEMPLATENAME_INCOMPLETEREGISTRATION);
-                            }
+                            result.Add(u.UserId, TEMPLATENAME_PLEASEVERIFY);
+                            return result;
                         }
-                    //}
+                    }
+                    else
+                    {
+                        List<EmailHistory> history = _cosmosDbService.GetEmailHistory(TEMPLATENAME_INCOMPLETEREGISTRATION, u.UserId.ToString()).Result;
+                        if (history.Count == 0)
+                        {
+                            result.Add(u.UserId, TEMPLATENAME_INCOMPLETEREGISTRATION);
+                            return result;
+                        }
+                    }
                 }
             }
             return result;

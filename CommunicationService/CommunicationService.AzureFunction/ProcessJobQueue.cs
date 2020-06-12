@@ -33,6 +33,8 @@ namespace CommunicationService.AzureFunction
                     CommunicationJobType = sendCommunicationRequest.CommunicationJob.CommunicationJobType,
                     TemplateName = item.Value,
                     RecipientUserID = item.Key,
+                    JobID = sendCommunicationRequest.JobID,
+                    GroupID = sendCommunicationRequest.GroupID,
                     MessageType = MessageTypes.Email
                 });
             }

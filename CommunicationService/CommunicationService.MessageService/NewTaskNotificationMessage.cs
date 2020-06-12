@@ -5,6 +5,7 @@ using CommunicationService.MessageService.Substitution;
 using HelpMyStreet.Contracts.UserService.Response;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -14,26 +15,11 @@ namespace CommunicationService.MessageService
     {
         private readonly IConnectUserService _connectUserService;
         private readonly IConnectRequestService _connectRequestService;
+        private const string TEMPLATENAME = "TaskNotification";
         public NewTaskNotificationMessage(IConnectUserService connectUserService, IConnectRequestService connectRequestService)
         {
             _connectUserService = connectUserService;
             _connectRequestService = connectRequestService;
-        }
-
-        public string TemplateId
-        {
-            get
-            {
-                return "d-14a35071720e4a9fa0619c6891b3f108";
-            }
-        }
-
-        public string MessageId
-        {
-            get
-            {
-                return "2";
-            }
         }
 
         public Dictionary<int,string> IdentifyRecipients(int? recipientUserId, int? jobId, int? groupId)
@@ -50,7 +36,8 @@ namespace CommunicationService.MessageService
                 {
                     foreach(VolunteerSummary vs in volunteers.Volunteers)
                     {
-                        recipients.Add(vs.UserID, TemplateId);
+                        recipients.Add(vs.UserID, TEMPLATENAME);
+                        return recipients;
                     }
                 }
             }
@@ -61,17 +48,44 @@ namespace CommunicationService.MessageService
         {
             var job = _connectRequestService.GetJobDetailsAsync(jobId.Value).Result;
             var user = await _connectUserService.GetUserByIdAsync(recipientUserId.Value);
+            var volunteers = _connectUserService.GetHelpersByPostcodeAndTaskType
+                (
+                    job.PostCode,
+                    new List<HelpMyStreet.Utils.Enums.SupportActivities>() { job.SupportActivity },
+                    CancellationToken.None
+                ).Result;
 
-            if (user != null && job != null)
+            bool isStreetChampionForGivenPostCode = false;
+
+            if (volunteers != null)
             {
-                return new EmailBuildData()
+                var volunteer = volunteers.Volunteers.FirstOrDefault(x => x.UserID == user.ID);
+                if (volunteer != null)
                 {
-                    BaseDynamicData = new NewTaskNotificationData(recipientUserId.Value, user.UserPersonalDetails.FirstName, user.UserPersonalDetails.LastName, job.SupportActivity),
-                    EmailToAddress = user.UserPersonalDetails.EmailAddress,
-                    EmailToName = user.UserPersonalDetails.DisplayName,
-                    RecipientUserID = recipientUserId.Value
-                };
+                    isStreetChampionForGivenPostCode = volunteer.IsStreetChampionForGivenPostCode.Value;
+                }
+                if (user != null && job != null)
+                {
+                    return new EmailBuildData()
+                    {
+                        BaseDynamicData = new NewTaskNotificationData
+                        (
+                            recipientUserId.Value,
+                            user.UserPersonalDetails.FirstName,
+                            user.UserPersonalDetails.LastName,
+                            true,
+                            true,
+                            //user.IsVerified.HasValue? !user.IsVerified.Value : false,
+                            //isStreetChampionForGivenPostCode,
+                            job.SupportActivity
+                        ),
+                        EmailToAddress = user.UserPersonalDetails.EmailAddress,
+                        EmailToName = user.UserPersonalDetails.DisplayName,
+                        RecipientUserID = recipientUserId.Value
+                    };
+                }
             }
+           
             throw new Exception("unable to retrive user details");
         }
     }
