@@ -23,7 +23,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CommunicationService.Reques
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CommunicationService.SendGridService", "CommunicationService\CommunicationService.SendGridService\CommunicationService.SendGridService.csproj", "{5888975E-7362-441F-8A76-4BEE011125A2}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CommunicationService.SendGridManagement", "CommunicationService\CommunicationService.SendGridManagement\CommunicationService.SendGridManagement.csproj", "{20EDDF0F-4EFB-4C86-B745-93737B22A46A}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CommunicationService.SendGridManagement", "CommunicationService\CommunicationService.SendGridManagement\CommunicationService.SendGridManagement.csproj", "{20EDDF0F-4EFB-4C86-B745-93737B22A46A}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CommunicationService.UnitTests", "CommunicationService\CommunicationService.UnitTests\CommunicationService.UnitTests.csproj", "{FF609DE6-CA42-4F99-A1FE-53FDBD132DDA}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -75,6 +77,10 @@ Global
 		{20EDDF0F-4EFB-4C86-B745-93737B22A46A}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{20EDDF0F-4EFB-4C86-B745-93737B22A46A}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{20EDDF0F-4EFB-4C86-B745-93737B22A46A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{FF609DE6-CA42-4F99-A1FE-53FDBD132DDA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{FF609DE6-CA42-4F99-A1FE-53FDBD132DDA}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{FF609DE6-CA42-4F99-A1FE-53FDBD132DDA}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{FF609DE6-CA42-4F99-A1FE-53FDBD132DDA}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

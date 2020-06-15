@@ -19,6 +19,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
+using SendGrid;
 using System;
 using System.Collections.Generic;
 using System.Net;
@@ -75,6 +76,9 @@ namespace CommunicationService.AzureFunction
 
             IConfigurationSection sendGridConfigSettings = config.GetSection("SendGridConfig");
             builder.Services.Configure<SendGridConfig>(sendGridConfigSettings);
+            var sendGridConfig = config.GetSection("SendGridConfig").Get<SendGridConfig>();
+            builder.Services.AddSingleton<ISendGridClient>(new SendGridClient(sendGridConfig.ApiKey));
+
             builder.Services.AddTransient<IHttpClientWrapper, HttpClientWrapper>();
             builder.Services.AddMediatR(typeof(SendEmailHandler).Assembly);
             builder.Services.AddAutoMapper(typeof(AddressDetailsProfile).Assembly);
