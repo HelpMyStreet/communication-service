@@ -13,16 +13,16 @@ using System.Collections.Generic;
 
 namespace CommunicationService.AzureFunction
 {
-    public class SendGridWebHookImproved
+    public class SendGridWebHook
     {
         private readonly ICosmosDbService _cosmosDbService;
 
-        public SendGridWebHookImproved(ICosmosDbService cosmosDbService)
+        public SendGridWebHook(ICosmosDbService cosmosDbService)
         {
             _cosmosDbService = cosmosDbService;
         }
 
-        [FunctionName("SendGridWebHookImproved")]
+        [FunctionName("SendGridWebHook")]
         public async Task<IActionResult> Run(
             [HttpTrigger(AuthorizationLevel.Function, "post", Route = null)] HttpRequest req,
             ILogger log)
@@ -46,7 +46,7 @@ namespace CommunicationService.AzureFunction
             }
             catch (Exception exc)
             {
-                log.LogError($"Exception occured in SendGridWebHookImproved {exc}");
+                log.LogError($"Exception occured in SendGridWebHook {exc}");
                 return new BadRequestObjectResult(exc);
             }
         }

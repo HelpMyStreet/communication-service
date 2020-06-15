@@ -70,14 +70,13 @@ namespace CommunicationService.MessageService
                     {
                         BaseDynamicData = new NewTaskNotificationData
                         (
-                            recipientUserId.Value,
-                            user.UserPersonalDetails.FirstName,
-                            user.UserPersonalDetails.LastName,
-                            true,
-                            true,
-                            //user.IsVerified.HasValue? !user.IsVerified.Value : false,
-                            //isStreetChampionForGivenPostCode,
-                            job.SupportActivity
+                            Mapping.ActivityMappings[job.SupportActivity],
+                            job.PostCode,
+                            volunteer.DistanceInMiles,
+                            job.DueDate.ToString("dd/MM/yyyy"),
+                            user.IsVerified.HasValue ? !user.IsVerified.Value : false,
+                            isStreetChampionForGivenPostCode,
+                            job.HealthCritical
                         ),
                         EmailToAddress = user.UserPersonalDetails.EmailAddress,
                         EmailToName = user.UserPersonalDetails.DisplayName,

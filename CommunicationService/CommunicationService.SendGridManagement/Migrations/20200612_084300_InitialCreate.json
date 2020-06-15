@@ -1,10 +1,6 @@
 ﻿{
   "Templates": [
     {
-      "name": "TaskNotification",
-      "subject": "ACTION REQUIRED: A REQUEST FOR HELP has arrived via HelpMyStreet.org"
-    },
-    {
       "name": "IncompleteRegistration",
       "subject": "Your registration – Help My Street"
     },
