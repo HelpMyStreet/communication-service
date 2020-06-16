@@ -5,10 +5,12 @@
 	</PropertyGroup>
 	<ItemGroup>
 		<PackageReference Include="AzureFunctions.Extensions.Swashbuckle" Version="1.4.4" />
-		<PackageReference Include="HelpMyStreet.Contracts" Version="1.1.43" />
+		<PackageReference Include="HelpMyStreet.Contracts" Version="1.1.207" />
 		<PackageReference Include="Microsoft.Azure.Functions.Extensions" Version="1.0.0" />
 		<PackageReference Include="AutoMapper.Extensions.Microsoft.DependencyInjection" Version="7.0.0" />
 		<PackageReference Include="MediatR" Version="8.0.1" />
+		<PackageReference Include="Microsoft.Azure.WebJobs.Extensions.ServiceBus" Version="4.1.0" />
+		<PackageReference Include="Microsoft.Azure.WebJobs.Extensions.Storage" Version="3.0.10" />
 		<PackageReference Include="Microsoft.EntityFrameworkCore" Version="2.2.0" />
 		<PackageReference Include="Microsoft.EntityFrameworkCore.InMemory" Version="2.2.0" />
 		<PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="2.2.0" />
@@ -24,9 +26,12 @@
 		<ProjectReference ReplaceParameters="true" Include="..\CommunicationService.Mappers\CommunicationService.Mappers.csproj">
 			<Name>CommunicationService.Mappers</Name>
 		</ProjectReference>
+		<ProjectReference Include="..\CommunicationService.MessageService\CommunicationService.MessageService.csproj" />
 		<ProjectReference ReplaceParameters="true" Include="..\CommunicationService.Repo\CommunicationService.Repo.csproj">
 			<Name>CommunicationService.Repo</Name>
 		</ProjectReference>
+		<ProjectReference Include="..\CommunicationService.RequestService\CommunicationService.RequestService.csproj" />
+		<ProjectReference Include="..\CommunicationService.SendGridService\CommunicationService.SendGridService.csproj" />
 		<ProjectReference Include="..\CommunicationService.UserService\CommunicationService.UserService.csproj" />
 	</ItemGroup>
 	<ItemGroup>

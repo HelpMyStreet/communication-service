@@ -1,6 +1,6 @@
 ﻿using CommunicationService.Core.Configuration;
+using CommunicationService.Core.Domains;
 using CommunicationService.Core.Interfaces.Services;
-using CommunicationService.UserService;
 using HelpMyStreet.Contracts.CommunicationService.Request;
 using HelpMyStreet.Utils.Models;
 using Microsoft.Extensions.Options;
@@ -27,7 +27,7 @@ namespace CommunicationService.EmailService
 
         public async Task<bool> SendEmailToUser(SendEmailToUserRequest sendEmailToUserRequest)
         {
-            System.Collections.Generic.List<HelpMyStreet.Utils.Models.User> users = _connectUserService.PostUsersForListOfUserID(new System.Collections.Generic.List<int>()
+            List<User> users = _connectUserService.PostUsersForListOfUserID(new List<int>()
             {
                 sendEmailToUserRequest.ToUserID
             }).Result;
@@ -66,7 +66,7 @@ namespace CommunicationService.EmailService
             var DistinctUsers = UserIds.Distinct().ToList();
 
 
-            System.Collections.Generic.List<HelpMyStreet.Utils.Models.User> Users = _connectUserService
+            List<User> Users = _connectUserService
                 .PostUsersForListOfUserID(DistinctUsers)
                 .Result;
 
