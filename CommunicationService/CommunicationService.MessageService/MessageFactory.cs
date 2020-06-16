@@ -41,12 +41,6 @@ namespace CommunicationService.MessageService
         {
             switch (communicationJobTypes)
             {
-                case CommunicationJobTypes.SendWelcomeMessage:
-                    return new WelcomeMessage(_connectUserService);
-                case CommunicationJobTypes.SendNewTaskNotification:
-                    return new NewTaskNotificationMessage(_connectUserService, _connectRequestService);
-                case CommunicationJobTypes.SendRegistrationChasers:
-                    return new RegistrationChasers(_connectUserService,_cosmosDbService);
                 case CommunicationJobTypes.SendCompletedRegistration:
                     return new CompletedRegistrationMessage(_connectUserService, _cosmosDbService);
                 case CommunicationJobTypes.SendSuccessfulYoti:
