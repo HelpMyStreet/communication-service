@@ -12,31 +12,33 @@ using System.Net;
 using System.Dynamic;
 using System.Threading.Tasks;
 using CommunicationService.Core.Domains.SendGrid;
+using CommunicationService.Core.Interfaces;
+using CommunicationService.Core.Exception;
+using Remotion.Linq.Parsing;
 
 namespace CommunicationService.SendGridManagement
 {
     public class EmailTemplateUploader
     {
-        private CosmosConfig _cosmosConfig;
-        private SendGridConfig _sendGridConfig;
         private string _currentDirectory;
-        private ICosmosDbService _cosmosDbService;
+        private readonly ICosmosDbService _cosmosDbService;
+        private readonly ISendGridClient _sendGridClient;
+        private readonly IDirectoryService _directoryService;
 
 
-        public EmailTemplateUploader(CosmosConfig cosmosConfig, SendGridConfig sendGridConfig, string currentDirectory)
+        public EmailTemplateUploader(ISendGridClient sendGridClient, ICosmosDbService cosmosDbService, IDirectoryService directoryService, string currentDirectory)
         {
-            _cosmosConfig = cosmosConfig;
-            _sendGridConfig = sendGridConfig;
+            _sendGridClient = sendGridClient;
+            _cosmosDbService = cosmosDbService;
+            _directoryService = directoryService;
             _currentDirectory = currentDirectory;
         }
 
         public async Task Migrate()
         {
-            _cosmosDbService = InitializeCosmosClientInstance(_cosmosConfig);
             List<MigrationHistory> history = _cosmosDbService.GetMigrationHistory().Result;
 
-            var files = Directory.GetFiles($"{_currentDirectory}/Migrations");
-            foreach (string s in files)
+            foreach (string s in _directoryService.GetFiles($"{_currentDirectory}/Migrations"))
             {
                 string migrationName = Path.GetFileName(s);
                 if (history.FirstOrDefault(x => x.MigrationId == migrationName) == null)
@@ -49,22 +51,42 @@ namespace CommunicationService.SendGridManagement
 
         private async Task AddMigration(string fileName, string migrationName)
         {
-            var json = File.ReadAllText(fileName);
+            var json = _directoryService.ReadAllText(fileName);
             Templates templates = JsonConvert.DeserializeObject<Templates>(json);
-            foreach (Template template in templates.templates)
+            if (templates.templates?.Length > 0)
             {
-                var templateId = CreateNewTemplate(template);
-                bool success = CreateNewTemplateVersion(new NewTemplateVersion()
+                foreach (Template template in templates.templates)
                 {
-                    template_id = templateId,
-                    name = template.name,
-                    active = 1,
-                    html_content = GetEmailHtml(template.name),
-                    plain_content = "",
-                    subject = template.subject
+                    string templateId;
+                    try
+                    {
+                        templateId = await GetTemplateId(template.name);
+                    }
+                    catch (UnknownTemplateException)
+                    {
+                        templateId = CreateNewTemplate(template);
+                    }
+                    bool success = CreateNewTemplateVersion(new NewTemplateVersion()
+                    {
+                        template_id = templateId,
+                        name = template.versions[0].name,
+                        active = 1,
+                        html_content = GetEmailHtml(template.name),
+                        plain_content = "",
+                        subject = template.versions[0].subject
+                    }
+                    );
                 }
-                );
             }
+
+            if (templates.unsubscribeGroups?.Length > 0)
+            {
+                foreach (UnsubscribeGroups unsubscribeGroups in templates.unsubscribeGroups)
+                {
+                    int groupId = CreateNewGroup(unsubscribeGroups);
+                }
+            }
+
 
             ExpandoObject o = new ExpandoObject();
             o.TryAdd("id", Guid.NewGuid());
@@ -74,65 +96,103 @@ namespace CommunicationService.SendGridManagement
 
         private string GetEmailHtml(string name)
         {
-            string html = File.ReadAllText($"{_currentDirectory}/Emails/{name}.html");
+            string html = _directoryService.ReadAllText($"{_currentDirectory}/Emails/{name}.html");
             return html;
         }
 
+        private async Task<string> GetTemplateId(string templateName)
+        {
+            var queryParams = @"{
+                'generations': 'dynamic'
+                }";
+            Response response = await _sendGridClient.RequestAsync(SendGridClient.Method.GET, null, queryParams, "templates");
+
+            if (response != null && response.StatusCode == HttpStatusCode.OK)
+            {
+                string body = response.Body.ReadAsStringAsync().Result;
+                var templates = JsonConvert.DeserializeObject<Templates>(body);
+                if (templates != null && templates.templates.Length > 0)
+                {
+                    var template = templates.templates.Where(x => x.name == templateName).FirstOrDefault();
+                    if (template != null)
+                    {
+                        return template.id;
+                    }
+                    else
+                    {
+                        throw new UnknownTemplateException($"{templateName} cannot be found in templates");
+                    }
+                }
+                else
+                {
+                    throw new UnknownTemplateException("No templates found");
+                }
+            }
+            else
+            {
+                throw new SendGridException();
+            }
+        }
+
+        private int CreateNewGroup(UnsubscribeGroups unsubscribeGroups)
+        {
+            string requestBody = JsonConvert.SerializeObject(unsubscribeGroups);
+
+            Response response = _sendGridClient.RequestAsync(SendGridClient.Method.POST, requestBody, null, "asm/groups").Result;
+
+            if (response != null && response.StatusCode == HttpStatusCode.Created)
+            {
+                string body = response.Body.ReadAsStringAsync().Result;
+                var newGroup = JsonConvert.DeserializeObject<UnsubscribeGroups>(body);
+
+                if (newGroup != null)
+                {
+                    return newGroup.id;
+                }
+                else
+                {
+                    throw new Exception($"Unable to create group {unsubscribeGroups.name}");
+                }
+            }
+            else
+            {
+                throw new Exception("Invalid response from create group");
+            }
+        }
 
         private string CreateNewTemplate(Template template)
         {
-            var apiKey = _sendGridConfig.ApiKey;
-            if (apiKey == string.Empty)
-            {
-                throw new Exception("SendGrid Api Key missing.");
-            }
-
-            var client = new SendGridClient(apiKey);
-
             string requestBody = JsonConvert.SerializeObject(template);
 
-            try
+            Response response = _sendGridClient.RequestAsync(SendGridClient.Method.POST, requestBody, null, "templates").Result;
+
+            if (response != null && response.StatusCode == HttpStatusCode.Created)
             {
-                Response response = client.RequestAsync(SendGridClient.Method.POST, requestBody, null, "templates").Result;
+                string body = response.Body.ReadAsStringAsync().Result;
+                var newTemplate = JsonConvert.DeserializeObject<Template>(body);
 
-                if (response != null && response.StatusCode == HttpStatusCode.Created)
+                if (newTemplate != null)
                 {
-                    string body = response.Body.ReadAsStringAsync().Result;
-                    var newTemplate = JsonConvert.DeserializeObject<Template>(body);
-
-                    if (newTemplate != null)
-                    {
-                        return newTemplate.id;
-                    }
+                    return newTemplate.id;
+                }
+                else
+                {
+                    throw new Exception($"Unable to create template {template.name}");
                 }
             }
-
-            catch (AggregateException exc)
+            else
             {
-                throw new Exception("Create template error", exc.Flatten());
+                throw new Exception("Invalid response from create new template");
             }
-
-            catch (Exception exc)
-            {
-                throw exc;
-            }
-            return string.Empty;
         }
+        
 
         private bool CreateNewTemplateVersion(NewTemplateVersion newTemplateVersion)
         {
-            var apiKey = _sendGridConfig.ApiKey;
-            if (apiKey == string.Empty)
-            {
-                throw new Exception("SendGrid Api Key missing.");
-            }
-
-            var client = new SendGridClient(apiKey);
-
             string requestBody = JsonConvert.SerializeObject(newTemplateVersion);
             try
             {
-                Response response = client.RequestAsync(SendGridClient.Method.POST, requestBody, null, $"templates/{newTemplateVersion.template_id}/versions").Result;
+                Response response = _sendGridClient.RequestAsync(SendGridClient.Method.POST, requestBody, null, $"templates/{newTemplateVersion.template_id}/versions").Result;
 
                 if (response != null && response.StatusCode == HttpStatusCode.Created)
                 {
@@ -149,19 +209,7 @@ namespace CommunicationService.SendGridManagement
             {
                 throw exc;
             }
-            return false ;
-        }
-
-
-        private CosmosDbService InitializeCosmosClientInstance(CosmosConfig cosmosConfig)
-        {
-            Microsoft.Azure.Cosmos.Fluent.CosmosClientBuilder clientBuilder = new Microsoft.Azure.Cosmos.Fluent.CosmosClientBuilder(cosmosConfig.ConnectionString);
-            Microsoft.Azure.Cosmos.CosmosClient client = clientBuilder
-                                .WithConnectionModeDirect()
-                                .Build();
-            CosmosDbService cosmosDbService = new CosmosDbService(client, cosmosConfig.DatabaseName, cosmosConfig.ContainerName);
-
-            return cosmosDbService;
+            return false;
         }
     }
 }

@@ -6,12 +6,13 @@ namespace CommunicationService.Core.Exception
 {
     public class SendGridException: System.Exception
     {
-        public override string Message
+        public SendGridException() : this("SendGridException")
         {
-            get
-            {
-                return "Error returned by SendGrid";
-            }
+
+        }
+
+        public SendGridException(string message) : base(message)
+        {
         }
     }
 }

@@ -17,13 +17,14 @@ using System.Threading.Tasks;
 
 namespace CommunicationService.UnitTests.SendGridService
 {
-    public class SendGridServiceTests
+    public class EmailTemplateUploaderTests
     {
         private Mock<IOptions<SendGridConfig>> _sendGridConfig;
         private Mock<ISendGridClient> _sendGridClient;
         private SendGridConfig _sendGridConfigSettings;
         private ConnectSendGridService _classUnderTest;
-        private Task<Response> _response;
+        private Task<Response> _templatesResponse;
+        private Task<Response> _groupsResponse;
         private string _templateId;
         private Task<Response> _sendEmailResponse;
 
@@ -53,16 +54,36 @@ namespace CommunicationService.UnitTests.SendGridService
                 template
             };
             string responseBody = JsonConvert.SerializeObject(templates);
-            _response = Task.FromResult(new Response(System.Net.HttpStatusCode.OK, new StringContent(responseBody), null));
+            _templatesResponse = Task.FromResult(new Response(System.Net.HttpStatusCode.OK, new StringContent(responseBody), null));
 
             _sendGridClient.Setup(x => x.RequestAsync(
                 It.IsAny<SendGridClient.Method>(), 
                 It.IsAny<string>(), 
                 It.IsAny<string>(),
-                It.IsAny<string>(),
+               It.Is<String>(s => s.Contains("templates")),
                 It.IsAny<CancellationToken>()))
-                  .Returns(() => _response
+                  .Returns(() => _templatesResponse
                   );
+
+            UnsubscribeGroups[] groups = new UnsubscribeGroups[1];
+            groups[0] = new UnsubscribeGroups()
+            {
+                id = 1,
+                name = "KnownGroup",
+                description = "KnownGroup description"
+            };
+            string groupsResponseBody = JsonConvert.SerializeObject(groups);
+            _groupsResponse = Task.FromResult(new Response(System.Net.HttpStatusCode.OK, new StringContent(groupsResponseBody), null));
+
+            _sendGridClient.Setup(x => x.RequestAsync(
+                It.IsAny<SendGridClient.Method>(),
+                It.IsAny<string>(),
+                It.IsAny<string>(),
+                It.Is<String>(s => s.Contains("groups")),
+                It.IsAny<CancellationToken>()))
+                  .Returns(() => _groupsResponse
+                  );
+
 
             _sendGridClient.Setup(x => x.SendEmailAsync(
                 It.IsAny<SendGridMessage>(),
@@ -82,7 +103,7 @@ namespace CommunicationService.UnitTests.SendGridService
         [Test]
         public void GetTemplateId_ThrowsException_WhenTemplateNameIsUnknown()
         {
-            _response = Task.FromResult(new Response(System.Net.HttpStatusCode.OK, new StringContent(string.Empty), null));
+            _templatesResponse = Task.FromResult(new Response(System.Net.HttpStatusCode.OK, new StringContent(string.Empty), null));
 
             UnknownTemplateException ex = Assert.ThrowsAsync<UnknownTemplateException>(async () => await _classUnderTest.GetTemplateId("UnknownTemplate"));
             Assert.AreEqual("No templates found", ex.Message);
@@ -99,7 +120,7 @@ namespace CommunicationService.UnitTests.SendGridService
         [Test]
         public void GetTemplateId_ThrowsSendGridException_WhenTemplateNameIsUnknown()
         {
-            _response = Task.FromResult(new Response(System.Net.HttpStatusCode.BadRequest,new StringContent(string.Empty), null));
+            _templatesResponse = Task.FromResult(new Response(System.Net.HttpStatusCode.BadRequest,new StringContent(string.Empty), null));
 
             Assert.ThrowsAsync<SendGridException>(async () => await _classUnderTest.GetTemplateId("UnknownTemplate"));
         }
@@ -109,7 +130,7 @@ namespace CommunicationService.UnitTests.SendGridService
         {
             _sendEmailResponse = Task.FromResult(new Response(System.Net.HttpStatusCode.OK,new StringContent(string.Empty),null));
 
-            bool success = await _classUnderTest.SendDynamicEmail("KnownTemplate",new Core.Domains.EmailBuildData());
+            bool success = await _classUnderTest.SendDynamicEmail("KnownTemplate","KnownGroup",new Core.Domains.EmailBuildData());
             Assert.AreEqual(true, success);
         }
 
@@ -118,7 +139,7 @@ namespace CommunicationService.UnitTests.SendGridService
         {
             _sendEmailResponse = Task.FromResult(new Response(System.Net.HttpStatusCode.Accepted, new StringContent(string.Empty), null));
 
-            bool success = await _classUnderTest.SendDynamicEmail("KnownTemplate", new Core.Domains.EmailBuildData());
+            bool success = await _classUnderTest.SendDynamicEmail("KnownTemplate", "KnownGroup", new Core.Domains.EmailBuildData());
             Assert.AreEqual(true, success);
         }
 
@@ -127,7 +148,7 @@ namespace CommunicationService.UnitTests.SendGridService
         {
             _sendEmailResponse = Task.FromResult(new Response(System.Net.HttpStatusCode.BadRequest, new StringContent(string.Empty), null));
 
-            bool success = await _classUnderTest.SendDynamicEmail("KnownTemplate", new Core.Domains.EmailBuildData());
+            bool success = await _classUnderTest.SendDynamicEmail("KnownTemplate", "KnownGroup", new Core.Domains.EmailBuildData());
             Assert.AreEqual(false, success);
         }
 
