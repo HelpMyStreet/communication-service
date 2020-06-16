@@ -21,12 +21,12 @@ namespace CommunicationService.AzureFunction
         }
 
         [FunctionName("DailyRegistrationChaser")]
-        public async Task Run([TimerTrigger("0 55 * * * *", RunOnStartup =true)]TimerInfo myTimer, ILogger log)
+        public async Task Run([TimerTrigger("0 55 * * * *", RunOnStartup =false)]TimerInfo myTimer, ILogger log)
         {
             RequestCommunicationRequest req = new RequestCommunicationRequest()
             {
-                CommunicationJob = new CommunicationJob() 
-                { 
+                CommunicationJob = new CommunicationJob()
+                {
                     CommunicationJobType = CommunicationJobTypes.SendRegistrationChasers
                 }
             };

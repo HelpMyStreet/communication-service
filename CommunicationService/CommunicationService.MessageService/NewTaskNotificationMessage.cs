@@ -16,6 +16,15 @@ namespace CommunicationService.MessageService
         private readonly IConnectUserService _connectUserService;
         private readonly IConnectRequestService _connectRequestService;
         private const string TEMPLATENAME = "TaskNotification";
+
+        public string UnsubscriptionGroupName
+        {
+            get
+            {
+                return "IncompleteRegistration";
+            }
+        }
+
         public NewTaskNotificationMessage(IConnectUserService connectUserService, IConnectRequestService connectRequestService)
         {
             _connectUserService = connectUserService;

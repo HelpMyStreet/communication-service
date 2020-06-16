@@ -7,5 +7,6 @@ namespace CommunicationService.Core.Domains.SendGrid
     public class Templates
     {
         public Template[] templates { get; set; }
+        public UnsubscribeGroups[] unsubscribeGroups { get; set; }
     }
 }
