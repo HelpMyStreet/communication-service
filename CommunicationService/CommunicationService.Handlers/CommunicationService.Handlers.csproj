@@ -5,9 +5,10 @@
 	</PropertyGroup>
 
 	<ItemGroup>
-		<PackageReference Include="HelpMyStreet.Contracts" Version="1.1.43" />
+		<PackageReference Include="HelpMyStreet.Contracts" Version="1.1.207" />
 		<PackageReference Include="MediatR" Version="8.0.1" />
 		<PackageReference Include="MediatR.Extensions.Microsoft.DependencyInjection" Version="8.0.0" />
+		<PackageReference Include="Microsoft.Azure.ServiceBus" Version="4.1.3" />
 	</ItemGroup>
 	<ItemGroup>
 		<ProjectReference ReplaceParameters="true" Include="..\CommunicationService.Core\CommunicationService.Core.csproj">
