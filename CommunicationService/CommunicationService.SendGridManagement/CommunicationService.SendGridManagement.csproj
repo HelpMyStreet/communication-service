@@ -6,24 +6,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <None Remove="Emails\IncompleteRegistration.html" />
-    <None Remove="Emails\PleaseVerify.html" />
-    <None Remove="Emails\TaskNotification.html" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <EmbeddedResource Include="Emails\IncompleteRegistration.html">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Emails\PleaseVerify.html">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </EmbeddedResource>
-    <EmbeddedResource Include="Emails\TaskNotification.html">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </EmbeddedResource>
-  </ItemGroup>
-
-  <ItemGroup>
 	  <PackageReference Include="Microsoft.Extensions.Configuration" Version="2.2.0" />
 	  <PackageReference Include="Microsoft.Extensions.Configuration.Binder" Version="2.2.0" />
 	  <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="2.2.0" />
@@ -41,31 +23,10 @@
     <None Update="Emails\CompletedRegistration.html">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <None Update="Emails\FailedYoti.html">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Update="Emails\PartialRegistration.html">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
     <None Update="Emails\SuccessfulYoti.html">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <None Update="Emails\YotiReminder.html">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Update="Migrations\20200616_084300_AddUnsubscribeToTaskNotification.json">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
     <None Update="Migrations\20200616_084300_NewTemplates.json">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Update="Migrations\20200615_084300_AddUnsubscribeGroups.json">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Update="Migrations\20200612_084300_TaskNotification.json">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Update="Migrations\20200612_084300_InitialCreate.json">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
   </ItemGroup>

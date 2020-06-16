@@ -96,7 +96,6 @@ namespace CommunicationService.SendGridService
         {
             string templateId = await GetTemplateId(templateName);
             int groupId = await GetGroupId(groupName);
-            emailBuildData.EmailToAddress = "jawwad@factor-50.co.uk";
             Personalization personalization = new Personalization()
             {
                 Tos = new List<EmailAddress>() { new EmailAddress(emailBuildData.EmailToAddress, emailBuildData.EmailToName) },

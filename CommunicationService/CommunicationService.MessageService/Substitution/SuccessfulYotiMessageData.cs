@@ -5,11 +5,11 @@ using System.Text;
 
 namespace CommunicationService.MessageService.Substitution
 {
-    public class RegistrationChaserData : BaseDynamicData
+    public class SuccessfulYotiMessageData : BaseDynamicData
     {
         public string FirstName { get; private set; }
         public string LastName { get; private set; }
-        public RegistrationChaserData(string firstName, string lastName)
+        public SuccessfulYotiMessageData(string firstName, string lastName)
         {
             FirstName = firstName;
             LastName = lastName;
