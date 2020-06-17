@@ -7,5 +7,6 @@ namespace CommunicationService.MessageService
     public static class UnsubscribeGroupName
     {
         public static string PostYotiCommunication = "PostYotiCommunication";
+        public static string RegistrationChasers = "RegistrationChasers";
     }
 }

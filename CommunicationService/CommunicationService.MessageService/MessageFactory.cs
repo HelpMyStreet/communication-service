@@ -43,6 +43,8 @@ namespace CommunicationService.MessageService
             {
                 case CommunicationJobTypes.PostYotiCommunication:
                     return new PostYotiCommunicationMessage(_connectUserService, _cosmosDbService);
+                case CommunicationJobTypes.SendRegistrationChasers:
+                    return new RegistrationChaserMessage(_connectUserService, _cosmosDbService);
                 default:
                     throw new Exception("Unknown Email Type");
             }

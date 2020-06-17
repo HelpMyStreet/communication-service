@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 
 namespace CommunicationService.MessageService
 {
-    public class PostYotiCommunicationMessage : IMessage
+    public class RegistrationChaserMessage : IMessage
     {
         private readonly IConnectUserService _connectUserService;
         private readonly ICosmosDbService _cosmosDbService;
@@ -20,11 +20,11 @@ namespace CommunicationService.MessageService
         {
             get
             {
-                return UnsubscribeGroupName.PostYotiCommunication;
+                return UnsubscribeGroupName.RegistrationChasers;
             }
         }
 
-        public PostYotiCommunicationMessage(IConnectUserService connectUserService, ICosmosDbService cosmosDbService)
+        public RegistrationChaserMessage(IConnectUserService connectUserService, ICosmosDbService cosmosDbService)
         {
             _connectUserService = connectUserService;
             _cosmosDbService = cosmosDbService;
@@ -70,33 +70,32 @@ namespace CommunicationService.MessageService
         public Dictionary<int,string> IdentifyRecipients(int? recipientUserId, int? jobId, int? groupId)
         {
             Dictionary<int, string> response = new Dictionary<int, string>();
+            var users = _connectUserService.GetIncompleteRegistrationStatusAsync().Result;
 
-            var user = _connectUserService.GetUserByIdAsync(recipientUserId.Value).Result;
-
-            if (user != null)
+            if(users!=null)
             {
-                if(user.IsVerified.HasValue)
+                var validUsersWithRange = users.Users.Where(x => ((DateTime.Now.ToUniversalTime() - x.DateCompleted).TotalMinutes >= 30)
+                && ((DateTime.Now.ToUniversalTime() - x.DateCompleted).TotalHours <=48)).ToList();
+
+                if(validUsersWithRange!=null)
                 {
-                    if (user.IsVerified.Value)
+                    foreach(var u in validUsersWithRange)
                     {
-                        List<EmailHistory> reminderhistory = _cosmosDbService.GetEmailHistory(TemplateName.YotiReminder, user.ID.ToString()).Result;
-                        if (reminderhistory.Count > 0)
+                        var user = _connectUserService.GetUserByIdAsync(u.UserId).Result;
+                        if (!user.IsVerified.HasValue)
                         {
-                            response = AddRecipientAndTemplate(TemplateName.Welcome, recipientUserId.Value);
-                        }
-                        else
-                        {
-                            response = AddRecipientAndTemplate(TemplateName.ThanksForVerifying, recipientUserId.Value);
+                            if (u.RegistrationStep == REGISTRATION_STEP4)
+                            {
+                                response = AddRecipientAndTemplate(TemplateName.YotiReminder, u.UserId);
+                            }
+                            else
+                            {
+                                response = AddRecipientAndTemplate(TemplateName.PartialRegistration, u.UserId);
+                            }
                         }
                     }
-                    else
-                    {
-                        if(user.RegistrationHistory.Max(x=> x.Key)==REGISTRATION_STEP4)
-                        {
-                            response = AddRecipientAndTemplate(TemplateName.UnableToVerify, recipientUserId.Value);
-                        }
-                    }
-                }   
+                }
+
             }
             return response;
         }
