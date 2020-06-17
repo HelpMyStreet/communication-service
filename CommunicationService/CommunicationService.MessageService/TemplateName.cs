@@ -10,6 +10,7 @@ namespace CommunicationService.MessageService
         public static string ThanksForVerifying = "ThanksForVerifying";
         public static string UnableToVerify = "UnableToVerify";
         public static string YotiReminder = "YotiReminder";
+        public static string PartialRegistration = "PartialRegistration";
     }
 }
 

@@ -6,28 +6,36 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Remove="Emails\PartialRegistration.html" />
     <None Remove="Emails\ThanksForVerifying.html" />
     <None Remove="Emails\UnableToVerify.html" />
     <None Remove="Emails\Welcome.html" />
+    <None Remove="Emails\YotiReminder.html" />
     <None Remove="Migrations\20200617_084300_AmendTemplates.json" />
-    <None Remove="Migrations\20200617_084300_NewTemplates.json" />
     <None Remove="Migrations\20200617_084300_PostYotiCommunication.json" />
+    <None Remove="Migrations\20200617_084300_RegistrationChasers.json" />
   </ItemGroup>
 
   <ItemGroup>
+    <EmbeddedResource Include="Emails\YotiReminder.html">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </EmbeddedResource>
     <EmbeddedResource Include="Emails\UnableToVerify.html">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </EmbeddedResource>
     <EmbeddedResource Include="Emails\ThanksForVerifying.html">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </EmbeddedResource>
+    <EmbeddedResource Include="Emails\PartialRegistration.html">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </EmbeddedResource>
     <EmbeddedResource Include="Emails\Welcome.html">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\20200617_084300_PostYotiCommunication.json">
+    <EmbeddedResource Include="Migrations\20200617_084300_RegistrationChasers.json">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </EmbeddedResource>
-    <EmbeddedResource Include="Migrations\20200617_084300_NewTemplates.json">
+    <EmbeddedResource Include="Migrations\20200617_084300_PostYotiCommunication.json">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </EmbeddedResource>
   </ItemGroup>
