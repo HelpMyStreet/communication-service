@@ -41,15 +41,12 @@ namespace CommunicationService.MessageService
         {
             switch (communicationJobTypes)
             {
-                case CommunicationJobTypes.SendWelcomeMessage:
-                    return new WelcomeMessage(_connectUserService);
-                case CommunicationJobTypes.SendNewTaskNotification:
-                    return new NewTaskNotificationMessage(_connectUserService, _connectRequestService);
-                case CommunicationJobTypes.SendRegistrationChasers:
-                    return new RegistrationChasers(_connectUserService,_cosmosDbService);
+                case CommunicationJobTypes.SendCompletedRegistration:
+                    return new CompletedRegistrationMessage(_connectUserService, _cosmosDbService);
+                case CommunicationJobTypes.SendSuccessfulYoti:
+                    return new SuccessfulYotiMessage(_connectUserService,_cosmosDbService);
                 default:
                     throw new Exception("Unknown Email Type");
-
             }
         }
 
@@ -59,7 +56,7 @@ namespace CommunicationService.MessageService
             var message = new Message(Encoding.UTF8.GetBytes(messageBody));
 
             // Send the message to the queue
-            await _queueClient.SendAsync(message);
+            await _queueClient.SendAsync(message).ConfigureAwait(false);
         }
     }
 }

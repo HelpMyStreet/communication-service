@@ -14,7 +14,7 @@ namespace CommunicationService.Handlers
 {
     public class RequestCommunicationHandler : IRequestHandler<RequestCommunicationRequest,RequestCommunicationResponse>
     {
-        static IQueueClient _queueClient;
+        private readonly IQueueClient _queueClient;
         private readonly IOptions<ServiceBusConfig> _serviceBusConfig;
 
         public RequestCommunicationHandler(IQueueClient queueClient, IOptions<ServiceBusConfig> serviceBusConfig)
@@ -39,7 +39,7 @@ namespace CommunicationService.Handlers
             var message = new Message(Encoding.UTF8.GetBytes(messageBody));
 
             // Send the message to the queue
-            await _queueClient.SendAsync(message);
+            await _queueClient.SendAsync(message).ConfigureAwait(false);
         }
     }
 }

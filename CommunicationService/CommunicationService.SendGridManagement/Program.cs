@@ -1,5 +1,7 @@
-﻿using CommunicationService.SendGridManagement.Configuration;
+﻿using CommunicationService.Repo;
+using CommunicationService.SendGridManagement.Configuration;
 using Microsoft.Extensions.Configuration;
+using SendGrid;
 using System;
 using System.Threading.Tasks;
 
@@ -18,14 +20,26 @@ namespace CommunicationService.SendGridManagement
             CosmosConfig cosmosConfig = config.GetSection("CosmosConfig").Get<CosmosConfig>();
             SendGridConfig sendGridConfig = config.GetSection("SendGridConfig").Get<SendGridConfig>();
 
+            SendGridClient sgc = new SendGridClient(sendGridConfig.ApiKey);
+            CosmosDbService cosmosDbService = InitializeCosmosClientInstance(cosmosConfig);
+
             EmailTemplateUploader emailTemplateUploader = new EmailTemplateUploader(
-                cosmosConfig,
-                sendGridConfig,
-                currentDirectory
+                sgc,
+                cosmosDbService
                 );
 
             await emailTemplateUploader.Migrate();
-            int i = 1;
+        }
+
+        private static CosmosDbService InitializeCosmosClientInstance(CosmosConfig cosmosConfig)
+        {
+            Microsoft.Azure.Cosmos.Fluent.CosmosClientBuilder clientBuilder = new Microsoft.Azure.Cosmos.Fluent.CosmosClientBuilder(cosmosConfig.ConnectionString);
+            Microsoft.Azure.Cosmos.CosmosClient client = clientBuilder
+                                .WithConnectionModeDirect()
+                                .Build();
+            CosmosDbService cosmosDbService = new CosmosDbService(client, cosmosConfig.DatabaseName, cosmosConfig.ContainerName);
+
+            return cosmosDbService;
         }
     }
 }

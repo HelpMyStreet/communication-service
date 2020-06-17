@@ -6,19 +6,20 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <None Remove="Emails\IncompleteRegistration.html" />
-    <None Remove="Emails\PleaseVerify.html" />
-    <None Remove="Emails\TaskNotification.html" />
+    <None Remove="Emails\CompletedRegistration.html" />
+    <None Remove="Emails\SuccessfulYoti.html" />
+    <None Remove="Migrations\20200617_084300_AmendTemplates.json" />
+    <None Remove="Migrations\20200617_084300_NewTemplates.json" />
   </ItemGroup>
 
   <ItemGroup>
-    <EmbeddedResource Include="Emails\IncompleteRegistration.html">
+    <EmbeddedResource Include="Emails\CompletedRegistration.html">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </EmbeddedResource>
-    <EmbeddedResource Include="Emails\PleaseVerify.html">
+    <EmbeddedResource Include="Emails\SuccessfulYoti.html">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </EmbeddedResource>
-    <EmbeddedResource Include="Emails\TaskNotification.html">
+    <EmbeddedResource Include="Migrations\20200617_084300_NewTemplates.json">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </EmbeddedResource>
   </ItemGroup>
@@ -37,12 +38,6 @@
   <ItemGroup>
     <None Update="appsettings.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Update="Migrations\20200612_084300_TaskNotification.json">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
-    <None Update="Migrations\20200612_084300_InitialCreate.json">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
   </ItemGroup>
 
