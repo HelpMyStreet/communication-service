@@ -57,7 +57,8 @@ namespace CommunicationService.Repo
 
         public async Task<List<EmailHistory>> GetEmailHistory(string templateName, string recipientId)
         {
-            string queryString = $"SELECT udf.convertTime(c._ts) as LastSent FROM c where c.TemplateName = '{templateName}' and c.RecipientUserID = {recipientId}";
+            string queryString = $"SELECT udf.convertTime(c._ts) as LastSent FROM c where c.event='processed' and c.TemplateName = '{templateName}' and c.RecipientUserID = '{recipientId}'";
+
             var query = this._container.GetItemQueryIterator<EmailHistory>(new QueryDefinition(queryString));
             List<EmailHistory> results = new List<EmailHistory>();
             while (query.HasMoreResults)

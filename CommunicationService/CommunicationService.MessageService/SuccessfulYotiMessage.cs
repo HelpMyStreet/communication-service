@@ -1,5 +1,6 @@
 ﻿using CommunicationService.Core.Domains;
 using CommunicationService.Core.Interfaces;
+using CommunicationService.Core.Interfaces.Repositories;
 using CommunicationService.Core.Interfaces.Services;
 using CommunicationService.MessageService.Substitution;
 using System;
@@ -8,29 +9,23 @@ using System.Threading.Tasks;
 
 namespace CommunicationService.MessageService
 {
-    public class WelcomeMessage : IMessage
+    public class SuccessfulYotiMessage : IMessage
     {
         private readonly IConnectUserService _connectUserService;
+        private readonly ICosmosDbService _cosmosDbService;
 
-        public string TemplateId
+        public string UnsubscriptionGroupName
         {
             get
             {
-                return "d-14a35071720e4a9fa0619c6891b3f108";
+                return TemplateName.SuccessfulYoti;
             }
         }
 
-        public string MessageId
-        {
-            get
-            {
-                return "2";
-            }
-        }
-
-        public WelcomeMessage(IConnectUserService connectUserService)
+        public SuccessfulYotiMessage(IConnectUserService connectUserService, ICosmosDbService cosmosDbService)
         {
             _connectUserService = connectUserService;
+            _cosmosDbService = cosmosDbService;
             
         }
 
@@ -42,7 +37,7 @@ namespace CommunicationService.MessageService
             {
                 return new EmailBuildData()
                 {
-                    BaseDynamicData = new WelcomeData(user.UserPersonalDetails.FirstName, user.UserPersonalDetails.LastName),
+                    BaseDynamicData = new SuccessfulYotiMessageData(user.UserPersonalDetails.FirstName, user.UserPersonalDetails.LastName),
                     EmailToAddress = user.UserPersonalDetails.EmailAddress,
                     EmailToName = user.UserPersonalDetails.DisplayName,
                     RecipientUserID = recipientUserId.Value
@@ -57,7 +52,20 @@ namespace CommunicationService.MessageService
         public Dictionary<int,string> IdentifyRecipients(int? recipientUserId, int? jobId, int? groupId)
         {
             Dictionary<int, string> response = new Dictionary<int, string>();
-            response.Add(recipientUserId.Value, TemplateId);
+
+            var user = _connectUserService.GetUserByIdAsync(recipientUserId.Value).Result;
+            if (user != null && user.IsVerified.HasValue && user.IsVerified.Value)
+            {
+                List<EmailHistory> reminderhistory = _cosmosDbService.GetEmailHistory(TemplateName.YotiReminder, user.ID.ToString()).Result;
+                if (reminderhistory.Count>0)
+                {
+                    List<EmailHistory> history = _cosmosDbService.GetEmailHistory(TemplateName.SuccessfulYoti, user.ID.ToString()).Result;
+                    if (history.Count == 0)
+                    {
+                        response.Add(recipientUserId.Value, TemplateName.SuccessfulYoti);
+                    }
+                }
+            }
             return response;
         }
     }

@@ -11,6 +11,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
 namespace CommunicationService.SendGridService
@@ -24,6 +25,37 @@ namespace CommunicationService.SendGridService
         {
             _sendGridConfig = sendGridConfig;
             _sendGridClient = sendGridClient;
+        }
+
+        public async Task<int> GetGroupId(string groupName)
+        {
+            Response response = await _sendGridClient.RequestAsync(SendGridClient.Method.GET, null, null, "asm/groups");
+
+            if (response != null && response.StatusCode == HttpStatusCode.OK)
+            {
+                string body = response.Body.ReadAsStringAsync().Result;
+                var groups = JsonConvert.DeserializeObject<UnsubscribeGroups[]>(body);
+                if (groups != null && groups.Length > 0)
+                {
+                    var group = groups.Where(x => x.name == groupName).FirstOrDefault();
+                    if (group != null)
+                    {
+                        return group.id;
+                    }
+                    else
+                    {
+                        throw new UnknownSubscriptionGroupException($"{groupName} cannot be found in groups");
+                    }
+                }
+                else
+                {
+                    throw new UnknownSubscriptionGroupException("No groups found");
+                }
+            }
+            else
+            {
+                throw new SendGridException("CallingGetGroupId");
+            }
         }
 
         public async Task<string> GetTemplateId(string templateName)
@@ -56,14 +88,14 @@ namespace CommunicationService.SendGridService
             }
             else
             {
-                throw new SendGridException();
+                throw new SendGridException("CallingGetTemplateId");
             }
         }
 
-        public async Task<bool> SendDynamicEmail(string templateName, EmailBuildData emailBuildData)
+        public async Task<bool> SendDynamicEmail(string templateName, string groupName, EmailBuildData emailBuildData)
         {
             string templateId = await GetTemplateId(templateName);
-            emailBuildData.EmailToAddress = "jawwad@factor-50.co.uk";
+            int groupId = await GetGroupId(groupName);
             Personalization personalization = new Personalization()
             {
                 Tos = new List<EmailAddress>() { new EmailAddress(emailBuildData.EmailToAddress, emailBuildData.EmailToName) },
@@ -74,6 +106,10 @@ namespace CommunicationService.SendGridService
             {
                 From = new EmailAddress(_sendGridConfig.Value.FromEmail, _sendGridConfig.Value.FromName),
                 TemplateId = templateId,
+                Asm = new ASM()
+                {
+                    GroupId = groupId
+                },
                 Personalizations = new List<Personalization>()
                 {
                     personalization
@@ -81,7 +117,9 @@ namespace CommunicationService.SendGridService
                 CustomArgs = new Dictionary<string, string>
                 {
                     { "TemplateId", templateId },
-                    { "RecipientUserID",emailBuildData.RecipientUserID.ToString() }
+                    { "RecipientUserID", emailBuildData.RecipientUserID.ToString() },
+                    { "TemplateName", templateName },
+                    { "GroupName", groupName}
                 }
             };
 

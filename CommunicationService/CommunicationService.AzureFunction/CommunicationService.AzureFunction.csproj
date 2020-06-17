@@ -5,7 +5,7 @@
 	</PropertyGroup>
 	<ItemGroup>
 		<PackageReference Include="AzureFunctions.Extensions.Swashbuckle" Version="1.4.4" />
-		<PackageReference Include="HelpMyStreet.Contracts" Version="1.1.207" />
+		<PackageReference Include="HelpMyStreet.Contracts" Version="1.1.219" />
 		<PackageReference Include="Microsoft.Azure.Functions.Extensions" Version="1.0.0" />
 		<PackageReference Include="AutoMapper.Extensions.Microsoft.DependencyInjection" Version="7.0.0" />
 		<PackageReference Include="MediatR" Version="8.0.1" />
@@ -31,6 +31,7 @@
 			<Name>CommunicationService.Repo</Name>
 		</ProjectReference>
 		<ProjectReference Include="..\CommunicationService.RequestService\CommunicationService.RequestService.csproj" />
+		<ProjectReference Include="..\CommunicationService.SendGridManagement\CommunicationService.SendGridManagement.csproj" />
 		<ProjectReference Include="..\CommunicationService.SendGridService\CommunicationService.SendGridService.csproj" />
 		<ProjectReference Include="..\CommunicationService.UserService\CommunicationService.UserService.csproj" />
 	</ItemGroup>
@@ -46,4 +47,5 @@
 			<CopyToPublishDirectory>Never</CopyToPublishDirectory>
 		</None>
 	</ItemGroup>
+	<ProjectExtensions><VisualStudio><UserProperties local_1settings_1json__JsonSchema="https://jenkins-x.io/schemas/jx-schema.json" /></VisualStudio></ProjectExtensions>
 </Project>
