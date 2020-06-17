@@ -6,8 +6,10 @@ namespace CommunicationService.MessageService
 {
     public static class TemplateName
     {
-        public static string SuccessfulYoti = "SuccessfulYoti";
+        public static string Welcome = "Welcome";
+        public static string ThanksForVerifying = "ThanksForVerifying";
+        public static string UnableToVerify = "UnableToVerify";
         public static string YotiReminder = "YotiReminder";
-        public static string CompletedRegistration = "CompletedRegistration";
     }
 }
+

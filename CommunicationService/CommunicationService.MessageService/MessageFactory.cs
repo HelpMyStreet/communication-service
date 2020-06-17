@@ -41,10 +41,8 @@ namespace CommunicationService.MessageService
         {
             switch (communicationJobTypes)
             {
-                case CommunicationJobTypes.SendCompletedRegistration:
-                    return new CompletedRegistrationMessage(_connectUserService, _cosmosDbService);
-                case CommunicationJobTypes.SendSuccessfulYoti:
-                    return new SuccessfulYotiMessage(_connectUserService,_cosmosDbService);
+                case CommunicationJobTypes.PostYotiCommunication:
+                    return new PostYotiCommunicationMessage(_connectUserService, _cosmosDbService);
                 default:
                     throw new Exception("Unknown Email Type");
             }
