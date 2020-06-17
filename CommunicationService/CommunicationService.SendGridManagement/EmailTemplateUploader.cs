@@ -1,57 +1,62 @@
 ﻿using CommunicationService.Core.Domains;
 using CommunicationService.Core.Interfaces.Repositories;
-using CommunicationService.Repo;
 using Newtonsoft.Json;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using CommunicationService.SendGridManagement.Configuration;
 using System;
 using SendGrid;
 using System.Net;
 using System.Dynamic;
 using System.Threading.Tasks;
 using CommunicationService.Core.Domains.SendGrid;
-using CommunicationService.Core.Interfaces;
 using CommunicationService.Core.Exception;
-using Remotion.Linq.Parsing;
+using System.Reflection;
 
 namespace CommunicationService.SendGridManagement
 {
     public class EmailTemplateUploader
     {
-        private string _currentDirectory;
         private readonly ICosmosDbService _cosmosDbService;
         private readonly ISendGridClient _sendGridClient;
-        private readonly IDirectoryService _directoryService;
 
-
-        public EmailTemplateUploader(ISendGridClient sendGridClient, ICosmosDbService cosmosDbService, IDirectoryService directoryService, string currentDirectory)
+        public EmailTemplateUploader(ISendGridClient sendGridClient, ICosmosDbService cosmosDbService)
         {
             _sendGridClient = sendGridClient;
             _cosmosDbService = cosmosDbService;
-            _directoryService = directoryService;
-            _currentDirectory = currentDirectory;
         }
 
         public async Task Migrate()
         {
+            var assembly = Assembly.GetExecutingAssembly();
+            var files = assembly.GetManifestResourceNames();
+
+            var migrationfolder = files.Where(x => x.Contains(".SendGridManagement.Migrations.")).ToList();
+
             List<MigrationHistory> history = _cosmosDbService.GetMigrationHistory().Result;
 
-            foreach (string s in _directoryService.GetFiles($"{_currentDirectory}/Migrations"))
+            foreach(string s in migrationfolder)
             {
-                string migrationName = Path.GetFileName(s);
-                if (history.FirstOrDefault(x => x.MigrationId == migrationName) == null)
+                if (history.FirstOrDefault(x => x.MigrationId == s) == null)
                 {
-                    await AddMigration(s, migrationName);
+                    await AddMigration(s);
                 }
             }
-
         }
 
-        private async Task AddMigration(string fileName, string migrationName)
+        private string ReadFile(string resourceName)
         {
-            var json = _directoryService.ReadAllText(fileName);
+            var assembly = Assembly.GetExecutingAssembly();
+            using (Stream stream = assembly.GetManifestResourceStream(resourceName))
+            using (StreamReader reader = new StreamReader(stream))
+            {
+                return reader.ReadToEnd();
+            }
+        }
+
+        private async Task AddMigration(string fileName)
+        {
+            var json = ReadFile(fileName);
             Templates templates = JsonConvert.DeserializeObject<Templates>(json);
             if (templates.templates?.Length > 0)
             {
@@ -90,13 +95,14 @@ namespace CommunicationService.SendGridManagement
 
             ExpandoObject o = new ExpandoObject();
             o.TryAdd("id", Guid.NewGuid());
-            o.TryAdd("MigrationId", migrationName);
+            o.TryAdd("MigrationId", fileName);
             await _cosmosDbService.AddItemAsync(o); 
         }
 
         private string GetEmailHtml(string name)
         {
-            string html = _directoryService.ReadAllText($"{_currentDirectory}/Emails/{name}.html");
+            string filename = $"CommunicationService.SendGridManagement.Emails.{name}.html";
+            string html = ReadFile(filename);
             return html;
         }
 
