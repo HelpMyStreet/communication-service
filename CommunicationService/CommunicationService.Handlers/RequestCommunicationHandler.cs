@@ -40,7 +40,6 @@ namespace CommunicationService.Handlers
 
             // Send the message to the queue
             await _queueClient.SendAsync(message).ConfigureAwait(false);
-            int i = 1;
         }
     }
 }
