@@ -80,7 +80,7 @@ namespace CommunicationService.MessageService
                     if (user.IsVerified.Value)
                     {
                         List<EmailHistory> reminderhistory = _cosmosDbService.GetEmailHistory(TemplateName.YotiReminder, user.ID.ToString()).Result;
-                        if (reminderhistory.Count > 0)
+                        if (reminderhistory.Count == 0)
                         {
                             response = AddRecipientAndTemplate(TemplateName.Welcome, recipientUserId.Value);
                         }
