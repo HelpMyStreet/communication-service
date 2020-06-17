@@ -9,6 +9,7 @@
     <None Remove="Emails\CompletedRegistration.html" />
     <None Remove="Emails\SuccessfulYoti.html" />
     <None Remove="Migrations\20200616_084300_NewTemplates.json" />
+    <None Remove="Migrations\20200617_084300_AmendTemplates.json" />
   </ItemGroup>
 
   <ItemGroup>
