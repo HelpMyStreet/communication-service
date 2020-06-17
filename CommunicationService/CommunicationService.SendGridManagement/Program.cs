@@ -25,9 +25,7 @@ namespace CommunicationService.SendGridManagement
 
             EmailTemplateUploader emailTemplateUploader = new EmailTemplateUploader(
                 sgc,
-                cosmosDbService,
-                new DirectoryService(),
-                currentDirectory
+                cosmosDbService
                 );
 
             await emailTemplateUploader.Migrate();

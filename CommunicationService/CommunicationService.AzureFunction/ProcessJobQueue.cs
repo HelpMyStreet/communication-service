@@ -22,22 +22,22 @@ namespace CommunicationService.AzureFunction
         [FunctionName("ProcessJobQueue")]
         public void Run([ServiceBusTrigger("job", Connection = "ServiceBus")]string myQueueItem, ILogger log)
         {
-            RequestCommunicationRequest sendCommunicationRequest = JsonConvert.DeserializeObject<RequestCommunicationRequest>(myQueueItem);
-            IMessage message = _messageFactory.Create(sendCommunicationRequest);
-            Dictionary<int, string> recipients = message.IdentifyRecipients(sendCommunicationRequest.RecipientUserID, sendCommunicationRequest.JobID, sendCommunicationRequest.GroupID);
+            //RequestCommunicationRequest sendCommunicationRequest = JsonConvert.DeserializeObject<RequestCommunicationRequest>(myQueueItem);
+            //IMessage message = _messageFactory.Create(sendCommunicationRequest);
+            //Dictionary<int, string> recipients = message.IdentifyRecipients(sendCommunicationRequest.RecipientUserID, sendCommunicationRequest.JobID, sendCommunicationRequest.GroupID);
 
-            foreach (var item in recipients)
-            {
-                _messageFactory.AddToMessageQueueAsync(new SendMessageRequest()
-                {
-                    CommunicationJobType = sendCommunicationRequest.CommunicationJob.CommunicationJobType,
-                    TemplateName = item.Value,
-                    RecipientUserID = item.Key,
-                    JobID = sendCommunicationRequest.JobID,
-                    GroupID = sendCommunicationRequest.GroupID,
-                    MessageType = MessageTypes.Email
-                });
-            }
+            //foreach (var item in recipients)
+            //{
+            //    _messageFactory.AddToMessageQueueAsync(new SendMessageRequest()
+            //    {
+            //        CommunicationJobType = sendCommunicationRequest.CommunicationJob.CommunicationJobType,
+            //        TemplateName = item.Value,
+            //        RecipientUserID = item.Key,
+            //        JobID = sendCommunicationRequest.JobID,
+            //        GroupID = sendCommunicationRequest.GroupID,
+            //        MessageType = MessageTypes.Email
+            //    });
+            //}
 
             log.LogInformation($"C# ServiceBus queue trigger function processed message: {myQueueItem}");
         }

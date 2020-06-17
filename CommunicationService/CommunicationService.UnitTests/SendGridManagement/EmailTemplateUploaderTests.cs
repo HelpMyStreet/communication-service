@@ -25,7 +25,6 @@ namespace CommunicationService.UnitTests.SendGridManagement
     {
         private Mock<ISendGridClient> _sendGridClient;
         private Mock<ICosmosDbService> _cosmosDbService;
-        private Mock<IDirectoryService> _directoryService;
         private List<MigrationHistory> _history;
         private string[] _directoryFiles;
         private string _file;
@@ -68,37 +67,13 @@ namespace CommunicationService.UnitTests.SendGridManagement
                 .Returns(()=>Task.FromResult(_history));
         }
 
-        private void SetupDirectoryService()
-        {
-            _directoryFiles = new string[1];
-            _directoryFiles[0] = "test.html";
-            _directoryService = new Mock<IDirectoryService>();
-            _directoryService.Setup(x => x.GetFiles(It.IsAny<string>()))
-                .Returns(() => _directoryFiles);
-
-            Templates templates = new Templates();
-            Template template = new Template()
-            {
-                name = "KnownTemplate",
-                subject = "test"
-            };
-            templates.templates = new Template[1]
-            {
-                template
-            };
-            _file = JsonConvert.SerializeObject(templates);
-            _directoryService.Setup(x => x.ReadAllText(It.IsAny<string>()))
-                .Returns(() => _file);
-        }
-
         [SetUp]
         public void SetUp()
         {
             SetupCosmosDbService();
             SetupSendGridClient();
-            SetupDirectoryService();
 
-            _classUnderTest = new EmailTemplateUploader(_sendGridClient.Object,_cosmosDbService.Object,_directoryService.Object, string.Empty);
+            _classUnderTest = new EmailTemplateUploader(_sendGridClient.Object,_cosmosDbService.Object);
         }
 
         //[Test]
