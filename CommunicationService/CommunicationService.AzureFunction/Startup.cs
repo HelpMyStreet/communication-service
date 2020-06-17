@@ -98,6 +98,10 @@ namespace CommunicationService.AzureFunction
             CosmosConfig cosmosConfig = config.GetSection("CosmosConfig").Get<CosmosConfig>();
             builder.Services.AddSingleton<ICosmosDbService>(InitializeCosmosClientInstance(cosmosConfig));
 
+            SendGridManagement.EmailTemplateUploader emailTemplateUploader =
+                new SendGridManagement.EmailTemplateUploader(new SendGridClient(sendGridConfig.ApiKey), InitializeCosmosClientInstance(cosmosConfig));
+
+            emailTemplateUploader.Migrate().ConfigureAwait(false);
         }
 
         private static CosmosDbService InitializeCosmosClientInstance(CosmosConfig cosmosConfig)
