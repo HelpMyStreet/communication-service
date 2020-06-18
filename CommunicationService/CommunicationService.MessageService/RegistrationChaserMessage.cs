@@ -20,7 +20,7 @@ namespace CommunicationService.MessageService
         {
             get
             {
-                return UnsubscribeGroupName.RegistrationChasers;
+                return UnsubscribeGroupName.RegistrationUpdates;
             }
         }
 
