@@ -14,6 +14,8 @@
     <None Remove="Migrations\20200617_084300_AmendTemplates.json" />
     <None Remove="Migrations\20200617_084300_PostYotiCommunication.json" />
     <None Remove="Migrations\20200617_084300_RegistrationChasers.json" />
+    <None Remove="Migrations\20200618_110400_UpdateGroups.json" />
+    <None Remove="Migrations\20200618_11229_DeleteGroups.json" />
   </ItemGroup>
 
   <ItemGroup>
@@ -30,6 +32,12 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </EmbeddedResource>
     <EmbeddedResource Include="Emails\Welcome.html">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\20200618_11229_DeleteGroups.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\20200618_110400_UpdateGroups.json">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\20200617_084300_RegistrationChasers.json">
