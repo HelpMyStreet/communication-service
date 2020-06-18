@@ -15,7 +15,17 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CommunicationService.Repo",
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CommunicationService.EmailService", "CommunicationService\CommunicationService.EmailService\CommunicationService.EmailService.csproj", "{49DE34EC-7A61-4353-9531-C2DB66625480}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CommunicationService.UserService", "CommunicationService\CommunicationService.UserService\CommunicationService.UserService.csproj", "{2A0222BF-4177-4499-8ACD-006F0B9963A1}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CommunicationService.UserService", "CommunicationService\CommunicationService.UserService\CommunicationService.UserService.csproj", "{2A0222BF-4177-4499-8ACD-006F0B9963A1}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CommunicationService.MessageService", "CommunicationService\CommunicationService.MessageService\CommunicationService.MessageService.csproj", "{5A8E3CB7-D347-49F1-B2B4-96A1A075E0F1}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CommunicationService.RequestService", "CommunicationService\CommunicationService.RequestService\CommunicationService.RequestService.csproj", "{FADF593E-2002-4382-A518-796B3B88330C}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CommunicationService.SendGridService", "CommunicationService\CommunicationService.SendGridService\CommunicationService.SendGridService.csproj", "{5888975E-7362-441F-8A76-4BEE011125A2}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CommunicationService.SendGridManagement", "CommunicationService\CommunicationService.SendGridManagement\CommunicationService.SendGridManagement.csproj", "{20EDDF0F-4EFB-4C86-B745-93737B22A46A}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CommunicationService.UnitTests", "CommunicationService\CommunicationService.UnitTests\CommunicationService.UnitTests.csproj", "{FF609DE6-CA42-4F99-A1FE-53FDBD132DDA}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -51,6 +61,26 @@ Global
 		{2A0222BF-4177-4499-8ACD-006F0B9963A1}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{2A0222BF-4177-4499-8ACD-006F0B9963A1}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{2A0222BF-4177-4499-8ACD-006F0B9963A1}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5A8E3CB7-D347-49F1-B2B4-96A1A075E0F1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5A8E3CB7-D347-49F1-B2B4-96A1A075E0F1}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5A8E3CB7-D347-49F1-B2B4-96A1A075E0F1}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5A8E3CB7-D347-49F1-B2B4-96A1A075E0F1}.Release|Any CPU.Build.0 = Release|Any CPU
+		{FADF593E-2002-4382-A518-796B3B88330C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{FADF593E-2002-4382-A518-796B3B88330C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{FADF593E-2002-4382-A518-796B3B88330C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{FADF593E-2002-4382-A518-796B3B88330C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5888975E-7362-441F-8A76-4BEE011125A2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5888975E-7362-441F-8A76-4BEE011125A2}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5888975E-7362-441F-8A76-4BEE011125A2}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5888975E-7362-441F-8A76-4BEE011125A2}.Release|Any CPU.Build.0 = Release|Any CPU
+		{20EDDF0F-4EFB-4C86-B745-93737B22A46A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{20EDDF0F-4EFB-4C86-B745-93737B22A46A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{20EDDF0F-4EFB-4C86-B745-93737B22A46A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{20EDDF0F-4EFB-4C86-B745-93737B22A46A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{FF609DE6-CA42-4F99-A1FE-53FDBD132DDA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{FF609DE6-CA42-4F99-A1FE-53FDBD132DDA}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{FF609DE6-CA42-4F99-A1FE-53FDBD132DDA}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{FF609DE6-CA42-4F99-A1FE-53FDBD132DDA}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
