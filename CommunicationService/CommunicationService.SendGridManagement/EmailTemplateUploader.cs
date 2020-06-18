@@ -12,6 +12,7 @@ using System.Threading.Tasks;
 using CommunicationService.Core.Domains.SendGrid;
 using CommunicationService.Core.Exception;
 using System.Reflection;
+using System.Security;
 
 namespace CommunicationService.SendGridManagement
 {
@@ -31,7 +32,7 @@ namespace CommunicationService.SendGridManagement
             var assembly = Assembly.GetExecutingAssembly();
             var files = assembly.GetManifestResourceNames();
 
-            var migrationfolder = files.Where(x => x.Contains(".SendGridManagement.Migrations.")).ToList();
+            var migrationfolder = files.Where(x => x.Contains(".SendGridManagement.Migrations.")).OrderBy(s=>s).ToList();
 
             List<MigrationHistory> history = _cosmosDbService.GetMigrationHistory().Result;
 
@@ -84,11 +85,37 @@ namespace CommunicationService.SendGridManagement
                 }
             }
 
-            if (templates.unsubscribeGroups?.Length > 0)
+            if (templates.createUpdateUnsubscribeGroups?.Length > 0)
             {
-                foreach (UnsubscribeGroups unsubscribeGroups in templates.unsubscribeGroups)
+                foreach (UnsubscribeGroups unsubscribeGroups in templates.createUpdateUnsubscribeGroups)
+                { 
+                    int groupId;
+                    try
+                    {
+                        groupId = await GetGroupId(unsubscribeGroups.name);
+                        unsubscribeGroups.id = groupId;
+                        UpdateUnsubscribeGroup(unsubscribeGroups);
+                    }
+                    catch (UnknownSubscriptionGroupException)
+                    {
+                        groupId = CreateNewGroup(unsubscribeGroups);
+                    }
+                }
+            }
+
+            if (templates.deleteUnsubscribeGroups?.Length > 0)
+            {
+                foreach (UnsubscribeGroups unsubscribeGroups in templates.deleteUnsubscribeGroups)
                 {
-                    int groupId = CreateNewGroup(unsubscribeGroups);
+                    int groupId;
+                    try
+                    {
+                        groupId = await GetGroupId(unsubscribeGroups.name);
+                        DeleteUnsubscribeGroup(groupId);
+                    }
+                    catch (UnknownSubscriptionGroupException)
+                    {
+                    }
                 }
             }
 
@@ -137,6 +164,37 @@ namespace CommunicationService.SendGridManagement
             else
             {
                 throw new SendGridException();
+            }
+        }
+
+        private async Task<int> GetGroupId(string groupName)
+        {
+            Response response = await _sendGridClient.RequestAsync(SendGridClient.Method.GET, null, null, "asm/groups");
+
+            if (response != null && response.StatusCode == HttpStatusCode.OK)
+            {
+                string body = response.Body.ReadAsStringAsync().Result;
+                var groups = JsonConvert.DeserializeObject<UnsubscribeGroups[]>(body);
+                if (groups != null && groups.Length > 0)
+                {
+                    var group = groups.Where(x => x.name == groupName).FirstOrDefault();
+                    if (group != null)
+                    {
+                        return group.id;
+                    }
+                    else
+                    {
+                        throw new UnknownSubscriptionGroupException($"{groupName} cannot be found in groups");
+                    }
+                }
+                else
+                {
+                    throw new UnknownSubscriptionGroupException("No groups found");
+                }
+            }
+            else
+            {
+                throw new SendGridException("CallingGetGroupId");
             }
         }
 
@@ -191,7 +249,6 @@ namespace CommunicationService.SendGridManagement
                 throw new Exception("Invalid response from create new template");
             }
         }
-        
 
         private bool CreateNewTemplateVersion(NewTemplateVersion newTemplateVersion)
         {
@@ -216,6 +273,36 @@ namespace CommunicationService.SendGridManagement
                 throw exc;
             }
             return false;
+        }
+
+        private bool UpdateUnsubscribeGroup(UnsubscribeGroups unsubscribeGroups)
+        {
+            string requestBody = JsonConvert.SerializeObject(unsubscribeGroups);
+
+            Response response = _sendGridClient.RequestAsync(SendGridClient.Method.PATCH, requestBody, null, $"asm/groups/{unsubscribeGroups.id}").Result;
+
+            if (response != null && response.StatusCode == HttpStatusCode.OK)
+            {
+                return true;
+            }
+            else
+            {
+                throw new Exception("Unable to update unsubscribe group");
+            }
+        }
+
+        private bool DeleteUnsubscribeGroup(int groupId)
+        {
+            Response response = _sendGridClient.RequestAsync(SendGridClient.Method.DELETE, null, null, $"asm/groups/{groupId}").Result;
+
+            if (response != null && response.StatusCode == HttpStatusCode.NoContent)
+            {
+                return true;
+            }
+            else
+            {
+                throw new Exception("Unable to update unsubscribe group");
+            }
         }
     }
 }
