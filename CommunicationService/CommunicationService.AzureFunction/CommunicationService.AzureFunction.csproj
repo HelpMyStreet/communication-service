@@ -17,6 +17,8 @@
 		<PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="2.2.0" />
 		<PackageReference Include="Microsoft.Extensions.Http" Version="2.2.0" />
 		<PackageReference Include="Microsoft.NET.Sdk.Functions" Version="1.0.28" />
+		<PackageReference Include="NewRelic.Agent" Version="8.27.139" />
+		<PackageReference Include="NewRelic.Agent.Api" Version="8.27.139" />
 	</ItemGroup>
 	<ItemGroup>
 		<ProjectReference Include="..\CommunicationService.EmailService\CommunicationService.EmailService.csproj" />
@@ -47,5 +49,4 @@
 			<CopyToPublishDirectory>Never</CopyToPublishDirectory>
 		</None>
 	</ItemGroup>
-	<ProjectExtensions><VisualStudio><UserProperties local_1settings_1json__JsonSchema="https://jenkins-x.io/schemas/jx-schema.json" /></VisualStudio></ProjectExtensions>
 </Project>
