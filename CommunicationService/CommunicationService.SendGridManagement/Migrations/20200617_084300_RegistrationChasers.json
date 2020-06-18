@@ -1,0 +1,32 @@
+﻿{
+  "Templates": [
+    {
+      "name": "PartialRegistration",
+      "subject": "Your registration – Help My Street",
+      "generation": "dynamic",
+      "versions": [
+        {
+          "name": "First",
+          "subject": "Your registration – Help My Street"
+        }
+      ]
+    },
+    {
+      "name": "YotiReminder",
+      "subject": "Welcome to Help My Street! Verify your identity to access requests",
+      "generation": "dynamic",
+      "versions": [
+        {
+          "name": "First",
+          "subject": "Welcome to Help My Street! Verify your identity to access requests"
+        }
+      ]
+    }
+  ],
+  "UnsubscribeGroups": [
+    {
+      "name": "RegistrationChasers",
+      "description": "RegistrationChasers descriptions"
+    }
+  ]
+}
