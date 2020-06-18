@@ -11,6 +11,7 @@ using HelpMyStreet.Contracts.CommunicationService.Request;
 using HelpMyStreet.Contracts.CommunicationService.Response;
 using HelpMyStreet.Contracts.Shared;
 using Microsoft.AspNetCore.Http;
+using NewRelic.Api.Agent;
 
 namespace CommunicationService.AzureFunction
 {
@@ -23,6 +24,7 @@ namespace CommunicationService.AzureFunction
             _mediator = mediator;
         }
 
+        [Transaction(Web = true)]
         [FunctionName("SendEmailToUsers")]
         [ProducesResponseType((int)HttpStatusCode.OK, Type = typeof(SendEmailResponse))]
         public async Task<IActionResult> Run(
@@ -32,13 +34,14 @@ namespace CommunicationService.AzureFunction
         {
             try
             {
+                NewRelic.Api.Agent.NewRelic.SetTransactionName("CommunicationService", "SendEmailToUsers");
                 log.LogInformation("C# HTTP trigger function processed a request.");
                 SendEmailResponse response = await _mediator.Send(req);
                 return new OkObjectResult(ResponseWrapper<SendEmailResponse, CommunicationServiceErrorCode>.CreateSuccessfulResponse(response));                
             }
             catch (Exception exc)
             {
-                log.LogError("Exception occured in Send Email To Users", exc);
+                LogError.Log(log, exc, req);
                 return new ObjectResult(ResponseWrapper<SendEmailResponse, CommunicationServiceErrorCode>.CreateUnsuccessfulResponse(CommunicationServiceErrorCode.InternalServerError, "Internal Error")) { StatusCode = StatusCodes.Status500InternalServerError };                
             }
         }
