@@ -1,5 +1,5 @@
 ﻿{
-  "UnsubscribeGroups": [
+  "CreateUpdateUnsubscribeGroups": [
     {
       "name": "Registration Updates",
       "description": "Emails regarding your registration"
