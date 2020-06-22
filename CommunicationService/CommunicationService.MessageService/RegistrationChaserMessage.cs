@@ -15,6 +15,7 @@ namespace CommunicationService.MessageService
         private readonly IConnectUserService _connectUserService;
         private readonly ICosmosDbService _cosmosDbService;
         private const int REGISTRATION_STEP4 = 4;
+        private Dictionary<int, string> _recipients;
 
         public string UnsubscriptionGroupName
         {
@@ -28,6 +29,7 @@ namespace CommunicationService.MessageService
         {
             _connectUserService = connectUserService;
             _cosmosDbService = cosmosDbService;
+            _recipients = new Dictionary<int, string>();
             
         }
 
@@ -51,31 +53,24 @@ namespace CommunicationService.MessageService
             }
         }
 
-        private Dictionary<int, string> AddRecipientAndTemplate(string templateName, int userId)
+        private void AddRecipientAndTemplate(string templateName, int userId)
         {
             List<EmailHistory> history = _cosmosDbService.GetEmailHistory(templateName, userId.ToString()).Result;
             if (history.Count == 0)
             {
-                return new Dictionary<int, string>()
-                {
-                    {userId,templateName }
-                };
-            }
-            else
-            {
-                return new Dictionary<int, string>();
+                _recipients.Add(userId, templateName);
             }
         }
 
         public Dictionary<int,string> IdentifyRecipients(int? recipientUserId, int? jobId, int? groupId)
         {
-            Dictionary<int, string> response = new Dictionary<int, string>();
+            _recipients = new Dictionary<int, string>();
             var users = _connectUserService.GetIncompleteRegistrationStatusAsync().Result;
 
             if(users!=null)
             {
                 var validUsersWithRange = users.Users.Where(x => ((DateTime.Now.ToUniversalTime() - x.DateCompleted).TotalMinutes >= 30)
-                && ((DateTime.Now.ToUniversalTime() - x.DateCompleted).TotalHours <=48)).ToList();
+                && ((DateTime.Now.ToUniversalTime() - x.DateCompleted).TotalHours <=60)).ToList();
 
                 if(validUsersWithRange!=null)
                 {
@@ -86,18 +81,18 @@ namespace CommunicationService.MessageService
                         {
                             if (u.RegistrationStep == REGISTRATION_STEP4)
                             {
-                                response = AddRecipientAndTemplate(TemplateName.YotiReminder, u.UserId);
+                                AddRecipientAndTemplate(TemplateName.YotiReminder, u.UserId);
                             }
                             else
                             {
-                                response = AddRecipientAndTemplate(TemplateName.PartialRegistration, u.UserId);
+                                AddRecipientAndTemplate(TemplateName.PartialRegistration, u.UserId);
                             }
                         }
                     }
                 }
 
             }
-            return response;
+            return _recipients;
         }
     }
 }
