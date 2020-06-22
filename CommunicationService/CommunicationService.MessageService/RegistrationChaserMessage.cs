@@ -1,8 +1,10 @@
-﻿using CommunicationService.Core.Domains;
+﻿using CommunicationService.Core.Configuration;
+using CommunicationService.Core.Domains;
 using CommunicationService.Core.Interfaces;
 using CommunicationService.Core.Interfaces.Repositories;
 using CommunicationService.Core.Interfaces.Services;
 using CommunicationService.MessageService.Substitution;
+using Microsoft.Extensions.Options;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -14,6 +16,7 @@ namespace CommunicationService.MessageService
     {
         private readonly IConnectUserService _connectUserService;
         private readonly ICosmosDbService _cosmosDbService;
+        private readonly IOptions<EmailConfig> _emailConfig;
         private const int REGISTRATION_STEP4 = 4;
         private Dictionary<int, string> _recipients;
 
@@ -25,10 +28,11 @@ namespace CommunicationService.MessageService
             }
         }
 
-        public RegistrationChaserMessage(IConnectUserService connectUserService, ICosmosDbService cosmosDbService)
+        public RegistrationChaserMessage(IConnectUserService connectUserService, ICosmosDbService cosmosDbService, IOptions<EmailConfig> emailConfig)
         {
             _connectUserService = connectUserService;
             _cosmosDbService = cosmosDbService;
+            _emailConfig = emailConfig;
             _recipients = new Dictionary<int, string>();
             
         }
@@ -69,8 +73,8 @@ namespace CommunicationService.MessageService
 
             if(users!=null)
             {
-                var validUsersWithRange = users.Users.Where(x => ((DateTime.Now.ToUniversalTime() - x.DateCompleted).TotalMinutes >= 30)
-                && ((DateTime.Now.ToUniversalTime() - x.DateCompleted).TotalHours <=60)).ToList();
+                var validUsersWithRange = users.Users.Where(x => ((DateTime.Now.ToUniversalTime() - x.DateCompleted).TotalMinutes >= _emailConfig.Value.RegistrationChaserMinTimeInMinutes)
+                && ((DateTime.Now.ToUniversalTime() - x.DateCompleted).TotalHours <= _emailConfig.Value.RegistrationChaserMaxTimeInHours)).ToList();
 
                 if(validUsersWithRange!=null)
                 {
