@@ -105,6 +105,7 @@ namespace CommunicationService.SendGridService
             var eml = new SendGridMessage()
             {
                 From = new EmailAddress(_sendGridConfig.Value.FromEmail, _sendGridConfig.Value.FromName),
+                ReplyTo  = new EmailAddress(_sendGridConfig.Value.FromEmail, _sendGridConfig.Value.FromName),
                 TemplateId = templateId,
                 Asm = new ASM()
                 {
