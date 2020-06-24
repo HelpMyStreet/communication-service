@@ -69,17 +69,17 @@ namespace CommunicationService.MessageService
         private Dictionary<int, string> AddRecipientAndTemplate(string templateName, int userId)
         {
             List<EmailHistory> history = _cosmosDbService.GetEmailHistory(templateName, userId.ToString()).Result;
-            //if (history.Count == 0)
-            //{
+            if (history.Count == 0)
+            {
                 return new Dictionary<int, string>()
                 {
                     {userId,templateName }
                 };
-            //}
-            //else
-            //{
-            //    return new Dictionary<int, string>();
-            //}
+            }
+            else
+            {
+                return new Dictionary<int, string>();
+            }
         }
 
         public Dictionary<int,string> IdentifyRecipients(int? recipientUserId, int? jobId, int? groupId)
