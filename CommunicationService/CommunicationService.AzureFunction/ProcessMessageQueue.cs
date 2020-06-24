@@ -28,7 +28,7 @@ namespace CommunicationService.AzureFunction
         {
             SendMessageRequest sendMessageRequest = JsonConvert.DeserializeObject<SendMessageRequest>(myQueueItem);
             IMessage message = _messageFactory.Create(sendMessageRequest);
-            EmailBuildData emailBuildData = message.PrepareTemplateData(sendMessageRequest.RecipientUserID, sendMessageRequest.JobID, sendMessageRequest.GroupID).Result;
+            EmailBuildData emailBuildData = message.PrepareTemplateData(sendMessageRequest.RecipientUserID, sendMessageRequest.JobID, sendMessageRequest.GroupID, sendMessageRequest.TemplateName).Result;
             _connectSendGridService.SendDynamicEmail(sendMessageRequest.TemplateName, message.UnsubscriptionGroupName, emailBuildData);
             AddCommunicationRequestToCosmos(sendMessageRequest);
             log.LogInformation($"C# ServiceBus queue trigger function processed message: {myQueueItem}");
