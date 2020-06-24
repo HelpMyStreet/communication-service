@@ -9,10 +9,12 @@ namespace CommunicationService.MessageService.Substitution
     {
         public string FirstName { get; private set; }
         public string LastName { get; private set; }
-        public PostYotiCommunicationData(string firstName, string lastName)
+        public string Title { get; private set; }
+        public PostYotiCommunicationData(string firstName, string lastName, string title)
         {
             FirstName = firstName;
             LastName = lastName;
+            Title = title;
         }
     }
 }

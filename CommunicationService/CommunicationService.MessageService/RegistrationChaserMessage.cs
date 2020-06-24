@@ -37,7 +37,20 @@ namespace CommunicationService.MessageService
             
         }
 
-        public async Task<EmailBuildData> PrepareTemplateData(int? recipientUserId, int? jobId, int? groupId)
+        private string GetTitleFromTemplateName(string templateName)
+        {
+            switch (templateName)
+            {
+                case TemplateName.PartialRegistration:
+                    return "Almost there, complete your registration to start helping your street";
+                case TemplateName.YotiReminder:
+                    return "Welcome to Help My Street!";
+                default:
+                    throw new Exception($"{templateName} is unknown");
+            }
+        }
+
+        public async Task<EmailBuildData> PrepareTemplateData(int? recipientUserId, int? jobId, int? groupId,string templateName)
         {
             var user = await _connectUserService.GetUserByIdAsync(recipientUserId.Value);
 
@@ -45,7 +58,7 @@ namespace CommunicationService.MessageService
             {
                 return new EmailBuildData()
                 {
-                    BaseDynamicData = new RegistrationChaserData(user.UserPersonalDetails.FirstName, user.UserPersonalDetails.LastName),
+                    BaseDynamicData = new RegistrationChaserData(user.UserPersonalDetails.FirstName, user.UserPersonalDetails.LastName, GetTitleFromTemplateName(templateName)),
                     EmailToAddress = user.UserPersonalDetails.EmailAddress,
                     EmailToName = user.UserPersonalDetails.DisplayName,
                     RecipientUserID = recipientUserId.Value

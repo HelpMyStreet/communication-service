@@ -77,7 +77,7 @@ namespace CommunicationService.SendGridManagement
                         template_id = templateId,
                         name = template.versions[0].name,
                         active = 1,
-                        html_content = GetEmailHtml("Header") + GetEmailHtml(template.name),
+                        html_content = GetEmailHtml("Header") + GetEmailHtml(template.name) + GetEmailHtml("Footer"),
                         plain_content = "",
                         subject = template.versions[0].subject
                     }
