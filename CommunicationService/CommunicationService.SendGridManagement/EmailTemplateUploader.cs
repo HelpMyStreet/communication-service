@@ -72,12 +72,13 @@ namespace CommunicationService.SendGridManagement
                     {
                         templateId = CreateNewTemplate(template);
                     }
+                    string html_content = GetEmailHtml("Layout").Replace("{{Body}}", GetEmailHtml(template.name));
                     bool success = CreateNewTemplateVersion(new NewTemplateVersion()
                     {
                         template_id = templateId,
                         name = template.versions[0].name,
                         active = 1,
-                        html_content = GetEmailHtml("Header") + GetEmailHtml(template.name) + GetEmailHtml("Footer"),
+                        html_content = html_content,
                         plain_content = "",
                         subject = template.versions[0].subject
                     }

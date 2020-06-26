@@ -6,7 +6,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <None Remove="Emails\Footer.html" />
+    <None Remove="Emails\Layout.html" />
     <None Remove="Emails\PartialRegistration.html" />
     <None Remove="Emails\ThanksForVerifying.html" />
     <None Remove="Emails\UnableToVerify.html" />
@@ -18,14 +18,12 @@
     <None Remove="Migrations\20200618_110400_UpdateGroups.json" />
     <None Remove="Migrations\20200618_11229_DeleteGroups.json" />
     <None Remove="Migrations\20200623_089300_ChangeSignature.json" />
-    <None Remove="Emails\Header.html" />
     <None Remove="Migrations\20200623_142900_AddHeader.json" />
     <None Remove="Migrations\20200624_100000_AddFooter.json" />
     <None Remove="Migrations\20200626_100000_MarkupTweaks.json" />
   </ItemGroup>
 
   <ItemGroup>
-    <EmbeddedResource Include="Emails\Footer.html" />
     <EmbeddedResource Include="Emails\YotiReminder.html">
     </EmbeddedResource>
     <EmbeddedResource Include="Emails\UnableToVerify.html">
@@ -44,7 +42,7 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\20200617_084300_PostYotiCommunication.json">
     </EmbeddedResource>
-    <EmbeddedResource Include="Emails\Header.html" />
+    <EmbeddedResource Include="Emails\Layout.html" />
     <EmbeddedResource Include="Migrations\20200626_100000_MarkupTweaks.json" />
     <EmbeddedResource Include="Migrations\20200624_100000_AddFooter.json" />
     <EmbeddedResource Include="Migrations\20200623_142900_AddHeader.json" />
