@@ -13,6 +13,7 @@ using CommunicationService.Core.Domains.SendGrid;
 using CommunicationService.Core.Exception;
 using System.Reflection;
 using System.Security;
+using System.Text.RegularExpressions;
 
 namespace CommunicationService.SendGridManagement
 {
@@ -73,13 +74,17 @@ namespace CommunicationService.SendGridManagement
                         templateId = CreateNewTemplate(template);
                     }
                     string html_content = GetEmailHtml("Layout").Replace("{{Body}}", GetEmailHtml(template.name));
+                    
+                    string plain_content = Regex.Replace(GetEmailHtml(template.name), @"<[^>]*>", String.Empty);
+                    plain_content = GetEmailText("Layout").Replace("{{Body}}", plain_content);
+
                     bool success = CreateNewTemplateVersion(new NewTemplateVersion()
                     {
                         template_id = templateId,
                         name = template.versions[0].name,
                         active = 1,
                         html_content = html_content,
-                        plain_content = "",
+                        plain_content = plain_content,
                         subject = template.versions[0].subject
                     }
                     );
@@ -130,6 +135,13 @@ namespace CommunicationService.SendGridManagement
         private string GetEmailHtml(string name)
         {
             string filename = $"CommunicationService.SendGridManagement.Emails.{name}.html";
+            string html = ReadFile(filename);
+            return html;
+        }
+
+        private string GetEmailText(string name)
+        {
+            string filename = $"CommunicationService.SendGridManagement.Emails.{name}.txt";
             string html = ReadFile(filename);
             return html;
         }
