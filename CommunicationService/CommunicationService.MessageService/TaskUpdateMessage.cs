@@ -7,6 +7,7 @@ using HelpMyStreet.Contracts.UserService.Response;
 using HelpMyStreet.Utils.Enums;
 using System;
 using System.Collections.Generic;
+using System.Text.RegularExpressions;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -36,7 +37,8 @@ namespace CommunicationService.MessageService
         {
             var job = _connectRequestService.GetJobDetailsAsync(jobId.Value).Result;
             var timeOfDay = DateTime.Now.ToString("t");
-            var timeUpdated = $"today at {timeOfDay}";
+            timeOfDay = Regex.Replace(timeOfDay, @"\s+", "");
+            var timeUpdated = $"today at {timeOfDay.ToLower()}";
             bool isFaceMask = job.SupportActivity == SupportActivities.FaceMask;
             bool isOpen = job.JobStatus == JobStatuses.Open;
             bool isDone = job.JobStatus == JobStatuses.Done;
