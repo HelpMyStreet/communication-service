@@ -1,0 +1,59 @@
+﻿{
+  "Templates": [
+    {
+      "name": "PartialRegistration",
+      "subject": "Your registration – Help My Street",
+      "generation": "dynamic",
+      "versions": [
+        {
+          "name": "Add Header",
+          "subject": "Your registration – Help My Street"
+        }
+      ]
+    },
+    {
+      "name": "YotiReminder",
+      "subject": "Welcome to Help My Street! Verify your identity to access requests",
+      "generation": "dynamic",
+      "versions": [
+        {
+          "name": "Add Header",
+          "subject": "Welcome to Help My Street! Verify your identity to access requests"
+        }
+      ]
+    },
+    {
+      "name": "Welcome",
+      "subject": "Welcome to Help My Street!",
+      "generation": "dynamic",
+      "versions": [
+        {
+          "name": "Add Header",
+          "subject": "Welcome to Help My Street!"
+        }
+      ]
+    },
+    {
+      "name": "ThanksForVerifying",
+      "subject": "Thanks for verifying your identity with Help My Street!",
+      "generation": "dynamic",
+      "versions": [
+        {
+          "name": "Add Header",
+          "subject": "Thanks for verifying your identity with Help My Street!"
+        }
+      ]
+    },
+    {
+      "name": "UnableToVerify",
+      "subject": "Your HelpMyStreet registration",
+      "generation": "dynamic",
+      "versions": [
+        {
+          "name": "Add Header",
+          "subject": "Your HelpMyStreet registration"
+        }
+      ]
+    }
+  ]
+}

@@ -6,6 +6,8 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Remove="Emails\Layout.html" />
+    <None Remove="Emails\Layout.txt" />
     <None Remove="Emails\PartialRegistration.html" />
     <None Remove="Emails\ThanksForVerifying.html" />
     <None Remove="Emails\UnableToVerify.html" />
@@ -17,36 +19,37 @@
     <None Remove="Migrations\20200618_110400_UpdateGroups.json" />
     <None Remove="Migrations\20200618_11229_DeleteGroups.json" />
     <None Remove="Migrations\20200623_089300_ChangeSignature.json" />
+    <None Remove="Migrations\20200623_142900_AddHeader.json" />
+    <None Remove="Migrations\20200624_100000_AddFooter.json" />
+    <None Remove="Migrations\20200626_100000_MarkupTweaks.json" />
+    <None Remove="Migrations\20200626_200000_AddingPlainText.json" />
   </ItemGroup>
 
   <ItemGroup>
+    <EmbeddedResource Include="Emails\Layout.txt" />
     <EmbeddedResource Include="Emails\YotiReminder.html">
-      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
     </EmbeddedResource>
     <EmbeddedResource Include="Emails\UnableToVerify.html">
-      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
     </EmbeddedResource>
     <EmbeddedResource Include="Emails\ThanksForVerifying.html">
-      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
     </EmbeddedResource>
     <EmbeddedResource Include="Emails\PartialRegistration.html">
-      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
     </EmbeddedResource>
     <EmbeddedResource Include="Emails\Welcome.html">
-      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\20200618_11229_DeleteGroups.json">
-      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\20200618_110400_UpdateGroups.json">
-      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\20200623_089300_ChangeSignature.json">
-      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\20200617_084300_PostYotiCommunication.json">
-      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
     </EmbeddedResource>
+    <EmbeddedResource Include="Emails\Layout.html" />
+    <EmbeddedResource Include="Migrations\20200626_200000_AddingPlainText.json" />
+    <EmbeddedResource Include="Migrations\20200626_100000_MarkupTweaks.json" />
+    <EmbeddedResource Include="Migrations\20200624_100000_AddFooter.json" />
+    <EmbeddedResource Include="Migrations\20200623_142900_AddHeader.json" />
   </ItemGroup>
 
   <ItemGroup>

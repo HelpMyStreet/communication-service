@@ -9,7 +9,7 @@ namespace CommunicationService.Core.Interfaces
 	{
 		string UnsubscriptionGroupName { get;}
 		Dictionary<int,string> IdentifyRecipients(int? recipientUserId, int? jobId, int? groupId);
-		Task<EmailBuildData> PrepareTemplateData(int? recipientUserId, int? jobId, int? groupId);
+		Task<EmailBuildData> PrepareTemplateData(int? recipientUserId, int? jobId, int? groupId, string templateName);
 	}
 
 }
