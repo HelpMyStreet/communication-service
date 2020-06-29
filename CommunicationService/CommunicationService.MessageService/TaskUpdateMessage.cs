@@ -35,14 +35,22 @@ namespace CommunicationService.MessageService
         public async Task<EmailBuildData> PrepareTemplateData(int? recipientUserId, int? jobId, int? groupId, string templateName)
         {
             var job = _connectRequestService.GetJobDetailsAsync(jobId.Value).Result;
-
+            var timeOfDay = DateTime.Now.ToString("t");
+            var timeUpdated = $"today at {timeOfDay}";
+            bool isFaceMask = job.SupportActivity == SupportActivities.FaceMask;
+            bool isOpen = job.JobStatus == JobStatuses.Open;
+            bool isDone = job.JobStatus == JobStatuses.Done;
             return new EmailBuildData()
             {
                 BaseDynamicData = new TaskUpdateData
                 (
                 job.DateRequested.ToString("dd/MM/yyyy"),
                 Mapping.ActivityMappings[job.SupportActivity],
-                Mapping.StatusMappings[job.JobStatus]
+                Mapping.StatusMappings[job.JobStatus],
+                timeUpdated,
+                isFaceMask,
+                isDone,
+                isOpen
                 ),
                 EmailToAddress = job.Requestor.EmailAddress,
                 EmailToName = $"{job.Requestor.FirstName} {job.Requestor.LastName}",
