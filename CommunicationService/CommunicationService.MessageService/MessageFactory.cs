@@ -49,6 +49,10 @@ namespace CommunicationService.MessageService
                     return new PostYotiCommunicationMessage(_connectUserService, _cosmosDbService);
                 case CommunicationJobTypes.SendRegistrationChasers:
                     return new RegistrationChaserMessage(_connectUserService, _cosmosDbService,_emailConfig);
+                case CommunicationJobTypes.SendNewTaskNotification:
+                    return new TaskNotificationMessage(_connectUserService, _connectRequestService);
+                case CommunicationJobTypes.SendTaskStateChangeUpdate:
+                    return new TaskUpdateMessage(_connectUserService, _connectRequestService);
                 default:
                     throw new Exception("Unknown Email Type");
             }

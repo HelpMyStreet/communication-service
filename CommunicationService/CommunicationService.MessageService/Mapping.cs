@@ -20,5 +20,12 @@ namespace CommunicationService.MessageService
             { HelpMyStreet.Utils.Enums.SupportActivities.WellbeingPackage, "Wellbeing Package" },
             { HelpMyStreet.Utils.Enums.SupportActivities.Other, "Other" }
         };
+
+        public static Dictionary<HelpMyStreet.Utils.Enums.JobStatuses, string> StatusMappings = new Dictionary<HelpMyStreet.Utils.Enums.JobStatuses, string>()
+        {
+            {HelpMyStreet.Utils.Enums.JobStatuses.Done, "Completed" },
+            {HelpMyStreet.Utils.Enums.JobStatuses.InProgress, "In Progress"},
+            {HelpMyStreet.Utils.Enums.JobStatuses.Open, "Open"}
+        };
     }
 }
