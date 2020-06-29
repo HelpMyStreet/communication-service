@@ -16,6 +16,7 @@ namespace CommunicationService.MessageService.Substitution
         public bool IsNotVerified { get; private set; }
         public bool IsStreetChampionOfPostcode { get; private set; }
         public bool IsHealthCritical { get; set; }
+        public bool IsFaceMask { get; set; }
 
         public TaskNotificationData(
             bool isRequestor,
@@ -26,7 +27,8 @@ namespace CommunicationService.MessageService.Substitution
             string dueDate,
             bool isNotVerified,
             bool isStreetChampionOfPostcode,
-            bool isHealthCritical
+            bool isHealthCritical,
+            bool isFaceMask
             )
         {
             IsRequestor = isRequestor;
@@ -38,6 +40,7 @@ namespace CommunicationService.MessageService.Substitution
             IsNotVerified = isNotVerified;
             IsStreetChampionOfPostcode = isStreetChampionOfPostcode;
             IsHealthCritical = isHealthCritical;
+            IsFaceMask = isFaceMask;
         }
     }
 }

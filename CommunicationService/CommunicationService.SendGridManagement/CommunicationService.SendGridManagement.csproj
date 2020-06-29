@@ -23,6 +23,8 @@
     <None Remove="Migrations\20200624_100000_AddFooter.json" />
     <None Remove="Migrations\20200626_100000_MarkupTweaks.json" />
     <None Remove="Migrations\20200626_200000_AddingPlainText.json" />
+    <None Remove="Emails\TaskUpdate.html" />
+    <None Remove="Emails\TaskNotification.html" />
   </ItemGroup>
 
   <ItemGroup>
@@ -50,6 +52,8 @@
     <EmbeddedResource Include="Migrations\20200626_100000_MarkupTweaks.json" />
     <EmbeddedResource Include="Migrations\20200624_100000_AddFooter.json" />
     <EmbeddedResource Include="Migrations\20200623_142900_AddHeader.json" />
+    <EmbeddedResource Include="Emails\TaskUpdate.html" />
+    <EmbeddedResource Include="Emails\TaskNotification.html" />
   </ItemGroup>
 
   <ItemGroup>

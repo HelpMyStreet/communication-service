@@ -38,6 +38,7 @@ namespace CommunicationService.MessageService
             var job = _connectRequestService.GetJobDetailsAsync(jobId.Value).Result;
             byte[] jobIdBytes = System.Text.Encoding.UTF8.GetBytes(job.JobID.ToString());
             string encodedJobId = System.Convert.ToBase64String(jobIdBytes);
+            bool isFaceMask = job.SupportActivity == SupportActivities.FaceMask;
 
             if (recipientUserId < 0)
             {
@@ -53,7 +54,8 @@ namespace CommunicationService.MessageService
                         job.DueDate.ToString("dd/MM/yyyy"),
                         false,
                         false,
-                        job.HealthCritical
+                        job.HealthCritical,
+                        isFaceMask
                     ),
                     EmailToAddress = job.Requestor.EmailAddress,
                     EmailToName = $"{job.Requestor.FirstName} {job.Requestor.LastName}",
@@ -93,7 +95,8 @@ namespace CommunicationService.MessageService
                             job.DueDate.ToString("dd/MM/yyyy"),
                             user.IsVerified.HasValue ? !user.IsVerified.Value : false,
                             isStreetChampionForGivenPostCode,
-                            job.HealthCritical
+                            job.HealthCritical,
+                            isFaceMask
                         ),
                         EmailToAddress = user.UserPersonalDetails.EmailAddress,
                         EmailToName = user.UserPersonalDetails.DisplayName,
