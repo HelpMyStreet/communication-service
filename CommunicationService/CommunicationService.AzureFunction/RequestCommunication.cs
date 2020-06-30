@@ -11,6 +11,7 @@ using HelpMyStreet.Contracts.CommunicationService.Response;
 using HelpMyStreet.Contracts.CommunicationService.Request;
 using HelpMyStreet.Contracts.Shared;
 using Microsoft.AspNetCore.Http;
+using Newtonsoft.Json;
 
 namespace CommunicationService.AzureFunction
 {
@@ -32,7 +33,8 @@ namespace CommunicationService.AzureFunction
         {
             try
             {
-                log.LogInformation("C# HTTP trigger function processed a request.");
+                var request = JsonConvert.SerializeObject(req);
+                log.LogInformation($"RequestCommunicationRequest {request}");
 
                 RequestCommunicationResponse response = await _mediator.Send(req);
                 return new OkObjectResult(ResponseWrapper<RequestCommunicationResponse, CommunicationServiceErrorCode>.CreateSuccessfulResponse(response));
