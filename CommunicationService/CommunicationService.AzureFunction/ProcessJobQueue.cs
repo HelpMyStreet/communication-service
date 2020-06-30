@@ -22,9 +22,21 @@ namespace CommunicationService.AzureFunction
         [FunctionName("ProcessJobQueue")]
         public void Run([ServiceBusTrigger("job", Connection = "ServiceBus")]string myQueueItem, ILogger log)
         {
+            log.LogInformation($"myQueueItem {myQueueItem}");
+
             RequestCommunicationRequest sendCommunicationRequest = JsonConvert.DeserializeObject<RequestCommunicationRequest>(myQueueItem);
             IMessage message = _messageFactory.Create(sendCommunicationRequest);
             Dictionary<int, string> recipients = message.IdentifyRecipients(sendCommunicationRequest.RecipientUserID, sendCommunicationRequest.JobID, sendCommunicationRequest.GroupID);
+
+            if (recipients.Count == 0)
+            {
+                log.LogInformation("No recipients identified");
+            }
+            else
+            {
+                var rec = JsonConvert.SerializeObject(recipients);
+                log.LogInformation($"Recipients { rec}");
+            }
 
             foreach (var item in recipients)
             {
