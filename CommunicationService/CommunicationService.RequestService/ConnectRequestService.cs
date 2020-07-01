@@ -3,6 +3,7 @@ using CommunicationService.Core.Interfaces.Services;
 using CommunicationService.Core.Utils;
 using HelpMyStreet.Contracts.CommunicationService.Response;
 using HelpMyStreet.Contracts.RequestService.Response;
+using HelpMyStreet.Contracts.RequestService.Request;
 using HelpMyStreet.Contracts.Shared;
 using Newtonsoft.Json;
 using System;
@@ -36,6 +37,22 @@ namespace CommunicationService.RequestService
                 }
                 return null;
             }
+        }
+
+        public async Task<GetJobsByFilterResponse> GetJobsByFilter(GetJobsByFilterRequest request)
+        {
+            string path = $"/api/GetJobsByFilter";
+            using (HttpResponseMessage response = await _httpClientWrapper.GetAsync(HttpClientConfigName.RequestService, path, request, CancellationToken.None).ConfigureAwait(false))
+            {
+                string jsonResponse = await response.Content.ReadAsStringAsync();
+                var getJobsResponse = JsonConvert.DeserializeObject<ResponseWrapper<GetJobsByFilterResponse, CommunicationServiceErrorCode>>(jsonResponse);
+                if (getJobsResponse.HasContent && getJobsResponse.IsSuccessful)
+                {
+                    return getJobsResponse.Content;
+                }
+                return null;
+            }
+            
         }
 
 

@@ -13,6 +13,7 @@ namespace CommunicationService.MessageService
         public const string PartialRegistration = "PartialRegistration";
         public const string TaskNotification = "TaskNotification";
         public const string TaskUpdate = "TaskUpdate";
+        public const string DailyDigest = "DailyDigest";
     }
 }
 
