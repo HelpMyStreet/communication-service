@@ -23,6 +23,7 @@
     <None Remove="Migrations\20200624_100000_AddFooter.json" />
     <None Remove="Migrations\20200626_100000_MarkupTweaks.json" />
     <None Remove="Migrations\20200626_200000_AddingPlainText.json" />
+    <None Remove="Migrations\20200701_095600_TweakThanksForVerifying.json" />
   </ItemGroup>
 
   <ItemGroup>
@@ -46,6 +47,7 @@
     <EmbeddedResource Include="Migrations\20200617_084300_PostYotiCommunication.json">
     </EmbeddedResource>
     <EmbeddedResource Include="Emails\Layout.html" />
+    <EmbeddedResource Include="Migrations\20200701_095600_TweakThanksForVerifying.json" />
     <EmbeddedResource Include="Migrations\20200626_200000_AddingPlainText.json" />
     <EmbeddedResource Include="Migrations\20200626_100000_MarkupTweaks.json" />
     <EmbeddedResource Include="Migrations\20200624_100000_AddFooter.json" />
