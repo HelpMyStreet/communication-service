@@ -25,6 +25,19 @@ namespace CommunicationService.UserService
             _httpClientWrapper = httpClientWrapper;
         }
 
+        public async Task<GetUsersResponse> GetUsers(CancellationToken cancellationToken)
+        {
+            string path = $"api/GetUsers";
+            GetUsersResponse usersResponse;
+            using (HttpResponseMessage response = await _httpClientWrapper.GetAsync(HttpClientConfigName.UserService, path, cancellationToken).ConfigureAwait(false))
+            {
+                response.EnsureSuccessStatusCode();
+                string content = await response.Content.ReadAsStringAsync();
+                usersResponse = JsonConvert.DeserializeObject<GetUsersResponse>(content);
+            }
+            return usersResponse;
+        }
+
         public async Task<User> GetUserByIdAsync(int userID)
         {
             string path = $"/api/GetUserByID?ID=" + userID;

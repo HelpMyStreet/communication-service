@@ -7,10 +7,31 @@ namespace CommunicationService.MessageService.Substitution
 {
     public struct DailyDigestDataJob
     {
+        public DailyDigestDataJob(
+            string activity,
+            string dueDate,
+            bool soon,
+            bool urgent,
+            int count,
+            string encodedJobId,
+            string distanceInMiles
+            )
+        {
+            Activity = activity;
+            DueDate = dueDate;
+            Soon = soon;
+            Urgent = urgent;
+            Count = count;
+            EncodedJobID = encodedJobId;
+            DistanceInMiles = distanceInMiles;
+        }
         public string Activity { get; set; }
         public string DueDate { get; set; }
         public bool Soon { get; set; }
         public bool Urgent { get; set; }
+        public int Count { get; set; }
+        public string EncodedJobID { get; set; }
+        public string DistanceInMiles { get; set; }
     }
     public class DailyDigestData : BaseDynamicData
     {
@@ -20,7 +41,7 @@ namespace CommunicationService.MessageService.Substitution
         public int OtherJobs { get; set; }
         public List<DailyDigestDataJob> ChosenJobsList { get; set; }
         public List<DailyDigestDataJob> OtherJobsList { get; set; }
-
+        public bool IsVerified { get; set; }
 
         public DailyDigestData(
             string firstName,
@@ -28,7 +49,8 @@ namespace CommunicationService.MessageService.Substitution
             int chosenJobs,
             int otherJobs,
             List<DailyDigestDataJob> chosenJobsList,
-            List<DailyDigestDataJob> otherJobsList
+            List<DailyDigestDataJob> otherJobsList,
+            bool isVerified
             )
 
         { 
@@ -38,6 +60,7 @@ namespace CommunicationService.MessageService.Substitution
             OtherJobs = otherJobs;
             ChosenJobsList = chosenJobsList;
             OtherJobsList = otherJobsList;
+            IsVerified = isVerified;
         }
         
     
