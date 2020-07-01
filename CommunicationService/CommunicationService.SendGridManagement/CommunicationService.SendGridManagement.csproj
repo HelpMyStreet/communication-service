@@ -26,6 +26,7 @@
     <None Remove="Emails\TaskUpdate.html" />
     <None Remove="Emails\TaskNotification.html" />
     <None Remove="Emails\DailyDigest.html" />
+    <None Remove="Migrations\20200701_1656_AddingRequestMails.json" />
   </ItemGroup>
 
   <ItemGroup>
@@ -56,6 +57,7 @@
     <EmbeddedResource Include="Emails\TaskUpdate.html" />
     <EmbeddedResource Include="Emails\TaskNotification.html" />
     <EmbeddedResource Include="Emails\DailyDigest.html" />
+    <EmbeddedResource Include="Migrations\20200701_165600_AddingRequestMails.json" />
   </ItemGroup>
 
   <ItemGroup>
