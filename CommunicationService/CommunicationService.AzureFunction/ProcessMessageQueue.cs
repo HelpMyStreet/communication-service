@@ -26,6 +26,7 @@ namespace CommunicationService.AzureFunction
         [FunctionName("ProcessMessageQueue")]
         public void Run([ServiceBusTrigger("message", Connection = "ServiceBus")]string myQueueItem, ILogger log)
         {
+            log.LogInformation($"myQueueItem {myQueueItem}");
             SendMessageRequest sendMessageRequest = JsonConvert.DeserializeObject<SendMessageRequest>(myQueueItem);
             IMessage message = _messageFactory.Create(sendMessageRequest);
             EmailBuildData emailBuildData = message.PrepareTemplateData(sendMessageRequest.RecipientUserID, sendMessageRequest.JobID, sendMessageRequest.GroupID, sendMessageRequest.TemplateName).Result;
