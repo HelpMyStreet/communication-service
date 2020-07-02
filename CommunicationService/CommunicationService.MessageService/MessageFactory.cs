@@ -54,7 +54,7 @@ namespace CommunicationService.MessageService
                 case CommunicationJobTypes.SendTaskStateChangeUpdate:
                     return new TaskUpdateMessage(_connectUserService, _connectRequestService);
                 case CommunicationJobTypes.SendOpenTaskDigest:
-                    return new DailyDigestMessage(_connectUserService, _connectRequestService);
+                    return new DailyDigestMessage(_connectUserService, _connectRequestService, _emailConfig);
                 default:
                     throw new Exception("Unknown Email Type");
             }

@@ -3,7 +3,9 @@ using CommunicationService.Core.Interfaces;
 using CommunicationService.Core.Interfaces.Repositories;
 using CommunicationService.Core.Interfaces.Services;
 using CommunicationService.MessageService.Substitution;
+using CommunicationService.Core.Configuration;
 using HelpMyStreet.Contracts.UserService.Response;
+using Microsoft.Extensions.Options;
 using HelpMyStreet.Contracts.RequestService.Response;
 using HelpMyStreet.Contracts.RequestService.Request;
 using HelpMyStreet.Utils.Enums;
@@ -19,6 +21,7 @@ namespace CommunicationService.MessageService
     {
         private readonly IConnectUserService _connectUserService;
         private readonly IConnectRequestService _connectRequestService;
+        private readonly IOptions<EmailConfig> _emailConfig;
 
         public string UnsubscriptionGroupName
         {
@@ -28,10 +31,11 @@ namespace CommunicationService.MessageService
             }
         }
 
-        public DailyDigestMessage(IConnectUserService connectUserService, IConnectRequestService connectRequestService)
+        public DailyDigestMessage(IConnectUserService connectUserService, IConnectRequestService connectRequestService, IOptions<EmailConfig> eMailConfig)
         {
             _connectUserService = connectUserService;
             _connectRequestService = connectRequestService;
+            _emailConfig = eMailConfig;
         }
 
         public async Task<EmailBuildData> PrepareTemplateData(int? recipientUserId, int? jobId, int? groupId, string templateName)
@@ -50,7 +54,7 @@ namespace CommunicationService.MessageService
             var jobStatusRequest = new JobStatusRequest();
             jobStatusRequest.JobStatuses = new List<JobStatuses>() { JobStatuses.Open };
             jobRequest.Postcode = user.PostalCode;
-            jobRequest.DistanceInMiles = 20; //needs connecting to Application Settings
+            jobRequest.DistanceInMiles = _emailConfig.Value.DigestOtherJobsDistance;
             jobRequest.JobStatuses = jobStatusRequest;
             jobRequest.ActivitySpecificSupportDistancesInMiles = activitySpecificSupportDistancesInMiles;
 
