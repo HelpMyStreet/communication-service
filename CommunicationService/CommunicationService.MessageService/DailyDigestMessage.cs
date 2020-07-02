@@ -48,7 +48,7 @@ namespace CommunicationService.MessageService
 
             var jobRequest = new GetJobsByFilterRequest();
             var jobStatusRequest = new JobStatusRequest();
-            jobStatusRequest.JobStatuses = new List<JobStatuses>() { JobStatuses.Done };
+            jobStatusRequest.JobStatuses = new List<JobStatuses>() { JobStatuses.Open };
             jobRequest.Postcode = user.PostalCode;
             jobRequest.DistanceInMiles = 20; //needs connecting to Application Settings
             jobRequest.JobStatuses = jobStatusRequest;
