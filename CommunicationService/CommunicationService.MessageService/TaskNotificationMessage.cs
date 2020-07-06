@@ -17,6 +17,8 @@ namespace CommunicationService.MessageService
     {
         private readonly IConnectUserService _connectUserService;
         private readonly IConnectRequestService _connectRequestService;
+        private readonly IConnectGroupService _connectGroupService;
+
         private const int REQUESTOR_DUMMY_USERID = -1;
 
         public string UnsubscriptionGroupName
@@ -27,11 +29,11 @@ namespace CommunicationService.MessageService
             }
         }
 
-        public TaskNotificationMessage(IConnectUserService connectUserService, IConnectRequestService connectRequestService)
+        public TaskNotificationMessage(IConnectUserService connectUserService, IConnectRequestService connectRequestService, IConnectGroupService connectGroupService)
         {
             _connectUserService = connectUserService;
             _connectRequestService = connectRequestService;
-            
+            _connectGroupService = connectGroupService;
         }
 
         public async Task<EmailBuildData> PrepareTemplateData(int? recipientUserId, int? jobId, int? groupId, string templateName)
@@ -114,6 +116,11 @@ namespace CommunicationService.MessageService
         public Dictionary<int, string> IdentifyRecipients(int? recipientUserId, int? jobId, int? groupId)
         {
             Dictionary<int, string> recipients = new Dictionary<int, string>();
+
+            if(groupId.HasValue)
+            {
+                var groupMembers = _connectGroupService.GetGroupMembers(groupId.Value);
+            }
             
             var job = _connectRequestService.GetJobDetailsAsync(jobId.Value).Result;
             List<SupportActivities> supportActivities = new List<SupportActivities>();
