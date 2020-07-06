@@ -27,6 +27,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CommunicationService.SendGr
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CommunicationService.UnitTests", "CommunicationService\CommunicationService.UnitTests\CommunicationService.UnitTests.csproj", "{FF609DE6-CA42-4F99-A1FE-53FDBD132DDA}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CommunicationService.GroupService", "CommunicationService\CommunicationService.GroupService\CommunicationService.GroupService.csproj", "{16298A88-E67A-4D6D-B2CB-ECFE1DD37C7A}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -81,6 +83,10 @@ Global
 		{FF609DE6-CA42-4F99-A1FE-53FDBD132DDA}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{FF609DE6-CA42-4F99-A1FE-53FDBD132DDA}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{FF609DE6-CA42-4F99-A1FE-53FDBD132DDA}.Release|Any CPU.Build.0 = Release|Any CPU
+		{16298A88-E67A-4D6D-B2CB-ECFE1DD37C7A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{16298A88-E67A-4D6D-B2CB-ECFE1DD37C7A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{16298A88-E67A-4D6D-B2CB-ECFE1DD37C7A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{16298A88-E67A-4D6D-B2CB-ECFE1DD37C7A}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
