@@ -1,0 +1,12 @@
+﻿{
+  "CreateUpdateUnsubscribeGroups": [
+    {
+      "name": "Registration Updates",
+      "description": "Emails regarding your registration"
+    },
+    {
+      "name": "RegistrationChasers",
+      "description": "RegistrationChasers updated"
+    }
+  ]
+}

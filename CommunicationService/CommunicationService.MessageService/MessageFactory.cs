@@ -1,10 +1,12 @@
-﻿using CommunicationService.Core.Domains;
+﻿using CommunicationService.Core.Configuration;
+using CommunicationService.Core.Domains;
 using CommunicationService.Core.Interfaces;
 using CommunicationService.Core.Interfaces.Repositories;
 using CommunicationService.Core.Interfaces.Services;
 using HelpMyStreet.Contracts.CommunicationService.Request;
 using HelpMyStreet.Contracts.RequestService.Response;
 using Microsoft.Azure.ServiceBus;
+using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
@@ -19,13 +21,15 @@ namespace CommunicationService.MessageService
         private readonly IConnectRequestService _connectRequestService;
         private readonly IQueueClient _queueClient;
         private readonly ICosmosDbService _cosmosDbService;
+        private readonly IOptions<EmailConfig> _emailConfig;
 
-        public MessageFactory(IConnectUserService connectUserService, IConnectRequestService connectRequestService, IQueueClient queueClient, ICosmosDbService cosmosDbService)
+        public MessageFactory(IConnectUserService connectUserService, IConnectRequestService connectRequestService, IQueueClient queueClient, ICosmosDbService cosmosDbService, IOptions<EmailConfig> emailConfig)
         {
             _connectUserService = connectUserService;
             _connectRequestService = connectRequestService;
             _queueClient = queueClient;
             _cosmosDbService = cosmosDbService;
+            _emailConfig = emailConfig;
         }
         public IMessage Create(RequestCommunicationRequest sendCommunicationRequest)
         {
@@ -44,7 +48,13 @@ namespace CommunicationService.MessageService
                 case CommunicationJobTypes.PostYotiCommunication:
                     return new PostYotiCommunicationMessage(_connectUserService, _cosmosDbService);
                 case CommunicationJobTypes.SendRegistrationChasers:
-                    return new RegistrationChaserMessage(_connectUserService, _cosmosDbService);
+                    return new RegistrationChaserMessage(_connectUserService, _cosmosDbService,_emailConfig);
+                case CommunicationJobTypes.SendNewTaskNotification:
+                    return new TaskNotificationMessage(_connectUserService, _connectRequestService);
+                case CommunicationJobTypes.SendTaskStateChangeUpdate:
+                    return new TaskUpdateMessage(_connectUserService, _connectRequestService);
+                case CommunicationJobTypes.SendOpenTaskDigest:
+                    return new DailyDigestMessage(_connectUserService, _connectRequestService, _emailConfig);
                 default:
                     throw new Exception("Unknown Email Type");
             }

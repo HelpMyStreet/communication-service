@@ -6,11 +6,14 @@ namespace CommunicationService.MessageService
 {
     public static class TemplateName
     {
-        public static string Welcome = "Welcome";
-        public static string ThanksForVerifying = "ThanksForVerifying";
-        public static string UnableToVerify = "UnableToVerify";
-        public static string YotiReminder = "YotiReminder";
-        public static string PartialRegistration = "PartialRegistration";
+        public const string Welcome = "Welcome";
+        public const string ThanksForVerifying = "ThanksForVerifying";
+        public const string UnableToVerify = "UnableToVerify";
+        public const string YotiReminder = "YotiReminder";
+        public const string PartialRegistration = "PartialRegistration";
+        public const string TaskNotification = "TaskNotification";
+        public const string TaskUpdate = "TaskUpdate";
+        public const string DailyDigest = "DailyDigest";
     }
 }
 
