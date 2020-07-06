@@ -17,6 +17,7 @@ namespace CommunicationService.MessageService
     {
         private readonly IConnectUserService _connectUserService;
         private readonly IConnectRequestService _connectRequestService;
+        private const int REQUESTOR_DUMMY_USERID = -1;
 
         public string UnsubscriptionGroupName
         {
@@ -36,11 +37,10 @@ namespace CommunicationService.MessageService
         public async Task<EmailBuildData> PrepareTemplateData(int? recipientUserId, int? jobId, int? groupId, string templateName)
         {
             var job = _connectRequestService.GetJobDetailsAsync(jobId.Value).Result;
-            byte[] jobIdBytes = System.Text.Encoding.UTF8.GetBytes(job.JobID.ToString());
-            string encodedJobId = System.Convert.ToBase64String(jobIdBytes);
+            string encodedJobId = HelpMyStreet.Utils.Utils.Base64Utils.Base64Encode(job.JobID.ToString());
             bool isFaceMask = job.SupportActivity == SupportActivities.FaceMask;
 
-            if (recipientUserId < 0)
+            if (recipientUserId == REQUESTOR_DUMMY_USERID)
             {
                 return new EmailBuildData()
                 {
@@ -59,51 +59,53 @@ namespace CommunicationService.MessageService
                     ),
                     EmailToAddress = job.Requestor.EmailAddress,
                     EmailToName = $"{job.Requestor.FirstName} {job.Requestor.LastName}",
-                    RecipientUserID = -1,
+                    RecipientUserID = REQUESTOR_DUMMY_USERID,
                 };
             }
-
-            var user = await _connectUserService.GetUserByIdAsync(recipientUserId.Value);
-            var volunteers = _connectUserService.GetHelpersByPostcodeAndTaskType
-                (
-                    job.PostCode,
-                    new List<SupportActivities>() { job.SupportActivity },
-                    CancellationToken.None
-                ).Result;
-
-            bool isStreetChampionForGivenPostCode = false;
-
-            if (volunteers != null)
+            else
             {
-                
-                var volunteer = volunteers.Volunteers.FirstOrDefault(x => x.UserID == user.ID);
-                if (volunteer != null)
+                var user = await _connectUserService.GetUserByIdAsync(recipientUserId.Value);
+                var volunteers = _connectUserService.GetHelpersByPostcodeAndTaskType
+                    (
+                        job.PostCode,
+                        new List<SupportActivities>() { job.SupportActivity },
+                        CancellationToken.None
+                    ).Result;
+
+                bool isStreetChampionForGivenPostCode = false;
+
+                if (volunteers != null)
                 {
-                    isStreetChampionForGivenPostCode = volunteer.IsStreetChampionForGivenPostCode.Value;
-                }
-                if (user != null && job != null)
-                {
-                    return new EmailBuildData()
+
+                    var volunteer = volunteers.Volunteers.FirstOrDefault(x => x.UserID == user.ID);
+                    if (volunteer != null)
                     {
-                        BaseDynamicData = new TaskNotificationData
-                        (
-                            false,
-                            encodedJobId,
-                            Mapping.ActivityMappings[job.SupportActivity],
-                            job.PostCode,
-                            volunteer.DistanceInMiles,
-                            job.DueDate.ToString("dd/MM/yyyy"),
-                            user.IsVerified.HasValue ? !user.IsVerified.Value : false,
-                            isStreetChampionForGivenPostCode,
-                            job.HealthCritical,
-                            isFaceMask
-                        ),
-                        EmailToAddress = user.UserPersonalDetails.EmailAddress,
-                        EmailToName = user.UserPersonalDetails.DisplayName,
-                        RecipientUserID = recipientUserId.Value
-                    };
+                        isStreetChampionForGivenPostCode = volunteer.IsStreetChampionForGivenPostCode.Value;
+                    }
+                    if (user != null && job != null)
+                    {
+                        return new EmailBuildData()
+                        {
+                            BaseDynamicData = new TaskNotificationData
+                            (
+                                false,
+                                encodedJobId,
+                                Mapping.ActivityMappings[job.SupportActivity],
+                                job.PostCode,
+                                volunteer.DistanceInMiles,
+                                job.DueDate.ToString("dd/MM/yyyy"),
+                                user.IsVerified.HasValue ? !user.IsVerified.Value : false,
+                                isStreetChampionForGivenPostCode,
+                                job.HealthCritical,
+                                isFaceMask
+                            ),
+                            EmailToAddress = user.UserPersonalDetails.EmailAddress,
+                            EmailToName = $"{user.UserPersonalDetails.FirstName} {user.UserPersonalDetails.LastName}",
+                            RecipientUserID = recipientUserId.Value
+                        };
+                    }
+
                 }
-                
             }
 
             throw new Exception("unable to retrieve user details");
@@ -118,7 +120,7 @@ namespace CommunicationService.MessageService
             if (job != null)
             {
                 // Add dummy recipient to represent requestor, who will not necessarily exist within our DB and so has no userID to lookup/refer to
-                recipients.Add(-1, TemplateName.TaskNotification);
+                recipients.Add(REQUESTOR_DUMMY_USERID, TemplateName.TaskNotification);
                 // Continue
                 supportActivities.Add(job.SupportActivity);
                 var volunteers = _connectUserService.GetHelpersByPostcodeAndTaskType(job.PostCode, supportActivities, CancellationToken.None).Result;
@@ -128,7 +130,6 @@ namespace CommunicationService.MessageService
                     foreach (VolunteerSummary vs in volunteers.Volunteers)
                     {
                         recipients.Add(vs.UserID, TemplateName.TaskNotification);
-                        return recipients;
                     }
                 }
             }

@@ -25,11 +25,11 @@ namespace CommunicationService.UserService
             _httpClientWrapper = httpClientWrapper;
         }
 
-        public async Task<GetUsersResponse> GetUsers(CancellationToken cancellationToken)
+        public async Task<GetUsersResponse> GetUsers()
         {
             string path = $"api/GetUsers";
             GetUsersResponse usersResponse;
-            using (HttpResponseMessage response = await _httpClientWrapper.GetAsync(HttpClientConfigName.UserService, path, cancellationToken).ConfigureAwait(false))
+            using (HttpResponseMessage response = await _httpClientWrapper.GetAsync(HttpClientConfigName.UserService, path, CancellationToken.None).ConfigureAwait(false))
             {
                 response.EnsureSuccessStatusCode();
                 string content = await response.Content.ReadAsStringAsync();
