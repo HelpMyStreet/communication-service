@@ -1,0 +1,37 @@
+﻿{
+  "Templates": [
+    {
+      "name": "DailyDigest",
+      "subject": "Help Needed Near You",
+      "generation": "dynamic",
+      "versions": [
+        {
+          "name": "Adding Daily Digest",
+          "subject": "Help Needed Near You"
+        }
+      ]
+    },
+    {
+      "name": "TaskUpdate",
+      "subject": "A HelpMyStreet Task Has Been Updated",
+      "generation": "dynamic",
+      "versions": [
+        {
+          "name": "Adding Task Update",
+          "subject": "A HelpMyStreet Task Has Been Updated"
+        }
+      ]
+    },
+    {
+      "name": "TaskNotification",
+      "subject": "A New HelpMyStreet Request Has Been Raised",
+      "generation": "dynamic",
+      "versions": [
+        {
+          "name": "Adding Task Update",
+          "subject": "A New HelpMyStreet Request Has Been Raised"
+        }
+      ]
+    }
+  ]
+}

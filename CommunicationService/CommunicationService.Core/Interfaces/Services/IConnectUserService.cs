@@ -18,5 +18,7 @@ namespace CommunicationService.Core.Interfaces.Services
         Task<GetVolunteersByPostcodeAndActivityResponse> GetHelpersByPostcodeAndTaskType(string postcode, List<SupportActivities> activities, CancellationToken cancellationToken);
 
         Task<GetIncompleteRegistrationStatusResponse> GetIncompleteRegistrationStatusAsync();
+
+        Task<GetUsersResponse> GetUsers();
     }
 }

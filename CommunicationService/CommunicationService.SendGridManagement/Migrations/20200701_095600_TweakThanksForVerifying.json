@@ -1,0 +1,15 @@
+﻿{
+  "Templates": [
+    {
+      "name": "ThanksForVerifying",
+      "subject": "Thanks for verifying your identity with Help My Street!",
+      "generation": "dynamic",
+      "versions": [
+        {
+          "name": "Fix content",
+          "subject": "Thanks for verifying your identity with Help My Street!"
+        }
+      ]
+    }
+  ]
+}

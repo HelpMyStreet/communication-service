@@ -1,0 +1,10 @@
+﻿{
+  "DeleteUnsubscribeGroups": [
+    {
+      "name": "RegistrationChasers"
+    },
+    {
+      "name": "PostYotiCommunication"
+    }
+  ]
+}

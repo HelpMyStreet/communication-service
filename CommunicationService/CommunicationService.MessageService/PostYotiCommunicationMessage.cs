@@ -20,7 +20,22 @@ namespace CommunicationService.MessageService
         {
             get
             {
-                return UnsubscribeGroupName.PostYotiCommunication;
+                return UnsubscribeGroupName.RegistrationUpdates;
+            }
+        }
+
+        private string GetTitleFromTemplateName(string templateName)
+        {
+            switch(templateName)
+            {
+                case TemplateName.Welcome:
+                    return "Welcome to Help My Street!";
+                case TemplateName.ThanksForVerifying:
+                    return "Thanks for verifying, now you’re ready to start accepting requests!";
+                case TemplateName.UnableToVerify:
+                    return "Hmm, something’s not quite right – can we help?";
+                default:
+                    throw new Exception($"{templateName} is unknown");
             }
         }
 
@@ -31,7 +46,7 @@ namespace CommunicationService.MessageService
             
         }
 
-        public async Task<EmailBuildData> PrepareTemplateData(int? recipientUserId, int? jobId, int? groupId)
+        public async Task<EmailBuildData> PrepareTemplateData(int? recipientUserId, int? jobId, int? groupId, string templateName)
         {
             var user = await _connectUserService.GetUserByIdAsync(recipientUserId.Value);
 
@@ -39,7 +54,7 @@ namespace CommunicationService.MessageService
             {
                 return new EmailBuildData()
                 {
-                    BaseDynamicData = new PostYotiCommunicationData(user.UserPersonalDetails.FirstName, user.UserPersonalDetails.LastName),
+                    BaseDynamicData = new PostYotiCommunicationData(user.UserPersonalDetails.FirstName, user.UserPersonalDetails.LastName, GetTitleFromTemplateName(templateName)),
                     EmailToAddress = user.UserPersonalDetails.EmailAddress,
                     EmailToName = user.UserPersonalDetails.DisplayName,
                     RecipientUserID = recipientUserId.Value

@@ -1,8 +1,10 @@
-﻿using CommunicationService.Core.Domains;
+﻿using CommunicationService.Core.Configuration;
+using CommunicationService.Core.Domains;
 using CommunicationService.Core.Interfaces;
 using CommunicationService.Core.Interfaces.Repositories;
 using CommunicationService.Core.Interfaces.Services;
 using CommunicationService.MessageService.Substitution;
+using Microsoft.Extensions.Options;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -14,24 +16,41 @@ namespace CommunicationService.MessageService
     {
         private readonly IConnectUserService _connectUserService;
         private readonly ICosmosDbService _cosmosDbService;
+        private readonly IOptions<EmailConfig> _emailConfig;
         private const int REGISTRATION_STEP4 = 4;
+        private Dictionary<int, string> _recipients;
 
         public string UnsubscriptionGroupName
         {
             get
             {
-                return UnsubscribeGroupName.RegistrationChasers;
+                return UnsubscribeGroupName.RegistrationUpdates;
             }
         }
 
-        public RegistrationChaserMessage(IConnectUserService connectUserService, ICosmosDbService cosmosDbService)
+        public RegistrationChaserMessage(IConnectUserService connectUserService, ICosmosDbService cosmosDbService, IOptions<EmailConfig> emailConfig)
         {
             _connectUserService = connectUserService;
             _cosmosDbService = cosmosDbService;
+            _emailConfig = emailConfig;
+            _recipients = new Dictionary<int, string>();
             
         }
 
-        public async Task<EmailBuildData> PrepareTemplateData(int? recipientUserId, int? jobId, int? groupId)
+        private string GetTitleFromTemplateName(string templateName)
+        {
+            switch (templateName)
+            {
+                case TemplateName.PartialRegistration:
+                    return "Almost there, complete your registration to start helping your street";
+                case TemplateName.YotiReminder:
+                    return "Welcome to Help My Street!";
+                default:
+                    throw new Exception($"{templateName} is unknown");
+            }
+        }
+
+        public async Task<EmailBuildData> PrepareTemplateData(int? recipientUserId, int? jobId, int? groupId,string templateName)
         {
             var user = await _connectUserService.GetUserByIdAsync(recipientUserId.Value);
 
@@ -39,7 +58,7 @@ namespace CommunicationService.MessageService
             {
                 return new EmailBuildData()
                 {
-                    BaseDynamicData = new RegistrationChaserData(user.UserPersonalDetails.FirstName, user.UserPersonalDetails.LastName),
+                    BaseDynamicData = new RegistrationChaserData(user.UserPersonalDetails.FirstName, user.UserPersonalDetails.LastName, GetTitleFromTemplateName(templateName)),
                     EmailToAddress = user.UserPersonalDetails.EmailAddress,
                     EmailToName = user.UserPersonalDetails.DisplayName,
                     RecipientUserID = recipientUserId.Value
@@ -51,31 +70,24 @@ namespace CommunicationService.MessageService
             }
         }
 
-        private Dictionary<int, string> AddRecipientAndTemplate(string templateName, int userId)
+        private void AddRecipientAndTemplate(string templateName, int userId)
         {
             List<EmailHistory> history = _cosmosDbService.GetEmailHistory(templateName, userId.ToString()).Result;
             if (history.Count == 0)
             {
-                return new Dictionary<int, string>()
-                {
-                    {userId,templateName }
-                };
-            }
-            else
-            {
-                return new Dictionary<int, string>();
+                _recipients.Add(userId, templateName);
             }
         }
 
         public Dictionary<int,string> IdentifyRecipients(int? recipientUserId, int? jobId, int? groupId)
         {
-            Dictionary<int, string> response = new Dictionary<int, string>();
+            _recipients = new Dictionary<int, string>();
             var users = _connectUserService.GetIncompleteRegistrationStatusAsync().Result;
 
             if(users!=null)
             {
-                var validUsersWithRange = users.Users.Where(x => ((DateTime.Now.ToUniversalTime() - x.DateCompleted).TotalMinutes >= 30)
-                && ((DateTime.Now.ToUniversalTime() - x.DateCompleted).TotalHours <=48)).ToList();
+                var validUsersWithRange = users.Users.Where(x => ((DateTime.Now.ToUniversalTime() - x.DateCompleted).TotalMinutes >= _emailConfig.Value.RegistrationChaserMinTimeInMinutes)
+                && ((DateTime.Now.ToUniversalTime() - x.DateCompleted).TotalHours <= _emailConfig.Value.RegistrationChaserMaxTimeInHours)).ToList();
 
                 if(validUsersWithRange!=null)
                 {
@@ -86,18 +98,18 @@ namespace CommunicationService.MessageService
                         {
                             if (u.RegistrationStep == REGISTRATION_STEP4)
                             {
-                                response = AddRecipientAndTemplate(TemplateName.YotiReminder, u.UserId);
+                                AddRecipientAndTemplate(TemplateName.YotiReminder, u.UserId);
                             }
                             else
                             {
-                                response = AddRecipientAndTemplate(TemplateName.PartialRegistration, u.UserId);
+                                AddRecipientAndTemplate(TemplateName.PartialRegistration, u.UserId);
                             }
                         }
                     }
                 }
 
             }
-            return response;
+            return _recipients;
         }
     }
 }

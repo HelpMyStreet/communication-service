@@ -70,6 +70,9 @@ namespace CommunicationService.AzureFunction
                 });
             }
 
+            IConfigurationSection emailConfigSettings = config.GetSection("EmailConfig");
+            builder.Services.Configure<EmailConfig>(emailConfigSettings);
+
             IConfigurationSection serviceBusConfigSettings = config.GetSection("ServiceBusConfig");
             builder.Services.Configure<ServiceBusConfig>(serviceBusConfigSettings);
             ServiceBusConfig serviceBusConfig = serviceBusConfigSettings.Get<ServiceBusConfig>();
