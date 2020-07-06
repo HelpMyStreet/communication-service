@@ -42,7 +42,7 @@ namespace CommunicationService.MessageService
         {
             if (recipientUserId == null)
             {
-                return null;
+                throw new Exception("recipientUserId is null");
             }
 
             var user = _connectUserService.GetUserByIdAsync(recipientUserId.Value).Result;
@@ -84,8 +84,8 @@ namespace CommunicationService.MessageService
 
             foreach (var job in criteriaJobs)
             {
-                byte[] jobIdBytes = System.Text.Encoding.UTF8.GetBytes(job.JobID.ToString());
-                string encodedJobId = System.Convert.ToBase64String(jobIdBytes);
+                string encodedJobId = HelpMyStreet.Utils.Utils.Base64Utils.Base64Encode(job.JobID.ToString());
+
                 chosenJobsList.Add(new DailyDigestDataJob(
                     Mapping.ActivityMappings[job.SupportActivity],
                     job.DueDate.ToString("dd/MM/yyyy"),

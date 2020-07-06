@@ -35,7 +35,7 @@ namespace CommunicationService.AzureFunction
                 _connectSendGridService.SendDynamicEmail(sendMessageRequest.TemplateName, message.UnsubscriptionGroupName, emailBuildData);
                 AddCommunicationRequestToCosmos(sendMessageRequest);
             }
-                log.LogInformation($"C# ServiceBus queue trigger function processed message: {myQueueItem}");
+            log.LogInformation($"C# ServiceBus queue trigger function processed message: {myQueueItem}");
         }
 
         private void AddCommunicationRequestToCosmos(SendMessageRequest sendMessageRequest)
