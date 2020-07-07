@@ -4,6 +4,7 @@ using CommunicationService.Core.Interfaces.Repositories;
 using CommunicationService.Core.Interfaces.Services;
 using CommunicationService.Core.Utils;
 using CommunicationService.EmailService;
+using CommunicationService.GroupService;
 using CommunicationService.Handlers;
 using CommunicationService.Mappers;
 using CommunicationService.MessageService;
@@ -92,6 +93,7 @@ namespace CommunicationService.AzureFunction
             builder.Services.AddSingleton<ISendEmailService, SendEmailService>();
             builder.Services.AddSingleton<IConnectUserService, ConnectUserService>();
             builder.Services.AddSingleton<IConnectRequestService, ConnectRequestService>();
+            builder.Services.AddSingleton<IConnectGroupService, ConnectGroupService>();
             builder.Services.AddSingleton<IConnectSendGridService, ConnectSendGridService>();
 
             builder.Services.AddDbContext<ApplicationDbContext>(options =>
