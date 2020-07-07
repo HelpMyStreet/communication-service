@@ -3,6 +3,7 @@ using CommunicationService.Core.Interfaces;
 using CommunicationService.Core.Interfaces.Repositories;
 using CommunicationService.Core.Interfaces.Services;
 using CommunicationService.MessageService.Substitution;
+using HelpMyStreet.Contracts.GroupService.Response;
 using HelpMyStreet.Contracts.UserService.Response;
 using HelpMyStreet.Utils.Enums;
 using System;
@@ -116,11 +117,15 @@ namespace CommunicationService.MessageService
         public Dictionary<int, string> IdentifyRecipients(int? recipientUserId, int? jobId, int? groupId)
         {
             Dictionary<int, string> recipients = new Dictionary<int, string>();
+            List<int> groupUsers = new List<int>();
 
-            if(groupId.HasValue)
+            if(!groupId.HasValue || !jobId.HasValue)
             {
-                var groupMembers = _connectGroupService.GetGroupMembers(groupId.Value);
+                throw new Exception($"GroupID or JobID is missing");
             }
+
+            var groupMembers = _connectGroupService.GetGroupMembers(groupId.Value).Result;
+            groupUsers = groupMembers.Users;
             
             var job = _connectRequestService.GetJobDetailsAsync(jobId.Value).Result;
             List<SupportActivities> supportActivities = new List<SupportActivities>();
@@ -136,7 +141,10 @@ namespace CommunicationService.MessageService
                 {
                     foreach (VolunteerSummary vs in volunteers.Volunteers)
                     {
-                        recipients.Add(vs.UserID, TemplateName.TaskNotification);
+                        if (groupUsers.Contains(vs.UserID))
+                        {
+                            recipients.Add(vs.UserID, TemplateName.TaskNotification);
+                        }   
                     }
                 }
             }
