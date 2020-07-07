@@ -3,6 +3,7 @@ using CommunicationService.Core.Interfaces;
 using CommunicationService.Core.Interfaces.Repositories;
 using CommunicationService.Core.Interfaces.Services;
 using CommunicationService.MessageService.Substitution;
+using HelpMyStreet.Contracts.GroupService.Response;
 using HelpMyStreet.Contracts.UserService.Response;
 using HelpMyStreet.Utils.Enums;
 using System;
@@ -17,6 +18,8 @@ namespace CommunicationService.MessageService
     {
         private readonly IConnectUserService _connectUserService;
         private readonly IConnectRequestService _connectRequestService;
+        private readonly IConnectGroupService _connectGroupService;
+
         private const int REQUESTOR_DUMMY_USERID = -1;
 
         public string UnsubscriptionGroupName
@@ -27,11 +30,11 @@ namespace CommunicationService.MessageService
             }
         }
 
-        public TaskNotificationMessage(IConnectUserService connectUserService, IConnectRequestService connectRequestService)
+        public TaskNotificationMessage(IConnectUserService connectUserService, IConnectRequestService connectRequestService, IConnectGroupService connectGroupService)
         {
             _connectUserService = connectUserService;
             _connectRequestService = connectRequestService;
-            
+            _connectGroupService = connectGroupService;
         }
 
         public async Task<EmailBuildData> PrepareTemplateData(int? recipientUserId, int? jobId, int? groupId, string templateName)
@@ -114,6 +117,15 @@ namespace CommunicationService.MessageService
         public Dictionary<int, string> IdentifyRecipients(int? recipientUserId, int? jobId, int? groupId)
         {
             Dictionary<int, string> recipients = new Dictionary<int, string>();
+            List<int> groupUsers = new List<int>();
+
+            if(!groupId.HasValue || !jobId.HasValue)
+            {
+                throw new Exception($"GroupID or JobID is missing");
+            }
+
+            var groupMembers = _connectGroupService.GetGroupMembers(groupId.Value).Result;
+            groupUsers = groupMembers.Users;
             
             var job = _connectRequestService.GetJobDetailsAsync(jobId.Value).Result;
             List<SupportActivities> supportActivities = new List<SupportActivities>();
@@ -129,7 +141,10 @@ namespace CommunicationService.MessageService
                 {
                     foreach (VolunteerSummary vs in volunteers.Volunteers)
                     {
-                        recipients.Add(vs.UserID, TemplateName.TaskNotification);
+                        if (groupUsers.Contains(vs.UserID))
+                        {
+                            recipients.Add(vs.UserID, TemplateName.TaskNotification);
+                        }   
                     }
                 }
             }
