@@ -62,11 +62,6 @@ namespace CommunicationService.MessageService
             GetJobsByFilterResponse jobsResponse = _connectRequestService.GetJobsByFilter(jobRequest).Result;
             var jobs = jobsResponse.JobSummaries;
 
-            if (!user.SupportActivities.Contains(SupportActivities.CommunityConnector))
-            {
-                jobs = jobs.Where(x => x.SupportActivity != SupportActivities.CommunityConnector).ToList();
-            }
-
             var criteriaJobs = jobs.Where(x => user.SupportActivities.Contains(x.SupportActivity) && x.DistanceInMiles < user.SupportRadiusMiles);
             if (criteriaJobs.Count() == 0)
             {
