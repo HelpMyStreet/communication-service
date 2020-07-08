@@ -19,14 +19,16 @@ namespace CommunicationService.MessageService
     {
         private readonly IConnectUserService _connectUserService;
         private readonly IConnectRequestService _connectRequestService;
+        private readonly IConnectGroupService _connectGroupService;
         private readonly IQueueClient _queueClient;
         private readonly ICosmosDbService _cosmosDbService;
         private readonly IOptions<EmailConfig> _emailConfig;
 
-        public MessageFactory(IConnectUserService connectUserService, IConnectRequestService connectRequestService, IQueueClient queueClient, ICosmosDbService cosmosDbService, IOptions<EmailConfig> emailConfig)
+        public MessageFactory(IConnectUserService connectUserService, IConnectRequestService connectRequestService, IConnectGroupService connectGroupService, IQueueClient queueClient, ICosmosDbService cosmosDbService, IOptions<EmailConfig> emailConfig)
         {
             _connectUserService = connectUserService;
             _connectRequestService = connectRequestService;
+            _connectGroupService = connectGroupService;
             _queueClient = queueClient;
             _cosmosDbService = cosmosDbService;
             _emailConfig = emailConfig;
@@ -49,6 +51,12 @@ namespace CommunicationService.MessageService
                     return new PostYotiCommunicationMessage(_connectUserService, _cosmosDbService);
                 case CommunicationJobTypes.SendRegistrationChasers:
                     return new RegistrationChaserMessage(_connectUserService, _cosmosDbService,_emailConfig);
+                case CommunicationJobTypes.SendNewTaskNotification:
+                    return new TaskNotificationMessage(_connectUserService, _connectRequestService, _connectGroupService);
+                case CommunicationJobTypes.SendTaskStateChangeUpdate:
+                    return new TaskUpdateMessage(_connectUserService, _connectRequestService);
+                case CommunicationJobTypes.SendOpenTaskDigest:
+                    return new DailyDigestMessage(_connectUserService, _connectRequestService, _emailConfig);
                 default:
                     throw new Exception("Unknown Email Type");
             }
