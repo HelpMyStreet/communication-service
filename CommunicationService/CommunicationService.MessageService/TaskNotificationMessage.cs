@@ -95,7 +95,7 @@ namespace CommunicationService.MessageService
                                 encodedJobId,
                                 Mapping.ActivityMappings[job.SupportActivity],
                                 job.PostCode,
-                                volunteer.DistanceInMiles,
+                                Math.Round(volunteer.DistanceInMiles, 1),
                                 job.DueDate.ToString("dd/MM/yyyy"),
                                 user.IsVerified.HasValue ? !user.IsVerified.Value : false,
                                 isStreetChampionForGivenPostCode,
