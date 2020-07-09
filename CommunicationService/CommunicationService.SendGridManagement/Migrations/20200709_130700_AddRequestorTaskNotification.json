@@ -1,0 +1,48 @@
+﻿{
+  "Templates": [
+    {
+      "name": "TaskNotification",
+      "subject": "Help Needed Near You",
+      "generation": "dynamic",
+      "versions": [
+        {
+          "name": "Fix handlebars",
+          "subject": "Help Needed Near You"
+        }
+      ]
+    },
+    {
+      "name": "RequestorTaskNotification",
+      "subject": "Your New Help Request",
+      "generation": "dynamic",
+      "versions": [
+        {
+          "name": "Add Requestor E-mail Template",
+          "subject": "Your New Help Request"
+        }
+      ]
+    },
+    {
+      "name": "TaskUpdate",
+      "subject": "A HelpMyStreet Task Has Been Updated",
+      "generation": "dynamic",
+      "versions": [
+        {
+          "name": "Fix Handlebars",
+          "subject": "A HelpMyStreet Task Has Been Updated"
+        }
+      ]
+    },
+    {
+      "name": "Daily Digest",
+      "subject": "Help Needed Near You",
+      "generation": "dynamic",
+      "versions": [
+        {
+          "name": "Fix Handlebars",
+          "subject": "Help Needed Near You"
+        }
+      ]
+    }
+  ]
+}
