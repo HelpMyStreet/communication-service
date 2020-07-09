@@ -132,7 +132,7 @@ namespace CommunicationService.MessageService
             if (job != null)
             {
                 // Add dummy recipient to represent requestor, who will not necessarily exist within our DB and so has no userID to lookup/refer to
-                recipients.Add(REQUESTOR_DUMMY_USERID, TemplateName.TaskNotification);
+                recipients.Add(REQUESTOR_DUMMY_USERID, TemplateName.RequestorTaskNotification);
                 // Continue
                 supportActivities.Add(job.SupportActivity);
                 var volunteers = _connectUserService.GetHelpersByPostcodeAndTaskType(job.PostCode, supportActivities, CancellationToken.None).Result;

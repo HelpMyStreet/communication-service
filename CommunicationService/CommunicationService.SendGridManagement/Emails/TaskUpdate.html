@@ -2,11 +2,11 @@
 <br />
 <p>You're receiving this e-mail because you submitted a request via <a href="http://www.helpmystreet.org">HelpMyStreet.org</a></p>
 <br />
-{{#if !IsOpen}}
+{{#unless !IsOpen}}
 {{#if IsFaceMask}}
 <p>Good news!</p>
 {{/if}}
-{{/if}}
+{{/unless}}
 <p>We're just letting you know that your request for help with {{Activity}} on {{RequestedDate}} has been updated to "{{RequestStatus}}" {{TimeUpdated}}.</p>
 {{#if IsDone}}
 {{#if IsFaceMask}}

@@ -113,7 +113,7 @@ namespace CommunicationService.MessageService
                     user.UserPersonalDetails.FirstName,
                     user.PostalCode,
                     criteriaJobs.Count(),
-                    otherJobs.Count(),
+                    otherJobs.Count() > 0,
                     chosenJobsList,
                     otherJobsList,
                     user.IsVerified.Value ? true : false
