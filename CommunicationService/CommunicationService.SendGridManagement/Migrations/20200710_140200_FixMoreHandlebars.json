@@ -1,0 +1,17 @@
+﻿{
+  "Templates": [
+    {
+      {
+        "name": "DailyDigest",
+        "subject": "Help Needed Near You",
+        "generation": "dynamic",
+        "versions": [
+          {
+            "name": "Fix Handlebars",
+            "subject": "Help Needed Near You"
+          }
+        ]
+      }
+    }
+  ]
+}
