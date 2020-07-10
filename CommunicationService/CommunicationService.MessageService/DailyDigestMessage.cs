@@ -88,7 +88,7 @@ namespace CommunicationService.MessageService
                     job.IsHealthCritical,
                     1,
                     encodedJobId,
-                    job.DistanceInMiles.ToString()
+                    Math.Round(job.DistanceInMiles,1).ToString()
                     ));
             }
 
