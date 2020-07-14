@@ -88,7 +88,7 @@ namespace CommunicationService.MessageService
                     job.IsHealthCritical,
                     1,
                     encodedJobId,
-                    job.DistanceInMiles.ToString()
+                    Math.Round(job.DistanceInMiles,1).ToString()
                     ));
             }
 
@@ -113,7 +113,7 @@ namespace CommunicationService.MessageService
                     user.UserPersonalDetails.FirstName,
                     user.PostalCode,
                     criteriaJobs.Count(),
-                    otherJobs.Count(),
+                    otherJobs.Count() > 0,
                     chosenJobsList,
                     otherJobsList,
                     user.IsVerified.Value ? true : false

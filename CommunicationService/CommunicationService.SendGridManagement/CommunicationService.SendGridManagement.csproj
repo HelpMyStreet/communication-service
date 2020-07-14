@@ -29,6 +29,9 @@
     <None Remove="Migrations\20200701_1656_AddingRequestMails.json" />
     <None Remove="Migrations\20200701_095600_TweakThanksForVerifying.json" />
     <None Remove="Migrations\20200706_085600_CorrectOpenRequestUrl.json" />
+    <None Remove="Emails\RequestorTaskNotification.html" />
+    <None Remove="Migrations\20200709_130700_AddRequestorTaskNotification.json" />
+    <None Remove="Migrations\20200710_140200_FixMoreHandlebars.json" />
   </ItemGroup>
 
   <ItemGroup>
@@ -62,6 +65,9 @@
     <EmbeddedResource Include="Emails\DailyDigest.html" />
     <EmbeddedResource Include="Migrations\20200706_085600_CorrectOpenRequestUrl.json" />
     <EmbeddedResource Include="Migrations\20200701_165600_AddingRequestMails.json" />
+    <EmbeddedResource Include="Emails\RequestorTaskNotification.html" />
+    <EmbeddedResource Include="Migrations\20200709_130700_AddRequestorTaskNotification.json" />
+    <EmbeddedResource Include="Migrations\20200710_140200_FixMoreHandlebars.json" />
   </ItemGroup>
 
   <ItemGroup>
