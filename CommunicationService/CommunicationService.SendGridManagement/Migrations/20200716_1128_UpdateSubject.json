@@ -1,0 +1,26 @@
+﻿{
+  "Templates": [
+    {
+      "name": "TaskReminder",
+      "subject": "Request reminder",
+      "generation": "dynamic",
+      "versions": [
+        {
+          "name": "Update Task Reminder",
+          "subject": "Request reminder"
+        }
+      ]
+    },
+    {
+      "name": "DailyDigest",
+      "subject": "Help Needed Near You",
+      "generation": "dynamic",
+      "versions": [
+        {
+          "name": "Update json",
+          "subject": "Help Needed Near You"
+        }
+      ]
+    }
+  ]
+}

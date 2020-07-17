@@ -19,6 +19,7 @@ namespace CommunicationService.MessageService
         private readonly IConnectUserService _connectUserService;
         private readonly IConnectRequestService _connectRequestService;
         private readonly IConnectGroupService _connectGroupService;
+        List<SendMessageRequest> _sendMessageRequests;
 
         private const int REQUESTOR_DUMMY_USERID = -1;
 
@@ -35,6 +36,7 @@ namespace CommunicationService.MessageService
             _connectUserService = connectUserService;
             _connectRequestService = connectRequestService;
             _connectGroupService = connectGroupService;
+            _sendMessageRequests = new List<SendMessageRequest>();
         }
 
         public async Task<EmailBuildData> PrepareTemplateData(int? recipientUserId, int? jobId, int? groupId, string templateName)
@@ -95,7 +97,7 @@ namespace CommunicationService.MessageService
                                 encodedJobId,
                                 Mapping.ActivityMappings[job.SupportActivity],
                                 job.PostCode,
-                                volunteer.DistanceInMiles,
+                                Math.Round(volunteer.DistanceInMiles, 1),
                                 job.DueDate.ToString("dd/MM/yyyy"),
                                 user.IsVerified.HasValue ? !user.IsVerified.Value : false,
                                 isStreetChampionForGivenPostCode,
@@ -114,9 +116,8 @@ namespace CommunicationService.MessageService
             throw new Exception("unable to retrieve user details");
         }
 
-        public Dictionary<int, string> IdentifyRecipients(int? recipientUserId, int? jobId, int? groupId)
+        public List<SendMessageRequest> IdentifyRecipients(int? recipientUserId, int? jobId, int? groupId)
         {
-            Dictionary<int, string> recipients = new Dictionary<int, string>();
             List<int> groupUsers = new List<int>();
 
             if(!groupId.HasValue || !jobId.HasValue)
@@ -132,7 +133,7 @@ namespace CommunicationService.MessageService
             if (job != null)
             {
                 // Add dummy recipient to represent requestor, who will not necessarily exist within our DB and so has no userID to lookup/refer to
-                recipients.Add(REQUESTOR_DUMMY_USERID, TemplateName.TaskNotification);
+                AddRecipientAndTemplate(TemplateName.RequestorTaskNotification, REQUESTOR_DUMMY_USERID, jobId, groupId);
                 // Continue
                 supportActivities.Add(job.SupportActivity);
                 var volunteers = _connectUserService.GetHelpersByPostcodeAndTaskType(job.PostCode, supportActivities, CancellationToken.None).Result;
@@ -143,12 +144,23 @@ namespace CommunicationService.MessageService
                     {
                         if (groupUsers.Contains(vs.UserID))
                         {
-                            recipients.Add(vs.UserID, TemplateName.TaskNotification);
+                            AddRecipientAndTemplate(TemplateName.TaskNotification, vs.UserID, jobId, groupId);
                         }   
                     }
                 }
             }
-            return recipients;
+            return _sendMessageRequests;
+        }
+
+        private void AddRecipientAndTemplate(string templateName, int userId, int? jobId, int? groupId)
+        {
+            _sendMessageRequests.Add(new SendMessageRequest()
+            {
+                TemplateName = templateName,
+                RecipientUserID = REQUESTOR_DUMMY_USERID,
+                GroupID = groupId,
+                JobID = jobId
+            });  
         }
     }
 }

@@ -9,6 +9,7 @@
     <None Remove="Emails\Layout.html" />
     <None Remove="Emails\Layout.txt" />
     <None Remove="Emails\PartialRegistration.html" />
+    <None Remove="Emails\TaskReminder.html" />
     <None Remove="Emails\ThanksForVerifying.html" />
     <None Remove="Emails\UnableToVerify.html" />
     <None Remove="Emails\Welcome.html" />
@@ -29,10 +30,19 @@
     <None Remove="Migrations\20200701_1656_AddingRequestMails.json" />
     <None Remove="Migrations\20200701_095600_TweakThanksForVerifying.json" />
     <None Remove="Migrations\20200706_085600_CorrectOpenRequestUrl.json" />
+    <None Remove="Emails\RequestorTaskNotification.html" />
+    <None Remove="Migrations\20200709_130700_AddRequestorTaskNotification.json" />
+    <None Remove="Migrations\20200710_140200_FixMoreHandlebars.json" />
+    <None Remove="Migrations\20200714_135500_AddTaskReminder.json" />
+    <None Remove="Migrations\20200714_14346_UpdateTaskReminder.json" />
+    <None Remove="Migrations\20200716_1128_UpdateSubject.json" />
+    <None Remove="Migrations\20200716_120006_AddAcceptanceDate.json" />
+    <None Remove="Migrations\20200716_144000_AddConditional.json" />
   </ItemGroup>
 
   <ItemGroup>
     <EmbeddedResource Include="Emails\Layout.txt" />
+    <EmbeddedResource Include="Emails\TaskReminder.html" />
     <EmbeddedResource Include="Emails\YotiReminder.html">
     </EmbeddedResource>
     <EmbeddedResource Include="Emails\UnableToVerify.html">
@@ -62,6 +72,14 @@
     <EmbeddedResource Include="Emails\DailyDigest.html" />
     <EmbeddedResource Include="Migrations\20200706_085600_CorrectOpenRequestUrl.json" />
     <EmbeddedResource Include="Migrations\20200701_165600_AddingRequestMails.json" />
+    <EmbeddedResource Include="Emails\RequestorTaskNotification.html" />
+    <EmbeddedResource Include="Migrations\20200709_130700_AddRequestorTaskNotification.json" />
+    <EmbeddedResource Include="Migrations\20200716_144000_AddConditional.json" />
+    <EmbeddedResource Include="Migrations\20200716_120006_AddAcceptanceDate.json" />
+    <EmbeddedResource Include="Migrations\20200716_1128_UpdateSubject.json" />
+    <EmbeddedResource Include="Migrations\20200714_14346_UpdateTaskReminder.json" />
+    <EmbeddedResource Include="Migrations\20200714_135500_AddTaskReminder.json" />
+    <EmbeddedResource Include="Migrations\20200710_140200_FixMoreHandlebars.json" />
   </ItemGroup>
 
   <ItemGroup>
