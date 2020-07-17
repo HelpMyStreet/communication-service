@@ -1,0 +1,41 @@
+﻿<p>
+    Hi {{FirstName}},
+</p>
+
+<p>
+    Thanks so much for accepting the request for help with {{Activity}} in {{Postcode}} on {{DateStatusLastChanged}} via HelpMyStreet.org.
+</p>
+
+{{#if DueToday}}
+<p>
+    The help is needed today.
+</p>
+{{else}}
+<p>
+    The help is needed on or before {{DueDate}} – {{DueDays}} days from now.
+</p>
+{{/if}}
+<p>
+    Have you already completed the request? If so – then thanks so much! It would be great if you could mark it as “Done” <a href="http://www.helpmystreet.org/account/accepted-requests">here</a> so that we know.
+</p>
+{{#if DueToday}}
+{{else}}
+<p>
+    Are you waiting for the due date? The request can be completed any time between the time it’s made and the due date – so please do go ahead and make a start whenever it’s convenient for you to do so, using the details included in the request <a href="http://www.helpmystreet.org/account/accepted-requests">here</a>.
+</p>
+{{/if}}
+<p>
+    Are you having problems? If you’re having technical difficulties or are unsure what you need to do, please do let us know at support@helpmystreet.org and we’ll do anything we can to help.
+</p>
+<p>
+    Are you no longer able to complete the task? Please “release” it by clicking the “Can’t Do” button beside it in your My Accepted Requests tab <a href="http://www.helpmystreet.org/account/accepted-requests">here</a>. This will make it available again for other volunteers to pick up if needed.
+</p>
+<p>
+    Thank you so much for your help!
+</p>
+<p>
+    Best regards,
+</p>
+<p>
+    The HelpMyStreet team
+</p>

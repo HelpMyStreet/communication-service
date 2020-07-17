@@ -8,5 +8,6 @@ namespace CommunicationService.Core.Interfaces.Services
     {
         Task<GetJobDetailsResponse> GetJobDetailsAsync(int jobID);
         Task<GetJobsByFilterResponse> GetJobsByFilter(GetJobsByFilterRequest request);
+        Task<GetJobsInProgressResponse> GetJobsInProgress();
     }
 }
