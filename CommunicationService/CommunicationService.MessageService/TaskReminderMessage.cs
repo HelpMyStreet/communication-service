@@ -51,7 +51,7 @@ namespace CommunicationService.MessageService
                 throw new Exception($"Recipient or JobID is missing");
             }
             var user = await _connectUserService.GetUserByIdAsync(recipientUserId.Value);
-            var job = _connectRequestService.GetJobDetailsAsync(jobId.Value).Result;
+            var job = await _connectRequestService.GetJobDetailsAsync(jobId.Value);
 
             return new EmailBuildData()
             {
