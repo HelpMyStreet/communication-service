@@ -12,8 +12,10 @@ namespace CommunicationService.MessageService
         public const string YotiReminder = "YotiReminder";
         public const string PartialRegistration = "PartialRegistration";
         public const string TaskNotification = "TaskNotification";
+        public const string RequestorTaskNotification = "RequestorTaskNotification";
         public const string TaskUpdate = "TaskUpdate";
         public const string DailyDigest = "DailyDigest";
+        public const string TaskReminder = "TaskReminder";
     }
 }
 

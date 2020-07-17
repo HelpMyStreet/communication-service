@@ -1,0 +1,21 @@
+﻿{
+  "Templates": [
+    {
+      "name": "TaskReminder",
+      "subject": "Reminder for task due soon",
+      "generation": "dynamic",
+      "versions": [
+        {
+          "name": "Adding Task Reminder",
+          "subject": "Reminder for task due soon"
+        }
+      ]
+    }
+  ],
+  "UnsubscribeGroups": [
+    {
+      "name": "TaskReminder",
+      "description": "Task Reminder descriptions"
+    }
+  ]
+}
