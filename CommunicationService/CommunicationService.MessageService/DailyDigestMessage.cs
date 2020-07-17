@@ -22,6 +22,7 @@ namespace CommunicationService.MessageService
         private readonly IConnectUserService _connectUserService;
         private readonly IConnectRequestService _connectRequestService;
         private readonly IOptions<EmailConfig> _emailConfig;
+        List<SendMessageRequest> _sendMessageRequests;
 
         public string UnsubscriptionGroupName
         {
@@ -36,6 +37,7 @@ namespace CommunicationService.MessageService
             _connectUserService = connectUserService;
             _connectRequestService = connectRequestService;
             _emailConfig = eMailConfig;
+            _sendMessageRequests = new List<SendMessageRequest>();
         }
 
         public async Task<EmailBuildData> PrepareTemplateData(int? recipientUserId, int? jobId, int? groupId, string templateName)
@@ -125,7 +127,7 @@ namespace CommunicationService.MessageService
             ;
         }
 
-        public Dictionary<int, string> IdentifyRecipients(int? recipientUserId, int? jobId, int? groupId)
+        public List<SendMessageRequest> IdentifyRecipients(int? recipientUserId, int? jobId, int? groupId)
         {
             var volunteers = _connectUserService.GetUsers().Result;
             
@@ -133,9 +135,15 @@ namespace CommunicationService.MessageService
 
             Dictionary<int, string> recipients = new Dictionary<int, string>();
             foreach (var volunteer in volunteers.UserDetails) {
-                recipients.Add(volunteer.UserID, TemplateName.DailyDigest);
+                _sendMessageRequests.Add(new SendMessageRequest()
+                {
+                    TemplateName = TemplateName.DailyDigest,
+                    RecipientUserID = volunteer.UserID,
+                    GroupID = groupId,
+                    JobID = jobId
+                });
             }
-            return recipients;
+            return _sendMessageRequests;
         }
     }
 }

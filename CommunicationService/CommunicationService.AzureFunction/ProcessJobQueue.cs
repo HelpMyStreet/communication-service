@@ -26,27 +26,27 @@ namespace CommunicationService.AzureFunction
 
             RequestCommunicationRequest sendCommunicationRequest = JsonConvert.DeserializeObject<RequestCommunicationRequest>(myQueueItem);
             IMessage message = _messageFactory.Create(sendCommunicationRequest);
-            Dictionary<int, string> recipients = message.IdentifyRecipients(sendCommunicationRequest.RecipientUserID, sendCommunicationRequest.JobID, sendCommunicationRequest.GroupID);
+            List<SendMessageRequest> messageDetails = message.IdentifyRecipients(sendCommunicationRequest.RecipientUserID, sendCommunicationRequest.JobID, sendCommunicationRequest.GroupID);
 
-            if (recipients.Count == 0)
+            if (messageDetails.Count == 0)
             {
                 log.LogInformation("No recipients identified");
             }
             else
             {
-                var rec = JsonConvert.SerializeObject(recipients);
+                var rec = JsonConvert.SerializeObject(messageDetails);
                 log.LogInformation($"Recipients { rec}");
             }
 
-            foreach (var item in recipients)
+            foreach (var m in messageDetails)
             {
                 _messageFactory.AddToMessageQueueAsync(new SendMessageRequest()
                 {
                     CommunicationJobType = sendCommunicationRequest.CommunicationJob.CommunicationJobType,
-                    TemplateName = item.Value,
-                    RecipientUserID = item.Key,
-                    JobID = sendCommunicationRequest.JobID,
-                    GroupID = sendCommunicationRequest.GroupID,
+                    TemplateName = m.TemplateName,
+                    RecipientUserID = m.RecipientUserID,
+                    JobID = m.JobID,
+                    GroupID = m.GroupID,
                     MessageType = MessageTypes.Email
                 });
             }
