@@ -3,6 +3,7 @@ using CommunicationService.Core.Interfaces;
 using CommunicationService.Core.Interfaces.Repositories;
 using CommunicationService.Core.Interfaces.Services;
 using CommunicationService.MessageService.Substitution;
+using HelpMyStreet.Utils.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -15,6 +16,7 @@ namespace CommunicationService.MessageService
         private readonly IConnectUserService _connectUserService;
         private readonly ICosmosDbService _cosmosDbService;
         private const int REGISTRATION_STEP4 = 4;
+        List<SendMessageRequest> _sendMessageRequests;
 
         public string UnsubscriptionGroupName
         {
@@ -43,6 +45,7 @@ namespace CommunicationService.MessageService
         {
             _connectUserService = connectUserService;
             _cosmosDbService = cosmosDbService;
+            _sendMessageRequests = new List<SendMessageRequest>();
             
         }
 
@@ -66,26 +69,23 @@ namespace CommunicationService.MessageService
             }
         }
 
-        private Dictionary<int, string> AddRecipientAndTemplate(string templateName, int userId)
+        private void AddRecipientAndTemplate(string templateName, int userId, int? jobId, int? groupId)
         {
             List<EmailHistory> history = _cosmosDbService.GetEmailHistory(templateName, userId.ToString()).Result;
             if (history.Count == 0)
             {
-                return new Dictionary<int, string>()
+                _sendMessageRequests.Add(new SendMessageRequest()
                 {
-                    {userId,templateName }
-                };
-            }
-            else
-            {
-                return new Dictionary<int, string>();
+                    TemplateName = templateName,
+                    RecipientUserID = userId,
+                    GroupID = groupId,
+                    JobID = jobId
+                });
             }
         }
 
-        public Dictionary<int,string> IdentifyRecipients(int? recipientUserId, int? jobId, int? groupId)
+        public List<SendMessageRequest> IdentifyRecipients(int? recipientUserId, int? jobId, int? groupId)
         {
-            Dictionary<int, string> response = new Dictionary<int, string>();
-
             var user = _connectUserService.GetUserByIdAsync(recipientUserId.Value).Result;
 
             if (user != null)
@@ -97,23 +97,23 @@ namespace CommunicationService.MessageService
                         List<EmailHistory> reminderhistory = _cosmosDbService.GetEmailHistory(TemplateName.YotiReminder, user.ID.ToString()).Result;
                         if (reminderhistory.Count == 0)
                         {
-                            response = AddRecipientAndTemplate(TemplateName.Welcome, recipientUserId.Value);
+                            AddRecipientAndTemplate(TemplateName.Welcome, recipientUserId.Value, jobId, groupId);
                         }
                         else
                         {
-                            response = AddRecipientAndTemplate(TemplateName.ThanksForVerifying, recipientUserId.Value);
+                            AddRecipientAndTemplate(TemplateName.ThanksForVerifying, recipientUserId.Value, jobId, groupId);
                         }
                     }
                     else
                     {
                         if(user.RegistrationHistory.Max(x=> x.Key)==REGISTRATION_STEP4)
                         {
-                            response = AddRecipientAndTemplate(TemplateName.UnableToVerify, recipientUserId.Value);
+                            AddRecipientAndTemplate(TemplateName.UnableToVerify, recipientUserId.Value, jobId, groupId);
                         }
                     }
                 }   
             }
-            return response;
+            return _sendMessageRequests;
         }
     }
 }

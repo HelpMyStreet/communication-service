@@ -45,7 +45,7 @@ namespace CommunicationService.RequestService
             using (HttpResponseMessage response = await _httpClientWrapper.GetAsync(HttpClientConfigName.RequestService, path, request, CancellationToken.None).ConfigureAwait(false))
             {
                 string jsonResponse = await response.Content.ReadAsStringAsync();
-                var getJobsResponse = JsonConvert.DeserializeObject<ResponseWrapper<GetJobsByFilterResponse, CommunicationServiceErrorCode>>(jsonResponse);
+                var getJobsResponse = JsonConvert.DeserializeObject<ResponseWrapper<GetJobsByFilterResponse, RequestServiceErrorCode>>(jsonResponse);
                 if (getJobsResponse.HasContent && getJobsResponse.IsSuccessful)
                 {
                     return getJobsResponse.Content;
@@ -53,6 +53,22 @@ namespace CommunicationService.RequestService
                 return null;
             }
             
+        }
+
+        public async Task<GetJobsInProgressResponse> GetJobsInProgress()
+        {
+            string path = $"/api/GetJobsInProgress";
+            using (HttpResponseMessage response = await _httpClientWrapper.GetAsync(HttpClientConfigName.RequestService, path, CancellationToken.None).ConfigureAwait(false))
+            {
+                string jsonResponse = await response.Content.ReadAsStringAsync();
+                var getJobsResponse = JsonConvert.DeserializeObject<ResponseWrapper<GetJobsInProgressResponse, RequestServiceErrorCode>>(jsonResponse);
+                if (getJobsResponse.HasContent && getJobsResponse.IsSuccessful)
+                {
+                    return getJobsResponse.Content;
+                }
+                return null;
+            }
+
         }
 
 
