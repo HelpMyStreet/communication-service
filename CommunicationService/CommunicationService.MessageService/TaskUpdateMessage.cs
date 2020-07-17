@@ -16,8 +16,10 @@ namespace CommunicationService.MessageService
 {
     public class TaskUpdateMessage : IMessage
     {
-        private readonly IConnectUserService _connectUserService;
         private readonly IConnectRequestService _connectRequestService;
+        private const int REQUESTOR_DUMMY_USERID = -1;
+
+        List<SendMessageRequest> _sendMessageRequests;
 
         public string UnsubscriptionGroupName
         {
@@ -27,10 +29,10 @@ namespace CommunicationService.MessageService
             }
         }
 
-        public TaskUpdateMessage(IConnectUserService connectUserService, IConnectRequestService connectRequestService)
+        public TaskUpdateMessage(IConnectRequestService connectRequestService)
         {
-            _connectUserService = connectUserService;
             _connectRequestService = connectRequestService;
+            _sendMessageRequests = new List<SendMessageRequest>();
         }
 
         public async Task<EmailBuildData> PrepareTemplateData(int? recipientUserId, int? jobId, int? groupId, string templateName)
@@ -56,16 +58,23 @@ namespace CommunicationService.MessageService
                 ),
                 EmailToAddress = job.Requestor.EmailAddress,
                 EmailToName = $"{job.Requestor.FirstName} {job.Requestor.LastName}",
-                RecipientUserID = -1,
+                RecipientUserID = recipientUserId.Value,
             };
         }
 
-        public Dictionary<int, string> IdentifyRecipients(int? recipientUserId, int? jobId, int? groupId)
+        public List<SendMessageRequest> IdentifyRecipients(int? recipientUserId, int? jobId, int? groupId)
         {
-            Dictionary<int, string> recipients = new Dictionary<int, string>();
-            recipients.Add(-1, TemplateName.TaskUpdate);
+            var job = _connectRequestService.GetJobDetailsAsync(jobId.Value).Result;
 
-            return recipients;
+            _sendMessageRequests.Add(new SendMessageRequest()
+            {
+                TemplateName = TemplateName.TaskUpdate,
+                RecipientUserID = REQUESTOR_DUMMY_USERID,
+                GroupID = groupId,
+                JobID = jobId
+            });
+            
+            return _sendMessageRequests;
         }
     }
 }

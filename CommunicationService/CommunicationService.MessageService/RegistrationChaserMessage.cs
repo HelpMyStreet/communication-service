@@ -18,7 +18,7 @@ namespace CommunicationService.MessageService
         private readonly ICosmosDbService _cosmosDbService;
         private readonly IOptions<EmailConfig> _emailConfig;
         private const int REGISTRATION_STEP4 = 4;
-        private Dictionary<int, string> _recipients;
+        List<SendMessageRequest> _sendMessageRequests;
 
         public string UnsubscriptionGroupName
         {
@@ -33,7 +33,7 @@ namespace CommunicationService.MessageService
             _connectUserService = connectUserService;
             _cosmosDbService = cosmosDbService;
             _emailConfig = emailConfig;
-            _recipients = new Dictionary<int, string>();
+            _sendMessageRequests = new List<SendMessageRequest>();
             
         }
 
@@ -70,18 +70,23 @@ namespace CommunicationService.MessageService
             }
         }
 
-        private void AddRecipientAndTemplate(string templateName, int userId)
+        private void AddRecipientAndTemplate(string templateName, int userId, int? jobId, int? groupId)
         {
             List<EmailHistory> history = _cosmosDbService.GetEmailHistory(templateName, userId.ToString()).Result;
             if (history.Count == 0)
             {
-                _recipients.Add(userId, templateName);
+                _sendMessageRequests.Add(new SendMessageRequest()
+                {
+                    TemplateName = templateName,
+                    RecipientUserID = userId,
+                    GroupID = groupId,
+                    JobID = jobId
+                });
             }
         }
 
-        public Dictionary<int,string> IdentifyRecipients(int? recipientUserId, int? jobId, int? groupId)
+        public List<SendMessageRequest>  IdentifyRecipients(int? recipientUserId, int? jobId, int? groupId)
         {
-            _recipients = new Dictionary<int, string>();
             var users = _connectUserService.GetIncompleteRegistrationStatusAsync().Result;
 
             if(users!=null)
@@ -98,18 +103,18 @@ namespace CommunicationService.MessageService
                         {
                             if (u.RegistrationStep == REGISTRATION_STEP4)
                             {
-                                AddRecipientAndTemplate(TemplateName.YotiReminder, u.UserId);
+                                AddRecipientAndTemplate(TemplateName.YotiReminder, u.UserId, jobId, groupId);
                             }
                             else
                             {
-                                AddRecipientAndTemplate(TemplateName.PartialRegistration, u.UserId);
+                                AddRecipientAndTemplate(TemplateName.PartialRegistration, u.UserId, jobId, groupId);
                             }
                         }
                     }
                 }
 
             }
-            return _recipients;
+            return _sendMessageRequests;
         }
     }
 }
