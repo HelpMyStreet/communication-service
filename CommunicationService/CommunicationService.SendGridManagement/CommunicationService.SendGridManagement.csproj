@@ -38,6 +38,11 @@
     <None Remove="Migrations\20200716_1128_UpdateSubject.json" />
     <None Remove="Migrations\20200716_120006_AddAcceptanceDate.json" />
     <None Remove="Migrations\20200716_144000_AddConditional.json" />
+    <None Remove="Migrations\20200717_152400_AddUnsubscribeGroupsDailyDigest.json" />
+    <None Remove="Migrations\20200717_153100_RDailyDigest - Copy.json" />
+    <None Remove="Migrations\20200717_153100_TidyDailyDigest.json" />
+    <None Remove="Migrations\20200717_153700_RemoveBRDailyDigest.json" />
+    <None Remove="Migrations\20200720_134500_FixEmails.json" />
   </ItemGroup>
 
   <ItemGroup>
@@ -74,6 +79,10 @@
     <EmbeddedResource Include="Migrations\20200701_165600_AddingRequestMails.json" />
     <EmbeddedResource Include="Emails\RequestorTaskNotification.html" />
     <EmbeddedResource Include="Migrations\20200709_130700_AddRequestorTaskNotification.json" />
+    <EmbeddedResource Include="Migrations\20200717_152400_AddUnsubscribeGroupsDailyDigest.json" />
+    <EmbeddedResource Include="Migrations\20200720_134500_FixEmails.json" />
+    <EmbeddedResource Include="Migrations\20200717_153700_RemoveBRDailyDigest.json" />
+    <EmbeddedResource Include="Migrations\20200717_153100_TidyDailyDigest.json" />
     <EmbeddedResource Include="Migrations\20200716_144000_AddConditional.json" />
     <EmbeddedResource Include="Migrations\20200716_120006_AddAcceptanceDate.json" />
     <EmbeddedResource Include="Migrations\20200716_1128_UpdateSubject.json" />

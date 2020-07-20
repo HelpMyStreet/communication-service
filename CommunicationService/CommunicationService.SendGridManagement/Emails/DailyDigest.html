@@ -1,5 +1,5 @@
-﻿<p>Hi {{FirstName}},</p><br />
-<p>You're receiving this e-mail because you signed up as a volunteer at HelpMyStreet.org.</p><br />
+﻿<p>Hi {{FirstName}},</p>
+<p>You're receiving this e-mail because you signed up as a volunteer at HelpMyStreet.org.</p>
 <p>Open Requests:</p>
 <p><i>There are currently {{ChosenJobs}} open requests in your area that meet criteria you signed up for:</i></p>
 <ol>
@@ -10,18 +10,15 @@
     </li>
     {{/each}}
 </ol>
-<br />
 {{#if OtherJobs}}
 <p>Other Requests:</p>
 <p><i>There are other open requests, which don’t meet the criteria you specified when you signed up:</i></p>
 <ol>
     {{#each OtherJobsList}}
-    <li>{{Count}} requests for <strong>Activity</strong> within 20 miles - earliest due {{DueDate}}</li>
+    <li>{{Count}} requests for <strong>{{Activity}}</strong> within 20 miles - earliest due {{DueDate}}</li>
     {{/each}}
 </ol>
 {{/if}}
-<br />
 <p>Please click <a href="http://www.helpmystreet.org/account/open-requests">here</a> to view open requests at HelpMyStreet and accept any that you can help with.</p>
-<br />
 <p>Thanks,</p>
 <p>The HelpMyStreet.org Team</p>

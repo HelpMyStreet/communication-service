@@ -1,0 +1,12 @@
+﻿{
+  "CreateUpdateUnsubscribeGroups": [
+    {
+      "name": "Daily Digests",
+      "description": "Daily Digests descriptions"
+    },
+    {
+      "name": "Task Notifications",
+      "description": "Task Notifications descriptions"
+    }
+  ]
+}
