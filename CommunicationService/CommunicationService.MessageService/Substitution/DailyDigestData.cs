@@ -39,7 +39,7 @@ namespace CommunicationService.MessageService.Substitution
         public string PostCode { get; set; }
         public int ChosenJobs { get; set; }
         public bool OtherJobs { get; set; }
-        public List<DailyDigestDataJob> ChosenJobsList { get; set; }
+        public List<DailyDigestDataJob> ChosenJobList { get; set; }
         public List<DailyDigestDataJob> OtherJobsList { get; set; }
         public bool IsVerified { get; set; }
 
@@ -58,7 +58,7 @@ namespace CommunicationService.MessageService.Substitution
             PostCode = postCode;
             ChosenJobs = chosenJobs;
             OtherJobs = otherJobs;
-            ChosenJobsList = chosenJobsList;
+            ChosenJobList = chosenJobsList;
             OtherJobsList = otherJobsList;
             IsVerified = isVerified;
         }
