@@ -157,7 +157,7 @@ namespace CommunicationService.MessageService
             _sendMessageRequests.Add(new SendMessageRequest()
             {
                 TemplateName = templateName,
-                RecipientUserID = REQUESTOR_DUMMY_USERID,
+                RecipientUserID = userId,
                 GroupID = groupId,
                 JobID = jobId
             });  
