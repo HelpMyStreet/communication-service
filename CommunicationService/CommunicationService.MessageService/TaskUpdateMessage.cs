@@ -38,7 +38,9 @@ namespace CommunicationService.MessageService
         public async Task<EmailBuildData> PrepareTemplateData(int? recipientUserId, int? jobId, int? groupId, string templateName)
         {
             var job = _connectRequestService.GetJobDetailsAsync(jobId.Value).Result;
-            var timeOfDay = DateTime.Now.ToLocalTime().ToString("t");
+            DateTime datestatuschanged = job.DateStatusLastChanged;
+            datestatuschanged = DateTime.SpecifyKind(datestatuschanged, DateTimeKind.Local);
+            var timeOfDay = datestatuschanged.ToString("t");
             timeOfDay = Regex.Replace(timeOfDay, @"\s+", "");
             var timeUpdated = $"today at {timeOfDay.ToLower()}";
             bool isFaceMask = job.SupportActivity == SupportActivities.FaceMask;
