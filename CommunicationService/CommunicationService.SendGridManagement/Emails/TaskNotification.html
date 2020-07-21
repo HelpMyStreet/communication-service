@@ -1,16 +1,11 @@
 ﻿<p>Hi. You’re receiving this email because you signed up as a Volunteer at <a href='http://www.helpmystreet.org/'>HelpMyStreet.org</a>.</p>
-<div>&#xA0;</div>
 {{#if IsStreetChampionOfPostcode}}
 <p>A new request for help has just arrived in a postcode that you're Street Champion for.</p>
 {{else}}
 <p>A new request for help has just arrived in a postcode that meets the criteria you said you could help with.</p>
 {{/if}}
-<div>&#xA0;</div>
-<br />
  <p><strong>{{Activity}}</strong> in {{PostCode}} ({{DistanceFromPostCode}} miles away) - Due {{DueDate}} {{#if IsHealthCritical}}<strong> - CRITICAL </strong>{{/if}}</p>
-<br />
 <p>Please visit your <a href='http://www.helpmystreeet.org/account/open-requests?j={{EncodedJobID}}'>Open Requests</a> page to view more details of the request and accept it if you’re able to help. </p>
-<br>
 {{#if IsStreetChampionOfPostcode}}
 <p>As Street Champion for this postcode, it would be great if you could help to ensure that someone responds to the request, even if you aren't able to do so yourself. You can find the contact details of other Street Champions and helpers that cover your postcodes in your <a href='http://www.helpmystreet.org/account/streets'>My Streets page</a>.</p>
 {{/if}}

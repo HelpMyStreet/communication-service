@@ -9,7 +9,7 @@ namespace CommunicationService.MessageService.Substitution
     {
         public string DateRequested { get; set; }
         public string Activity { get; set; }
-        public string RequestedStatus { get; set; }
+        public string RequestStatus { get; set; }
         public string TimeUpdated { get; set; }
         public bool IsFaceMask { get; set; }
         public bool IsDone { get; set; }
@@ -18,7 +18,7 @@ namespace CommunicationService.MessageService.Substitution
         public TaskUpdateData(
             string dateRequested,
             string activity,
-            string requestedStatus,
+            string requestStatus,
             string timeUpdated,
             bool isFaceMask,
             bool isDone,
@@ -27,7 +27,7 @@ namespace CommunicationService.MessageService.Substitution
         {
             DateRequested = dateRequested;
             Activity = activity;
-            RequestedStatus = requestedStatus;
+            RequestStatus = requestStatus;
             TimeUpdated = timeUpdated;
             IsOpen = isOpen;
             IsDone = isDone;
