@@ -37,12 +37,19 @@ namespace CommunicationService.MessageService
 
         public async Task<EmailBuildData> PrepareTemplateData(int? recipientUserId, int? jobId, int? groupId, string templateName)
         {
+            var britishZone = TimeZoneInfo.FindSystemTimeZoneById("GMT Standard Time");
             var job = _connectRequestService.GetJobDetailsAsync(jobId.Value).Result;
-            DateTime datestatuschanged = job.DateStatusLastChanged;
-            datestatuschanged = DateTime.SpecifyKind(datestatuschanged, DateTimeKind.Local);
+            DateTime datestatuschanged;
+            datestatuschanged = TimeZoneInfo.ConvertTime(job.DateStatusLastChanged, TimeZoneInfo.Local, britishZone);
             var timeOfDay = datestatuschanged.ToString("t");
             timeOfDay = Regex.Replace(timeOfDay, @"\s+", "");
             var timeUpdated = $"today at {timeOfDay.ToLower()}";
+
+            if ((DateTime.Now.Date - datestatuschanged.Date).TotalDays != 0)
+            {
+                timeUpdated = $"on {datestatuschanged.ToString("dd/MM/yyyy")} at {timeOfDay.ToLower()}";
+            }
+
             bool isFaceMask = job.SupportActivity == SupportActivities.FaceMask;
             bool isOpen = job.JobStatus == JobStatuses.Open;
             bool isDone = job.JobStatus == JobStatuses.Done;
@@ -50,6 +57,7 @@ namespace CommunicationService.MessageService
             {
                 BaseDynamicData = new TaskUpdateData
                 (
+                "Request status updated",
                 job.DateRequested.ToString("dd/MM/yyyy"),
                 Mapping.ActivityMappings[job.SupportActivity],
                 Mapping.StatusMappings[job.JobStatus],
