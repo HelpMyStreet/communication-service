@@ -41,15 +41,15 @@ namespace CommunicationService.MessageService
             var job = _connectRequestService.GetJobDetailsAsync(jobId.Value).Result;
             DateTime datestatuschanged;
             datestatuschanged = TimeZoneInfo.ConvertTime(job.DateStatusLastChanged, TimeZoneInfo.Local, britishZone);
-            var timeOfDay = datestatuschanged.ToString("hh:mmtt");
-
+            var timeOfDay = datestatuschanged.ToString("t");
+            timeOfDay = Regex.Replace(timeOfDay, @"\s+", "");
             var timeUpdated = $"today at {timeOfDay.ToLower()}";
 
-            if ((DateTime.Now.Date-datestatuschanged.Date).TotalDays!=0)
+            if ((DateTime.Now.Date - datestatuschanged.Date).TotalDays != 0)
             {
                 timeUpdated = $"on {datestatuschanged.ToString("dd/MM/yyyy")} at {timeOfDay.ToLower()}";
             }
-            
+
             bool isFaceMask = job.SupportActivity == SupportActivities.FaceMask;
             bool isOpen = job.JobStatus == JobStatuses.Open;
             bool isDone = job.JobStatus == JobStatuses.Done;
