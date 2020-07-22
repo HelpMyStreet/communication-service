@@ -46,6 +46,7 @@
     <None Remove="Migrations\20200721_135400_RemoveBR.json" />
     <None Remove="Migrations\20200722_102000_MakeTextBigger.json" />
     <None Remove="Migrations\20200722_131000_Tweaks.json" />
+    <None Remove="Migrations\20200722_140000_Tweaks.json" />
   </ItemGroup>
 
   <ItemGroup>
@@ -83,6 +84,7 @@
     <EmbeddedResource Include="Emails\RequestorTaskNotification.html" />
     <EmbeddedResource Include="Migrations\20200709_130700_AddRequestorTaskNotification.json" />
     <EmbeddedResource Include="Migrations\20200717_152400_AddUnsubscribeGroupsDailyDigest.json" />
+    <EmbeddedResource Include="Migrations\20200722_140000_Tweaks.json" />
     <EmbeddedResource Include="Migrations\20200722_131000_Tweaks.json" />
     <EmbeddedResource Include="Migrations\20200722_102000_MakeTextBigger.json" />
     <EmbeddedResource Include="Migrations\20200721_135400_RemoveBR.json" />
