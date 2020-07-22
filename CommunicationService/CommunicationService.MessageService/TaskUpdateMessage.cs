@@ -53,6 +53,7 @@ namespace CommunicationService.MessageService
             bool isFaceMask = job.SupportActivity == SupportActivities.FaceMask;
             bool isOpen = job.JobStatus == JobStatuses.Open;
             bool isDone = job.JobStatus == JobStatuses.Done;
+            bool isInProgress = job.JobStatus == JobStatuses.InProgress;
             return new EmailBuildData()
             {
                 BaseDynamicData = new TaskUpdateData
@@ -64,7 +65,8 @@ namespace CommunicationService.MessageService
                 timeUpdated,
                 isFaceMask,
                 isDone,
-                isOpen
+                isOpen,
+                isInProgress
                 ),
                 EmailToAddress = job.Requestor.EmailAddress,
                 EmailToName = $"{job.Requestor.FirstName} {job.Requestor.LastName}",
