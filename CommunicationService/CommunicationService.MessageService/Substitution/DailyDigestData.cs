@@ -37,6 +37,7 @@ namespace CommunicationService.MessageService.Substitution
     {
         public string FirstName { get; set; }
         public string PostCode { get; set; }
+        public bool SingleChosenJob { get; set; }
         public int ChosenJobs { get; set; }
         public bool OtherJobs { get; set; }
         public List<DailyDigestDataJob> ChosenJobList { get; set; }
@@ -46,6 +47,7 @@ namespace CommunicationService.MessageService.Substitution
         public DailyDigestData(
             string firstName,
             string postCode,
+            bool singleChosenJob,
             int chosenJobs,
             bool otherJobs,
             List<DailyDigestDataJob> chosenJobsList,
@@ -56,6 +58,7 @@ namespace CommunicationService.MessageService.Substitution
         { 
             FirstName = firstName;
             PostCode = postCode;
+            SingleChosenJob = singleChosenJob;
             ChosenJobs = chosenJobs;
             OtherJobs = otherJobs;
             ChosenJobList = chosenJobsList;
