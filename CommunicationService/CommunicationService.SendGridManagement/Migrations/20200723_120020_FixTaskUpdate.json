@@ -1,0 +1,15 @@
+﻿{
+  "Templates": [
+    {
+      "name": "TaskUpdate",
+      "subject": "A HelpMyStreet Task Has Been Updated",
+      "generation": "dynamic",
+      "versions": [
+        {
+          "name": "Fix Logic",
+          "subject": "A HelpMyStreet Task Has Been Updated"
+        }
+      ]
+    }
+  ]
+}
