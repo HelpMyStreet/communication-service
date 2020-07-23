@@ -114,6 +114,7 @@ namespace CommunicationService.MessageService
                 BaseDynamicData = new DailyDigestData(
                     user.UserPersonalDetails.FirstName,
                     user.PostalCode,
+                    criteriaJobs.Count() >1 ? false: true,
                     criteriaJobs.Count(),
                     otherJobs.Count() > 0,
                     chosenJobsList,
