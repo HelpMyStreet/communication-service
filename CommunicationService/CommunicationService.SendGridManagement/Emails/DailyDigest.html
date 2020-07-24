@@ -1,11 +1,16 @@
 ﻿<p>Hi {{FirstName}},</p>
 <p>You're receiving this e-mail because you signed up as a volunteer at HelpMyStreet.org.</p>
 <p>Open Requests:</p>
+{{#if SingleChosenJob}}
+<p><i>There is currently 1 open request in your area that meet criteria you signed up for:</i></p>
+{{else}}
 <p><i>There are currently {{ChosenJobs}} open requests in your area that meet criteria you signed up for:</i></p>
+{{/if}}
 <ol>
     {{#each ChosenJobList}}
-    <li><a href="http://helpmystreet.org/account/open-requests/j={{EncodedJobID}}"><strong>{{Activity}}</strong> in {{@root.PostCode}} ({{DistanceInMiles}} miles away) - {{#if Soon}}<span style="color: #ff4e00">{{else}}<span>{{/if}}Due {{DueDate}}</span></a>
-        {{Activity}} 
+    <li>
+        <a href="http://helpmystreet.org/account/open-requests/j={{EncodedJobID}}"><strong>{{Activity}}</strong> in {{@root.PostCode}} ({{DistanceInMiles}} miles away) - {{#if Soon}}<span style="color: #ff4e00">{{else}}<span>{{/if}}Due {{DueDate}}</span></a>
+        {{Activity}}
         {{#if Urgent}}<strong> - CRITICAL</strong>{{/if}}
     </li>
     {{/each}}

@@ -1,0 +1,15 @@
+﻿{
+  "Templates": [
+    {
+      "name": "TaskReminder",
+      "subject": "Request reminder",
+      "generation": "dynamic",
+      "versions": [
+        {
+          "name": "Format Text",
+          "subject": "Request reminder"
+        }
+      ]
+    }
+  ]
+}
