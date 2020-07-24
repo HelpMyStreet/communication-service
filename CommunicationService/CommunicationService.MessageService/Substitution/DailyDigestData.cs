@@ -58,7 +58,8 @@ namespace CommunicationService.MessageService.Substitution
             bool isVerified
             )
 
-        { 
+        {
+            Title = title;
             FirstName = firstName;
             PostCode = postCode;
             SingleChosenJob = singleChosenJob;
