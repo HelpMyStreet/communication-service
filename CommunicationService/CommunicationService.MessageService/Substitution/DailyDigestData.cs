@@ -25,6 +25,7 @@ namespace CommunicationService.MessageService.Substitution
             EncodedJobID = encodedJobId;
             DistanceInMiles = distanceInMiles;
         }
+
         public string Activity { get; set; }
         public string DueDate { get; set; }
         public bool Soon { get; set; }
@@ -35,6 +36,7 @@ namespace CommunicationService.MessageService.Substitution
     }
     public class DailyDigestData : BaseDynamicData
     {
+        public string Title { get; set; }
         public string FirstName { get; set; }
         public string PostCode { get; set; }
         public bool SingleChosenJob { get; set; }
@@ -45,6 +47,7 @@ namespace CommunicationService.MessageService.Substitution
         public bool IsVerified { get; set; }
 
         public DailyDigestData(
+            string title,
             string firstName,
             string postCode,
             bool singleChosenJob,
