@@ -1,26 +1,42 @@
 ﻿<p>Hi,</p>
-<p>You're receiving this e-mail because you submitted a request via <a href="http://www.helpmystreet.org">HelpMyStreet.org</a></p>
-{{#unless IsOpen}}
-{{#if IsFaceMask}}
-<p>Good news!</p>
-{{/if}}
-{{/unless}}
-<p>We're just letting you know that your request for help with {{Activity}} on {{RequestedDate}} has been updated to "{{RequestStatus}}" {{TimeUpdated}}.</p>
+<!--Start Section 1 -->
 {{#if IsDone}}
 {{#if IsFaceMask}}
-<p>If your face coverings aren’t with you already, then they should be on their way.  If you haven’t received them after a few days, please let us know by contacting <a href="mailto:support@helpmystreet.org">support@helpmystreet.org</a></p>
+<p>Good News!</p>
+{{/if}}
+{{/if}}
+
+{{#if IsInProgress}}
+<p>Good News!</p>
+{{/if}}
+<!--End Section 1 -->
+<p>
+    The request you made via HelpMyStreet.org on {{DateRequested}} for help with {{Activity}} was updated to <strong>{{RequestStatus}}</strong> {{TimeUpdated}}.
+</p>
+
+<!--Start Section 2 -->
+{{#if IsDone}}
+{{#if IsFaceMask}}
+<p>
+    If your face coverings aren’t with you already, then they should be on their way.  If you haven’t received them after a few days, please let us know by contacting <a href="mailto:support@helpmystreet.org">support@helpmystreet.org</a>.
+</p>
 {{else}}
-<p>If you think this has been done in error, please let us know at <a href="mailto:support@helpmystreet.org">support@helpmystreet.org</a></p>
+<p>
+    If you think this has been done in error, please let us know at <a href="mailto:support@helpmystreet.org">support@helpmystreet.org</a>
+</p>
 {{/if}}
 {{/if}}
+
 {{#if IsInProgress}}
 <p>This means a volunteer has seen and accepted your request.  You may hear from them soon if there’s anything they need to arrange with you.  If you have any questions, or if you need to change or cancel the request, please do contact us at <a href="mailto:support@helpmystreet.org">support@helpmystreet.org</a></p>
 {{/if}}
+
 {{#if IsOpen}}
 <p>This probably means that the volunteer who had accepted it is now unable to complete it.  It is visible to other volunteers again and will hopefully be accepted soon by one of them.  As soon as it is, you’ll be notified.  Thanks for your patience.</p>
-<p>If you think this has been done in error, please let us know at <a href="mailto:support@helpmystreet.org">support@helpmystreet.org.</a></p>
-{{/if}}
-<p>If you have any feedback for us (about this service or your request), please do let us know at <a href="mailto:feedback@helpmystreet.org">feedback@helpmystreet.org</a></p>
+<p>If you have any questions, or if you need to change or cancel the request, please do contact us at <a href="mailto:support@helpmystreet.org">support@helpmystreet.org</a>
+<p>
+    {{/if}}
+    <!--End Section 2 -->
 <p>Thanks for using HelpMyStreet.org. Stay safe!</p>
 <p>Best regards,</p>
 <p>The HelpMyStreet Team</p>
