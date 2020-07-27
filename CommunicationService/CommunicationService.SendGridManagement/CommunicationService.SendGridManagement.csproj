@@ -54,6 +54,7 @@
     <None Remove="Migrations\20200724_090000_Reword.json" />
     <None Remove="Migrations\20200727_094100_Reword.json" />
     <None Remove="Migrations\20200727_10000_FixHyperlink.json" />
+    <None Remove="Migrations\20200727_102500_AddJobIDToHyperlink.json" />
   </ItemGroup>
 
   <ItemGroup>
@@ -91,6 +92,7 @@
     <EmbeddedResource Include="Emails\RequestorTaskNotification.html" />
     <EmbeddedResource Include="Migrations\20200709_130700_AddRequestorTaskNotification.json" />
     <EmbeddedResource Include="Migrations\20200717_152400_AddUnsubscribeGroupsDailyDigest.json" />
+    <EmbeddedResource Include="Migrations\20200727_102500_AddJobIDToHyperlink.json" />
     <EmbeddedResource Include="Migrations\20200727_10000_FixHyperlink.json" />
     <EmbeddedResource Include="Migrations\20200727_094100_Reword.json" />
     <EmbeddedResource Include="Migrations\20200724_090000_Reword.json" />

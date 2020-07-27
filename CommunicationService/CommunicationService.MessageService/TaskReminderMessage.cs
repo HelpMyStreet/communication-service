@@ -53,9 +53,12 @@ namespace CommunicationService.MessageService
             var user = await _connectUserService.GetUserByIdAsync(recipientUserId.Value);
             var job = await _connectRequestService.GetJobDetailsAsync(jobId.Value);
 
+            string encodedJobId = HelpMyStreet.Utils.Utils.Base64Utils.Base64Encode(job.JobID.ToString());
+
             return new EmailBuildData()
             {
                 BaseDynamicData = new TaskReminderData(
+                    encodedJobId,
                     GetTitleFromDays(job.DueDays),
                     user.UserPersonalDetails.FirstName,
                     Mapping.ActivityMappings[job.SupportActivity],

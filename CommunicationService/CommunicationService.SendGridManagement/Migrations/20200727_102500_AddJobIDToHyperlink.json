@@ -1,0 +1,15 @@
+﻿{
+  "Templates": [
+    {
+      "name": "TaskReminder",
+      "subject": "Request reminder",
+      "generation": "dynamic",
+      "versions": [
+        {
+          "name": "Add encoded job id",
+          "subject": "Request reminder"
+        }
+      ]
+    }
+  ]
+}
