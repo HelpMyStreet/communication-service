@@ -8,23 +8,23 @@
 
 {{#if DueToday}}
 <p>The help is needed today.</p>
-<p>If you haven’t yet done so, please do go ahead and make a start as soon as you can, using the details included in the request <a href="http://www.helpmystreet.org/account/accepted-requests">here</a>.</p>
-<p>Have you already completed the request? If so – then thanks so much! It would be great if you could mark it as “Done” <a href="http://www.helpmystreet.org/account/accepted-requests">here</a> so that we know.</p>
+<p>If you haven’t yet done so, please do go ahead and make a start as soon as you can, using the details included in the request <a href="http://www.helpmystreet.org/account/accepted-requests?j={{EncodedJobID}}">here</a>.</p>
+<p>Have you already completed the request? If so – then thanks so much! It would be great if you could mark it as “Done” <a href="http://www.helpmystreet.org/account/accepted-requests?j={{EncodedJobID}}">here</a> so that we know.</p>
 <p>Are you having problems? If you’re having technical difficulties or are unsure what you need to do, please do let us know at <a href="mailto:support@helpmystreet.org">support@helpmystreet.org</a> and we’ll do anything we can to help.</p>
 <p>
-    Are you no longer able to complete the task? Please “release” it by clicking the “Can’t Do” button beside it in your <a href="http://www.helpmystreet.org/account/accepted-requests">My Accepted Requests</a> tab. This will make it available again for other volunteers to pick up if needed.
+    Are you no longer able to complete the task? Please “release” it by clicking the “Can’t Do” button beside it in your <a href="http://www.helpmystreet.org/account/accepted-requests?j={{EncodedJobID}}">My Accepted Requests</a> tab. This will make it available again for other volunteers to pick up if needed.
 </p>
 
 {{else}}
 <p>The help is needed on or before {{DueDate}} – {{DueDays}} days from now.</p>
-<p>If you haven’t yet done so, please do go ahead and make a start whenever you can, using the details included in the request <a href="http://www.helpmystreet.org/account/accepted-requests">here</a>.</p>
+<p>If you haven’t yet done so, please do go ahead and make a start whenever you can, using the details included in the request <a href="http://www.helpmystreet.org/account/accepted-requests?j={{EncodedJobID}}">here</a>.</p>
 <p>Were you waiting for the due date?  The request can be completed any time between the time it’s made and the due date.</p>
-<p>Have you already completed the request? If so – then thanks so much! It would be great if you could mark it as “Done” <a href="http://www.helpmystreet.org/account/accepted-requests">here</a> so that we know.</p>
+<p>Have you already completed the request? If so – then thanks so much! It would be great if you could mark it as “Done” <a href="http://www.helpmystreet.org/account/accepted-requests?j={{EncodedJobID}}">here</a> so that we know.</p>
 <p>
-    Are you having problems? If you’re having technical difficulties or are unsure what you need to do, please do let us know at <a href="mailto:support@helpmystreet.org">support@helpmystreet.org</a> and we’ll do anything we can to help.
+    Are you having problems? If you’re having technical difficulties or are unsure what you need to do, please do let us know at <a href="mailto:support@helpmystreet.org?j={{EncodedJobID}}">support@helpmystreet.org</a> and we’ll do anything we can to help.
 </p>
 <p>
-    Are you no longer able to complete the task? Please “release” it by clicking the “Can’t Do” button beside it in your <a href="http://www.helpmystreet.org/account/accepted-requests">My Accepted Requests</a> tab. This will make it available again for other volunteers to pick up if needed.
+    Are you no longer able to complete the task? Please “release” it by clicking the “Can’t Do” button beside it in your <a href="http://www.helpmystreet.org/account/accepted-requests?j={{EncodedJobID}}">My Accepted Requests</a> tab. This will make it available again for other volunteers to pick up if needed.
 </p>
 
 {{/if}}
