@@ -52,6 +52,7 @@
     <None Remove="Migrations\20200723_130000_FixTaskReminder.json" />
     <None Remove="Migrations\20200723_163000_FixDailyDigest.json" />
     <None Remove="Migrations\20200724_090000_Reword.json" />
+    <None Remove="Migrations\20200727_094100_Reword.json" />
   </ItemGroup>
 
   <ItemGroup>
@@ -89,6 +90,7 @@
     <EmbeddedResource Include="Emails\RequestorTaskNotification.html" />
     <EmbeddedResource Include="Migrations\20200709_130700_AddRequestorTaskNotification.json" />
     <EmbeddedResource Include="Migrations\20200717_152400_AddUnsubscribeGroupsDailyDigest.json" />
+    <EmbeddedResource Include="Migrations\20200727_094100_Reword.json" />
     <EmbeddedResource Include="Migrations\20200724_090000_Reword.json" />
     <EmbeddedResource Include="Migrations\20200723_163000_FixDailyDigest.json" />
     <EmbeddedResource Include="Migrations\20200723_130000_FixTaskReminder.json" />
