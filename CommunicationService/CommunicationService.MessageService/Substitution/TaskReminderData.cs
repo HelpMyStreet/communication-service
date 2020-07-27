@@ -7,6 +7,7 @@ namespace CommunicationService.MessageService.Substitution
 {
     public class TaskReminderData : BaseDynamicData
     {
+        public string EncodedJobID { get; private set; }
         public string Title { get; private set; }
         public string FirstName { get; private set; }
         public string Activity { get; private set; }
@@ -18,6 +19,7 @@ namespace CommunicationService.MessageService.Substitution
 
 
         public TaskReminderData(
+            string encodedJobId,
             string title,
             string firstname,
             string activity,
@@ -28,6 +30,7 @@ namespace CommunicationService.MessageService.Substitution
             string datestatuslastchanged
             )
         {
+            EncodedJobID = encodedJobId;
             Title = title;
             FirstName = firstname;
             Activity = activity;
