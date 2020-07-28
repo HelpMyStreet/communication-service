@@ -2,15 +2,14 @@
 <p>You're receiving this e-mail because you signed up as a volunteer at HelpMyStreet.org.</p>
 <p>Open Requests:</p>
 {{#if SingleChosenJob}}
-<p><i>There is currently 1 open request in your area that meet criteria you signed up for:</i></p>
+<p><i>There is currently 1 open request in your area that meet the criteria you signed up for:</i></p>
 {{else}}
-<p><i>There are currently {{ChosenJobs}} open requests in your area that meet criteria you signed up for:</i></p>
+<p><i>There are currently {{ChosenJobs}} open requests in your area that meet the criteria you signed up for:</i></p>
 {{/if}}
 <ol>
     {{#each ChosenJobList}}
     <li>
         <a href="http://helpmystreet.org/account/open-requests/j={{EncodedJobID}}"><strong>{{Activity}}</strong> in {{@root.PostCode}} ({{DistanceInMiles}} miles away) - {{#if Soon}}<span style="color: #ff4e00">{{else}}<span>{{/if}}Due {{DueDate}}</span></a>
-        {{Activity}}
         {{#if Urgent}}<strong> - CRITICAL</strong>{{/if}}
     </li>
     {{/each}}
@@ -20,10 +19,19 @@
 <p><i>There are other open requests, which don’t meet the criteria you specified when you signed up:</i></p>
 <ol>
     {{#each OtherJobsList}}
+    {{#if IsSingleItem}}
+    <li>{{Count}} request for <strong>{{Activity}}</strong> within 20 miles - due {{DueDate}}</li>
+    {{else}}
     <li>{{Count}} requests for <strong>{{Activity}}</strong> within 20 miles - earliest due {{DueDate}}</li>
+    {{/if}}
     {{/each}}
 </ol>
 {{/if}}
 <p>Please click <a href="http://www.helpmystreet.org/account/open-requests">here</a> to view open requests at HelpMyStreet and accept any that you can help with.</p>
-<p>Thanks,</p>
-<p>The HelpMyStreet.org Team</p>
+<p>Thanks!</p>
+<p>Best wishes,</p>
+<p>The Help My Street Team</p>
+
+
+
+{{IsSingleItem}}

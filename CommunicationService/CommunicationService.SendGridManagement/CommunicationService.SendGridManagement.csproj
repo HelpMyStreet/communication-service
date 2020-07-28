@@ -58,6 +58,7 @@
     <None Remove="Migrations\20200727_124900_TweakYotiReminder.json" />
     <None Remove="Migrations\20200727_162500_TweakTaskNotification.json" />
     <None Remove="Migrations\20200728_10000_TweakTaskUpdate.json" />
+    <None Remove="Migrations\20200728_104500_DailyDigestUpdate.json" />
   </ItemGroup>
 
   <ItemGroup>
@@ -95,6 +96,7 @@
     <EmbeddedResource Include="Emails\RequestorTaskNotification.html" />
     <EmbeddedResource Include="Migrations\20200709_130700_AddRequestorTaskNotification.json" />
     <EmbeddedResource Include="Migrations\20200717_152400_AddUnsubscribeGroupsDailyDigest.json" />
+    <EmbeddedResource Include="Migrations\20200728_104500_DailyDigestUpdate.json" />
     <EmbeddedResource Include="Migrations\20200728_10000_TweakTaskUpdate.json" />
     <EmbeddedResource Include="Migrations\20200727_162500_TweakTaskNotification.json" />
     <EmbeddedResource Include="Migrations\20200727_124900_TweakYotiReminder.json" />
