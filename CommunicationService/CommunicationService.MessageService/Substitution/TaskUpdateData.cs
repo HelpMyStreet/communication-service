@@ -7,6 +7,7 @@ namespace CommunicationService.MessageService.Substitution
 {
     public class TaskUpdateData : BaseDynamicData
     {
+        public string FirstName { get; private set; }
         public string Title { get; private set; }
         public string DateRequested { get; private set; }
         public string Activity { get; private set; }
@@ -18,6 +19,7 @@ namespace CommunicationService.MessageService.Substitution
         public bool IsInProgress { get; private set; }
 
         public TaskUpdateData(
+            string firstname,
             string title,
             string dateRequested,
             string activity,
@@ -29,6 +31,7 @@ namespace CommunicationService.MessageService.Substitution
             bool isInProgress
             )
         {
+            FirstName = firstname;
             Title = title;
             DateRequested = dateRequested;
             Activity = activity;

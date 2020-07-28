@@ -58,6 +58,7 @@ namespace CommunicationService.MessageService
             {
                 BaseDynamicData = new TaskUpdateData
                 (
+                job.Requestor.FirstName,
                 "Request status updated",
                 job.DateRequested.ToString("dd/MM/yyyy"),
                 Mapping.ActivityMappings[job.SupportActivity],

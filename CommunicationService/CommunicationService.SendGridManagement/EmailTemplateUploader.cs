@@ -46,7 +46,6 @@ namespace CommunicationService.SendGridManagement
             }
         }
 
-
         private string ReadFile(string resourceName)
         {
             var assembly = Assembly.GetExecutingAssembly();
