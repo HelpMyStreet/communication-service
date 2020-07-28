@@ -51,6 +51,7 @@ namespace CommunicationService.MessageService
                 {
                     BaseDynamicData = new TaskNotificationData
                     (
+                        job.Requestor.FirstName,
                         true,
                         encodedJobId,
                         Mapping.ActivityMappings[job.SupportActivity],
@@ -93,6 +94,7 @@ namespace CommunicationService.MessageService
                         {
                             BaseDynamicData = new TaskNotificationData
                             (
+                                user.UserPersonalDetails.FirstName,
                                 false,
                                 encodedJobId,
                                 Mapping.ActivityMappings[job.SupportActivity],

@@ -18,7 +18,8 @@ namespace CommunicationService.MessageService
             { HelpMyStreet.Utils.Enums.SupportActivities.CheckingIn, "Check In" },
             { HelpMyStreet.Utils.Enums.SupportActivities.FaceMask, "Face Covering" },
             { HelpMyStreet.Utils.Enums.SupportActivities.WellbeingPackage, "Wellbeing Package" },
-            { HelpMyStreet.Utils.Enums.SupportActivities.Other, "Other" }
+            { HelpMyStreet.Utils.Enums.SupportActivities.Other, "Other" },
+            { HelpMyStreet.Utils.Enums.SupportActivities.CommunityConnector, "Community Connector" }
         };
 
         public static Dictionary<HelpMyStreet.Utils.Enums.JobStatuses, string> StatusMappings = new Dictionary<HelpMyStreet.Utils.Enums.JobStatuses, string>()

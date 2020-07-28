@@ -88,6 +88,7 @@ namespace CommunicationService.MessageService
                     job.DueDate.ToString("dd/MM/yyyy"),
                     job.DueDate < DateTime.Now.AddDays(1),
                     job.IsHealthCritical,
+                    true,
                     1,
                     encodedJobId,
                     Math.Round(job.DistanceInMiles,1).ToString()
@@ -103,6 +104,7 @@ namespace CommunicationService.MessageService
                     job.Min.ToString("dd/MM/yyyy"),
                     false,
                     false,
+                    job.Count==1 ? true : false,
                     job.Count,
                     "",
                     ""
