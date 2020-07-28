@@ -56,6 +56,9 @@
     <None Remove="Migrations\20200727_10000_FixHyperlink.json" />
     <None Remove="Migrations\20200727_102500_AddJobIDToHyperlink.json" />
     <None Remove="Migrations\20200727_124900_TweakYotiReminder.json" />
+    <None Remove="Migrations\20200727_162500_TweakTaskNotification.json" />
+    <None Remove="Migrations\20200728_10000_TweakTaskUpdate.json" />
+    <None Remove="Migrations\20200728_104500_DailyDigestUpdate.json" />
   </ItemGroup>
 
   <ItemGroup>
@@ -93,6 +96,9 @@
     <EmbeddedResource Include="Emails\RequestorTaskNotification.html" />
     <EmbeddedResource Include="Migrations\20200709_130700_AddRequestorTaskNotification.json" />
     <EmbeddedResource Include="Migrations\20200717_152400_AddUnsubscribeGroupsDailyDigest.json" />
+    <EmbeddedResource Include="Migrations\20200728_104500_DailyDigestUpdate.json" />
+    <EmbeddedResource Include="Migrations\20200728_10000_TweakTaskUpdate.json" />
+    <EmbeddedResource Include="Migrations\20200727_162500_TweakTaskNotification.json" />
     <EmbeddedResource Include="Migrations\20200727_124900_TweakYotiReminder.json" />
     <EmbeddedResource Include="Migrations\20200727_102500_AddJobIDToHyperlink.json" />
     <EmbeddedResource Include="Migrations\20200727_10000_FixHyperlink.json" />
