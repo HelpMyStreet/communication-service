@@ -9,6 +9,7 @@ namespace CommunicationService.MessageService.Substitution
     {
         public DailyDigestDataJob(
             string activity,
+            string postCode,
             string dueDate,
             bool soon,
             bool urgent,
@@ -19,6 +20,7 @@ namespace CommunicationService.MessageService.Substitution
             )
         {
             Activity = activity;
+            PostCode = postCode;
             DueDate = dueDate;
             Soon = soon;
             Urgent = urgent;
@@ -29,6 +31,7 @@ namespace CommunicationService.MessageService.Substitution
         }
 
         public string Activity { get; private set; }
+        public string PostCode { get; private set; }
         public string DueDate { get; private set; }
         public bool Soon { get; private set; }
         public bool Urgent { get; private set; }
@@ -41,7 +44,6 @@ namespace CommunicationService.MessageService.Substitution
     {
         public string Title { get; private set; }
         public string FirstName { get; private set; }
-        public string PostCode { get; private set; }
         public bool SingleChosenJob { get; private set; }
         public int ChosenJobs { get; private set; }
         public bool OtherJobs { get; private set; }
@@ -52,7 +54,6 @@ namespace CommunicationService.MessageService.Substitution
         public DailyDigestData(
             string title,
             string firstName,
-            string postCode,
             bool singleChosenJob,
             int chosenJobs,
             bool otherJobs,
@@ -64,7 +65,6 @@ namespace CommunicationService.MessageService.Substitution
         {
             Title = title;
             FirstName = firstName;
-            PostCode = postCode;
             SingleChosenJob = singleChosenJob;
             ChosenJobs = chosenJobs;
             OtherJobs = otherJobs;
