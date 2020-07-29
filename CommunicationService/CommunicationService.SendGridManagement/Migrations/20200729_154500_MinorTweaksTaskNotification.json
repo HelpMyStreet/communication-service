@@ -1,0 +1,26 @@
+﻿{
+  "Templates": [
+    {
+      "name": "RequestorTaskNotification",
+      "subject": "Your New Help Request",
+      "generation": "dynamic",
+      "versions": [
+        {
+          "name": "Updating wording",
+          "subject": "Your New Help Request"
+        }
+      ]
+    },
+    {
+      "name": "TaskNotification",
+      "subject": "A New HelpMyStreet Request Has Been Raised",
+      "generation": "dynamic",
+      "versions": [
+        {
+          "name": "Updating wording",
+          "subject": "A New HelpMyStreet Request Has Been Raised"
+        }
+      ]
+    }
+  ]
+}

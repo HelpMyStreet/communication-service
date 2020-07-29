@@ -62,6 +62,7 @@
     <None Remove="Migrations\20200729_113700_DailyDigestCorrectPostCode.json" />
     <None Remove="Migrations\20200729_120000_DailyDigestCorrectPostCode.json" />
     <None Remove="Migrations\20200729_143000_MinorTweaks.json" />
+    <None Remove="Migrations\20200729_154500_MinorTweaksTaskNotification.json" />
   </ItemGroup>
 
   <ItemGroup>
@@ -99,6 +100,7 @@
     <EmbeddedResource Include="Emails\RequestorTaskNotification.html" />
     <EmbeddedResource Include="Migrations\20200709_130700_AddRequestorTaskNotification.json" />
     <EmbeddedResource Include="Migrations\20200717_152400_AddUnsubscribeGroupsDailyDigest.json" />
+    <EmbeddedResource Include="Migrations\20200729_154500_MinorTweaksTaskNotification.json" />
     <EmbeddedResource Include="Migrations\20200729_143000_MinorTweaks.json" />
     <EmbeddedResource Include="Migrations\20200729_120000_DailyDigestCorrectPostCode.json" />
     <EmbeddedResource Include="Migrations\20200729_113700_DailyDigestCorrectPostCode.json" />
