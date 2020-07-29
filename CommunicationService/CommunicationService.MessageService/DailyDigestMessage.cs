@@ -115,7 +115,7 @@ namespace CommunicationService.MessageService
 
             return new EmailBuildData()
             {
-                BaseDynamicData = new DailyDigestData(_emailConfig.Value.ShowUserIDInEmailTitle ? recipientUserId.Value.ToString() : string.Empty,
+                BaseDynamicData = new DailyDigestData(string.Empty,
                     user.UserPersonalDetails.FirstName,
                     criteriaJobs.Count() >1 ? false: true,
                     criteriaJobs.Count(),
