@@ -85,6 +85,7 @@ namespace CommunicationService.MessageService
 
                 chosenJobsList.Add(new DailyDigestDataJob(
                     Mapping.ActivityMappings[job.SupportActivity],
+                    job.PostCode,
                     job.DueDate.ToString("dd/MM/yyyy"),
                     job.DueDate < DateTime.Now.AddDays(1),
                     job.IsHealthCritical,
@@ -101,6 +102,7 @@ namespace CommunicationService.MessageService
             {
                 otherJobsList.Add(new DailyDigestDataJob(
                     Mapping.ActivityMappings[job.Key],
+                    string.Empty,
                     job.Min.ToString("dd/MM/yyyy"),
                     false,
                     false,
@@ -113,9 +115,8 @@ namespace CommunicationService.MessageService
 
             return new EmailBuildData()
             {
-                BaseDynamicData = new DailyDigestData(recipientUserId.Value.ToString(),
+                BaseDynamicData = new DailyDigestData(_emailConfig.Value.ShowUserIDInEmailTitle ? recipientUserId.Value.ToString() : string.Empty,
                     user.UserPersonalDetails.FirstName,
-                    user.PostalCode,
                     criteriaJobs.Count() >1 ? false: true,
                     criteriaJobs.Count(),
                     otherJobs.Count() > 0,
