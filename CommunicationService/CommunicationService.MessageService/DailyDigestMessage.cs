@@ -122,7 +122,7 @@ namespace CommunicationService.MessageService
                     otherJobs.Count() > 0,
                     chosenJobsList,
                     otherJobsList,
-                    user.IsVerified.Value ? true : false
+                    user.IsVerified ?? false
                     ),
                 EmailToAddress = user.UserPersonalDetails.EmailAddress,
                 EmailToName = user.UserPersonalDetails.DisplayName,
