@@ -34,11 +34,15 @@ namespace CommunicationService.AzureFunction
                 EmailBuildData emailBuildData = message.PrepareTemplateData(sendMessageRequest.RecipientUserID, sendMessageRequest.JobID, sendMessageRequest.GroupID, sendMessageRequest.TemplateName).Result;
                 if (emailBuildData != null)
                 {
+                    log.LogInformation($"Try to send email for {myQueueItem}");
                     AddCommunicationRequestToCosmos(sendMessageRequest);
 
                     var result = _connectSendGridService.SendDynamicEmail(sendMessageRequest.TemplateName, message.UnsubscriptionGroupName, emailBuildData).Result;
                     log.LogInformation($"SendDynamicEmail({sendMessageRequest.TemplateName}) returned {result}");
-
+                }
+                else
+                {
+                    log.LogInformation($"No information to email for {myQueueItem}");
                 }
             }
             catch (AggregateException exc)
