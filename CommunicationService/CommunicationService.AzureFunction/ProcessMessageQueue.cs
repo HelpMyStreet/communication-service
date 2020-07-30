@@ -27,25 +27,27 @@ namespace CommunicationService.AzureFunction
         public void Run([ServiceBusTrigger("message", Connection = "ServiceBus")]string myQueueItem, ILogger log)
         {
             log.LogInformation($"Start ProcessMessageQueue:{myQueueItem}");
-            SendMessageRequest sendMessageRequest = JsonConvert.DeserializeObject<SendMessageRequest>(myQueueItem);
-            IMessage message = _messageFactory.Create(sendMessageRequest);
-            EmailBuildData emailBuildData = message.PrepareTemplateData(sendMessageRequest.RecipientUserID, sendMessageRequest.JobID, sendMessageRequest.GroupID, sendMessageRequest.TemplateName).Result;
-            if (emailBuildData != null)
+            try
             {
-                AddCommunicationRequestToCosmos(sendMessageRequest);
-                try
+                SendMessageRequest sendMessageRequest = JsonConvert.DeserializeObject<SendMessageRequest>(myQueueItem);
+                IMessage message = _messageFactory.Create(sendMessageRequest);
+                EmailBuildData emailBuildData = message.PrepareTemplateData(sendMessageRequest.RecipientUserID, sendMessageRequest.JobID, sendMessageRequest.GroupID, sendMessageRequest.TemplateName).Result;
+                if (emailBuildData != null)
                 {
-                   var result =  _connectSendGridService.SendDynamicEmail(sendMessageRequest.TemplateName, message.UnsubscriptionGroupName, emailBuildData).Result;
-                   log.LogInformation($"SendDynamicEmail({sendMessageRequest.TemplateName}) returned {result}");      
+                    AddCommunicationRequestToCosmos(sendMessageRequest);
+
+                    var result = _connectSendGridService.SendDynamicEmail(sendMessageRequest.TemplateName, message.UnsubscriptionGroupName, emailBuildData).Result;
+                    log.LogInformation($"SendDynamicEmail({sendMessageRequest.TemplateName}) returned {result}");
+
                 }
-                catch (AggregateException exc)
-                {
-                    log.LogError($"{exc.Flatten()} error for queueitem {myQueueItem}");
-                }
-                catch (Exception exc)
-                {
-                    log.LogError($"{exc} error for queueitem {myQueueItem}");
-                }
+            }
+            catch (AggregateException exc)
+            {
+                log.LogError($"{exc.Flatten()} error for queueitem {myQueueItem}");
+            }
+            catch (Exception exc)
+            {
+                log.LogError($"{exc} error for queueitem {myQueueItem}");
             }
             log.LogInformation($"End ProcessMessageQueue:{myQueueItem}");
         }
