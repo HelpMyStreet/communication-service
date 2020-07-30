@@ -71,7 +71,7 @@ namespace CommunicationService.MessageService
             else
             {
                 var user = await _connectUserService.GetUserByIdAsync(recipientUserId.Value);
-                var volunteers = _connectUserService.GetHelpersByPostcodeAndTaskType
+                var volunteers = _connectUserService.GetVolunteersByPostcodeAndActivity
                     (
                         job.PostCode,
                         new List<SupportActivities>() { job.SupportActivity },
@@ -101,7 +101,7 @@ namespace CommunicationService.MessageService
                                 job.PostCode,
                                 Math.Round(volunteer.DistanceInMiles, 1),
                                 job.DueDate.ToString("dd/MM/yyyy"),
-                                user.IsVerified.HasValue ? !user.IsVerified.Value : false,
+                                user.IsVerified.HasValue ? !user.IsVerified.Value : true,
                                 isStreetChampionForGivenPostCode,
                                 job.HealthCritical,
                                 isFaceMask
@@ -138,7 +138,7 @@ namespace CommunicationService.MessageService
                 AddRecipientAndTemplate(TemplateName.RequestorTaskNotification, REQUESTOR_DUMMY_USERID, jobId, groupId);
                 // Continue
                 supportActivities.Add(job.SupportActivity);
-                var volunteers = _connectUserService.GetHelpersByPostcodeAndTaskType(job.PostCode, supportActivities, CancellationToken.None).Result;
+                var volunteers = _connectUserService.GetVolunteersByPostcodeAndActivity(job.PostCode, supportActivities, CancellationToken.None).Result;
 
                 if (volunteers != null)
                 {
