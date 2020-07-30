@@ -27,7 +27,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CommunicationService.SendGr
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CommunicationService.UnitTests", "CommunicationService\CommunicationService.UnitTests\CommunicationService.UnitTests.csproj", "{FF609DE6-CA42-4F99-A1FE-53FDBD132DDA}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CommunicationService.GroupService", "CommunicationService\CommunicationService.GroupService\CommunicationService.GroupService.csproj", "{16298A88-E67A-4D6D-B2CB-ECFE1DD37C7A}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CommunicationService.GroupService", "CommunicationService\CommunicationService.GroupService\CommunicationService.GroupService.csproj", "{16298A88-E67A-4D6D-B2CB-ECFE1DD37C7A}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
