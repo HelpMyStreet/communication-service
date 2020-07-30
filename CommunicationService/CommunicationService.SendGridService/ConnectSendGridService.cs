@@ -29,11 +29,11 @@ namespace CommunicationService.SendGridService
 
         public async Task<int> GetGroupId(string groupName)
         {
-            Response response = await _sendGridClient.RequestAsync(SendGridClient.Method.GET, null, null, "asm/groups");
+            Response response = await _sendGridClient.RequestAsync(SendGridClient.Method.GET, null, null, "asm/groups").ConfigureAwait(false);
 
             if (response != null && response.StatusCode == HttpStatusCode.OK)
             {
-                string body = response.Body.ReadAsStringAsync().Result;
+                string body = await response.Body.ReadAsStringAsync().ConfigureAwait(false);
                 var groups = JsonConvert.DeserializeObject<UnsubscribeGroups[]>(body);
                 if (groups != null && groups.Length > 0)
                 {
@@ -63,11 +63,11 @@ namespace CommunicationService.SendGridService
             var queryParams = @"{
                 'generations': 'dynamic'
                 }";
-            Response response = await _sendGridClient.RequestAsync(SendGridClient.Method.GET, null, queryParams, "templates");
+            Response response = await _sendGridClient.RequestAsync(SendGridClient.Method.GET, null, queryParams, "templates").ConfigureAwait(false);
 
             if (response != null && response.StatusCode == HttpStatusCode.OK)
             {
-                string body = response.Body.ReadAsStringAsync().Result;
+                string body = await response.Body.ReadAsStringAsync().ConfigureAwait(false);
                 var templates = JsonConvert.DeserializeObject<Templates>(body);
                 if (templates != null && templates.templates.Length > 0)
                 {
@@ -94,8 +94,8 @@ namespace CommunicationService.SendGridService
 
         public async Task<bool> SendDynamicEmail(string templateName, string groupName, EmailBuildData emailBuildData)
         {
-            string templateId = await GetTemplateId(templateName);
-            int groupId = await GetGroupId(groupName);
+            string templateId = await GetTemplateId(templateName).ConfigureAwait(false);
+            int groupId = await GetGroupId(groupName).ConfigureAwait(false);
             Personalization personalization = new Personalization()
             {
                 Tos = new List<EmailAddress>() { new EmailAddress(emailBuildData.EmailToAddress, emailBuildData.EmailToName) },
@@ -124,7 +124,7 @@ namespace CommunicationService.SendGridService
                 }
             };
 
-            Response response = await _sendGridClient.SendEmailAsync(eml);
+            Response response = await _sendGridClient.SendEmailAsync(eml).ConfigureAwait(false);
             if (response.StatusCode == HttpStatusCode.OK || response.StatusCode == HttpStatusCode.Accepted)
                 return true;
             else
