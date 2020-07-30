@@ -14,5 +14,7 @@ namespace CommunicationService.Core.Configuration
 
         public int? MaxConnectionsPerServer { get; set; }
 
+        public bool IsExternal { get; set; }
+
     }
 }
