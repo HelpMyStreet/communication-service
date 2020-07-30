@@ -58,7 +58,7 @@ namespace CommunicationService.UserService
             return user;
         }
 
-        public async Task<GetVolunteersByPostcodeAndActivityResponse> GetHelpersByPostcodeAndTaskType(string postcode, List<SupportActivities> activities, CancellationToken cancellationToken)
+        public async Task<GetVolunteersByPostcodeAndActivityResponse> GetVolunteersByPostcodeAndActivity(string postcode, List<SupportActivities> activities, CancellationToken cancellationToken)
         {
             string path = $"api/GetVolunteersByPostcodeAndActivity";
             GetVolunteersByPostcodeAndActivityResponse helperResponse;
