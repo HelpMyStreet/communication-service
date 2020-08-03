@@ -56,7 +56,7 @@ namespace CommunicationService.MessageService
                 case CommunicationJobTypes.SendTaskStateChangeUpdate:
                     return new TaskUpdateMessage(_connectRequestService);
                 case CommunicationJobTypes.SendOpenTaskDigest:
-                    return new DailyDigestMessage(_connectUserService, _connectRequestService, _emailConfig);
+                    return new DailyDigestMessage(_connectGroupService, _connectUserService, _connectRequestService, _emailConfig);
                 case CommunicationJobTypes.SendTaskReminder:
                     return new TaskReminderMessage(_connectRequestService, _connectUserService);
                 default:

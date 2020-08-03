@@ -37,5 +37,22 @@ namespace CommunicationService.GroupService
                 return null;
             }
         }
+
+        public async Task<GetUserGroupsResponse> GetUserGroups(int userId)
+        {
+            string path = $"/api/GetUserGroups?userId={userId}";
+            string absolutePath = $"{path}";
+
+            using (HttpResponseMessage response = await _httpClientWrapper.GetAsync(HttpClientConfigName.GroupService, absolutePath, CancellationToken.None).ConfigureAwait(false))
+            {
+                string jsonResponse = await response.Content.ReadAsStringAsync();
+                var getJobsResponse = JsonConvert.DeserializeObject<ResponseWrapper<GetUserGroupsResponse, GroupServiceErrorCode>>(jsonResponse);
+                if (getJobsResponse.HasContent && getJobsResponse.IsSuccessful)
+                {
+                    return getJobsResponse.Content;
+                }
+                return null;
+            }
+        }
     }
 }
