@@ -19,6 +19,7 @@ namespace CommunicationService.MessageService
 {
     public class DailyDigestMessage : IMessage
     {
+        private readonly IConnectGroupService _connectGroupService;
         private readonly IConnectUserService _connectUserService;
         private readonly IConnectRequestService _connectRequestService;
         private readonly IOptions<EmailConfig> _emailConfig;
@@ -32,8 +33,9 @@ namespace CommunicationService.MessageService
             }
         }
 
-        public DailyDigestMessage(IConnectUserService connectUserService, IConnectRequestService connectRequestService, IOptions<EmailConfig> eMailConfig)
+        public DailyDigestMessage(IConnectGroupService connectGroupService, IConnectUserService connectUserService, IConnectRequestService connectRequestService, IOptions<EmailConfig> eMailConfig)
         {
+            _connectGroupService = connectGroupService;
             _connectUserService = connectUserService;
             _connectRequestService = connectRequestService;
             _emailConfig = eMailConfig;
@@ -48,6 +50,7 @@ namespace CommunicationService.MessageService
             }
             try
             {
+                var groups = _connectGroupService.GetUserGroups(recipientUserId.Value).Result;
                 var user = _connectUserService.GetUserByIdAsync(recipientUserId.Value).Result;
                 var nationalSupportActivities = new List<SupportActivities>() { SupportActivities.FaceMask, SupportActivities.HomeworkSupport, SupportActivities.PhoneCalls_Anxious, SupportActivities.PhoneCalls_Friendly };
 
@@ -60,7 +63,7 @@ namespace CommunicationService.MessageService
                 jobRequest.DistanceInMiles = _emailConfig.Value.DigestOtherJobsDistance;
                 jobRequest.JobStatuses = jobStatusRequest;
                 jobRequest.ActivitySpecificSupportDistancesInMiles = activitySpecificSupportDistancesInMiles;
-
+                jobRequest.Groups = new GroupRequest() { Groups = groups.Groups };
 
                 GetJobsByFilterResponse jobsResponse = _connectRequestService.GetJobsByFilter(jobRequest).Result;
                 var jobs = jobsResponse.JobSummaries;
