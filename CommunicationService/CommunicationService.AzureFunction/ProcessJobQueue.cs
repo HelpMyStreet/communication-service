@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Threading;
 using CommunicationService.Core.Domains;
 using CommunicationService.Core.Interfaces;
 using CommunicationService.Core.Interfaces.Services;
@@ -22,7 +23,7 @@ namespace CommunicationService.AzureFunction
         [FunctionName("ProcessJobQueue")]
         public void Run([ServiceBusTrigger("job", Connection = "ServiceBus")]string myQueueItem, ILogger log)
         {
-            log.LogInformation($"myQueueItem {myQueueItem}");
+            log.LogInformation($"start ProcessJobQueue myQueueItem {myQueueItem}");
 
             RequestCommunicationRequest sendCommunicationRequest = JsonConvert.DeserializeObject<RequestCommunicationRequest>(myQueueItem);
             IMessage message = _messageFactory.Create(sendCommunicationRequest);
@@ -49,9 +50,10 @@ namespace CommunicationService.AzureFunction
                     GroupID = m.GroupID,
                     MessageType = MessageTypes.Email
                 });
+                Thread.Sleep(2000);
             }
 
-            log.LogInformation($"C# ServiceBus queue trigger function processed message: {myQueueItem}");
+            log.LogInformation($"End ProcessJobQueue:{myQueueItem}");
         }
 
 
