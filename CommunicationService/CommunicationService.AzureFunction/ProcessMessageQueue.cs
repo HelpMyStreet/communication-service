@@ -48,10 +48,12 @@ namespace CommunicationService.AzureFunction
             catch (AggregateException exc)
             {
                 log.LogError($"{exc.Flatten()} error for queueitem {myQueueItem}");
+                throw exc.Flatten();
             }
             catch (Exception exc)
             {
                 log.LogError($"{exc} error for queueitem {myQueueItem}");
+                throw exc;
             }
             log.LogInformation($"End ProcessMessageQueue:{myQueueItem}");
         }
