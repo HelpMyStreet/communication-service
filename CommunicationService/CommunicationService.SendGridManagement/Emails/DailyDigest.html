@@ -16,13 +16,13 @@
 </ul>
 {{#if OtherJobs}}
 <p>Other Requests:</p>
-<p><i>There are other open requests, which don’t meet the criteria you specified when you signed up:</i></p>
+<p><i>There are other open requests, which may interest you:</i></p>
 <ul>
     {{#each OtherJobsList}}
     {{#if IsSingleItem}}
-    <li>{{Count}} request for <strong>{{Activity}}</strong> within 20 miles - due {{DueDate}}</li>
+    <li>{{Count}} request for <strong>{{Activity}}</strong> - due {{DueDate}}</li>
     {{else}}
-    <li>{{Count}} requests for <strong>{{Activity}}</strong> within 20 miles - earliest due {{DueDate}}</li>
+    <li>{{Count}} requests for <strong>{{Activity}}</strong> - earliest due {{DueDate}}</li>
     {{/if}}
     {{/each}}
 </ul>
