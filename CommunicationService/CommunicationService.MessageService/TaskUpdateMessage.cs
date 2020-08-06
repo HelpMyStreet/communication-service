@@ -67,7 +67,9 @@ namespace CommunicationService.MessageService
                 isFaceMask,
                 isDone,
                 isOpen,
-                isInProgress
+                isInProgress,
+                job.ForRequestor,
+                job.Recipient.FirstName
                 ),
                 EmailToAddress = job.Requestor.EmailAddress,
                 EmailToName = $"{job.Requestor.FirstName} {job.Requestor.LastName}",
