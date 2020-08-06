@@ -11,7 +11,11 @@
 {{/if}}
 <!--End Section 1 -->
 <p>
+    {{#if ForRequestor}}
     The request you made via HelpMyStreet.org on {{DateRequested}} for help with {{Activity}} was updated to <strong>{{RequestStatus}}</strong> {{TimeUpdated}}.
+    {{else}}
+    The request you made via HelpMyStreet.org on {{DateRequested}} for help for {{RecipientFirstName}} with {{Activity}} was updated to <strong>{{RequestStatus}}</strong> {{TimeUpdated}}.
+    {{/if}}
 </p>
 
 <!--Start Section 2 -->

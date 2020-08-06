@@ -17,6 +17,8 @@ namespace CommunicationService.MessageService.Substitution
         public bool IsDone { get; private set; }
         public bool IsOpen { get; private set; }
         public bool IsInProgress { get; private set; }
+        public bool ForRequestor { get; private set; }
+        public string RecipientFirstName { get; private set; }
 
         public TaskUpdateData(
             string firstname,
@@ -28,7 +30,9 @@ namespace CommunicationService.MessageService.Substitution
             bool isFaceMask,
             bool isDone,
             bool isOpen,
-            bool isInProgress
+            bool isInProgress,
+            bool forRequestor,
+            string recipientFirstName
             )
         {
             FirstName = firstname;
@@ -41,6 +45,8 @@ namespace CommunicationService.MessageService.Substitution
             IsDone = isDone;
             IsFaceMask = isFaceMask;
             IsInProgress = isInProgress;
+            ForRequestor = forRequestor;
+            RecipientFirstName = recipientFirstName;
         }
     }
 }
