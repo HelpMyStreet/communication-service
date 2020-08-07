@@ -51,7 +51,19 @@ namespace CommunicationService.MessageService
             try
             {
                 var groups = _connectGroupService.GetUserGroups(recipientUserId.Value).Result;
+
+                if(groups==null)
+                {
+                    return null;
+                }
+
                 var user = _connectUserService.GetUserByIdAsync(recipientUserId.Value).Result;
+
+                if(user == null)
+                {
+                    throw new Exception($"unable to retrieve user object for {recipientUserId.Value}");
+                }
+
                 var nationalSupportActivities = new List<SupportActivities>() { SupportActivities.FaceMask, SupportActivities.HomeworkSupport, SupportActivities.PhoneCalls_Anxious, SupportActivities.PhoneCalls_Friendly };
 
                 var activitySpecificSupportDistancesInMiles = nationalSupportActivities.Where(a => user.SupportActivities.Contains(a)).ToDictionary(a => a, a => (double?)null);
@@ -66,7 +78,18 @@ namespace CommunicationService.MessageService
                 jobRequest.Groups = new GroupRequest() { Groups = groups.Groups };
 
                 GetJobsByFilterResponse jobsResponse = _connectRequestService.GetJobsByFilter(jobRequest).Result;
+
+                if(jobsResponse == null)
+                {
+                    throw new Exception($"GetJobsByFilter returned null for recipient userid {recipientUserId.Value}");
+                }
+
                 var jobs = jobsResponse.JobSummaries;
+                
+                if(jobs.Count()==0)
+                {
+                    return null;
+                }
 
                 var criteriaJobs = jobs.Where(x => user.SupportActivities.Contains(x.SupportActivity) && x.DistanceInMiles < user.SupportRadiusMiles);
                 if (criteriaJobs.Count() == 0)
@@ -79,7 +102,6 @@ namespace CommunicationService.MessageService
                 var otherJobs = jobs.Where(x => !criteriaJobs.Contains(x));
                 var otherJobsStats = otherJobs.GroupBy(x => x.SupportActivity, x => x.DueDate, (activity, dueDate) => new { Key = activity, Count = dueDate.Count(), Min = dueDate.Min() });
                 otherJobsStats = otherJobsStats.OrderByDescending(x => x.Count);
-
 
                 var chosenJobsList = new List<DailyDigestDataJob>();
 
