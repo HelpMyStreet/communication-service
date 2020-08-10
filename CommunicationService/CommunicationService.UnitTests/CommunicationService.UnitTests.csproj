@@ -15,6 +15,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\CommunicationService.Core\CommunicationService.Core.csproj" />
+    <ProjectReference Include="..\CommunicationService.MessageService\CommunicationService.MessageService.csproj" />
     <ProjectReference Include="..\CommunicationService.SendGridManagement\CommunicationService.SendGridManagement.csproj" />
     <ProjectReference Include="..\CommunicationService.SendGridService\CommunicationService.SendGridService.csproj" />
   </ItemGroup>
