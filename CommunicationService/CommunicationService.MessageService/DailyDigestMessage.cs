@@ -52,7 +52,7 @@ namespace CommunicationService.MessageService
             {
                 var groups = _connectGroupService.GetUserGroups(recipientUserId.Value).Result;
 
-                if(groups==null)
+                if(groups==null || groups.Groups==null)
                 {
                     return null;
                 }
