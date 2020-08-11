@@ -85,9 +85,9 @@ namespace CommunicationService.MessageService
             });
         }
 
-        public List<SendMessageRequest> IdentifyRecipients(int? recipientUserId, int? jobId, int? groupId)
+        public async Task<List<SendMessageRequest>> IdentifyRecipients(int? recipientUserId, int? jobId, int? groupId)
         {
-            var jobs = _connectRequestService.GetJobsInProgress().Result;
+            var jobs = await _connectRequestService.GetJobsInProgress();
 
             if (jobs != null && jobs.JobSummaries.Count>0)
             {

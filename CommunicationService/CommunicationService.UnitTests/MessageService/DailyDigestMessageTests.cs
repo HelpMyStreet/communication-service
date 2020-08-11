@@ -10,6 +10,7 @@ using HelpMyStreet.Contracts.GroupService.Response;
 using HelpMyStreet.Contracts.RequestService.Request;
 using HelpMyStreet.Contracts.RequestService.Response;
 using HelpMyStreet.Contracts.UserService.Response;
+using HelpMyStreet.Utils.Exceptions;
 using Microsoft.Extensions.Options;
 using Moq;
 using Newtonsoft.Json;
@@ -94,7 +95,7 @@ namespace CommunicationService.UnitTests.SendGridService
         }
 
         [Test]
-        public void IdentifyRecipientsBasedOnSupportRadiusMiles_ReturnsCorrectUsers()
+        public async Task IdentifyRecipientsBasedOnSupportRadiusMiles_ReturnsCorrectUsers()
         {
             int? recipientUserId = null;
             int? jobId = null;
@@ -121,7 +122,7 @@ namespace CommunicationService.UnitTests.SendGridService
             _getUsersResponse = new GetUsersResponse();
             _getUsersResponse.UserDetails = userDetails;
 
-            var result = _classUnderTest.IdentifyRecipients(recipientUserId, jobId, groupId);
+            var result = await _classUnderTest.IdentifyRecipients(recipientUserId, jobId, groupId);
             Assert.AreEqual(userDetails.Count(x => x.SupportRadiusMiles.HasValue), result.Count);
         }
 
@@ -300,7 +301,7 @@ namespace CommunicationService.UnitTests.SendGridService
             int? groupId = null;
             string templateName = string.Empty;
 
-            Exception ex = Assert.ThrowsAsync<Exception>(() => _classUnderTest.PrepareTemplateData
+            Exception ex = Assert.ThrowsAsync<BadRequestException>(() => _classUnderTest.PrepareTemplateData
             (
                 recipientUserId,
                 jobId,

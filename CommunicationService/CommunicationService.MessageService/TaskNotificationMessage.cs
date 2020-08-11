@@ -118,7 +118,7 @@ namespace CommunicationService.MessageService
             throw new Exception("unable to retrieve user details");
         }
 
-        public List<SendMessageRequest> IdentifyRecipients(int? recipientUserId, int? jobId, int? groupId)
+        public async Task<List<SendMessageRequest>> IdentifyRecipients(int? recipientUserId, int? jobId, int? groupId)
         {
             List<int> groupUsers = new List<int>();
 
@@ -127,10 +127,10 @@ namespace CommunicationService.MessageService
                 throw new Exception($"GroupID or JobID is missing");
             }
 
-            var groupMembers = _connectGroupService.GetGroupMembers(groupId.Value).Result;
+            var groupMembers = await _connectGroupService.GetGroupMembers(groupId.Value);
             groupUsers = groupMembers.Users;
             
-            var job = _connectRequestService.GetJobDetailsAsync(jobId.Value).Result;
+            var job = await _connectRequestService.GetJobDetailsAsync(jobId.Value);
             List<SupportActivities> supportActivities = new List<SupportActivities>();
             if (job != null)
             {
@@ -138,7 +138,7 @@ namespace CommunicationService.MessageService
                 AddRecipientAndTemplate(TemplateName.RequestorTaskNotification, REQUESTOR_DUMMY_USERID, jobId, groupId);
                 // Continue
                 supportActivities.Add(job.SupportActivity);
-                var volunteers = _connectUserService.GetVolunteersByPostcodeAndActivity(job.PostCode, supportActivities, CancellationToken.None).Result;
+                var volunteers = await _connectUserService.GetVolunteersByPostcodeAndActivity(job.PostCode, supportActivities, CancellationToken.None);
 
                 if (volunteers != null)
                 {
