@@ -178,6 +178,7 @@ public class ProcessMessageQueue
             message.MessageId = mySbMsg.MessageId;
             message.DeliveryCount = mySbMsg.SystemProperties.DeliveryCount;
             message.Error =ex.ToString();
+            message.StackTrack = ex.StackTrace;
 
             if (sendMessageRequest != null)
             {
