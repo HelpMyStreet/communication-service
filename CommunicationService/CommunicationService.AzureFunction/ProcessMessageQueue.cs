@@ -79,24 +79,16 @@ public class ProcessMessageQueue
         AddErrorToCosmos(ex, mySbMsg, sendMessageRequest);
         RetryPolicy policy = new RetryPolicy()
         {
-            MaxRetryCount = 0,
-            RetryInterval = 0
+            MaxRetryCount = 2,
+            RetryInterval = 2000
         };
 
         if (ex.GetType() == typeof(BadRequestException))
         {
             policy = new RetryPolicy()
             {
-                MaxRetryCount = 2,
-                RetryInterval = 2000
-            };
-        }
-        else if (ex.GetType() == typeof(InternalServerException))
-        {
-            policy = new RetryPolicy()
-            {
-                MaxRetryCount = 2,
-                RetryInterval = 2000
+                MaxRetryCount = 0,
+                RetryInterval = 0
             };
         }
         // Protocol errors policy
@@ -183,6 +175,8 @@ public class ProcessMessageQueue
 
             message = new ExpandoObject();
             message.id = Guid.NewGuid();
+            message.MessageId = mySbMsg.MessageId;
+            message.DeliveryCount = mySbMsg.SystemProperties.DeliveryCount;
             message.Error =ex.ToString();
 
             if (sendMessageRequest != null)
