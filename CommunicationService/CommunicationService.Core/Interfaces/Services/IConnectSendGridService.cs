@@ -8,7 +8,7 @@ namespace CommunicationService.Core.Interfaces.Services
     public interface IConnectSendGridService
     {
         Task<string> GetTemplateId(string templateName);
-        Task<bool> SendDynamicEmail(string templateName, string groupName, EmailBuildData sendGridData);
+        Task<bool> SendDynamicEmail(string messageId, string templateName, string groupName, EmailBuildData sendGridData);
         Task<int> GetGroupId(string groupName);
 
     }
