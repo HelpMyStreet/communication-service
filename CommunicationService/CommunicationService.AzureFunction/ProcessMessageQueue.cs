@@ -30,10 +30,12 @@ public class ProcessMessageQueue
     {
         log.LogInformation($"received message id: {mySbMsg.MessageId} Retry attempt: {mySbMsg.SystemProperties.DeliveryCount}");
 
+        SendMessageRequest sendMessageRequest = null;
+
         try
         {
             string converted = Encoding.UTF8.GetString(mySbMsg.Body, 0, mySbMsg.Body.Length);
-            SendMessageRequest sendMessageRequest = null;
+            
             sendMessageRequest = JsonConvert.DeserializeObject<SendMessageRequest>(converted);
 
             AddCommunicationRequestToCosmos(mySbMsg, "start", sendMessageRequest);
@@ -49,26 +51,32 @@ public class ProcessMessageQueue
                     AddCommunicationRequestToCosmos(sendMessageRequest, result);
                 }
             }
+            else
+            {
+                AddCommunicationRequestToCosmos(mySbMsg, "no emailBuildData", sendMessageRequest);
+            }
             AddCommunicationRequestToCosmos(mySbMsg, "finished", sendMessageRequest);
         }
         catch (AggregateException exc)
         {
-            RetryHandler(mySbMsg, exc.InnerException, log);
+            RetryHandler(mySbMsg, sendMessageRequest, exc.InnerException, log);
         }
         catch (Exception ex)
         {
             log.LogInformation($"Calling retry handler...");
 
             // Manage retries using our message retry handler
-            RetryHandler(mySbMsg, ex, log);
+            RetryHandler(mySbMsg, sendMessageRequest, ex, log);
         }
 
         log.LogInformation($"processed message id: {mySbMsg.MessageId}");
 
     }
 
-    public static void RetryHandler(Message mySbMsg, Exception ex, ILogger log)
+    public void RetryHandler(Message mySbMsg, SendMessageRequest sendMessageRequest, Exception ex, ILogger log)
     {
+        log.LogError(ex.ToString());
+        AddErrorToCosmos(ex, mySbMsg, sendMessageRequest);
         RetryPolicy policy = new RetryPolicy()
         {
             MaxRetryCount = 0,
@@ -160,6 +168,29 @@ public class ProcessMessageQueue
             message.TemplateName = sendMessageRequest.TemplateName;
             _cosmosDbService.AddItemAsync(message);
             AddCommunicationRequestToCosmos(sendMessageRequest, null);
+        }
+        catch (Exception exc)
+        {
+            string m = exc.ToString();
+        }
+    }
+
+    private void AddErrorToCosmos(Exception ex,Message mySbMsg, SendMessageRequest sendMessageRequest)
+    {
+        try
+        {
+            dynamic message;
+
+            message = new ExpandoObject();
+            message.id = Guid.NewGuid();
+            message.Error =ex.ToString();
+
+            if (sendMessageRequest != null)
+            {
+                message.RecipientUserID = sendMessageRequest.RecipientUserID;
+                message.TemplateName = sendMessageRequest.TemplateName;
+            }
+            _cosmosDbService.AddItemAsync(message);
         }
         catch (Exception exc)
         {
