@@ -1,12 +1,10 @@
-﻿using CommunicationService.Core.Configuration;
-using CommunicationService.Core.Interfaces.Services;
-using CommunicationService.Core.Utils;
-using HelpMyStreet.Contracts.GroupService.Request;
+﻿using CommunicationService.Core.Interfaces.Services;
 using HelpMyStreet.Contracts.GroupService.Response;
 using HelpMyStreet.Contracts.RequestService.Response;
 using HelpMyStreet.Contracts.Shared;
+using HelpMyStreet.Utils.Enums;
+using HelpMyStreet.Utils.Utils;
 using Newtonsoft.Json;
-using System;
 using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
