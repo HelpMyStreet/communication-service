@@ -1,15 +1,11 @@
-﻿using CommunicationService.Core.Configuration;
-using CommunicationService.Core.Interfaces.Services;
-using CommunicationService.Core.Utils;
+﻿using CommunicationService.Core.Interfaces.Services;
 using HelpMyStreet.Contracts.UserService.Request;
 using HelpMyStreet.Contracts.UserService.Response;
 using HelpMyStreet.Utils.Enums;
 using HelpMyStreet.Utils.Models;
-using Marvin.StreamExtensions;
+using HelpMyStreet.Utils.Utils;
 using Newtonsoft.Json;
-using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
