@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.Threading;
+using System.Threading.Tasks;
 using CommunicationService.Core.Configuration;
 using CommunicationService.Core.Domains;
 using CommunicationService.Core.Interfaces;
@@ -16,23 +17,20 @@ namespace CommunicationService.AzureFunction
     public class ProcessJobQueue
     {
         private readonly IMessageFactory _messageFactory;
-        private readonly IOptions<EmailConfig> _emailConfig;
 
-        public ProcessJobQueue(IMessageFactory messageFactory, IOptions<EmailConfig> emailConfig)
+        public ProcessJobQueue(IMessageFactory messageFactory)
         {
             _messageFactory = messageFactory;
-            _emailConfig = emailConfig;
         }
 
         [FunctionName("ProcessJobQueue")]
-        public void Run([ServiceBusTrigger("job", Connection = "ServiceBus")]string myQueueItem, ILogger log)
+        public async Task Run([ServiceBusTrigger("job", Connection = "ServiceBus")]string myQueueItem, ILogger log)
         {
             log.LogInformation($"start ProcessJobQueue myQueueItem {myQueueItem}");
-            int sleepTime = _emailConfig.Value.ServiceBusSleepInMilliseconds ?? 1000; 
-
+            
             RequestCommunicationRequest sendCommunicationRequest = JsonConvert.DeserializeObject<RequestCommunicationRequest>(myQueueItem);
             IMessage message = _messageFactory.Create(sendCommunicationRequest);
-            List<SendMessageRequest> messageDetails = message.IdentifyRecipients(sendCommunicationRequest.RecipientUserID, sendCommunicationRequest.JobID, sendCommunicationRequest.GroupID);
+            List<SendMessageRequest> messageDetails = await message.IdentifyRecipients(sendCommunicationRequest.RecipientUserID, sendCommunicationRequest.JobID, sendCommunicationRequest.GroupID);
 
             if (messageDetails.Count == 0)
             {
@@ -46,7 +44,7 @@ namespace CommunicationService.AzureFunction
 
             foreach (var m in messageDetails)
             {
-                _messageFactory.AddToMessageQueueAsync(new SendMessageRequest()
+                await _messageFactory.AddToMessageQueueAsync(new SendMessageRequest()
                 {
                     CommunicationJobType = sendCommunicationRequest.CommunicationJob.CommunicationJobType,
                     TemplateName = m.TemplateName,
@@ -55,13 +53,9 @@ namespace CommunicationService.AzureFunction
                     GroupID = m.GroupID,
                     MessageType = MessageTypes.Email
                 });
-                Thread.Sleep(sleepTime);
             }
 
             log.LogInformation($"End ProcessJobQueue:{myQueueItem}");
         }
-
-
-
     }
 }

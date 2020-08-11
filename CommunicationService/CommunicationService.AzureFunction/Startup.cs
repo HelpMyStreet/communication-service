@@ -2,7 +2,6 @@
 using CommunicationService.Core.Configuration;
 using CommunicationService.Core.Interfaces.Repositories;
 using CommunicationService.Core.Interfaces.Services;
-using CommunicationService.Core.Utils;
 using CommunicationService.EmailService;
 using CommunicationService.GroupService;
 using CommunicationService.Handlers;
@@ -28,7 +27,8 @@ using System.Collections.Generic;
 using System.Net;
 using System.Net.Http;
 using System.Net.Http.Headers;
-using Microsoft.Extensions.DependencyInjection.Extensions;
+using HelpMyStreet.Utils.Enums;
+using HelpMyStreet.Utils.Utils;
 
 [assembly: FunctionsStartup(typeof(CommunicationService.AzureFunction.Startup))]
 namespace CommunicationService.AzureFunction
