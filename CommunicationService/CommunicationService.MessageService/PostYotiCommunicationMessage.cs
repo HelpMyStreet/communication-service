@@ -60,7 +60,9 @@ namespace CommunicationService.MessageService
                     BaseDynamicData = new PostYotiCommunicationData(user.UserPersonalDetails.FirstName, user.UserPersonalDetails.LastName, GetTitleFromTemplateName(templateName)),
                     EmailToAddress = user.UserPersonalDetails.EmailAddress,
                     EmailToName = user.UserPersonalDetails.DisplayName,
-                    RecipientUserID = recipientUserId.Value
+                    RecipientUserID = recipientUserId.Value,
+                    GroupID = groupId,
+                    JobID = jobId
                 };
             }
             else

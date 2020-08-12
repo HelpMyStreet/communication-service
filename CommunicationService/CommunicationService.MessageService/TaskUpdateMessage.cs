@@ -74,6 +74,8 @@ namespace CommunicationService.MessageService
                 EmailToAddress = job.Requestor.EmailAddress,
                 EmailToName = $"{job.Requestor.FirstName} {job.Requestor.LastName}",
                 RecipientUserID = recipientUserId.Value,
+                GroupID = groupId,
+                JobID = jobId
             };
         }
 
