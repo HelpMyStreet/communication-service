@@ -69,10 +69,7 @@ namespace CommunicationService.MessageService
                     job.DateStatusLastChanged.ToString("dd/MM/yyyy")
                     ),
                 EmailToAddress = user.UserPersonalDetails.EmailAddress,
-                EmailToName = $"{user.UserPersonalDetails.FirstName} {user.UserPersonalDetails.LastName}",
-                RecipientUserID = recipientUserId.Value,
-                GroupID = groupId,
-                JobID = jobId
+                EmailToName = $"{user.UserPersonalDetails.FirstName} {user.UserPersonalDetails.LastName}"
             };
         }
 
