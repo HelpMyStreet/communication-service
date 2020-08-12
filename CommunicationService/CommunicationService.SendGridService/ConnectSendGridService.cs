@@ -92,7 +92,7 @@ namespace CommunicationService.SendGridService
             }
         }
 
-        public async Task<bool> SendDynamicEmail(string templateName, string groupName, EmailBuildData emailBuildData)
+        public async Task<bool> SendDynamicEmail(string messageId,string templateName, string groupName, EmailBuildData emailBuildData)
         {
             string templateId = await GetTemplateId(templateName).ConfigureAwait(false);
             int groupId = await GetGroupId(groupName).ConfigureAwait(false);
@@ -120,7 +120,10 @@ namespace CommunicationService.SendGridService
                     { "TemplateId", templateId },
                     { "RecipientUserID", emailBuildData.RecipientUserID.ToString() },
                     { "TemplateName", templateName },
-                    { "GroupName", groupName}
+                    { "GroupName", groupName},
+                    { "MessageId", messageId },
+                    { "JobId", emailBuildData.JobID.HasValue ? emailBuildData.JobID.ToString() : "null" },
+                    { "GroupId", emailBuildData.GroupID.HasValue ? emailBuildData.GroupID.ToString() : "null" }
                 }
             };
 

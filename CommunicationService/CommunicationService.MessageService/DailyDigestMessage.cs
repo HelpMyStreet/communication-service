@@ -151,8 +151,7 @@ namespace CommunicationService.MessageService
                     user.IsVerified ?? false
                     ),
                 EmailToAddress = user.UserPersonalDetails.EmailAddress,
-                EmailToName = user.UserPersonalDetails.DisplayName,
-                RecipientUserID = recipientUserId.Value
+                EmailToName = user.UserPersonalDetails.DisplayName
             };
         }
 
