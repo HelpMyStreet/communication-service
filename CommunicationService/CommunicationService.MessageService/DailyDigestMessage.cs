@@ -151,10 +151,7 @@ namespace CommunicationService.MessageService
                     user.IsVerified ?? false
                     ),
                 EmailToAddress = user.UserPersonalDetails.EmailAddress,
-                EmailToName = user.UserPersonalDetails.DisplayName,
-                RecipientUserID = recipientUserId.Value,
-                GroupID = groupId,
-                JobID = jobId
+                EmailToName = user.UserPersonalDetails.DisplayName
             };
         }
 

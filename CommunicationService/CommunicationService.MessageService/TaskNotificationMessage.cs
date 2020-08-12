@@ -107,10 +107,7 @@ namespace CommunicationService.MessageService
                                 isFaceMask
                             ),
                             EmailToAddress = user.UserPersonalDetails.EmailAddress,
-                            EmailToName = $"{user.UserPersonalDetails.FirstName} {user.UserPersonalDetails.LastName}",
-                            RecipientUserID = recipientUserId.Value,
-                            GroupID = groupId,
-                            JobID = jobId
+                            EmailToName = $"{user.UserPersonalDetails.FirstName} {user.UserPersonalDetails.LastName}"
                         };
                     }
 

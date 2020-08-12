@@ -72,10 +72,7 @@ namespace CommunicationService.MessageService
                 job.Recipient.FirstName
                 ),
                 EmailToAddress = job.Requestor.EmailAddress,
-                EmailToName = $"{job.Requestor.FirstName} {job.Requestor.LastName}",
-                RecipientUserID = recipientUserId.Value,
-                GroupID = groupId,
-                JobID = jobId
+                EmailToName = $"{job.Requestor.FirstName} {job.Requestor.LastName}"
             };
         }
 
