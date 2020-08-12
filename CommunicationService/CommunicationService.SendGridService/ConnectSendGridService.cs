@@ -121,7 +121,9 @@ namespace CommunicationService.SendGridService
                     { "RecipientUserID", emailBuildData.RecipientUserID.ToString() },
                     { "TemplateName", templateName },
                     { "GroupName", groupName},
-                    { "MessageId",messageId }
+                    { "MessageId", messageId },
+                    { "JobId", emailBuildData.JobID.HasValue ? emailBuildData.JobID.ToString() : "null" },
+                    { "GroupId", emailBuildData.GroupID.HasValue ? emailBuildData.GroupID.ToString() : "null" }
                 }
             };
 

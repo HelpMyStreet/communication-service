@@ -108,7 +108,9 @@ namespace CommunicationService.MessageService
                             ),
                             EmailToAddress = user.UserPersonalDetails.EmailAddress,
                             EmailToName = $"{user.UserPersonalDetails.FirstName} {user.UserPersonalDetails.LastName}",
-                            RecipientUserID = recipientUserId.Value
+                            RecipientUserID = recipientUserId.Value,
+                            GroupID = groupId,
+                            JobID = jobId
                         };
                     }
 
