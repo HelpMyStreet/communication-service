@@ -141,7 +141,7 @@ public class ProcessMessageQueue
 
             message = new ExpandoObject();
             message.id = Guid.NewGuid();
-            message.QueueName = "Message";
+            message.QueueName = "message";
             message.MessageId = mySbMsg.MessageId;
             message.DeliveryCount = mySbMsg.SystemProperties.DeliveryCount;
             message.Status = status;
