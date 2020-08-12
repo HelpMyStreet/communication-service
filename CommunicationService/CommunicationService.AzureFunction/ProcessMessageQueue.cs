@@ -148,9 +148,9 @@ public class ProcessMessageQueue
             {
                 message.RecipientUserID = sendMessageRequest.RecipientUserID;
                 message.TemplateName = sendMessageRequest.TemplateName;
-                message.JobID = sendMessageRequest.JobID;
+                message.JobId = sendMessageRequest.JobID;
                 message.CommunicationJob = sendMessageRequest.CommunicationJobType;
-                message.GroupID = sendMessageRequest.GroupID;
+                message.GroupId = sendMessageRequest.GroupID;
             }
 
             if(!string.IsNullOrEmpty(emailAddress))
