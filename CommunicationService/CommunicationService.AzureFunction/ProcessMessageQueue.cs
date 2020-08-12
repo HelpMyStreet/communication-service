@@ -28,7 +28,8 @@ public class ProcessMessageQueue
     [FunctionName("ProcessMessageQueue")]
     public async Task Run([ServiceBusTrigger("message", Connection = "ServiceBus")]Message mySbMsg, ILogger log)
     {
-        log.LogInformation($"received message id: {mySbMsg.MessageId} Retry attempt: {mySbMsg.SystemProperties.DeliveryCount}");
+        log.LogInformation($"ProcessMessageQueue received message id: {mySbMsg.MessageId} Retry attempt: {mySbMsg.SystemProperties.DeliveryCount}");
+
         SendMessageRequest sendMessageRequest = null;
 
         bool emailAlreadySent = await _cosmosDbService.EmailSent(mySbMsg.MessageId);
@@ -140,6 +141,7 @@ public class ProcessMessageQueue
 
             message = new ExpandoObject();
             message.id = Guid.NewGuid();
+            message.QueueName = "message";
             message.MessageId = mySbMsg.MessageId;
             message.DeliveryCount = mySbMsg.SystemProperties.DeliveryCount;
             message.Status = status;
@@ -173,6 +175,7 @@ public class ProcessMessageQueue
 
             message = new ExpandoObject();
             message.id = Guid.NewGuid();
+            message.QueueName = "message";
             message.MessageId = mySbMsg.MessageId;
             message.DeliveryCount = mySbMsg.SystemProperties.DeliveryCount;
             message.Error =ex.ToString();
