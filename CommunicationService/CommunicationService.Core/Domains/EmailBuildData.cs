@@ -8,5 +8,7 @@ namespace CommunicationService.Core.Domains
         public string EmailToAddress { get; set; }
         public string EmailToName { get; set; }
         public int RecipientUserID { get; set; }
+        public int? JobID { get; set; }
+        public int? GroupID { get; set; }
     }
 }

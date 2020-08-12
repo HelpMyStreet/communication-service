@@ -29,47 +29,59 @@ public class ProcessMessageQueue
     public async Task Run([ServiceBusTrigger("message", Connection = "ServiceBus")]Message mySbMsg, ILogger log)
     {
         log.LogInformation($"received message id: {mySbMsg.MessageId} Retry attempt: {mySbMsg.SystemProperties.DeliveryCount}");
-
         SendMessageRequest sendMessageRequest = null;
 
-        try
+        bool emailAlreadySent = await _cosmosDbService.EmailSent(mySbMsg.MessageId);
+
+        if (emailAlreadySent)
         {
-            string converted = Encoding.UTF8.GetString(mySbMsg.Body, 0, mySbMsg.Body.Length);
-            
-            sendMessageRequest = JsonConvert.DeserializeObject<SendMessageRequest>(converted);
-
-            AddCommunicationRequestToCosmos(mySbMsg, "start", sendMessageRequest);
-
-            IMessage message = _messageFactory.Create(sendMessageRequest);
-            EmailBuildData emailBuildData = await message.PrepareTemplateData(sendMessageRequest.RecipientUserID, sendMessageRequest.JobID, sendMessageRequest.GroupID, sendMessageRequest.TemplateName);
-            if (emailBuildData != null)
+            log.LogInformation($"email already sent for message id: {mySbMsg.MessageId}");
+            AddCommunicationRequestToCosmos(mySbMsg, "email already sent", null, string.Empty);
+        }
+        else
+        {
+            try
             {
-                var result = await _connectSendGridService.SendDynamicEmail(sendMessageRequest.TemplateName, message.UnsubscriptionGroupName, emailBuildData);
-                log.LogInformation($"SendDynamicEmail({sendMessageRequest.TemplateName}) returned {result}");
-                if (result)
+                string converted = Encoding.UTF8.GetString(mySbMsg.Body, 0, mySbMsg.Body.Length);
+
+                sendMessageRequest = JsonConvert.DeserializeObject<SendMessageRequest>(converted);
+
+                AddCommunicationRequestToCosmos(mySbMsg, "start", sendMessageRequest, string.Empty);
+
+                IMessage message = _messageFactory.Create(sendMessageRequest);
+                EmailBuildData emailBuildData = await message.PrepareTemplateData(sendMessageRequest.RecipientUserID, sendMessageRequest.JobID, sendMessageRequest.GroupID, sendMessageRequest.TemplateName);
+                emailBuildData.JobID = sendMessageRequest.JobID;
+                emailBuildData.GroupID = sendMessageRequest.GroupID;
+                emailBuildData.RecipientUserID = sendMessageRequest.RecipientUserID;
+                if (emailBuildData != null)
                 {
-                    AddCommunicationRequestToCosmos(sendMessageRequest, result);
+                    var result = await _connectSendGridService.SendDynamicEmail(mySbMsg.MessageId, sendMessageRequest.TemplateName, message.UnsubscriptionGroupName, emailBuildData);
+                    log.LogInformation($"SendDynamicEmail({sendMessageRequest.TemplateName}) returned {result}");
+                    if (result)
+                    {
+                        AddCommunicationRequestToCosmos(mySbMsg, result.ToString(), sendMessageRequest,emailBuildData.EmailToAddress);
+                    }
+                }
+                else
+                {
+                    AddCommunicationRequestToCosmos(mySbMsg, "no emailBuildData", sendMessageRequest, string.Empty);
                 }
             }
-            else
+            catch (AggregateException exc)
             {
-                AddCommunicationRequestToCosmos(mySbMsg, "no emailBuildData", sendMessageRequest);
+                RetryHandler(mySbMsg, sendMessageRequest, exc.InnerException, log);
             }
-            AddCommunicationRequestToCosmos(mySbMsg, "finished", sendMessageRequest);
-        }
-        catch (AggregateException exc)
-        {
-            RetryHandler(mySbMsg, sendMessageRequest, exc.InnerException, log);
-        }
-        catch (Exception ex)
-        {
-            log.LogInformation($"Calling retry handler...");
+            catch (Exception ex)
+            {
+                log.LogInformation($"Calling retry handler...");
 
-            // Manage retries using our message retry handler
-            RetryHandler(mySbMsg, sendMessageRequest, ex, log);
+                // Manage retries using our message retry handler
+                RetryHandler(mySbMsg, sendMessageRequest, ex, log);
+            }
         }
 
         log.LogInformation($"processed message id: {mySbMsg.MessageId}");
+        AddCommunicationRequestToCosmos(mySbMsg, "finished", sendMessageRequest, string.Empty);
 
     }
 
@@ -79,7 +91,7 @@ public class ProcessMessageQueue
         AddErrorToCosmos(ex, mySbMsg, sendMessageRequest);
         RetryPolicy policy = new RetryPolicy()
         {
-            MaxRetryCount = 2,
+            MaxRetryCount = 3,
             RetryInterval = 2000
         };
 
@@ -120,32 +132,7 @@ public class ProcessMessageQueue
         }
     }
 
-    private void AddCommunicationRequestToCosmos(SendMessageRequest sendMessageRequest, bool? result)
-    {
-        try
-        {
-            dynamic message;
-
-            message = new ExpandoObject();
-            message.id = Guid.NewGuid();
-            message.TemplateName = sendMessageRequest.TemplateName;
-            message.RecipientUserID = sendMessageRequest.RecipientUserID;
-            message.JobID = sendMessageRequest.JobID;
-            message.GroupID = sendMessageRequest.GroupID;
-            message.CommunicationJob = sendMessageRequest.CommunicationJobType;
-            if (result.HasValue)
-            {
-                message.Result = result.Value;
-            }
-            _cosmosDbService.AddItemAsync(message);
-        }
-        catch (Exception exc)
-        {
-            string m = exc.ToString();
-        }
-    }
-
-    private void AddCommunicationRequestToCosmos(Message mySbMsg, string status, SendMessageRequest sendMessageRequest)
+    private void AddCommunicationRequestToCosmos(Message mySbMsg, string status, SendMessageRequest sendMessageRequest, string emailAddress)
     {
         try
         {
@@ -155,11 +142,22 @@ public class ProcessMessageQueue
             message.id = Guid.NewGuid();
             message.MessageId = mySbMsg.MessageId;
             message.DeliveryCount = mySbMsg.SystemProperties.DeliveryCount;
-            message.RecipientUserID = sendMessageRequest.RecipientUserID;
             message.Status = status;
-            message.TemplateName = sendMessageRequest.TemplateName;
+
+            if (sendMessageRequest != null)
+            {
+                message.RecipientUserID = sendMessageRequest.RecipientUserID;
+                message.TemplateName = sendMessageRequest.TemplateName;
+                message.JobID = sendMessageRequest.JobID;
+                message.CommunicationJob = sendMessageRequest.CommunicationJobType;
+                message.GroupID = sendMessageRequest.GroupID;
+            }
+
+            if(!string.IsNullOrEmpty(emailAddress))
+            {
+                message.EmailAddress = emailAddress;
+            }
             _cosmosDbService.AddItemAsync(message);
-            AddCommunicationRequestToCosmos(sendMessageRequest, null);
         }
         catch (Exception exc)
         {
