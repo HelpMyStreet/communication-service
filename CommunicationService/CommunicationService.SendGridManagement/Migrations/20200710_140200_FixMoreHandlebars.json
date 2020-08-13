@@ -1,6 +1,5 @@
 ﻿{
   "Templates": [
-    {
       {
         "name": "DailyDigest",
         "subject": "Help Needed Near You",
@@ -12,6 +11,5 @@
           }
         ]
       }
-    }
   ]
 }

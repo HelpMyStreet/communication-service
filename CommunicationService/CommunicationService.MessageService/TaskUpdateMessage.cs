@@ -37,34 +37,48 @@ namespace CommunicationService.MessageService
 
         public async Task<EmailBuildData> PrepareTemplateData(int? recipientUserId, int? jobId, int? groupId, string templateName)
         {
+            var britishZone = TimeZoneInfo.FindSystemTimeZoneById("GMT Standard Time");
             var job = _connectRequestService.GetJobDetailsAsync(jobId.Value).Result;
-            var timeOfDay = DateTime.Now.ToString("t");
+            DateTime datestatuschanged;
+            datestatuschanged = TimeZoneInfo.ConvertTime(job.DateStatusLastChanged, TimeZoneInfo.Local, britishZone);
+            var timeOfDay = datestatuschanged.ToString("t");
             timeOfDay = Regex.Replace(timeOfDay, @"\s+", "");
             var timeUpdated = $"today at {timeOfDay.ToLower()}";
+
+            if ((DateTime.Now.Date - datestatuschanged.Date).TotalDays != 0)
+            {
+                timeUpdated = $"on {datestatuschanged.ToString("dd/MM/yyyy")} at {timeOfDay.ToLower()}";
+            }
+
             bool isFaceMask = job.SupportActivity == SupportActivities.FaceMask;
             bool isOpen = job.JobStatus == JobStatuses.Open;
             bool isDone = job.JobStatus == JobStatuses.Done;
+            bool isInProgress = job.JobStatus == JobStatuses.InProgress;
             return new EmailBuildData()
             {
                 BaseDynamicData = new TaskUpdateData
                 (
+                job.Requestor.FirstName,
+                "Request status updated",
                 job.DateRequested.ToString("dd/MM/yyyy"),
                 Mapping.ActivityMappings[job.SupportActivity],
                 Mapping.StatusMappings[job.JobStatus],
                 timeUpdated,
                 isFaceMask,
                 isDone,
-                isOpen
+                isOpen,
+                isInProgress,
+                job.ForRequestor,
+                job.Recipient.FirstName
                 ),
                 EmailToAddress = job.Requestor.EmailAddress,
-                EmailToName = $"{job.Requestor.FirstName} {job.Requestor.LastName}",
-                RecipientUserID = recipientUserId.Value,
+                EmailToName = $"{job.Requestor.FirstName} {job.Requestor.LastName}"
             };
         }
 
-        public List<SendMessageRequest> IdentifyRecipients(int? recipientUserId, int? jobId, int? groupId)
+        public async Task<List<SendMessageRequest>> IdentifyRecipients(int? recipientUserId, int? jobId, int? groupId)
         {
-            var job = _connectRequestService.GetJobDetailsAsync(jobId.Value).Result;
+            var job = await _connectRequestService.GetJobDetailsAsync(jobId.Value);
 
             _sendMessageRequests.Add(new SendMessageRequest()
             {

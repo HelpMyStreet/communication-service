@@ -51,6 +51,7 @@ namespace CommunicationService.MessageService
                 {
                     BaseDynamicData = new TaskNotificationData
                     (
+                        job.Requestor.FirstName,
                         true,
                         encodedJobId,
                         Mapping.ActivityMappings[job.SupportActivity],
@@ -70,7 +71,7 @@ namespace CommunicationService.MessageService
             else
             {
                 var user = await _connectUserService.GetUserByIdAsync(recipientUserId.Value);
-                var volunteers = _connectUserService.GetHelpersByPostcodeAndTaskType
+                var volunteers = _connectUserService.GetVolunteersByPostcodeAndActivity
                     (
                         job.PostCode,
                         new List<SupportActivities>() { job.SupportActivity },
@@ -93,20 +94,20 @@ namespace CommunicationService.MessageService
                         {
                             BaseDynamicData = new TaskNotificationData
                             (
+                                user.UserPersonalDetails.FirstName,
                                 false,
                                 encodedJobId,
                                 Mapping.ActivityMappings[job.SupportActivity],
                                 job.PostCode,
                                 Math.Round(volunteer.DistanceInMiles, 1),
                                 job.DueDate.ToString("dd/MM/yyyy"),
-                                user.IsVerified.HasValue ? !user.IsVerified.Value : false,
+                                user.IsVerified.HasValue ? !user.IsVerified.Value : true,
                                 isStreetChampionForGivenPostCode,
                                 job.HealthCritical,
                                 isFaceMask
                             ),
                             EmailToAddress = user.UserPersonalDetails.EmailAddress,
-                            EmailToName = $"{user.UserPersonalDetails.FirstName} {user.UserPersonalDetails.LastName}",
-                            RecipientUserID = recipientUserId.Value
+                            EmailToName = $"{user.UserPersonalDetails.FirstName} {user.UserPersonalDetails.LastName}"
                         };
                     }
 
@@ -116,7 +117,7 @@ namespace CommunicationService.MessageService
             throw new Exception("unable to retrieve user details");
         }
 
-        public List<SendMessageRequest> IdentifyRecipients(int? recipientUserId, int? jobId, int? groupId)
+        public async Task<List<SendMessageRequest>> IdentifyRecipients(int? recipientUserId, int? jobId, int? groupId)
         {
             List<int> groupUsers = new List<int>();
 
@@ -125,10 +126,10 @@ namespace CommunicationService.MessageService
                 throw new Exception($"GroupID or JobID is missing");
             }
 
-            var groupMembers = _connectGroupService.GetGroupMembers(groupId.Value).Result;
+            var groupMembers = await _connectGroupService.GetGroupMembers(groupId.Value);
             groupUsers = groupMembers.Users;
             
-            var job = _connectRequestService.GetJobDetailsAsync(jobId.Value).Result;
+            var job = await _connectRequestService.GetJobDetailsAsync(jobId.Value);
             List<SupportActivities> supportActivities = new List<SupportActivities>();
             if (job != null)
             {
@@ -136,7 +137,7 @@ namespace CommunicationService.MessageService
                 AddRecipientAndTemplate(TemplateName.RequestorTaskNotification, REQUESTOR_DUMMY_USERID, jobId, groupId);
                 // Continue
                 supportActivities.Add(job.SupportActivity);
-                var volunteers = _connectUserService.GetHelpersByPostcodeAndTaskType(job.PostCode, supportActivities, CancellationToken.None).Result;
+                var volunteers = await _connectUserService.GetVolunteersByPostcodeAndActivity(job.PostCode, supportActivities, CancellationToken.None);
 
                 if (volunteers != null)
                 {
@@ -157,7 +158,7 @@ namespace CommunicationService.MessageService
             _sendMessageRequests.Add(new SendMessageRequest()
             {
                 TemplateName = templateName,
-                RecipientUserID = REQUESTOR_DUMMY_USERID,
+                RecipientUserID = userId,
                 GroupID = groupId,
                 JobID = jobId
             });  

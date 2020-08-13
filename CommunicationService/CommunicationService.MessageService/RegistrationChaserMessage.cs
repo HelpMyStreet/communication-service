@@ -60,8 +60,7 @@ namespace CommunicationService.MessageService
                 {
                     BaseDynamicData = new RegistrationChaserData(user.UserPersonalDetails.FirstName, user.UserPersonalDetails.LastName, GetTitleFromTemplateName(templateName)),
                     EmailToAddress = user.UserPersonalDetails.EmailAddress,
-                    EmailToName = user.UserPersonalDetails.DisplayName,
-                    RecipientUserID = recipientUserId.Value
+                    EmailToName = user.UserPersonalDetails.DisplayName
                 };
             }
             else
@@ -85,9 +84,9 @@ namespace CommunicationService.MessageService
             }
         }
 
-        public List<SendMessageRequest>  IdentifyRecipients(int? recipientUserId, int? jobId, int? groupId)
+        public async Task<List<SendMessageRequest>> IdentifyRecipients(int? recipientUserId, int? jobId, int? groupId)
         {
-            var users = _connectUserService.GetIncompleteRegistrationStatusAsync().Result;
+            var users = await _connectUserService.GetIncompleteRegistrationStatusAsync();
 
             if(users!=null)
             {
@@ -98,7 +97,7 @@ namespace CommunicationService.MessageService
                 {
                     foreach(var u in validUsersWithRange)
                     {
-                        var user = _connectUserService.GetUserByIdAsync(u.UserId).Result;
+                        var user = await _connectUserService.GetUserByIdAsync(u.UserId);
                         if (!user.IsVerified.HasValue)
                         {
                             if (u.RegistrationStep == REGISTRATION_STEP4)

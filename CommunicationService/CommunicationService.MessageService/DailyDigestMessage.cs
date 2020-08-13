@@ -14,11 +14,13 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using HelpMyStreet.Utils.Exceptions;
 
 namespace CommunicationService.MessageService
 {
     public class DailyDigestMessage : IMessage
     {
+        private readonly IConnectGroupService _connectGroupService;
         private readonly IConnectUserService _connectUserService;
         private readonly IConnectRequestService _connectRequestService;
         private readonly IOptions<EmailConfig> _emailConfig;
@@ -32,8 +34,9 @@ namespace CommunicationService.MessageService
             }
         }
 
-        public DailyDigestMessage(IConnectUserService connectUserService, IConnectRequestService connectRequestService, IOptions<EmailConfig> eMailConfig)
+        public DailyDigestMessage(IConnectGroupService connectGroupService, IConnectUserService connectUserService, IConnectRequestService connectRequestService, IOptions<EmailConfig> eMailConfig)
         {
+            _connectGroupService = connectGroupService;
             _connectUserService = connectUserService;
             _connectRequestService = connectRequestService;
             _emailConfig = eMailConfig;
@@ -44,10 +47,23 @@ namespace CommunicationService.MessageService
         {
             if (recipientUserId == null)
             {
-                throw new Exception("recipientUserId is null");
+                throw new BadRequestException("recipientUserId is null");
             }
 
             var user = _connectUserService.GetUserByIdAsync(recipientUserId.Value).Result;
+
+            if (user == null)
+            {
+                throw new BadRequestException($"unable to retrieve user object for {recipientUserId.Value}");
+            }
+
+            var groups = _connectGroupService.GetUserGroups(recipientUserId.Value).Result;
+
+            if(groups==null || groups.Groups==null || groups.Groups.Count ==0)
+            {
+                return null;
+            }
+
             var nationalSupportActivities = new List<SupportActivities>() { SupportActivities.FaceMask, SupportActivities.HomeworkSupport, SupportActivities.PhoneCalls_Anxious, SupportActivities.PhoneCalls_Friendly };
 
             var activitySpecificSupportDistancesInMiles = nationalSupportActivities.Where(a => user.SupportActivities.Contains(a)).ToDictionary(a => a, a => (double?)null);
@@ -59,10 +75,21 @@ namespace CommunicationService.MessageService
             jobRequest.DistanceInMiles = _emailConfig.Value.DigestOtherJobsDistance;
             jobRequest.JobStatuses = jobStatusRequest;
             jobRequest.ActivitySpecificSupportDistancesInMiles = activitySpecificSupportDistancesInMiles;
-
+            jobRequest.Groups = new GroupRequest() { Groups = groups.Groups };
 
             GetJobsByFilterResponse jobsResponse = _connectRequestService.GetJobsByFilter(jobRequest).Result;
+
+            if(jobsResponse == null)
+            {
+                throw new Exception($"GetJobsByFilter returned null for recipient userid {recipientUserId.Value}");
+            }
+
             var jobs = jobsResponse.JobSummaries;
+                
+            if(jobs.Count()==0)
+            {
+                return null;
+            }
 
             var criteriaJobs = jobs.Where(x => user.SupportActivities.Contains(x.SupportActivity) && x.DistanceInMiles < user.SupportRadiusMiles);
             if (criteriaJobs.Count() == 0)
@@ -76,7 +103,6 @@ namespace CommunicationService.MessageService
             var otherJobsStats = otherJobs.GroupBy(x => x.SupportActivity, x => x.DueDate, (activity, dueDate) => new { Key = activity, Count = dueDate.Count(), Min = dueDate.Min() });
             otherJobsStats = otherJobsStats.OrderByDescending(x => x.Count);
 
-
             var chosenJobsList = new List<DailyDigestDataJob>();
 
             foreach (var job in criteriaJobs)
@@ -85,12 +111,14 @@ namespace CommunicationService.MessageService
 
                 chosenJobsList.Add(new DailyDigestDataJob(
                     Mapping.ActivityMappings[job.SupportActivity],
+                    job.PostCode,
                     job.DueDate.ToString("dd/MM/yyyy"),
                     job.DueDate < DateTime.Now.AddDays(1),
                     job.IsHealthCritical,
+                    true,
                     1,
                     encodedJobId,
-                    Math.Round(job.DistanceInMiles,1).ToString()
+                    Math.Round(job.DistanceInMiles, 1).ToString()
                     ));
             }
 
@@ -100,9 +128,11 @@ namespace CommunicationService.MessageService
             {
                 otherJobsList.Add(new DailyDigestDataJob(
                     Mapping.ActivityMappings[job.Key],
+                    string.Empty,
                     job.Min.ToString("dd/MM/yyyy"),
                     false,
                     false,
+                    job.Count == 1 ? true : false,
                     job.Count,
                     "",
                     ""
@@ -111,25 +141,23 @@ namespace CommunicationService.MessageService
 
             return new EmailBuildData()
             {
-                BaseDynamicData = new DailyDigestData(
+                BaseDynamicData = new DailyDigestData(_emailConfig.Value.ShowUserIDInEmailTitle ? recipientUserId.Value.ToString() : string.Empty,
                     user.UserPersonalDetails.FirstName,
-                    user.PostalCode,
+                    criteriaJobs.Count() > 1 ? false : true,
                     criteriaJobs.Count(),
                     otherJobs.Count() > 0,
                     chosenJobsList,
                     otherJobsList,
-                    user.IsVerified.Value ? true : false
+                    user.IsVerified ?? false
                     ),
                 EmailToAddress = user.UserPersonalDetails.EmailAddress,
-                EmailToName = user.UserPersonalDetails.DisplayName,
-                RecipientUserID = recipientUserId.Value
+                EmailToName = user.UserPersonalDetails.DisplayName
             };
-            ;
         }
 
-        public List<SendMessageRequest> IdentifyRecipients(int? recipientUserId, int? jobId, int? groupId)
+        public async  Task<List<SendMessageRequest>> IdentifyRecipients(int? recipientUserId, int? jobId, int? groupId)
         {
-            var volunteers = _connectUserService.GetUsers().Result;
+            var volunteers = await _connectUserService.GetUsers();
             
             volunteers.UserDetails = volunteers.UserDetails.Where(x => x.SupportRadiusMiles.HasValue);
 

@@ -2,7 +2,6 @@
 using CommunicationService.Core.Configuration;
 using CommunicationService.Core.Interfaces.Repositories;
 using CommunicationService.Core.Interfaces.Services;
-using CommunicationService.Core.Utils;
 using CommunicationService.EmailService;
 using CommunicationService.GroupService;
 using CommunicationService.Handlers;
@@ -12,6 +11,7 @@ using CommunicationService.Repo;
 using CommunicationService.RequestService;
 using CommunicationService.SendGridService;
 using CommunicationService.UserService;
+using HelpMyStreet.Utils.PollyPolicies;
 using MediatR;
 using Microsoft.Azure.Functions.Extensions.DependencyInjection;
 using Microsoft.Azure.ServiceBus;
@@ -20,12 +20,15 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
+using Polly;
 using SendGrid;
 using System;
 using System.Collections.Generic;
 using System.Net;
 using System.Net.Http;
 using System.Net.Http.Headers;
+using HelpMyStreet.Utils.Enums;
+using HelpMyStreet.Utils.Utils;
 
 [assembly: FunctionsStartup(typeof(CommunicationService.AzureFunction.Startup))]
 namespace CommunicationService.AzureFunction
@@ -46,10 +49,14 @@ namespace CommunicationService.AzureFunction
 
             IConfigurationRoot config = configBuilder.Build();
 
+            // DI doesn't work in startup
+            PollyHttpPolicies pollyHttpPolicies = new PollyHttpPolicies(new PollyHttpPoliciesConfig());
+
             Dictionary<HttpClientConfigName, ApiConfig> httpClientConfigs = config.GetSection("Apis").Get<Dictionary<HttpClientConfigName, ApiConfig>>();
 
             foreach (KeyValuePair<HttpClientConfigName, ApiConfig> httpClientConfig in httpClientConfigs)
             {
+                IAsyncPolicy<HttpResponseMessage> retryPolicy = httpClientConfig.Value.IsExternal ? pollyHttpPolicies.ExternalHttpRetryPolicy : pollyHttpPolicies.InternalHttpRetryPolicy;
 
                 builder.Services.AddHttpClient(httpClientConfig.Key.ToString(), c =>
                 {
@@ -68,7 +75,7 @@ namespace CommunicationService.AzureFunction
                 {
                     MaxConnectionsPerServer = httpClientConfig.Value.MaxConnectionsPerServer ?? 15,
                     AutomaticDecompression = DecompressionMethods.GZip | DecompressionMethods.Deflate
-                });
+                }).AddPolicyHandler(retryPolicy);
             }
 
             IConfigurationSection emailConfigSettings = config.GetSection("EmailConfig");

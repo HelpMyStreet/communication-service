@@ -7,31 +7,46 @@ namespace CommunicationService.MessageService.Substitution
 {
     public class TaskUpdateData : BaseDynamicData
     {
-        public string DateRequested { get; set; }
-        public string Activity { get; set; }
-        public string RequestedStatus { get; set; }
-        public string TimeUpdated { get; set; }
-        public bool IsFaceMask { get; set; }
-        public bool IsDone { get; set; }
-        public bool IsOpen { get; set; }
+        public string FirstName { get; private set; }
+        public string Title { get; private set; }
+        public string DateRequested { get; private set; }
+        public string Activity { get; private set; }
+        public string RequestStatus { get; private set; }
+        public string TimeUpdated { get; private set; }
+        public bool IsFaceMask { get; private set; }
+        public bool IsDone { get; private set; }
+        public bool IsOpen { get; private set; }
+        public bool IsInProgress { get; private set; }
+        public bool ForRequestor { get; private set; }
+        public string RecipientFirstName { get; private set; }
 
         public TaskUpdateData(
+            string firstname,
+            string title,
             string dateRequested,
             string activity,
-            string requestedStatus,
+            string requestStatus,
             string timeUpdated,
             bool isFaceMask,
             bool isDone,
-            bool isOpen
+            bool isOpen,
+            bool isInProgress,
+            bool forRequestor,
+            string recipientFirstName
             )
         {
+            FirstName = firstname;
+            Title = title;
             DateRequested = dateRequested;
             Activity = activity;
-            RequestedStatus = requestedStatus;
+            RequestStatus = requestStatus;
             TimeUpdated = timeUpdated;
             IsOpen = isOpen;
             IsDone = isDone;
             IsFaceMask = isFaceMask;
+            IsInProgress = isInProgress;
+            ForRequestor = forRequestor;
+            RecipientFirstName = recipientFirstName;
         }
     }
 }
