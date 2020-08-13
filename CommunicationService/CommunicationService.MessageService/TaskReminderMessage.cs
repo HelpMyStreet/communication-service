@@ -53,20 +53,20 @@ namespace CommunicationService.MessageService
             var user = await _connectUserService.GetUserByIdAsync(recipientUserId.Value);
             var job = await _connectRequestService.GetJobDetailsAsync(jobId.Value);
 
-            string encodedJobId = HelpMyStreet.Utils.Utils.Base64Utils.Base64Encode(job.JobSummary.JobID.ToString());
+            string encodedJobId = HelpMyStreet.Utils.Utils.Base64Utils.Base64Encode(job.JobID.ToString());
 
             return new EmailBuildData()
             {
                 BaseDynamicData = new TaskReminderData(
                     encodedJobId,
-                    GetTitleFromDays(job.JobSummary.DueDays),
+                    GetTitleFromDays(job.DueDays),
                     user.UserPersonalDetails.FirstName,
-                    Mapping.ActivityMappings[job.JobSummary.SupportActivity],
-                    job.JobSummary.PostCode,
-                    job.JobSummary.DueDays,
-                    job.JobSummary.DueDate.ToString("dd/MM/yyyy"),
-                    job.JobSummary.DueDays == 0 ? true : false,
-                    job.JobSummary.DateStatusLastChanged.ToString("dd/MM/yyyy")
+                    Mapping.ActivityMappings[job.SupportActivity],
+                    job.PostCode,
+                    job.DueDays,
+                    job.DueDate.ToString("dd/MM/yyyy"),
+                    job.DueDays == 0 ? true : false,
+                    job.DateStatusLastChanged.ToString("dd/MM/yyyy")
                     ),
                 EmailToAddress = user.UserPersonalDetails.EmailAddress,
                 EmailToName = $"{user.UserPersonalDetails.FirstName} {user.UserPersonalDetails.LastName}"
