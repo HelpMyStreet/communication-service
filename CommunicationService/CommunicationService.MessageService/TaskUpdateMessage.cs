@@ -40,7 +40,7 @@ namespace CommunicationService.MessageService
             var britishZone = TimeZoneInfo.FindSystemTimeZoneById("GMT Standard Time");
             var job = _connectRequestService.GetJobDetailsAsync(jobId.Value).Result;
             DateTime datestatuschanged;
-            datestatuschanged = TimeZoneInfo.ConvertTime(job.DateStatusLastChanged, TimeZoneInfo.Local, britishZone);
+            datestatuschanged = TimeZoneInfo.ConvertTime(job.JobSummary.DateStatusLastChanged, TimeZoneInfo.Local, britishZone);
             var timeOfDay = datestatuschanged.ToString("t");
             timeOfDay = Regex.Replace(timeOfDay, @"\s+", "");
             var timeUpdated = $"today at {timeOfDay.ToLower()}";
@@ -50,25 +50,25 @@ namespace CommunicationService.MessageService
                 timeUpdated = $"on {datestatuschanged.ToString("dd/MM/yyyy")} at {timeOfDay.ToLower()}";
             }
 
-            bool isFaceMask = job.SupportActivity == SupportActivities.FaceMask;
-            bool isOpen = job.JobStatus == JobStatuses.Open;
-            bool isDone = job.JobStatus == JobStatuses.Done;
-            bool isInProgress = job.JobStatus == JobStatuses.InProgress;
+            bool isFaceMask = job.JobSummary.SupportActivity == SupportActivities.FaceMask;
+            bool isOpen = job.JobSummary.JobStatus == JobStatuses.Open;
+            bool isDone = job.JobSummary.JobStatus == JobStatuses.Done;
+            bool isInProgress = job.JobSummary.JobStatus == JobStatuses.InProgress;
             return new EmailBuildData()
             {
                 BaseDynamicData = new TaskUpdateData
                 (
                 job.Requestor.FirstName,
                 "Request status updated",
-                job.DateRequested.ToString("dd/MM/yyyy"),
-                Mapping.ActivityMappings[job.SupportActivity],
-                Mapping.StatusMappings[job.JobStatus],
+                job.JobSummary.DateRequested.ToString("dd/MM/yyyy"),
+                Mapping.ActivityMappings[job.JobSummary.SupportActivity],
+                Mapping.StatusMappings[job.JobSummary.JobStatus],
                 timeUpdated,
                 isFaceMask,
                 isDone,
                 isOpen,
                 isInProgress,
-                job.ForRequestor,
+                job.JobSummary.RequestorType == RequestorType.Myself ? true : false,
                 job.Recipient.FirstName
                 ),
                 EmailToAddress = job.Requestor.EmailAddress,
