@@ -1,15 +1,15 @@
-﻿using CommunicationService.Core.Configuration;
-using CommunicationService.Core.Interfaces.Services;
-using CommunicationService.Core.Utils;
+﻿using CommunicationService.Core.Interfaces.Services;
 using HelpMyStreet.Contracts.CommunicationService.Response;
 using HelpMyStreet.Contracts.RequestService.Response;
 using HelpMyStreet.Contracts.RequestService.Request;
 using HelpMyStreet.Contracts.Shared;
 using Newtonsoft.Json;
-using System;
 using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
+using HelpMyStreet.Utils.Exceptions;
+using HelpMyStreet.Utils.Utils;
+using HelpMyStreet.Utils.Enums;
 
 namespace CommunicationService.RequestService
 {
@@ -50,7 +50,17 @@ namespace CommunicationService.RequestService
                 {
                     return getJobsResponse.Content;
                 }
-                return null;
+                else
+                {
+                    if(response.StatusCode== System.Net.HttpStatusCode.BadRequest)
+                    {
+                        throw new BadRequestException($"GetJobsByFilter Returned a bad request");
+                    }
+                    else
+                    {
+                        throw new InternalServerException($"GetJobsByFilter Returned {jsonResponse}");
+                    }
+                }
             }
             
         }

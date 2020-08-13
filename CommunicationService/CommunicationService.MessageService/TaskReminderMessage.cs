@@ -51,11 +51,14 @@ namespace CommunicationService.MessageService
                 throw new Exception($"Recipient or JobID is missing");
             }
             var user = await _connectUserService.GetUserByIdAsync(recipientUserId.Value);
-            var job = _connectRequestService.GetJobDetailsAsync(jobId.Value).Result;
+            var job = await _connectRequestService.GetJobDetailsAsync(jobId.Value);
+
+            string encodedJobId = HelpMyStreet.Utils.Utils.Base64Utils.Base64Encode(job.JobID.ToString());
 
             return new EmailBuildData()
             {
                 BaseDynamicData = new TaskReminderData(
+                    encodedJobId,
                     GetTitleFromDays(job.DueDays),
                     user.UserPersonalDetails.FirstName,
                     Mapping.ActivityMappings[job.SupportActivity],
@@ -66,8 +69,7 @@ namespace CommunicationService.MessageService
                     job.DateStatusLastChanged.ToString("dd/MM/yyyy")
                     ),
                 EmailToAddress = user.UserPersonalDetails.EmailAddress,
-                EmailToName = $"{user.UserPersonalDetails.FirstName} {user.UserPersonalDetails.LastName}",
-                RecipientUserID = recipientUserId.Value
+                EmailToName = $"{user.UserPersonalDetails.FirstName} {user.UserPersonalDetails.LastName}"
             };
         }
 
@@ -82,9 +84,9 @@ namespace CommunicationService.MessageService
             });
         }
 
-        public List<SendMessageRequest> IdentifyRecipients(int? recipientUserId, int? jobId, int? groupId)
+        public async Task<List<SendMessageRequest>> IdentifyRecipients(int? recipientUserId, int? jobId, int? groupId)
         {
-            var jobs = _connectRequestService.GetJobsInProgress().Result;
+            var jobs = await _connectRequestService.GetJobsInProgress();
 
             if (jobs != null && jobs.JobSummaries.Count>0)
             {

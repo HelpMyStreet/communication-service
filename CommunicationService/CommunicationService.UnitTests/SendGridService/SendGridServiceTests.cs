@@ -130,7 +130,7 @@ namespace CommunicationService.UnitTests.SendGridService
         {
             _sendEmailResponse = Task.FromResult(new Response(System.Net.HttpStatusCode.OK,new StringContent(string.Empty),null));
 
-            bool success = await _classUnderTest.SendDynamicEmail("KnownTemplate","KnownGroup",new Core.Domains.EmailBuildData());
+            bool success = await _classUnderTest.SendDynamicEmail("messageId","KnownTemplate","KnownGroup",new Core.Domains.EmailBuildData());
             Assert.AreEqual(true, success);
         }
 
@@ -139,7 +139,7 @@ namespace CommunicationService.UnitTests.SendGridService
         {
             _sendEmailResponse = Task.FromResult(new Response(System.Net.HttpStatusCode.Accepted, new StringContent(string.Empty), null));
 
-            bool success = await _classUnderTest.SendDynamicEmail("KnownTemplate", "KnownGroup", new Core.Domains.EmailBuildData());
+            bool success = await _classUnderTest.SendDynamicEmail("messageId", "KnownTemplate", "KnownGroup", new Core.Domains.EmailBuildData());
             Assert.AreEqual(true, success);
         }
 
@@ -148,7 +148,7 @@ namespace CommunicationService.UnitTests.SendGridService
         {
             _sendEmailResponse = Task.FromResult(new Response(System.Net.HttpStatusCode.BadRequest, new StringContent(string.Empty), null));
 
-            bool success = await _classUnderTest.SendDynamicEmail("KnownTemplate", "KnownGroup", new Core.Domains.EmailBuildData());
+            bool success = await _classUnderTest.SendDynamicEmail("messageId", "KnownTemplate", "KnownGroup", new Core.Domains.EmailBuildData());
             Assert.AreEqual(false, success);
         }
 

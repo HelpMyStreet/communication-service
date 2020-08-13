@@ -1,27 +1,37 @@
-﻿<p>Hi {{FirstName}},</p><br />
-<p>You're receiving this e-mail because you signed up as a volunteer at HelpMyStreet.org.</p><br />
+﻿<p>Hi {{FirstName}},</p>
+<p>You're receiving this e-mail because you signed up as a volunteer at HelpMyStreet.org.</p>
 <p>Open Requests:</p>
-<p><i>There are currently {{ChosenJobs}} open requests in your area that meet criteria you signed up for:</i></p>
-<ol>
+{{#if SingleChosenJob}}
+<p><i>There is currently 1 open request in your area that meets the criteria you signed up for:</i></p>
+{{else}}
+<p><i>There are currently {{ChosenJobs}} open requests in your area that meet the criteria you signed up for:</i></p>
+{{/if}}
+<ul>
     {{#each ChosenJobList}}
-    <li><a href="http://helpmystreet.org/account/open-requests/j={{EncodedJobID}}"><strong>{{Activity}}</strong> in {{@root.PostCode}} ({{DistanceInMiles}} miles away) - {{#if Soon}}<span style="color: #ff4e00">{{else}}<span>{{/if}}Due {{DueDate}}</span></a>
-        {{Activity}} 
+    <li>
+        <a href="http://helpmystreet.org/account/open-requests/j={{EncodedJobID}}"><strong>{{Activity}}</strong> in {{PostCode}} ({{DistanceInMiles}} miles away) - {{#if Soon}}<span style="color: #ff4e00">{{else}}<span>{{/if}}Due {{DueDate}}</span></a>
         {{#if Urgent}}<strong> - CRITICAL</strong>{{/if}}
     </li>
     {{/each}}
-</ol>
-<br />
+</ul>
 {{#if OtherJobs}}
 <p>Other Requests:</p>
-<p><i>There are other open requests, which don’t meet the criteria you specified when you signed up:</i></p>
-<ol>
+<p><i>There are other open requests, which may interest you:</i></p>
+<ul>
     {{#each OtherJobsList}}
-    <li>{{Count}} requests for <strong>Activity</strong> within 20 miles - earliest due {{DueDate}}</li>
+    {{#if IsSingleItem}}
+    <li>{{Count}} request for <strong>{{Activity}}</strong> - due {{DueDate}}</li>
+    {{else}}
+    <li>{{Count}} requests for <strong>{{Activity}}</strong> - earliest due {{DueDate}}</li>
+    {{/if}}
     {{/each}}
-</ol>
+</ul>
 {{/if}}
-<br />
 <p>Please click <a href="http://www.helpmystreet.org/account/open-requests">here</a> to view open requests at HelpMyStreet and accept any that you can help with.</p>
-<br />
-<p>Thanks,</p>
-<p>The HelpMyStreet.org Team</p>
+<p>Thanks!</p>
+<p>Best wishes,</p>
+<p>The Help My Street Team</p>
+
+
+
+{{IsSingleItem}}

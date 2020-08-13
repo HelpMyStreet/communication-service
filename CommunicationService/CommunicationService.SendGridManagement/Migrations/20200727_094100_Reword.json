@@ -1,0 +1,48 @@
+﻿{
+  "Templates": [
+    {
+      "name": "Welcome",
+      "subject": "Welcome to Help My Street!",
+      "generation": "dynamic",
+      "versions": [
+        {
+          "name": "Rewording",
+          "subject": "Welcome to Help My Street!"
+        }
+      ]
+    },
+    {
+      "name": "ThanksForVerifying",
+      "subject": "Thanks for verifying your identity with Help My Street!",
+      "generation": "dynamic",
+      "versions": [
+        {
+          "name": "Rewording",
+          "subject": "Thanks for verifying your identity with Help My Street!"
+        }
+      ]
+    },
+    {
+      "name": "UnableToVerify",
+      "subject": "Your HelpMyStreet registration",
+      "generation": "dynamic",
+      "versions": [
+        {
+          "name": "Rewording",
+          "subject": "Your HelpMyStreet registration"
+        }
+      ]
+    },
+    {
+      "name": "PartialRegistration",
+      "subject": "Your registration – Help My Street",
+      "generation": "dynamic",
+      "versions": [
+        {
+          "name": "Rewording",
+          "subject": "Your registration – Help My Street"
+        }
+      ]
+    }
+  ]
+}

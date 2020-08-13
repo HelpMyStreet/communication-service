@@ -1,0 +1,26 @@
+﻿{
+  "Templates": [
+    {
+      "name": "TaskReminder",
+      "subject": "Request reminder",
+      "generation": "dynamic",
+      "versions": [
+        {
+          "name": "Change tab hyperlink",
+          "subject": "Request reminder"
+        }
+      ]
+    },
+    {
+      "name": "YotiReminder",
+      "subject": "Welcome to Help My Street! Verify your identity to access requests",
+      "generation": "dynamic",
+      "versions": [
+        {
+          "name": "Change tab hyperlink",
+          "subject": "Welcome to Help My Street! Verify your identity to access requests"
+        }
+      ]
+    }
+  ]
+}

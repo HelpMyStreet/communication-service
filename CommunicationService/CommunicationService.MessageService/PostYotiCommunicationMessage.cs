@@ -59,8 +59,7 @@ namespace CommunicationService.MessageService
                 {
                     BaseDynamicData = new PostYotiCommunicationData(user.UserPersonalDetails.FirstName, user.UserPersonalDetails.LastName, GetTitleFromTemplateName(templateName)),
                     EmailToAddress = user.UserPersonalDetails.EmailAddress,
-                    EmailToName = user.UserPersonalDetails.DisplayName,
-                    RecipientUserID = recipientUserId.Value
+                    EmailToName = user.UserPersonalDetails.DisplayName
                 };
             }
             else
@@ -84,9 +83,9 @@ namespace CommunicationService.MessageService
             }
         }
 
-        public List<SendMessageRequest> IdentifyRecipients(int? recipientUserId, int? jobId, int? groupId)
+        public async Task<List<SendMessageRequest>> IdentifyRecipients(int? recipientUserId, int? jobId, int? groupId)
         {
-            var user = _connectUserService.GetUserByIdAsync(recipientUserId.Value).Result;
+            var user = await _connectUserService.GetUserByIdAsync(recipientUserId.Value);
 
             if (user != null)
             {
@@ -94,7 +93,7 @@ namespace CommunicationService.MessageService
                 {
                     if (user.IsVerified.Value)
                     {
-                        List<EmailHistory> reminderhistory = _cosmosDbService.GetEmailHistory(TemplateName.YotiReminder, user.ID.ToString()).Result;
+                        List<EmailHistory> reminderhistory = await _cosmosDbService.GetEmailHistory(TemplateName.YotiReminder, user.ID.ToString());
                         if (reminderhistory.Count == 0)
                         {
                             AddRecipientAndTemplate(TemplateName.Welcome, recipientUserId.Value, jobId, groupId);
