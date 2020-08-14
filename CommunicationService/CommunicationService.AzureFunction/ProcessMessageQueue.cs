@@ -51,11 +51,12 @@ public class ProcessMessageQueue
 
                 IMessage message = _messageFactory.Create(sendMessageRequest);
                 EmailBuildData emailBuildData = await message.PrepareTemplateData(sendMessageRequest.RecipientUserID, sendMessageRequest.JobID, sendMessageRequest.GroupID, sendMessageRequest.TemplateName);
-                emailBuildData.JobID = sendMessageRequest.JobID;
-                emailBuildData.GroupID = sendMessageRequest.GroupID;
-                emailBuildData.RecipientUserID = sendMessageRequest.RecipientUserID;
+                
                 if (emailBuildData != null)
                 {
+                    emailBuildData.JobID = sendMessageRequest.JobID;
+                    emailBuildData.GroupID = sendMessageRequest.GroupID;
+                    emailBuildData.RecipientUserID = sendMessageRequest.RecipientUserID;
                     var result = await _connectSendGridService.SendDynamicEmail(mySbMsg.MessageId, sendMessageRequest.TemplateName, message.UnsubscriptionGroupName, emailBuildData);
                     log.LogInformation($"SendDynamicEmail({sendMessageRequest.TemplateName}) returned {result}");
                     if (result)
