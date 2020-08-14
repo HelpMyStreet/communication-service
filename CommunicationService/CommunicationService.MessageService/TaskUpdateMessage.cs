@@ -11,6 +11,8 @@ using System.Text.RegularExpressions;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using HelpMyStreet.Contracts.RequestService.Request;
+using HelpMyStreet.Contracts.RequestService.Response;
 
 namespace CommunicationService.MessageService
 {
@@ -50,6 +52,31 @@ namespace CommunicationService.MessageService
                 timeUpdated = $"on {datestatuschanged.ToString("dd/MM/yyyy")} at {timeOfDay.ToLower()}";
             }
 
+            string reference = string.Empty;
+
+            var jobRequest = new GetJobsByFilterRequest();
+            var jobStatusRequest = new JobStatusRequest();
+            jobStatusRequest.JobStatuses = new List<JobStatuses>() { job.JobStatus };
+            jobRequest.Postcode = job.PostCode;
+            jobRequest.JobStatuses = jobStatusRequest;
+
+            GetJobsByFilterResponse jobsResponse = await _connectRequestService.GetJobsByFilter(jobRequest);
+            if(jobsResponse!=null && jobsResponse.JobSummaries.Count>0)
+            {
+                HelpMyStreet.Utils.Models.JobSummary summary = jobsResponse.JobSummaries.FirstOrDefault(x => x.JobID == job.JobID);
+                int groupID_ageuk = -3;
+                if(summary!=null && summary.ReferringGroupID == groupID_ageuk)
+                {
+                    var question = summary.Questions.FirstOrDefault(x => x.Id == (int) Questions.AgeUKReference);
+
+                    if(question!=null)
+                    {
+                        reference = question.Answer;
+                    }
+                }
+            }
+
+
             bool isFaceMask = job.SupportActivity == SupportActivities.FaceMask;
             bool isOpen = job.JobStatus == JobStatuses.Open;
             bool isDone = job.JobStatus == JobStatuses.Done;
@@ -69,7 +96,9 @@ namespace CommunicationService.MessageService
                 isOpen,
                 isInProgress,
                 job.ForRequestor,
-                job.Recipient.FirstName
+                job.Recipient.FirstName,
+                string.IsNullOrEmpty(reference) ? false : true,
+                reference
                 ),
                 EmailToAddress = job.Requestor.EmailAddress,
                 EmailToName = $"{job.Requestor.FirstName} {job.Requestor.LastName}"

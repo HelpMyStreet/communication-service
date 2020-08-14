@@ -66,6 +66,10 @@
     <None Remove="Migrations\20200803_111500_MinorTweaksTaskNotification - Copy.json" />
     <None Remove="Migrations\20200804_110600_DailyDigestTweaks.json" />
     <None Remove="Migrations\20200806_142000_TaskUpdateTweaks.json" />
+    <None Remove="Migrations\20200813_160000_AddAgeUKReference.json" />
+    <None Remove="Migrations\20200813_170000_TweakAgeUKReference.json" />
+    <None Remove="Migrations\20200814_090000_AddPunctuationToTaskUpdate.json" />
+    <None Remove="Migrations\20200814_091500_SpellingMistake.json" />
   </ItemGroup>
 
   <ItemGroup>
@@ -104,6 +108,10 @@
     <EmbeddedResource Include="Migrations\20200709_130700_AddRequestorTaskNotification.json" />
     <EmbeddedResource Include="Migrations\20200717_152400_AddUnsubscribeGroupsDailyDigest.json" />
     <EmbeddedResource Include="Migrations\20200729_154500_MinorTweaksTaskNotification - Copy.json" />
+    <EmbeddedResource Include="Migrations\20200813_160000_AddAgeUKReference.json" />
+    <EmbeddedResource Include="Migrations\20200814_091500_SpellingMistake.json" />
+    <EmbeddedResource Include="Migrations\20200814_090000_AddPunctuationToTaskUpdate.json" />
+    <EmbeddedResource Include="Migrations\20200813_170000_TweakAgeUKReference.json" />
     <EmbeddedResource Include="Migrations\20200806_142000_TaskUpdateTweaks.json" />
     <EmbeddedResource Include="Migrations\20200804_110600_DailyDigestTweaks.json" />
     <EmbeddedResource Include="Migrations\20200729_143000_MinorTweaks.json" />
