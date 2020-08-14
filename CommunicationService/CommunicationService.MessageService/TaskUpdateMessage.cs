@@ -67,7 +67,7 @@ namespace CommunicationService.MessageService
                 int groupID_ageuk = -3;
                 if(summary!=null && summary.ReferringGroupID == groupID_ageuk)
                 {
-                    var question = summary.Questions.FirstOrDefault(x => x.Name == "AgeUK Reference");
+                    var question = summary.Questions.FirstOrDefault(x => x.Id == (int) Questions.AgeUKReference);
 
                     if(question!=null)
                     {
