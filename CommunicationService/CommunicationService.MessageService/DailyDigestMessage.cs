@@ -16,6 +16,8 @@ using CommunicationService.Core.Domains.RequestService;
 using CommunicationService.Core.Services;
 using HelpMyStreet.Utils.Models;
 using HelpMyStreet.Contracts.AddressService.Response;
+using CommunicationService.Core.Interfaces.Repositories;
+using System.Dynamic;
 
 namespace CommunicationService.MessageService
 {
@@ -27,6 +29,7 @@ namespace CommunicationService.MessageService
         private readonly IJobFilteringService _jobFilteringService;
         private readonly IOptions<EmailConfig> _emailConfig;
         private readonly IConnectAddressService _connectAddressService;
+        private readonly ICosmosDbService _cosmosDbService;
         private const string CACHEKEY_OPEN_REQUESTS = "openRequests";
         private const string CACHEKEY_OPEN_ADDRESS = "openAddresses";
 
@@ -40,7 +43,7 @@ namespace CommunicationService.MessageService
             }
         }
 
-        public DailyDigestMessage(IConnectGroupService connectGroupService, IConnectUserService connectUserService, IConnectRequestService connectRequestService, IOptions<EmailConfig> eMailConfig, IJobFilteringService jobFilteringService, IConnectAddressService connectAddressService)
+        public DailyDigestMessage(IConnectGroupService connectGroupService, IConnectUserService connectUserService, IConnectRequestService connectRequestService, IOptions<EmailConfig> eMailConfig, IJobFilteringService jobFilteringService, IConnectAddressService connectAddressService, ICosmosDbService cosmosDbService)
         {
             _connectGroupService = connectGroupService;
             _connectUserService = connectUserService;
@@ -48,10 +51,11 @@ namespace CommunicationService.MessageService
             _emailConfig = eMailConfig;
             _jobFilteringService = jobFilteringService;
             _connectAddressService = connectAddressService;
+            _cosmosDbService = cosmosDbService;
             _sendMessageRequests = new List<SendMessageRequest>();
         }
 
-        public async Task<EmailBuildData> PrepareTemplateData(int? recipientUserId, int? jobId, int? groupId, string templateName)
+        public async Task<EmailBuildData> PrepareTemplateData(Guid batchId, int? recipientUserId, int? jobId, int? groupId, string templateName)
         {
             CacheItemPolicy cacheItemPolicy = new CacheItemPolicy();
             cacheItemPolicy.AbsoluteExpiration = DateTime.Now.AddHours(1.0);
@@ -81,10 +85,12 @@ namespace CommunicationService.MessageService
 
             if (cache.Contains(CACHEKEY_OPEN_REQUESTS))
             {
+                AddCacheDetailsToCosmos(batchId, "Open requests", true, recipientUserId, jobId, groupId, templateName);
                 openjobs = (GetJobsByStatusesResponse)cache.Get(CACHEKEY_OPEN_REQUESTS);
             }
             else
             {
+                AddCacheDetailsToCosmos(batchId, "Open requests", false, recipientUserId, jobId, groupId, templateName);
                 openjobs = await _connectRequestService.GetJobsByStatuses(new GetJobsByStatusesRequest()
                 {
                     JobStatuses = new JobStatusRequest()
@@ -108,10 +114,12 @@ namespace CommunicationService.MessageService
 
             if(cache.Contains(CACHEKEY_OPEN_ADDRESS))
             {
+                AddCacheDetailsToCosmos(batchId, "postcode", true, recipientUserId, jobId, groupId, templateName);
                 postcodeCoordinates = (List<PostcodeCoordinate>)cache.Get(CACHEKEY_OPEN_ADDRESS);
             }
             else
             {
+                AddCacheDetailsToCosmos(batchId, "postcode", false, recipientUserId, jobId, groupId, templateName);
                 var addresses = await _connectAddressService.GetPostcodeCoordinates(new HelpMyStreet.Contracts.AddressService.Request.GetPostcodeCoordinatesRequest()
                 {
                     Postcodes = openjobs.JobSummaries.Select(x=>x.PostCode).Distinct().ToList()
@@ -242,6 +250,29 @@ namespace CommunicationService.MessageService
                 });
             }
             return _sendMessageRequests;
+        }
+
+        private void AddCacheDetailsToCosmos(Guid batchId, string cacheName, bool inCache, int? recipientUserId, int? jobId, int? groupId, string templateName)
+        {
+            try
+            {
+                dynamic message;
+
+                message = new ExpandoObject();
+                message.id = Guid.NewGuid();
+                message.BatchId = batchId;
+                message.CacheName = cacheName;
+                message.InCache = inCache;
+                message.RecipientUserID = recipientUserId;
+                message.TemplateName = templateName;
+                message.JobId = jobId;
+                message.GroupId = groupId;
+                _cosmosDbService.AddItemAsync(message);
+            }
+            catch (Exception exc)
+            {
+                string m = exc.ToString();
+            }
         }
     }
 }

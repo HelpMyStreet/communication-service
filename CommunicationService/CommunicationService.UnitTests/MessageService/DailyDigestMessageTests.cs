@@ -1,5 +1,6 @@
 ﻿using CommunicationService.Core.Configuration;
 using CommunicationService.Core.Domains.RequestService;
+using CommunicationService.Core.Interfaces.Repositories;
 using CommunicationService.Core.Interfaces.Services;
 using CommunicationService.Core.Services;
 using CommunicationService.MessageService;
@@ -31,6 +32,7 @@ namespace CommunicationService.UnitTests.SendGridService
         private Mock<IOptions<EmailConfig>> _emailConfig;
         private Mock<IJobFilteringService> _jobFilteringService;
         private Mock<IConnectAddressService> _addressService;
+        private Mock<ICosmosDbService> _cosmosDbService;
         private EmailConfig _emailConfigSettings;
         private GetUsersResponse _getUsersResponse;
         private GetUserGroupsResponse _getUserGroupsResponse;
@@ -51,8 +53,16 @@ namespace CommunicationService.UnitTests.SendGridService
             SetupEmailConfig();
             SetupJobFilterService();
             SetupAddressService();
+            SetupCosmosDBService();
 
-            _classUnderTest = new DailyDigestMessage(_groupService.Object, _userService.Object, _requestService.Object, _emailConfig.Object,_jobFilteringService.Object, _addressService.Object);
+            _classUnderTest = new DailyDigestMessage(
+                _groupService.Object,
+                _userService.Object,
+                _requestService.Object,
+                _emailConfig.Object,
+                _jobFilteringService.Object,
+                _addressService.Object,
+                _cosmosDbService.Object) ;
         }
 
         private void SetupGroupService()
@@ -120,6 +130,11 @@ namespace CommunicationService.UnitTests.SendGridService
                 )).ReturnsAsync(() => _filteredJobs);
         }
 
+        private void SetupCosmosDBService()
+        {
+            _cosmosDbService = new Mock<ICosmosDbService>();
+        }
+
         [Test]
         public async Task IdentifyRecipientsBasedOnSupportRadiusMiles_ReturnsCorrectUsers()
         {
@@ -165,7 +180,7 @@ namespace CommunicationService.UnitTests.SendGridService
                 Groups = null
             };
 
-            var result = await _classUnderTest.PrepareTemplateData(recipientUserId, jobId, groupId,templateName);
+            var result = await _classUnderTest.PrepareTemplateData(Guid.NewGuid(),recipientUserId, jobId, groupId,templateName);
             Assert.AreEqual(null,result);
 
         }
@@ -180,7 +195,7 @@ namespace CommunicationService.UnitTests.SendGridService
 
             _getUserGroupsResponse = null;
 
-            var result = await _classUnderTest.PrepareTemplateData(recipientUserId, jobId, groupId, templateName);
+            var result = await _classUnderTest.PrepareTemplateData(Guid.NewGuid(),recipientUserId, jobId, groupId, templateName);
             Assert.AreEqual(null, result);
         }
 
@@ -205,7 +220,7 @@ namespace CommunicationService.UnitTests.SendGridService
                 
             };
 
-            var result = await _classUnderTest.PrepareTemplateData(recipientUserId, jobId, groupId, templateName);
+            var result = await _classUnderTest.PrepareTemplateData(Guid.NewGuid(),recipientUserId, jobId, groupId, templateName);
             Assert.AreEqual(null, result);
         }
 
@@ -257,7 +272,7 @@ namespace CommunicationService.UnitTests.SendGridService
             });
 
             var chosenJobCount = jobSummaries.Count(x => _user.SupportActivities.Contains(x.SupportActivity) && x.DistanceInMiles < _user.SupportRadiusMiles);
-            var result = await _classUnderTest.PrepareTemplateData(recipientUserId, jobId, groupId, templateName);
+            var result = await _classUnderTest.PrepareTemplateData(Guid.NewGuid(),recipientUserId, jobId, groupId, templateName);
             DailyDigestData ddd = (DailyDigestData) result.BaseDynamicData;
 
 
@@ -315,7 +330,7 @@ namespace CommunicationService.UnitTests.SendGridService
             _filteredJobs = jobSummaries;
 
             var chosenJobCount = jobSummaries.Count(x => _user.SupportActivities.Contains(x.SupportActivity) && x.DistanceInMiles < _user.SupportRadiusMiles);
-            var result = await _classUnderTest.PrepareTemplateData(recipientUserId, jobId, groupId, templateName);
+            var result = await _classUnderTest.PrepareTemplateData(Guid.NewGuid(),recipientUserId, jobId, groupId, templateName);
             Assert.AreEqual(null, result);
         }
 
@@ -329,6 +344,7 @@ namespace CommunicationService.UnitTests.SendGridService
 
             Exception ex = Assert.ThrowsAsync<BadRequestException>(() => _classUnderTest.PrepareTemplateData
             (
+                Guid.NewGuid(),
                 recipientUserId,
                 jobId,
                 groupId,
@@ -404,7 +420,7 @@ namespace CommunicationService.UnitTests.SendGridService
             var otherJobsStats = otherJobs.GroupBy(x => x.SupportActivity, x => x.DueDate, (activity, dueDate) => new { Key = activity, Count = dueDate.Count(), Min = dueDate.Min() });
             otherJobsStats = otherJobsStats.OrderByDescending(x => x.Count);
 
-            var result = await _classUnderTest.PrepareTemplateData(recipientUserId, jobId, groupId, templateName);
+            var result = await _classUnderTest.PrepareTemplateData(Guid.NewGuid(),recipientUserId, jobId, groupId, templateName);
             DailyDigestData ddd = (DailyDigestData)result.BaseDynamicData;
 
 

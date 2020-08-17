@@ -70,9 +70,6 @@ namespace CommunicationService.RequestService
 
         public async Task<GetJobsByStatusesResponse> GetJobsByStatuses(GetJobsByStatusesRequest getJobsByStatusesRequest)
         {
-            string json = JsonConvert.SerializeObject(getJobsByStatusesRequest);
-            StringContent data = new StringContent(json, Encoding.UTF8, "application/json");
-
             using (HttpResponseMessage response = await _httpClientWrapper.GetAsync(HttpClientConfigName.RequestService, "/api/GetJobsByStatuses", getJobsByStatusesRequest, CancellationToken.None ))
             {
                 string jsonResponse = await response.Content.ReadAsStringAsync();
