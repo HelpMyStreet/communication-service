@@ -29,6 +29,9 @@ using System.Net.Http;
 using System.Net.Http.Headers;
 using HelpMyStreet.Utils.Enums;
 using HelpMyStreet.Utils.Utils;
+using CommunicationService.AddressService;
+using CommunicationService.Core.Services;
+using UserService.Core.Utils;
 
 [assembly: FunctionsStartup(typeof(CommunicationService.AzureFunction.Startup))]
 namespace CommunicationService.AzureFunction
@@ -101,7 +104,10 @@ namespace CommunicationService.AzureFunction
             builder.Services.AddSingleton<IConnectUserService, ConnectUserService>();
             builder.Services.AddSingleton<IConnectRequestService, ConnectRequestService>();
             builder.Services.AddSingleton<IConnectGroupService, ConnectGroupService>();
+            builder.Services.AddTransient<IJobFilteringService, JobFilteringService>();
+            builder.Services.AddSingleton<IConnectAddressService, ConnectAddressService>();
             builder.Services.AddSingleton<IConnectSendGridService, ConnectSendGridService>();
+            builder.Services.AddSingleton<IDistanceCalculator, DistanceCalculator>();
 
             builder.Services.AddDbContext<ApplicationDbContext>(options =>
                    options.UseInMemoryDatabase(databaseName: "CommunicationService.AzureFunction"));
