@@ -63,7 +63,7 @@ namespace CommunicationService.AzureFunction
                     JobID = m.JobID,
                     GroupID = m.GroupID,
                     MessageType = MessageTypes.Email
-                }); ;
+                });
             }
 
             log.LogInformation($"End ProcessJobQueue id: {mySbMsg.MessageId}");
