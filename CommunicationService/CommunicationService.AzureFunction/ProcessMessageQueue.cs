@@ -50,7 +50,7 @@ public class ProcessMessageQueue
                 AddCommunicationRequestToCosmos(mySbMsg, "start", sendMessageRequest, string.Empty);
 
                 IMessage message = _messageFactory.Create(sendMessageRequest);
-                EmailBuildData emailBuildData = await message.PrepareTemplateData(sendMessageRequest.RecipientUserID, sendMessageRequest.JobID, sendMessageRequest.GroupID, sendMessageRequest.TemplateName);
+                EmailBuildData emailBuildData = await message.PrepareTemplateData(sendMessageRequest.BatchID, sendMessageRequest.RecipientUserID, sendMessageRequest.JobID, sendMessageRequest.GroupID, sendMessageRequest.TemplateName);
                 
                 if (emailBuildData != null)
                 {
@@ -154,6 +154,7 @@ public class ProcessMessageQueue
                 message.JobId = sendMessageRequest.JobID;
                 message.CommunicationJob = sendMessageRequest.CommunicationJobType;
                 message.GroupId = sendMessageRequest.GroupID;
+                message.BatchId = sendMessageRequest.BatchID.ToString();
             }
 
             if(!string.IsNullOrEmpty(emailAddress))
@@ -186,6 +187,7 @@ public class ProcessMessageQueue
             {
                 message.RecipientUserID = sendMessageRequest.RecipientUserID;
                 message.TemplateName = sendMessageRequest.TemplateName;
+                message.BatchId = sendMessageRequest.BatchID.ToString();
             }
             _cosmosDbService.AddItemAsync(message);
         }
