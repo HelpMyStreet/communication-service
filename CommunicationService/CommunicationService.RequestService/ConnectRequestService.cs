@@ -10,6 +10,9 @@ using System.Threading.Tasks;
 using HelpMyStreet.Utils.Exceptions;
 using HelpMyStreet.Utils.Utils;
 using HelpMyStreet.Utils.Enums;
+using CommunicationService.Core.Domains.RequestService;
+using System.Text;
+using System.IO;
 
 namespace CommunicationService.RequestService
 {
@@ -63,6 +66,23 @@ namespace CommunicationService.RequestService
                 }
             }
             
+        }
+
+        public async Task<GetJobsByStatusesResponse> GetJobsByStatuses(GetJobsByStatusesRequest getJobsByStatusesRequest)
+        {
+            string json = JsonConvert.SerializeObject(getJobsByStatusesRequest);
+            StringContent data = new StringContent(json, Encoding.UTF8, "application/json");
+
+            using (HttpResponseMessage response = await _httpClientWrapper.GetAsync(HttpClientConfigName.RequestService, "/api/GetJobsByStatuses", getJobsByStatusesRequest, CancellationToken.None ))
+            {
+                string jsonResponse = await response.Content.ReadAsStringAsync();
+                var sendEmailResponse = JsonConvert.DeserializeObject<ResponseWrapper<GetJobsByStatusesResponse, RequestServiceErrorCode>>(jsonResponse);
+                if (sendEmailResponse.HasContent && sendEmailResponse.IsSuccessful)
+                {
+                    return sendEmailResponse.Content;
+                }
+            }
+            return null;
         }
 
         public async Task<GetJobsInProgressResponse> GetJobsInProgress()
