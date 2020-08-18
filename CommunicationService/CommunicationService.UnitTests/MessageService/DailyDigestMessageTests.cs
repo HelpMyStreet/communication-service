@@ -1,28 +1,25 @@
 ﻿using CommunicationService.Core.Configuration;
-using CommunicationService.Core.Domains;
-using CommunicationService.Core.Domains.SendGrid;
-using CommunicationService.Core.Exception;
+using CommunicationService.Core.Domains.RequestService;
+using CommunicationService.Core.Interfaces.Repositories;
 using CommunicationService.Core.Interfaces.Services;
+using CommunicationService.Core.Services;
 using CommunicationService.MessageService;
 using CommunicationService.MessageService.Substitution;
-using CommunicationService.SendGridService;
+using HelpMyStreet.Contracts.AddressService.Request;
+using HelpMyStreet.Contracts.AddressService.Response;
 using HelpMyStreet.Contracts.GroupService.Response;
 using HelpMyStreet.Contracts.RequestService.Request;
 using HelpMyStreet.Contracts.RequestService.Response;
 using HelpMyStreet.Contracts.UserService.Response;
+using HelpMyStreet.Utils.Enums;
 using HelpMyStreet.Utils.Exceptions;
+using HelpMyStreet.Utils.Models;
 using Microsoft.Extensions.Options;
 using Moq;
-using Newtonsoft.Json;
 using NUnit.Framework;
-using SendGrid;
-using SendGrid.Helpers.Mail;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Net.Http;
-using System.Text;
-using System.Threading;
 using System.Threading.Tasks;
 
 namespace CommunicationService.UnitTests.SendGridService
@@ -33,11 +30,17 @@ namespace CommunicationService.UnitTests.SendGridService
         private Mock<IConnectUserService> _userService;
         private Mock<IConnectRequestService> _requestService;
         private Mock<IOptions<EmailConfig>> _emailConfig;
+        private Mock<IJobFilteringService> _jobFilteringService;
+        private Mock<IConnectAddressService> _addressService;
+        private Mock<ICosmosDbService> _cosmosDbService;
         private EmailConfig _emailConfigSettings;
         private GetUsersResponse _getUsersResponse;
         private GetUserGroupsResponse _getUserGroupsResponse;
-        private HelpMyStreet.Utils.Models.User _user;
-        private GetJobsByFilterResponse _getJobsByFilterResponse;
+        private User _user;
+        private GetJobsByStatusesResponse _getJobsByStatusesResponse;
+        private GetPostcodeCoordinatesResponse _getPostcodeCoordinatesResponse;
+        private List<JobSummary> _filteredJobs;
+
 
         private DailyDigestMessage _classUnderTest;
 
@@ -48,8 +51,18 @@ namespace CommunicationService.UnitTests.SendGridService
             SetupUserService();
             SetupRequestService();
             SetupEmailConfig();
+            SetupJobFilterService();
+            SetupAddressService();
+            SetupCosmosDBService();
 
-            _classUnderTest = new DailyDigestMessage(_groupService.Object, _userService.Object, _requestService.Object, _emailConfig.Object);
+            _classUnderTest = new DailyDigestMessage(
+                _groupService.Object,
+                _userService.Object,
+                _requestService.Object,
+                _emailConfig.Object,
+                _jobFilteringService.Object,
+                _addressService.Object,
+                _cosmosDbService.Object) ;
         }
 
         private void SetupGroupService()
@@ -75,8 +88,8 @@ namespace CommunicationService.UnitTests.SendGridService
         {
             _requestService = new Mock<IConnectRequestService>();
 
-            _requestService.Setup(x => x.GetJobsByFilter(It.IsAny<GetJobsByFilterRequest>()))
-                .ReturnsAsync(() => _getJobsByFilterResponse);
+            _requestService.Setup(x => x.GetJobsByStatuses(It.IsAny<GetJobsByStatusesRequest>()))
+                .ReturnsAsync(() => _getJobsByStatusesResponse);
         }
 
         private void SetupEmailConfig()
@@ -92,6 +105,34 @@ namespace CommunicationService.UnitTests.SendGridService
 
             _emailConfig = new Mock<IOptions<EmailConfig>>();
             _emailConfig.SetupGet(x => x.Value).Returns(_emailConfigSettings);
+        }
+
+        private void SetupAddressService()
+        {
+            _addressService = new Mock<IConnectAddressService>();
+            _addressService.Setup(x => x.GetPostcodeCoordinates(It.IsAny<GetPostcodeCoordinatesRequest>()))
+                .ReturnsAsync(() => _getPostcodeCoordinatesResponse);
+        }
+
+        private void SetupJobFilterService()
+        {
+            _jobFilteringService = new Mock<IJobFilteringService>();
+            _jobFilteringService.Setup(x => x.FilterJobSummaries(
+                It.IsAny<List<JobSummary>>(),
+                It.IsAny<List<SupportActivities>>(),
+                It.IsAny<string>(),
+                It.IsAny<double?>(),
+                It.IsAny<Dictionary<SupportActivities, double?>>(),
+                It.IsAny<int?>(),
+                It.IsAny<List<int>>(),
+                It.IsAny<List<JobStatuses>>(),
+                It.IsAny<List<PostcodeCoordinate>>()
+                )).ReturnsAsync(() => _filteredJobs);
+        }
+
+        private void SetupCosmosDBService()
+        {
+            _cosmosDbService = new Mock<ICosmosDbService>();
         }
 
         [Test]
@@ -139,7 +180,7 @@ namespace CommunicationService.UnitTests.SendGridService
                 Groups = null
             };
 
-            var result = await _classUnderTest.PrepareTemplateData(recipientUserId, jobId, groupId,templateName);
+            var result = await _classUnderTest.PrepareTemplateData(Guid.NewGuid(),recipientUserId, jobId, groupId,templateName);
             Assert.AreEqual(null,result);
 
         }
@@ -154,7 +195,7 @@ namespace CommunicationService.UnitTests.SendGridService
 
             _getUserGroupsResponse = null;
 
-            var result = await _classUnderTest.PrepareTemplateData(recipientUserId, jobId, groupId, templateName);
+            var result = await _classUnderTest.PrepareTemplateData(Guid.NewGuid(),recipientUserId, jobId, groupId, templateName);
             Assert.AreEqual(null, result);
         }
 
@@ -171,20 +212,15 @@ namespace CommunicationService.UnitTests.SendGridService
                 Groups = new List<int>() { 1}
             };
 
-            _user = new HelpMyStreet.Utils.Models.User()
+            _user = new User()
             {
                 ID = 1,
-                SupportActivities = new List<HelpMyStreet.Utils.Enums.SupportActivities>() { HelpMyStreet.Utils.Enums.SupportActivities.Shopping},
+                SupportActivities = new List<SupportActivities>() { SupportActivities.Shopping},
                 PostalCode = "NG1 6DQ"
                 
             };
 
-            _getJobsByFilterResponse = new GetJobsByFilterResponse()
-            {
-                JobSummaries = new List<HelpMyStreet.Utils.Models.JobSummary>()
-            };
-
-            var result = await _classUnderTest.PrepareTemplateData(recipientUserId, jobId, groupId, templateName);
+            var result = await _classUnderTest.PrepareTemplateData(Guid.NewGuid(),recipientUserId, jobId, groupId, templateName);
             Assert.AreEqual(null, result);
         }
 
@@ -201,13 +237,13 @@ namespace CommunicationService.UnitTests.SendGridService
                 Groups = new List<int>() { 1 }
             };
 
-            _user = new HelpMyStreet.Utils.Models.User()
+            _user = new User()
             {
                 ID = 1,
-                SupportActivities = new List<HelpMyStreet.Utils.Enums.SupportActivities>() { HelpMyStreet.Utils.Enums.SupportActivities.Shopping },
+                SupportActivities = new List<SupportActivities>() { SupportActivities.Shopping },
                 PostalCode = "NG1 6DQ",
                 SupportRadiusMiles = 20,
-                UserPersonalDetails = new HelpMyStreet.Utils.Models.UserPersonalDetails()
+                UserPersonalDetails = new UserPersonalDetails()
                 {
                     FirstName = "FIRST NAME",
                     EmailAddress = "EMAIL ADDRESS",
@@ -216,32 +252,27 @@ namespace CommunicationService.UnitTests.SendGridService
 
             };
 
-            List<HelpMyStreet.Utils.Models.JobSummary> jobSummaries = new List<HelpMyStreet.Utils.Models.JobSummary>();
-            jobSummaries.Add(new HelpMyStreet.Utils.Models.JobSummary()
+            List<JobSummary> jobSummaries = new List<JobSummary>();
+            jobSummaries.Add(new JobSummary()
             {
                 DistanceInMiles = 1,
-                SupportActivity = HelpMyStreet.Utils.Enums.SupportActivities.Shopping
+                SupportActivity = SupportActivities.Shopping
             });
 
-            jobSummaries.Add(new HelpMyStreet.Utils.Models.JobSummary()
+            jobSummaries.Add(new JobSummary()
             {
                 DistanceInMiles = 2,
-                SupportActivity = HelpMyStreet.Utils.Enums.SupportActivities.Shopping
+                SupportActivity = SupportActivities.Shopping
             });
 
-            jobSummaries.Add(new HelpMyStreet.Utils.Models.JobSummary()
+            jobSummaries.Add(new JobSummary()
             {
                 DistanceInMiles = 2,
-                SupportActivity = HelpMyStreet.Utils.Enums.SupportActivities.CheckingIn
+                SupportActivity = SupportActivities.CheckingIn
             });
-
-            _getJobsByFilterResponse = new GetJobsByFilterResponse()
-            {
-                JobSummaries = jobSummaries
-            };
 
             var chosenJobCount = jobSummaries.Count(x => _user.SupportActivities.Contains(x.SupportActivity) && x.DistanceInMiles < _user.SupportRadiusMiles);
-            var result = await _classUnderTest.PrepareTemplateData(recipientUserId, jobId, groupId, templateName);
+            var result = await _classUnderTest.PrepareTemplateData(Guid.NewGuid(),recipientUserId, jobId, groupId, templateName);
             DailyDigestData ddd = (DailyDigestData) result.BaseDynamicData;
 
 
@@ -261,13 +292,13 @@ namespace CommunicationService.UnitTests.SendGridService
                 Groups = new List<int>() { 1 }
             };
 
-            _user = new HelpMyStreet.Utils.Models.User()
+            _user = new User()
             {
                 ID = 1,
-                SupportActivities = new List<HelpMyStreet.Utils.Enums.SupportActivities>() { HelpMyStreet.Utils.Enums.SupportActivities.Shopping },
+                SupportActivities = new List<SupportActivities>() { SupportActivities.Shopping },
                 PostalCode = "NG1 6DQ",
                 SupportRadiusMiles = 20,
-                UserPersonalDetails = new HelpMyStreet.Utils.Models.UserPersonalDetails()
+                UserPersonalDetails = new UserPersonalDetails()
                 {
                     FirstName = "FIRST NAME",
                     EmailAddress = "EMAIL ADDRESS",
@@ -276,20 +307,30 @@ namespace CommunicationService.UnitTests.SendGridService
 
             };
 
-            List<HelpMyStreet.Utils.Models.JobSummary> jobSummaries = new List<HelpMyStreet.Utils.Models.JobSummary>();
-            jobSummaries.Add(new HelpMyStreet.Utils.Models.JobSummary()
+            List<JobSummary> jobSummaries = new List<JobSummary>();
+            jobSummaries.Add(new JobSummary()
             {
                 DistanceInMiles = 2,
-                SupportActivity = HelpMyStreet.Utils.Enums.SupportActivities.CheckingIn
+                SupportActivity = SupportActivities.CheckingIn
             });
 
-            _getJobsByFilterResponse = new GetJobsByFilterResponse()
+            _getJobsByStatusesResponse = new GetJobsByStatusesResponse()
             {
                 JobSummaries = jobSummaries
             };
 
+            _getPostcodeCoordinatesResponse = new GetPostcodeCoordinatesResponse()
+            {
+                PostcodeCoordinates = new List<PostcodeCoordinate>()
+                {
+                    new PostcodeCoordinate(){Postcode="DE23 6NY",Latitude=1d,Longitude=1d}
+                }
+            };
+
+            _filteredJobs = jobSummaries;
+
             var chosenJobCount = jobSummaries.Count(x => _user.SupportActivities.Contains(x.SupportActivity) && x.DistanceInMiles < _user.SupportRadiusMiles);
-            var result = await _classUnderTest.PrepareTemplateData(recipientUserId, jobId, groupId, templateName);
+            var result = await _classUnderTest.PrepareTemplateData(Guid.NewGuid(),recipientUserId, jobId, groupId, templateName);
             Assert.AreEqual(null, result);
         }
 
@@ -303,6 +344,7 @@ namespace CommunicationService.UnitTests.SendGridService
 
             Exception ex = Assert.ThrowsAsync<BadRequestException>(() => _classUnderTest.PrepareTemplateData
             (
+                Guid.NewGuid(),
                 recipientUserId,
                 jobId,
                 groupId,
@@ -324,13 +366,13 @@ namespace CommunicationService.UnitTests.SendGridService
                 Groups = new List<int>() { 1 }
             };
 
-            _user = new HelpMyStreet.Utils.Models.User()
+            _user = new User()
             {
                 ID = 1,
-                SupportActivities = new List<HelpMyStreet.Utils.Enums.SupportActivities>() { HelpMyStreet.Utils.Enums.SupportActivities.Shopping },
+                SupportActivities = new List<SupportActivities>() { SupportActivities.Shopping },
                 PostalCode = "NG1 6DQ",
                 SupportRadiusMiles = 20,
-                UserPersonalDetails = new HelpMyStreet.Utils.Models.UserPersonalDetails()
+                UserPersonalDetails = new UserPersonalDetails()
                 {
                     FirstName = "FIRST NAME",
                     EmailAddress = "EMAIL ADDRESS",
@@ -339,36 +381,46 @@ namespace CommunicationService.UnitTests.SendGridService
 
             };
 
-            List<HelpMyStreet.Utils.Models.JobSummary> jobSummaries = new List<HelpMyStreet.Utils.Models.JobSummary>();
-            jobSummaries.Add(new HelpMyStreet.Utils.Models.JobSummary()
+            List<JobSummary> jobSummaries = new List<JobSummary>();
+            jobSummaries.Add(new JobSummary()
             {
                 DistanceInMiles = 1,
-                SupportActivity = HelpMyStreet.Utils.Enums.SupportActivities.Shopping
+                SupportActivity = SupportActivities.Shopping
             });
 
-            jobSummaries.Add(new HelpMyStreet.Utils.Models.JobSummary()
+            jobSummaries.Add(new JobSummary()
             {
                 DistanceInMiles = 2,
-                SupportActivity = HelpMyStreet.Utils.Enums.SupportActivities.Shopping
+                SupportActivity = SupportActivities.Shopping
             });
 
-            jobSummaries.Add(new HelpMyStreet.Utils.Models.JobSummary()
+            jobSummaries.Add(new JobSummary()
             {
                 DistanceInMiles = 2,
-                SupportActivity = HelpMyStreet.Utils.Enums.SupportActivities.CheckingIn
+                SupportActivity = SupportActivities.CheckingIn
             });
 
-            _getJobsByFilterResponse = new GetJobsByFilterResponse()
+            _getJobsByStatusesResponse = new GetJobsByStatusesResponse()
             {
                 JobSummaries = jobSummaries
             };
+
+            _getPostcodeCoordinatesResponse = new GetPostcodeCoordinatesResponse()
+            {
+                PostcodeCoordinates = new List<PostcodeCoordinate>()
+                {
+                    new PostcodeCoordinate(){Postcode="DE23 6NY",Latitude=1d,Longitude=1d}
+                }
+            };
+
+            _filteredJobs = jobSummaries;
 
             var criteriaJobs = jobSummaries.Where(x => _user.SupportActivities.Contains(x.SupportActivity) && x.DistanceInMiles < _user.SupportRadiusMiles);
             var otherJobs = jobSummaries.Where(x => !criteriaJobs.Contains(x));
             var otherJobsStats = otherJobs.GroupBy(x => x.SupportActivity, x => x.DueDate, (activity, dueDate) => new { Key = activity, Count = dueDate.Count(), Min = dueDate.Min() });
             otherJobsStats = otherJobsStats.OrderByDescending(x => x.Count);
 
-            var result = await _classUnderTest.PrepareTemplateData(recipientUserId, jobId, groupId, templateName);
+            var result = await _classUnderTest.PrepareTemplateData(Guid.NewGuid(),recipientUserId, jobId, groupId, templateName);
             DailyDigestData ddd = (DailyDigestData)result.BaseDynamicData;
 
 

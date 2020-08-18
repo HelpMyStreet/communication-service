@@ -8,6 +8,7 @@ namespace CommunicationService.Core.Domains
 {
     public class SendMessageRequest
     {
+        public Guid BatchID { get; set; }
         public CommunicationJobTypes CommunicationJobType { get; set; }
         public MessageTypes MessageType { get; set; }
         public string TemplateName { get; set; }
