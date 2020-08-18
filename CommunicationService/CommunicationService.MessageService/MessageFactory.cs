@@ -3,6 +3,7 @@ using CommunicationService.Core.Domains;
 using CommunicationService.Core.Interfaces;
 using CommunicationService.Core.Interfaces.Repositories;
 using CommunicationService.Core.Interfaces.Services;
+using CommunicationService.Core.Services;
 using HelpMyStreet.Contracts.CommunicationService.Request;
 using HelpMyStreet.Contracts.RequestService.Response;
 using Microsoft.Azure.ServiceBus;
@@ -22,9 +23,11 @@ namespace CommunicationService.MessageService
         private readonly IConnectGroupService _connectGroupService;
         private readonly IQueueClient _queueClient;
         private readonly ICosmosDbService _cosmosDbService;
+        private readonly IJobFilteringService _jobFilteringService;
+        private readonly IConnectAddressService _connectAddressService;
         private readonly IOptions<EmailConfig> _emailConfig;
 
-        public MessageFactory(IConnectUserService connectUserService, IConnectRequestService connectRequestService, IConnectGroupService connectGroupService, IQueueClient queueClient, ICosmosDbService cosmosDbService, IOptions<EmailConfig> emailConfig)
+        public MessageFactory(IConnectUserService connectUserService, IConnectRequestService connectRequestService, IConnectGroupService connectGroupService, IQueueClient queueClient, ICosmosDbService cosmosDbService, IOptions<EmailConfig> emailConfig, IJobFilteringService jobFilteringService, IConnectAddressService connectAddressService)
         {
             _connectUserService = connectUserService;
             _connectRequestService = connectRequestService;
@@ -32,6 +35,8 @@ namespace CommunicationService.MessageService
             _queueClient = queueClient;
             _cosmosDbService = cosmosDbService;
             _emailConfig = emailConfig;
+            _jobFilteringService = jobFilteringService;
+            _connectAddressService = connectAddressService;
         }
         public IMessage Create(RequestCommunicationRequest sendCommunicationRequest)
         {
@@ -56,7 +61,7 @@ namespace CommunicationService.MessageService
                 case CommunicationJobTypes.SendTaskStateChangeUpdate:
                     return new TaskUpdateMessage(_connectRequestService);
                 case CommunicationJobTypes.SendOpenTaskDigest:
-                    return new DailyDigestMessage(_connectGroupService, _connectUserService, _connectRequestService, _emailConfig);
+                    return new DailyDigestMessage(_connectGroupService, _connectUserService, _connectRequestService, _emailConfig, _jobFilteringService,_connectAddressService, _cosmosDbService);
                 case CommunicationJobTypes.SendTaskReminder:
                     return new TaskReminderMessage(_connectRequestService, _connectUserService);
                 default:

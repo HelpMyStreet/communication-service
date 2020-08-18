@@ -50,10 +50,13 @@ namespace CommunicationService.AzureFunction
                 log.LogInformation($"Recipients { rec}");
             }
 
+            Guid batchId = Guid.NewGuid();
+
             foreach (var m in messageDetails)
             {
                 await _messageFactory.AddToMessageQueueAsync(new SendMessageRequest()
                 {
+                    BatchID = batchId,
                     CommunicationJobType = requestCommunicationRequest.CommunicationJob.CommunicationJobType,
                     TemplateName = m.TemplateName,
                     RecipientUserID = m.RecipientUserID,

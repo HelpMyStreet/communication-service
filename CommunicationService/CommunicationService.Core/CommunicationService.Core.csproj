@@ -17,7 +17,6 @@
   <ItemGroup>
     <Folder Include="Domains\Entities\" />
     <Folder Include="Dto\" />
-    <Folder Include="Services\" />
     <Folder Include="Utils\" />
   </ItemGroup>
 
