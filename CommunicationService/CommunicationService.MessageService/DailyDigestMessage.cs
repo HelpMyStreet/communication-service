@@ -141,7 +141,7 @@ namespace CommunicationService.MessageService
                     Postcodes = new List<string> { user.PostalCode }
                 });
 
-                if (userAddress != null)
+                if (userAddress != null && userAddress.PostcodeCoordinates.Count()>0)
                 {
                     postcodeCoordinates.Add(userAddress.PostcodeCoordinates.First());
                 }
@@ -169,7 +169,7 @@ namespace CommunicationService.MessageService
                 return null;
             }
 
-            var criteriaJobs = jobs.Where(x => user.SupportActivities.Contains(x.SupportActivity) && x.DistanceInMiles < user.SupportRadiusMiles);
+            var criteriaJobs = jobs.Where(x => user.SupportActivities.Contains(x.SupportActivity) && x.DistanceInMiles <= user.SupportRadiusMiles);
             if (criteriaJobs.Count() == 0)
             {
                 return null;
