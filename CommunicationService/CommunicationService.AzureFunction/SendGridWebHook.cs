@@ -10,6 +10,7 @@ using Newtonsoft.Json;
 using System.IO;
 using System.Dynamic;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace CommunicationService.AzureFunction
 {
@@ -36,10 +37,15 @@ namespace CommunicationService.AzureFunction
                 if (requestBody.Length > 0)
                 {
                     var data = JsonConvert.DeserializeObject<List<ExpandoObject>>(requestBody);
+
                     foreach(ExpandoObject o in data)
                     {
-                        o.TryAdd("id", Guid.NewGuid());
-                        await _cosmosDbService.AddItemAsync(o);
+                        string eventId = GetSGEventID(o);
+                        if(!await _cosmosDbService.SendGridEventExists(eventId))
+                        {
+                            o.TryAdd("id", Guid.NewGuid());
+                            await _cosmosDbService.AddItemAsync(o);
+                        }
                     }
                 }
                 return new OkObjectResult(true);
@@ -48,6 +54,20 @@ namespace CommunicationService.AzureFunction
             {
                 log.LogError($"Exception occured in SendGridWebHook {exc}");
                 return new BadRequestObjectResult(exc);
+            }
+        }
+
+        private string GetSGEventID(ExpandoObject o)
+        {
+            var sg_event_id = o.FirstOrDefault(x => x.Key == "sg_event_id");
+
+            if (sg_event_id.Key != null)
+            {
+                return sg_event_id.Value.ToString();
+            }
+            else
+            {
+                return string.Empty;
             }
         }
     }
