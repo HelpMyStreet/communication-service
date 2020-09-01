@@ -5,8 +5,6 @@ using Microsoft.Azure.WebJobs.Extensions.Http;
 using Microsoft.Extensions.Logging;
 using MediatR;
 using System;
-using System.Net;
-using AzureFunctions.Extensions.Swashbuckle.Attribute;
 using HelpMyStreet.Contracts.CommunicationService.Response;
 using HelpMyStreet.Contracts.CommunicationService.Request;
 using HelpMyStreet.Contracts.Shared;
@@ -26,10 +24,9 @@ namespace CommunicationService.AzureFunction
 
         [Transaction(Web = true)]
         [FunctionName("SendEmail")]
-        [ProducesResponseType((int)HttpStatusCode.OK, Type = typeof(SendEmailResponse))]
         public async Task<IActionResult> Run(
             [HttpTrigger(AuthorizationLevel.Function, "post", Route = null)]
-            [RequestBodyType(typeof(SendEmailRequest), "product request")] SendEmailRequest req,
+            SendEmailRequest req,
             ILogger log)
         {
             try
