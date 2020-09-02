@@ -1,7 +1,6 @@
 ﻿using HelpMyStreet.Contracts.RequestService.Response;
 using HelpMyStreet.Contracts.RequestService.Request;
 using System.Threading.Tasks;
-using CommunicationService.Core.Domains.RequestService;
 
 namespace CommunicationService.Core.Interfaces.Services
 {

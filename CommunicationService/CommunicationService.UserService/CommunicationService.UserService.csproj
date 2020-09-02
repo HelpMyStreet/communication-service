@@ -1,11 +1,11 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="HelpMyStreet.Contracts" Version="1.1.308" />
+    <PackageReference Include="HelpMyStreet.Contracts" Version="1.1.335" />
   </ItemGroup>
 
   <ItemGroup>

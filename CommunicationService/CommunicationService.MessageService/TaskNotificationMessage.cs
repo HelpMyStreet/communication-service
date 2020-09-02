@@ -42,8 +42,8 @@ namespace CommunicationService.MessageService
         public async Task<EmailBuildData> PrepareTemplateData(Guid batchId, int? recipientUserId, int? jobId, int? groupId, string templateName)
         {
             var job = _connectRequestService.GetJobDetailsAsync(jobId.Value).Result;
-            string encodedJobId = HelpMyStreet.Utils.Utils.Base64Utils.Base64Encode(job.JobID.ToString());
-            bool isFaceMask = job.SupportActivity == SupportActivities.FaceMask;
+            string encodedJobId = HelpMyStreet.Utils.Utils.Base64Utils.Base64Encode(job.JobSummary.JobID.ToString());
+            bool isFaceMask = job.JobSummary.SupportActivity == SupportActivities.FaceMask;
 
             if (recipientUserId == REQUESTOR_DUMMY_USERID)
             {
@@ -54,13 +54,13 @@ namespace CommunicationService.MessageService
                         job.Requestor.FirstName,
                         true,
                         encodedJobId,
-                        Mapping.ActivityMappings[job.SupportActivity],
-                        job.PostCode,
+                        Mapping.ActivityMappings[job.JobSummary.SupportActivity],
+                        job.JobSummary.PostCode,
                         0,
-                        job.DueDate.ToString("dd/MM/yyyy"),
+                        job.JobSummary.DueDate.ToString("dd/MM/yyyy"),
                         false,
                         false,
-                        job.HealthCritical,
+                        job.JobSummary.IsHealthCritical,
                         isFaceMask
                     ),
                     EmailToAddress = job.Requestor.EmailAddress,
@@ -73,8 +73,8 @@ namespace CommunicationService.MessageService
                 var user = await _connectUserService.GetUserByIdAsync(recipientUserId.Value);
                 var volunteers = _connectUserService.GetVolunteersByPostcodeAndActivity
                     (
-                        job.PostCode,
-                        new List<SupportActivities>() { job.SupportActivity },
+                        job.JobSummary.PostCode,
+                        new List<SupportActivities>() { job.JobSummary.SupportActivity },
                         CancellationToken.None
                     ).Result;
 
@@ -97,13 +97,13 @@ namespace CommunicationService.MessageService
                                 user.UserPersonalDetails.FirstName,
                                 false,
                                 encodedJobId,
-                                Mapping.ActivityMappings[job.SupportActivity],
-                                job.PostCode,
+                                Mapping.ActivityMappings[job.JobSummary.SupportActivity],
+                                job.JobSummary.PostCode,
                                 Math.Round(volunteer.DistanceInMiles, 1),
-                                job.DueDate.ToString("dd/MM/yyyy"),
+                                job.JobSummary.DueDate.ToString("dd/MM/yyyy"),
                                 user.IsVerified.HasValue ? !user.IsVerified.Value : true,
                                 isStreetChampionForGivenPostCode,
-                                job.HealthCritical,
+                                job.JobSummary.IsHealthCritical,
                                 isFaceMask
                             ),
                             EmailToAddress = user.UserPersonalDetails.EmailAddress,
@@ -136,8 +136,8 @@ namespace CommunicationService.MessageService
                 // Add dummy recipient to represent requestor, who will not necessarily exist within our DB and so has no userID to lookup/refer to
                 AddRecipientAndTemplate(TemplateName.RequestorTaskNotification, REQUESTOR_DUMMY_USERID, jobId, groupId);
                 // Continue
-                supportActivities.Add(job.SupportActivity);
-                var volunteers = await _connectUserService.GetVolunteersByPostcodeAndActivity(job.PostCode, supportActivities, CancellationToken.None);
+                supportActivities.Add(job.JobSummary.SupportActivity);
+                var volunteers = await _connectUserService.GetVolunteersByPostcodeAndActivity(job.JobSummary.PostCode, supportActivities, CancellationToken.None);
 
                 if (volunteers != null)
                 {

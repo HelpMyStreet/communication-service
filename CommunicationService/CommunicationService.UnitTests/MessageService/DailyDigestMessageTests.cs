@@ -1,5 +1,4 @@
 ﻿using CommunicationService.Core.Configuration;
-using CommunicationService.Core.Domains.RequestService;
 using CommunicationService.Core.Interfaces.Repositories;
 using CommunicationService.Core.Interfaces.Services;
 using CommunicationService.Core.Services;
