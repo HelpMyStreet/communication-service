@@ -10,9 +10,6 @@ using System.Threading.Tasks;
 using HelpMyStreet.Utils.Exceptions;
 using HelpMyStreet.Utils.Utils;
 using HelpMyStreet.Utils.Enums;
-using CommunicationService.Core.Domains.RequestService;
-using System.Text;
-using System.IO;
 
 namespace CommunicationService.RequestService
 {
@@ -27,7 +24,7 @@ namespace CommunicationService.RequestService
 
         public async Task<GetJobDetailsResponse> GetJobDetailsAsync(int jobID)
         {
-            string path = $"/api/GetJobDetails?jobID=" + jobID;
+            string path = $"/api/GetJobDetails?userID=-1&jobID=" + jobID;
             string absolutePath = $"{path}";
 
             using (HttpResponseMessage response = await _httpClientWrapper.GetAsync(HttpClientConfigName.RequestService, absolutePath, CancellationToken.None).ConfigureAwait(false))
