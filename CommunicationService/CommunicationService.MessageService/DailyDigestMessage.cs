@@ -12,12 +12,12 @@ using System.Linq;
 using System.Threading.Tasks;
 using HelpMyStreet.Utils.Exceptions;
 using System.Runtime.Caching;
-using CommunicationService.Core.Domains.RequestService;
 using CommunicationService.Core.Services;
 using HelpMyStreet.Utils.Models;
 using HelpMyStreet.Contracts.AddressService.Response;
 using CommunicationService.Core.Interfaces.Repositories;
 using System.Dynamic;
+using HelpMyStreet.Contracts.RequestService.Response;
 
 namespace CommunicationService.MessageService
 {
