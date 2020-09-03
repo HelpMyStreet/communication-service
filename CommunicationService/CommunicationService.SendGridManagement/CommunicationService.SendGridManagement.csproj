@@ -10,6 +10,7 @@
     <None Remove="Emails\Layout.txt" />
     <None Remove="Emails\PartialRegistration.html" />
     <None Remove="Emails\TaskReminder.html" />
+    <None Remove="Emails\TaskUpdateNew.html" />
     <None Remove="Emails\ThanksForVerifying.html" />
     <None Remove="Emails\UnableToVerify.html" />
     <None Remove="Emails\Welcome.html" />
@@ -70,11 +71,14 @@
     <None Remove="Migrations\20200813_170000_TweakAgeUKReference.json" />
     <None Remove="Migrations\20200814_090000_AddPunctuationToTaskUpdate.json" />
     <None Remove="Migrations\20200814_091500_SpellingMistake.json" />
+    <None Remove="Migrations\20200903_153000_NewTaskUpdateEmail.json" />
+    <None Remove="Migrations\20200903_160000_NewTaskUpdateEmail.json" />
   </ItemGroup>
 
   <ItemGroup>
     <EmbeddedResource Include="Emails\Layout.txt" />
     <EmbeddedResource Include="Emails\TaskReminder.html" />
+    <EmbeddedResource Include="Emails\TaskUpdateNew.html" />
     <EmbeddedResource Include="Emails\YotiReminder.html">
     </EmbeddedResource>
     <EmbeddedResource Include="Emails\UnableToVerify.html">
@@ -109,6 +113,8 @@
     <EmbeddedResource Include="Migrations\20200717_152400_AddUnsubscribeGroupsDailyDigest.json" />
     <EmbeddedResource Include="Migrations\20200729_154500_MinorTweaksTaskNotification - Copy.json" />
     <EmbeddedResource Include="Migrations\20200813_160000_AddAgeUKReference.json" />
+    <EmbeddedResource Include="Migrations\20200903_160000_NewTaskUpdateEmail.json" />
+    <EmbeddedResource Include="Migrations\20200903_153000_NewTaskUpdateEmail.json" />
     <EmbeddedResource Include="Migrations\20200814_091500_SpellingMistake.json" />
     <EmbeddedResource Include="Migrations\20200814_090000_AddPunctuationToTaskUpdate.json" />
     <EmbeddedResource Include="Migrations\20200813_170000_TweakAgeUKReference.json" />
