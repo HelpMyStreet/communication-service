@@ -73,7 +73,7 @@ namespace CommunicationService.AzureFunction
                     _connectAddressService,
                     _cosmosDbService);
 
-                var emailBuildData = await dailyDigestMessage.PrepareTemplateData(Guid.NewGuid(), req.RecipientUserID, null, null, "DailyDigest");
+                var emailBuildData = await dailyDigestMessage.PrepareTemplateData(Guid.NewGuid(), req.RecipientUserID, null, null, null, "DailyDigest");
 
                 emailBuildData.EmailToAddress = "jawwad@factor-50.co.uk";
                 emailBuildData.EmailToName = "Jawwad Mukhtar";
