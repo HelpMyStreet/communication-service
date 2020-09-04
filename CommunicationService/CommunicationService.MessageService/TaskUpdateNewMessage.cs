@@ -42,21 +42,45 @@ namespace CommunicationService.MessageService
             var britishZone = TimeZoneInfo.FindSystemTimeZoneById("GMT Standard Time");
             var job = _connectRequestService.GetJobDetailsAsync(jobId.Value).Result;
 
+            DateTime datestatuschanged;
+            datestatuschanged = TimeZoneInfo.ConvertTime(job.JobSummary.DateStatusLastChanged, TimeZoneInfo.Local, britishZone);
+            var timeOfDay = datestatuschanged.ToString("t");
+            timeOfDay = Regex.Replace(timeOfDay, @"\s+", "");
+            var timeUpdated = $"today at {timeOfDay.ToLower()}";
+
+            if ((DateTime.Now.Date - datestatuschanged.Date).TotalDays != 0)
+            {
+                timeUpdated = $"on {datestatuschanged.ToString("dd/MM/yyyy")} at {timeOfDay.ToLower()}";
+            }
+
+            int groupID_ageuk = -3;
+            string ageUKReference = string.Empty;
+            if (job.JobSummary.ReferringGroupID == groupID_ageuk)
+            {
+                var question = job.JobSummary.Questions.FirstOrDefault(x => x.Id == (int)Questions.AgeUKReference);
+
+                if (question != null)
+                {
+                    ageUKReference = question.Answer;
+                }
+            }
+
             string one = "Your";
             string two = "";
             string three = "accepted";
             string four = " volunteer";
-            string five = "[RequesterFirstName]";
-            string six = " for [RecipientFirstName] in [RecipientLocality]";
-            string seven = "[HelpType]";
-            string eight = "";
+            string five = job.Requestor.FirstName;
+            string six = $" for {job.Recipient.FirstName} in {job.Recipient.Address.Locality}";
+            string seven = Mapping.ActivityMappings[job.JobSummary.SupportActivity];
+            string eight = ageUKReference;
             string nine = "you made";
-            string ten = "[RequestDate]";
-            string eleven = "[EventDate]";
-            string twelve = "[EventTime]";
+            string ten = job.JobSummary.DateRequested.ToString("dd/MM/yyyy");
+            string eleven = datestatuschanged.ToString("dd/MM/yyyy");
+            string twelve = timeOfDay.ToLower();
             string thirteen = "This only usually  happens if they think that the help is no longer needed, or is not possible to deliver.";
             bool thirteensupplied = thirteen.Length > 0 ? true : false;
             string fourteen = "If you think that this has been done in error";
+
             return new EmailBuildData()
             {
                 BaseDynamicData = new TaskUpdateNewData
@@ -93,7 +117,23 @@ namespace CommunicationService.MessageService
                 GroupID = groupId,
                 JobID = jobId
             });
-            
+
+            _sendMessageRequests.Add(new SendMessageRequest()
+            {
+                TemplateName = TemplateName.TaskUpdateNew,
+                RecipientUserID = REQUESTOR_DUMMY_USERID,
+                GroupID = groupId,
+                JobID = jobId
+            });
+
+            _sendMessageRequests.Add(new SendMessageRequest()
+            {
+                TemplateName = TemplateName.TaskUpdateNew,
+                RecipientUserID = REQUESTOR_DUMMY_USERID,
+                GroupID = groupId,
+                JobID = jobId
+            });
+
             return _sendMessageRequests;
         }
     }
