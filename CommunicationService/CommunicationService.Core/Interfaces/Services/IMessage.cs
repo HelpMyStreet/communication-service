@@ -10,7 +10,7 @@ namespace CommunicationService.Core.Interfaces
 	{
 		string UnsubscriptionGroupName { get;}
 		Task<List<SendMessageRequest>> IdentifyRecipients(int? recipientUserId, int? jobId, int? groupId);
-		Task<EmailBuildData> PrepareTemplateData(Guid batchId, int? recipientUserId, int? jobId, int? groupId, string templateName);
+		Task<EmailBuildData> PrepareTemplateData(Guid batchId, int? recipientUserId, int? jobId, int? groupId, Dictionary<string, string> additionalParameters,  string templateName);
 	}
 
 }
