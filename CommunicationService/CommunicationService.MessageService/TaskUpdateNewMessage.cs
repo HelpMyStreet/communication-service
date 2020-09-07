@@ -19,6 +19,7 @@ namespace CommunicationService.MessageService
     public class TaskUpdateNewMessage : IMessage
     {
         private readonly IConnectRequestService _connectRequestService;
+        private readonly IConnectUserService _connectUserService;
         private const int REQUESTOR_DUMMY_USERID = -1;
 
         List<SendMessageRequest> _sendMessageRequests;
@@ -31,9 +32,10 @@ namespace CommunicationService.MessageService
             }
         }
 
-        public TaskUpdateNewMessage(IConnectRequestService connectRequestService)
+        public TaskUpdateNewMessage(IConnectRequestService connectRequestService, IConnectUserService connectUserService)
         {
             _connectRequestService = connectRequestService;
+            _connectUserService = connectUserService;
             _sendMessageRequests = new List<SendMessageRequest>();
         }
 
@@ -108,7 +110,37 @@ namespace CommunicationService.MessageService
 
         public async Task<List<SendMessageRequest>> IdentifyRecipients(int? recipientUserId, int? jobId, int? groupId)
         {
-            var job = await _connectRequestService.GetJobDetailsAsync(jobId.Value);
+            var job = await _connectRequestService.GetJobDetailsAsync(jobId.Value);            
+            string volunteerEmailAddress = string.Empty;
+            string recipientEmailAddress = string.Empty;
+            string requestorEmailAddress = string.Empty;
+
+            if (job==null)
+            {
+                throw new Exception($"Job details cannot be retrieved for jobId {jobId}");
+            }
+
+            if (job.JobSummary.VolunteerUserID.HasValue)
+            {
+                var user = await _connectUserService.GetUserByIdAsync(job.JobSummary.VolunteerUserID.Value);
+
+                if(user!=null)
+                {
+                    volunteerEmailAddress = user.UserPersonalDetails.EmailAddress;                    
+                }
+            }
+
+            int lastUpdatedBy = _connectRequestService.GetLastUpdatedBy(job);
+
+            if(job.Recipient!=null)
+            {
+                recipientEmailAddress = job.Recipient.EmailAddress;
+            }
+
+            if (job.Requestor != null)
+            {
+                requestorEmailAddress = job.Requestor.EmailAddress;
+            }
 
             _sendMessageRequests.Add(new SendMessageRequest()
             {
