@@ -102,7 +102,8 @@ namespace CommunicationService.MessageService
                     if (additionalParameters.TryGetValue("RecipientOrRequestor", out recipientOrRequestor))
                     {
                         int lastUpdatedBy = _connectRequestService.GetLastUpdatedBy(job);
-                        if (job.JobSummary.VolunteerUserID.Value == lastUpdatedBy) //revisit
+                        int? relevantVolunteerUserID = _connectRequestService.GetRelevantVolunteerUserID(job);
+                        if (relevantVolunteerUserID.HasValue && relevantVolunteerUserID.Value == lastUpdatedBy)
                         {
                             four = " volunteer";
                         }
@@ -185,9 +186,10 @@ namespace CommunicationService.MessageService
                 throw new Exception($"Job details cannot be retrieved for jobId {jobId}");
             }
 
-            if (job.JobSummary.VolunteerUserID.HasValue)
+            int? relevantVolunteerUserID = _connectRequestService.GetRelevantVolunteerUserID(job);
+            if (relevantVolunteerUserID.HasValue)
             {
-                var user = await _connectUserService.GetUserByIdAsync(job.JobSummary.VolunteerUserID.Value);
+                var user = await _connectUserService.GetUserByIdAsync(relevantVolunteerUserID.Value);
 
                 if(user!=null)
                 {
