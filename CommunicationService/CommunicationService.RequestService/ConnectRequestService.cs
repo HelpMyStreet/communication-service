@@ -111,5 +111,28 @@ namespace CommunicationService.RequestService
                 throw new Exception($"Unable to retrieve last updated by for job id {getJobDetailsResponse.JobSummary.JobID}");
             }
         }
+
+        public int? GetRelevantVolunteerUserID(GetJobDetailsResponse getJobDetailsResponse)
+        {
+            int? result = null;
+            if(getJobDetailsResponse.JobSummary.VolunteerUserID.HasValue)
+            {
+                result = getJobDetailsResponse.JobSummary.VolunteerUserID.Value;
+            }
+            else
+            {
+                var history = getJobDetailsResponse.History.OrderByDescending(x => x.StatusDate).ToList();
+
+                if (history.Count > 2)
+                {
+                    var previousState = history.ElementAt(1);
+                    if (previousState.JobStatus == JobStatuses.InProgress && previousState.VolunteerUserID.HasValue)
+                    {
+                        result = previousState.VolunteerUserID.Value;
+                    }
+                }
+            }        
+            return result;
+        }
     }
 }
