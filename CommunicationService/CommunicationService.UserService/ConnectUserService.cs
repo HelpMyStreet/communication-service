@@ -74,7 +74,7 @@ namespace CommunicationService.UserService
                 }
             };
 
-            using (HttpResponseMessage response = await _httpClientWrapper.GetAsync(HttpClientConfigName.UserService, path, request, CancellationToken.None).ConfigureAwait(false))
+            using (HttpResponseMessage response = await _httpClientWrapper.GetAsync(HttpClientConfigName.UserService, path, request, cancellationToken).ConfigureAwait(false))
             {
                 string jsonResponse = await response.Content.ReadAsStringAsync();
                 var helperResponse = JsonConvert.DeserializeObject<ResponseWrapper<GetVolunteersByPostcodeAndActivityResponse, UserServiceErrorCode>>(jsonResponse);
