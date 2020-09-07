@@ -10,6 +10,9 @@ using System.Threading.Tasks;
 using HelpMyStreet.Utils.Exceptions;
 using HelpMyStreet.Utils.Utils;
 using HelpMyStreet.Utils.Enums;
+using System.Linq;
+using System.Linq.Expressions;
+using System;
 
 namespace CommunicationService.RequestService
 {
@@ -95,6 +98,18 @@ namespace CommunicationService.RequestService
 
         }
 
+        public int GetLastUpdatedBy(GetJobDetailsResponse getJobDetailsResponse)
+        {
+            var lastHistory = getJobDetailsResponse.History.OrderByDescending(x => x.StatusDate).First();
 
+            if (lastHistory != null)
+            {
+                return lastHistory.CreatedByUserID.Value;
+            }
+            else
+            {
+                throw new Exception($"Unable to retrieve last updated by for job id {getJobDetailsResponse.JobSummary.JobID}");
+            }
+        }
     }
 }
