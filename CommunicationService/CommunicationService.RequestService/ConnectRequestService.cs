@@ -123,7 +123,7 @@ namespace CommunicationService.RequestService
             {
                 var history = getJobDetailsResponse.History.OrderByDescending(x => x.StatusDate).ToList();
 
-                if (history.Count > 2)
+                if (history.Count >= 2)
                 {
                     var previousState = history.ElementAt(1);
                     if (previousState.JobStatus == JobStatuses.InProgress && previousState.VolunteerUserID.HasValue)
