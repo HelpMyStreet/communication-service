@@ -10,5 +10,7 @@ namespace CommunicationService.Core.Interfaces.Services
         Task<GetJobsByFilterResponse> GetJobsByFilter(GetJobsByFilterRequest request);
         Task<GetJobsInProgressResponse> GetJobsInProgress();
         Task<GetJobsByStatusesResponse> GetJobsByStatuses(GetJobsByStatusesRequest getJobsByStatusesRequest);
+        int GetLastUpdatedBy(GetJobDetailsResponse getJobDetailsResponse);
+        int? GetRelevantVolunteerUserID(GetJobDetailsResponse getJobDetailsResponse);
     }
 }
