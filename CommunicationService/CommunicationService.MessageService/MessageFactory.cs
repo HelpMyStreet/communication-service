@@ -59,7 +59,7 @@ namespace CommunicationService.MessageService
                 case CommunicationJobTypes.SendNewTaskNotification:
                     return new TaskNotificationMessage(_connectUserService, _connectRequestService, _connectGroupService);
                 case CommunicationJobTypes.SendTaskStateChangeUpdate:
-                    return new TaskUpdateMessage(_connectRequestService);
+                    return new TaskUpdateNewMessage(_connectRequestService, _connectUserService);
                 case CommunicationJobTypes.SendOpenTaskDigest:
                     return new DailyDigestMessage(_connectGroupService, _connectUserService, _connectRequestService, _emailConfig, _jobFilteringService,_connectAddressService, _cosmosDbService);
                 case CommunicationJobTypes.SendTaskReminder:
