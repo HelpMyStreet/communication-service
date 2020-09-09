@@ -13,6 +13,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using HelpMyStreet.Contracts.RequestService.Request;
 using HelpMyStreet.Contracts.RequestService.Response;
+using System.Globalization;
 
 namespace CommunicationService.MessageService
 {
@@ -41,6 +42,9 @@ namespace CommunicationService.MessageService
 
         public async Task<EmailBuildData> PrepareTemplateData(Guid batchId, int? recipientUserId, int? jobId, int? groupId, Dictionary<string, string> additionalParameters, string templateName)
         {
+            CultureInfo cultureInfo = Thread.CurrentThread.CurrentCulture;
+            TextInfo textInfo = cultureInfo.TextInfo;
+
             var britishZone = TimeZoneInfo.FindSystemTimeZoneById("GMT Standard Time");
             var job = _connectRequestService.GetJobDetailsAsync(jobId.Value).Result;
 
@@ -85,8 +89,8 @@ namespace CommunicationService.MessageService
                 two = " you accepted";
                 four = "n administrator";
                 five = user.UserPersonalDetails.FirstName;
-                six = $" for {job.Recipient.FirstName} in {job.Recipient.Address.Locality}";
-                nine = "you accepted on";
+                six = $" for {job.Recipient.FirstName} in {textInfo.ToTitleCase(job.Recipient.Address.Locality)}";
+                nine = "you accepted";
                 ten = job.History.Where(x => x.JobStatus == JobStatuses.InProgress).OrderByDescending(x => x.StatusDate).First().StatusDate.ToString("dd/MM/yyyy");
                 thirteen = ParagraphTwo(job.JobSummary.JobStatus, job.JobSummary.SupportActivity, true);
                 fourteen = ParagraphThree(job.JobSummary.JobStatus, job.JobSummary.SupportActivity, true);
@@ -119,7 +123,7 @@ namespace CommunicationService.MessageService
                             five = job.Requestor.FirstName;
                             if (job.JobSummary.RequestorType != RequestorType.Myself)
                             {
-                                six = $" for {job.Recipient.FirstName} in {job.Recipient.Address.Locality}";
+                                six = $" for {job.Recipient.FirstName} in {textInfo.ToTitleCase(job.Recipient.Address.Locality)}";
                             }
                             nine = "you made";
                             thirteen = ParagraphTwo(job.JobSummary.JobStatus, job.JobSummary.SupportActivity, true);
