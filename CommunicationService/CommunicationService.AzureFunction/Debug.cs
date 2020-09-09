@@ -18,6 +18,7 @@ using CommunicationService.Core.Configuration;
 using CommunicationService.MessageService;
 using CommunicationService.Core.Services;
 using CommunicationService.Core.Interfaces.Repositories;
+using CommunicationService.Core.Domains;
 
 namespace CommunicationService.AzureFunction
 {
@@ -64,29 +65,25 @@ namespace CommunicationService.AzureFunction
                 var request = JsonConvert.SerializeObject(req);
                 log.LogInformation($"RequestCommunicationRequest {request}");
 
-                DailyDigestMessage dailyDigestMessage = new DailyDigestMessage(
-                    _connectGroupService, 
-                    _connectUserService, 
+                TaskUpdateNewMessage taskUpdateNewMessage = new TaskUpdateNewMessage(
                     _connectRequestService,
-                    _emailConfig, 
-                    _jobFilteringService, 
-                    _connectAddressService,
-                    _cosmosDbService);
+                    _connectUserService);
 
-                var emailBuildData = await dailyDigestMessage.PrepareTemplateData(Guid.NewGuid(), req.RecipientUserID, null, null, "DailyDigest");
+                var recipients = await taskUpdateNewMessage.IdentifyRecipients(null, req.JobID, null);
 
-                emailBuildData.EmailToAddress = "jawwad@factor-50.co.uk";
-                emailBuildData.EmailToName = "Jawwad Mukhtar";
-                var json2 = JsonConvert.SerializeObject(emailBuildData.BaseDynamicData);
-                _connectSendGridService.SendDynamicEmail(string.Empty, TemplateName.DailyDigest, UnsubscribeGroupName.DailyDigests, emailBuildData);
+                foreach(SendMessageRequest smr in recipients)
+                {
+                    var emailBuildData = await taskUpdateNewMessage.PrepareTemplateData(Guid.NewGuid(),smr.RecipientUserID, smr.JobID,smr.GroupID, smr.AdditionalParameters, TemplateName.TaskUpdateNew);
 
+                    emailBuildData.EmailToAddress = "jawwad@factor-50.co.uk";
+                    emailBuildData.EmailToName = "Jawwad Mukhtar";
+                    var json2 = JsonConvert.SerializeObject(emailBuildData.BaseDynamicData);
+                    _connectSendGridService.SendDynamicEmail(string.Empty, TemplateName.TaskUpdateNew, UnsubscribeGroupName.TaskNotification, emailBuildData);
+                }
 
                 int i = 1;
 
-
                 return new OkResult();
-
-                //return new OkObjectResult(ResponseWrapper<RequestCommunicationResponse, CommunicationServiceErrorCode>.CreateSuccessfulResponse(response));
             }
             catch (Exception exc)
             {

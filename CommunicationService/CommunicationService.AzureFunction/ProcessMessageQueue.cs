@@ -50,7 +50,7 @@ public class ProcessMessageQueue
                 AddCommunicationRequestToCosmos(mySbMsg, "start", sendMessageRequest, string.Empty);
 
                 IMessage message = _messageFactory.Create(sendMessageRequest);
-                EmailBuildData emailBuildData = await message.PrepareTemplateData(sendMessageRequest.BatchID, sendMessageRequest.RecipientUserID, sendMessageRequest.JobID, sendMessageRequest.GroupID, sendMessageRequest.TemplateName);
+                EmailBuildData emailBuildData = await message.PrepareTemplateData(sendMessageRequest.BatchID, sendMessageRequest.RecipientUserID, sendMessageRequest.JobID, sendMessageRequest.GroupID, sendMessageRequest.AdditionalParameters, sendMessageRequest.TemplateName);
                 
                 if (emailBuildData != null)
                 {
