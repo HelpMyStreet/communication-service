@@ -89,7 +89,7 @@ namespace CommunicationService.MessageService
                 two = " you accepted";
                 four = "n administrator";
                 five = user.UserPersonalDetails.FirstName;
-                six = $" for {job.Recipient.FirstName} in {textInfo.ToTitleCase(job.Recipient.Address.Locality)}";
+                six = $" for {job.Recipient.FirstName} in {textInfo.ToTitleCase(job.Recipient.Address.Locality.ToLower())}";
                 nine = "you accepted";
                 ten = job.History.Where(x => x.JobStatus == JobStatuses.InProgress).OrderByDescending(x => x.StatusDate).First().StatusDate.ToString("dd/MM/yyyy");
                 thirteen = ParagraphTwo(job.JobSummary.JobStatus, job.JobSummary.SupportActivity, true);
@@ -123,11 +123,11 @@ namespace CommunicationService.MessageService
                             five = job.Requestor.FirstName;
                             if (job.JobSummary.RequestorType != RequestorType.Myself)
                             {
-                                six = $" for {job.Recipient.FirstName} in {textInfo.ToTitleCase(job.Recipient.Address.Locality)}";
+                                six = $" for {job.Recipient.FirstName} in {textInfo.ToTitleCase(job.Recipient.Address.Locality.ToLower())}";
                             }
                             nine = "you made";
-                            thirteen = ParagraphTwo(job.JobSummary.JobStatus, job.JobSummary.SupportActivity, true);
-                            fourteen = ParagraphThree(job.JobSummary.JobStatus, job.JobSummary.SupportActivity, true);
+                            thirteen = ParagraphTwo(job.JobSummary.JobStatus, job.JobSummary.SupportActivity, false);
+                            fourteen = ParagraphThree(job.JobSummary.JobStatus, job.JobSummary.SupportActivity, false);
                             emailToAddress = job.Requestor.EmailAddress;
                             emailToName = $"{job.Requestor.FirstName} {job.Requestor.LastName}";
                         }
@@ -136,8 +136,8 @@ namespace CommunicationService.MessageService
                             one = "Your";
                             five = job.Recipient.FirstName;
                             nine = $"was made for you by {job.Requestor.FirstName}";
-                            thirteen = ParagraphTwo(job.JobSummary.JobStatus, job.JobSummary.SupportActivity, true);
-                            fourteen = ParagraphThree(job.JobSummary.JobStatus, job.JobSummary.SupportActivity, true);
+                            thirteen = ParagraphTwo(job.JobSummary.JobStatus, job.JobSummary.SupportActivity, false);
+                            fourteen = ParagraphThree(job.JobSummary.JobStatus, job.JobSummary.SupportActivity, false);
                             emailToAddress = job.Recipient.EmailAddress;
                             emailToName = $"{job.Recipient.FirstName} {job.Recipient.LastName}";
                         }
@@ -294,7 +294,7 @@ namespace CommunicationService.MessageService
             }
             if(jobstatus == JobStatuses.InProgress)
             {
-                return "You may hear from them soon if there’s anything they need to arrange with you -so please do keep an eye on your emails - including your junk folder(just in case).";
+                return "You may hear from them soon if there’s anything they need to arrange with you - so please do keep an eye on your emails - including your junk folder (just in case).";
             }
             throw new Exception($"Unable to calculate paragraph 2 for jobstatus {jobstatus.ToString()} and activity {activity.ToString()} and isvolunteer {isvolunteer}");
         }
