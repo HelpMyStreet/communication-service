@@ -62,7 +62,8 @@ namespace CommunicationService.AzureFunction
                     RecipientUserID = m.RecipientUserID,
                     JobID = m.JobID,
                     GroupID = m.GroupID,
-                    MessageType = MessageTypes.Email
+                    MessageType = MessageTypes.Email,
+                    AdditionalParameters =  m.AdditionalParameters
                 });
             }
 
