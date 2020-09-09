@@ -80,7 +80,7 @@ namespace CommunicationService.MessageService
             if (recipientUserId != REQUESTOR_DUMMY_USERID)
             {
                 //This email will be for the volunteer
-                var user = await _connectUserService.GetUserByIdAsync(job.JobSummary.VolunteerUserID.Value);
+                var user = await _connectUserService.GetUserByIdAsync(recipientUserId.Value);
                 one = "A";
                 two = " you accepted";
                 four = "n administrator";
@@ -209,13 +209,13 @@ namespace CommunicationService.MessageService
                 requestorEmailAddress = job.Requestor.EmailAddress;
             }
 
-            if(job.JobSummary.VolunteerUserID.HasValue && lastUpdatedBy > 0 && lastUpdatedBy != job.JobSummary.VolunteerUserID.Value)
+            if(relevantVolunteerUserID.HasValue && lastUpdatedBy > 0 && lastUpdatedBy != relevantVolunteerUserID.Value)
             {
                 //We send an email to the volunteer as they did not make this change
                 _sendMessageRequests.Add(new SendMessageRequest()
                 {
                     TemplateName = TemplateName.TaskUpdateNew,
-                    RecipientUserID = job.JobSummary.VolunteerUserID.Value,
+                    RecipientUserID = relevantVolunteerUserID.Value,
                     GroupID = groupId,
                     JobID = jobId
                 });
@@ -252,14 +252,6 @@ namespace CommunicationService.MessageService
                      }
                 });
             }
-
-            _sendMessageRequests.Add(new SendMessageRequest()
-            {
-                TemplateName = TemplateName.TaskUpdateNew,
-                RecipientUserID = REQUESTOR_DUMMY_USERID,
-                GroupID = groupId,
-                JobID = jobId
-            });
 
             return _sendMessageRequests;
         }
