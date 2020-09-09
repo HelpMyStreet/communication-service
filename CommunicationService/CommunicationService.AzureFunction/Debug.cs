@@ -75,8 +75,8 @@ namespace CommunicationService.AzureFunction
                 {
                     var emailBuildData = await taskUpdateNewMessage.PrepareTemplateData(Guid.NewGuid(),smr.RecipientUserID, smr.JobID,smr.GroupID, smr.AdditionalParameters, TemplateName.TaskUpdateNew);
 
-                    emailBuildData.EmailToAddress = "alastair@factor-50.co.uk";
-                    emailBuildData.EmailToName = "Alastair Smith";
+                    emailBuildData.EmailToAddress = "jawwad@factor-50.co.uk";
+                    emailBuildData.EmailToName = "Jawwad Mukhtar";
                     var json2 = JsonConvert.SerializeObject(emailBuildData.BaseDynamicData);
                     _connectSendGridService.SendDynamicEmail(string.Empty, TemplateName.TaskUpdateNew, UnsubscribeGroupName.TaskNotification, emailBuildData);
                 }
