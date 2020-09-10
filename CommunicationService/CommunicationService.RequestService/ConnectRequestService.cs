@@ -134,5 +134,20 @@ namespace CommunicationService.RequestService
             }        
             return result;
         }
+
+        public JobStatuses PreviousJobStatus(GetJobDetailsResponse getJobDetailsResponse)
+        {
+            var history = getJobDetailsResponse.History.OrderByDescending(x => x.StatusDate).ToList();
+            if (history.Count >= 2)
+            {                
+                var previousState = history.ElementAt(1);
+                return previousState.JobStatus;
+            }
+            else
+            {
+                throw new Exception($"no previous job status for jobid {getJobDetailsResponse.JobSummary.JobID}");
+            }
+
+        }
     }
 }

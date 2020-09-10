@@ -67,7 +67,7 @@ namespace CommunicationService.MessageService
 
                 if (question != null)
                 {
-                    ageUKReference = question.Answer;
+                    ageUKReference = $" ({question.Answer})";
                 }
             }
             string one = string.Empty;
@@ -92,7 +92,7 @@ namespace CommunicationService.MessageService
                 six = $" for {job.Recipient.FirstName} in {textInfo.ToTitleCase(job.Recipient.Address.Locality.ToLower())}";
                 nine = "you accepted";
                 ten = job.History.Where(x => x.JobStatus == JobStatuses.InProgress).OrderByDescending(x => x.StatusDate).First().StatusDate.ToString("dd/MM/yyyy");
-                thirteen = ParagraphTwo(job.JobSummary.JobStatus, job.JobSummary.SupportActivity, true);
+                thirteen = ParagraphTwo(job, true);
                 fourteen = ParagraphThree(job.JobSummary.JobStatus, job.JobSummary.SupportActivity, true);
                 emailToAddress = user.UserPersonalDetails.EmailAddress;
                 emailToName = $"{user.UserPersonalDetails.FirstName} {user.UserPersonalDetails.LastName}";
@@ -126,7 +126,7 @@ namespace CommunicationService.MessageService
                                 six = $" for {job.Recipient.FirstName} in {textInfo.ToTitleCase(job.Recipient.Address.Locality.ToLower())}";
                             }
                             nine = "you made";
-                            thirteen = ParagraphTwo(job.JobSummary.JobStatus, job.JobSummary.SupportActivity, false);
+                            thirteen = ParagraphTwo(job, false);
                             fourteen = ParagraphThree(job.JobSummary.JobStatus, job.JobSummary.SupportActivity, false);
                             emailToAddress = job.Requestor.EmailAddress;
                             emailToName = $"{job.Requestor.FirstName} {job.Requestor.LastName}";
@@ -136,7 +136,7 @@ namespace CommunicationService.MessageService
                             one = "Your";
                             five = job.Recipient.FirstName;
                             nine = $"was made for you by {job.Requestor.FirstName}";
-                            thirteen = ParagraphTwo(job.JobSummary.JobStatus, job.JobSummary.SupportActivity, false);
+                            thirteen = ParagraphTwo(job, false);
                             fourteen = ParagraphThree(job.JobSummary.JobStatus, job.JobSummary.SupportActivity, false);
                             emailToAddress = job.Recipient.EmailAddress;
                             emailToName = $"{job.Recipient.FirstName} {job.Recipient.LastName}";
@@ -145,7 +145,7 @@ namespace CommunicationService.MessageService
                 }
             }
 
-            string three = Mapping.StatusMappingsNotifications[job.JobSummary.JobStatus];
+            string three = CalculateVariableThree(job);
             string seven = Mapping.ActivityMappings[job.JobSummary.SupportActivity];
             string eight = ageUKReference;
             string eleven = datestatuschanged.ToString("dd/MM/yyyy");
@@ -176,6 +176,28 @@ namespace CommunicationService.MessageService
                 EmailToName = emailToName
             };
 
+        }
+
+        private string CalculateVariableThree(GetJobDetailsResponse job)
+        {
+            switch(job.JobSummary.JobStatus)
+            {
+                case JobStatuses.Cancelled:
+                case JobStatuses.Done:
+                case JobStatuses.Open:
+                    return Mapping.StatusMappingsNotifications[job.JobSummary.JobStatus];
+                case JobStatuses.InProgress:
+                    if(_connectRequestService.PreviousJobStatus(job) == JobStatuses.Done)
+                    {
+                        return "marked as in progress again";
+                    }
+                    else
+                    {
+                        return Mapping.StatusMappingsNotifications[job.JobSummary.JobStatus];
+                    }
+                default:
+                    throw new Exception($"Unable to calculate variable three for {job.JobSummary.JobStatus}");
+            }            
         }
 
         public async Task<List<SendMessageRequest>> IdentifyRecipients(int? recipientUserId, int? jobId, int? groupId)
@@ -260,19 +282,20 @@ namespace CommunicationService.MessageService
             return _sendMessageRequests;
         }
 
-        private string ParagraphTwo(JobStatuses jobstatus, SupportActivities activity, bool isvolunteer)
+        private string ParagraphTwo(GetJobDetailsResponse job, bool isvolunteer)
         {
             //IF(B=4,"[CR]This only usually  happens if they think that the help is no longer needed, or is not possible to deliver.[CR]",
             //IF(B=3,IF(F=12,"[CR]If your face coverings aren’t with you already, then they should be on their way, possibly being hand delivered or in the post. [CR]",""),
             //IF(B=1,IF(D="Vol","[CR]This only usually happens if they think that you are unable to deliver the help and unable to "release" the request yourself.[CR]","[CR]This only usually happens if the volunteer that had accepted the request was unable to deliver it.  The request is now visible to other volunteers and hopefully another will accept it soon.  We'll let you know if this happens.[CR]"),
             //"[CR]You may hear from them soon if there’s anything they need to arrange with you -so please do keep an eye on your emails - including your "junk" folder(just in case).[CR]")))
-            if(jobstatus== JobStatuses.Cancelled)
+            if(job.JobSummary.JobStatus  == JobStatuses.Cancelled)
             {
-                return "This only usually  happens if they think that the help is no longer needed, or is not possible to deliver.";
+                return "This only usually happens if they think that the help is no longer needed, or is not possible to deliver.";
             }
-            if(jobstatus == JobStatuses.Done)
+
+            if(job.JobSummary.JobStatus == JobStatuses.Done)
             {
-                if(activity == SupportActivities.FaceMask)
+                if(job.JobSummary.SupportActivity == SupportActivities.FaceMask && !isvolunteer)
                 {
                     return "If your face coverings aren’t with you already, then they should be on their way, possibly being hand delivered or in the post.";
                 }
@@ -281,7 +304,8 @@ namespace CommunicationService.MessageService
                     return string.Empty;
                 }
             }
-            if(jobstatus == JobStatuses.Open)
+
+            if(job.JobSummary.JobStatus == JobStatuses.Open)
             {
                 if(isvolunteer)
                 {
@@ -292,11 +316,26 @@ namespace CommunicationService.MessageService
                     return "This only usually happens if the volunteer that accepted the request was unable to deliver it.  The request is now visible to other volunteers and hopefully another will accept it soon.  We'll let you know if this happens.";
                 }
             }
-            if(jobstatus == JobStatuses.InProgress)
+
+            if(job.JobSummary.JobStatus == JobStatuses.InProgress)
             {
-                return "You may hear from them soon if there’s anything they need to arrange with you - so please do keep an eye on your emails - including your junk folder (just in case).";
+                if (isvolunteer)
+                {
+                    return "This usually means they think the request has been marked as completed by mistake.";
+                }
+                else
+                {
+                    if (_connectRequestService.PreviousJobStatus(job) == JobStatuses.Open)
+                    {
+                        return "You may hear from them soon if there’s anything they need to arrange with you - so please do keep an eye on your emails - including your junk folder (just in case).";
+                    }
+                    else
+                    {
+                        return "This usually means it was marked as completed by mistake.";
+                    }
+                }
             }
-            throw new Exception($"Unable to calculate paragraph 2 for jobstatus {jobstatus.ToString()} and activity {activity.ToString()} and isvolunteer {isvolunteer}");
+            throw new Exception($"Unable to calculate paragraph 2 for jobstatus {job.JobSummary.JobStatus.ToString()} and activity {job.JobSummary.SupportActivity.ToString()} and isvolunteer {isvolunteer}");
         }
 
         private string ParagraphThree(JobStatuses jobstatus, SupportActivities activity, bool isvolunteer)
@@ -311,7 +350,7 @@ namespace CommunicationService.MessageService
             }
             if (jobstatus == JobStatuses.Done)
             {
-                if (activity == SupportActivities.FaceMask)
+                if (activity == SupportActivities.FaceMask && !isvolunteer)
                 {
                     return "If you haven’t received them after a few days, if you have any other questions or concerns";
                 }
@@ -333,7 +372,14 @@ namespace CommunicationService.MessageService
             }
             if (jobstatus == JobStatuses.InProgress)
             {
-                return "If you have any questions or concerns, if you need to change or cancel the request";
+                if (isvolunteer)
+                {
+                    return "If you think this has been done in error";
+                }
+                else
+                {
+                    return "If you have any questions or concerns, if you need to change or cancel the request";
+                }
             }
             throw new Exception($"Unable to calculate paragraph 3 for jobstatus {jobstatus.ToString()} and activity {activity.ToString()} and isvolunteer {isvolunteer}");
         }
