@@ -16,6 +16,7 @@ using HelpMyStreet.Contracts.RequestService.Response;
 using System.Globalization;
 using Microsoft.Net.Http.Headers;
 using System.Resources;
+using System.Security.Principal;
 
 namespace CommunicationService.MessageService
 {
@@ -42,39 +43,47 @@ namespace CommunicationService.MessageService
             _sendMessageRequests = new List<SendMessageRequest>();
         }
 
-        private string GetTitleFromJob(GetJobDetailsResponse job)
+        private string GetTitleFromJob(GetJobDetailsResponse job, bool isVolunteer)
         {
-            JobStatuses current = job.JobSummary.JobStatus;
-            JobStatuses previous = _connectRequestService.PreviousJobStatus(job);
             string title = string.Empty;
+            JobStatuses current = job.JobSummary.JobStatus;
 
-            switch(current)
-            {
-                case JobStatuses.InProgress:
-                    if(previous == JobStatuses.Open)
-                    {
-                        title = "Thank you! – and Next Steps"; 
-                    }
-                    else if(previous == JobStatuses.Done)
-                    {
-                        title = "Confirmed";
-                    }
-                    break;
-                case JobStatuses.Done:
-                    if (previous == JobStatuses.InProgress)
-                    {
-                        title = "Thank you so much!";
-                    }
-                    break;
-                case JobStatuses.Open:
-                    if (previous == JobStatuses.InProgress)
-                    {
-                        title = "Is everything OK?";
-                    }
-                    break;
-                default:
-                    title = string.Empty;
-                    break;
+            if (isVolunteer)
+            {                
+                JobStatuses previous = _connectRequestService.PreviousJobStatus(job);
+
+                switch (current)
+                {
+                    case JobStatuses.InProgress:
+                        if (previous == JobStatuses.Open)
+                        {
+                            title = "Thank you! – and Next Steps";
+                        }
+                        else if (previous == JobStatuses.Done)
+                        {
+                            title = "Confirmed";
+                        }
+                        break;
+                    case JobStatuses.Done:
+                        if (previous == JobStatuses.InProgress)
+                        {
+                            title = "Thank you so much!";
+                        }
+                        break;
+                    case JobStatuses.Open:
+                        if (previous == JobStatuses.InProgress)
+                        {
+                            title = "Is everything OK?";
+                        }
+                        break;
+                    default:
+                        title = string.Empty;
+                        break;
+                }
+            }
+            else
+            {                
+                title = $"Request {Mapping.StatusMappingsNotifications[current]}";
             }
             return title;
         }
@@ -96,7 +105,8 @@ namespace CommunicationService.MessageService
                 }
             }
 
-            int lastUpdatedBy = _connectRequestService.GetLastUpdatedBy(job);           
+            int lastUpdatedBy = _connectRequestService.GetLastUpdatedBy(job);
+            string title = string.Empty;
             string recipient = string.Empty;
             string paragraph1 = string.Empty;
             string paragraph2 = string.Empty;
@@ -108,6 +118,7 @@ namespace CommunicationService.MessageService
             {
                 //This email will be for the volunteer
                 var user = await _connectUserService.GetUserByIdAsync(recipientUserId.Value);
+                title = GetTitleFromJob(job, true);
                 recipient = user.UserPersonalDetails.FirstName;
                 paragraph1 = ParagraphOne(job, ageUKReference,string.Empty, true, lastUpdatedBy);
                 paragraph2 = ParagraphTwo(job,string.Empty,true, lastUpdatedBy);
@@ -117,6 +128,7 @@ namespace CommunicationService.MessageService
             }
             else
             {
+                title = GetTitleFromJob(job, false);
                 //check if we need to send an email to the requester
                 if (additionalParameters != null)
                 {
@@ -147,7 +159,7 @@ namespace CommunicationService.MessageService
             {
                 BaseDynamicData = new TaskUpdateNewData
                 (
-                    GetTitleFromJob(job),
+                    title,
                     recipient,
                     paragraph1,
                     paragraph2,
