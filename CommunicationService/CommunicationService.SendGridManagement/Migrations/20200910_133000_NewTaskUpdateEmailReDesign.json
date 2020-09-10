@@ -1,0 +1,15 @@
+﻿{
+  "Templates": [
+    {
+      "name": "TaskUpdateNew",
+      "subject": "A HelpMyStreet Request Has Been Updated",
+      "generation": "dynamic",
+      "versions": [
+        {
+          "name": "Forth Draft",
+          "subject": "A HelpMyStreet Request Has Been Updated"
+        }
+      ]
+    }
+  ]
+}
