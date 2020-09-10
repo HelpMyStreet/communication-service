@@ -74,6 +74,7 @@
     <None Remove="Migrations\20200903_153000_NewTaskUpdateEmail.json" />
     <None Remove="Migrations\20200903_160000_NewTaskUpdateEmail.json" />
     <None Remove="Migrations\20200909_1142000_NewTaskUpdateEmailTweaks.json" />
+    <None Remove="Migrations\20200910_133000_NewTaskUpdateEmailReDesign.json" />
   </ItemGroup>
 
   <ItemGroup>
@@ -114,6 +115,7 @@
     <EmbeddedResource Include="Migrations\20200717_152400_AddUnsubscribeGroupsDailyDigest.json" />
     <EmbeddedResource Include="Migrations\20200729_154500_MinorTweaksTaskNotification - Copy.json" />
     <EmbeddedResource Include="Migrations\20200813_160000_AddAgeUKReference.json" />
+    <EmbeddedResource Include="Migrations\20200910_133000_NewTaskUpdateEmailReDesign.json" />
     <EmbeddedResource Include="Migrations\20200909_1142000_NewTaskUpdateEmailTweaks.json" />
     <EmbeddedResource Include="Migrations\20200903_160000_NewTaskUpdateEmail.json" />
     <EmbeddedResource Include="Migrations\20200903_153000_NewTaskUpdateEmail.json" />
