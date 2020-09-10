@@ -14,6 +14,8 @@ using System.Threading.Tasks;
 using HelpMyStreet.Contracts.RequestService.Request;
 using HelpMyStreet.Contracts.RequestService.Response;
 using System.Globalization;
+using Microsoft.Net.Http.Headers;
+using System.Resources;
 
 namespace CommunicationService.MessageService
 {
@@ -38,6 +40,43 @@ namespace CommunicationService.MessageService
             _connectRequestService = connectRequestService;
             _connectUserService = connectUserService;
             _sendMessageRequests = new List<SendMessageRequest>();
+        }
+
+        private string GetTitleFromJob(GetJobDetailsResponse job)
+        {
+            JobStatuses current = job.JobSummary.JobStatus;
+            JobStatuses previous = _connectRequestService.PreviousJobStatus(job);
+            string title = string.Empty;
+
+            switch(current)
+            {
+                case JobStatuses.InProgress:
+                    if(previous == JobStatuses.Open)
+                    {
+                        title = "Thank you! – and Next Steps"; 
+                    }
+                    else if(previous == JobStatuses.Done)
+                    {
+                        title = "Confirmed";
+                    }
+                    break;
+                case JobStatuses.Done:
+                    if (previous == JobStatuses.InProgress)
+                    {
+                        title = "Thank you so much!";
+                    }
+                    break;
+                case JobStatuses.Open:
+                    if (previous == JobStatuses.InProgress)
+                    {
+                        title = "Is everything OK?";
+                    }
+                    break;
+                default:
+                    title = string.Empty;
+                    break;
+            }
+            return title;
         }
 
         public async Task<EmailBuildData> PrepareTemplateData(Guid batchId, int? recipientUserId, int? jobId, int? groupId, Dictionary<string, string> additionalParameters, string templateName)
@@ -108,11 +147,12 @@ namespace CommunicationService.MessageService
             {
                 BaseDynamicData = new TaskUpdateNewData
                 (
-                recipient,
-                paragraph1,
-                paragraph2,
-                paragraph2.Length>0 ? true : false,
-                paragraph3
+                    GetTitleFromJob(job),
+                    recipient,
+                    paragraph1,
+                    paragraph2,
+                    paragraph2.Length>0 ? true : false,
+                    paragraph3
                 ),
                 EmailToAddress = emailToAddress,
                 EmailToName = emailToName
@@ -236,7 +276,9 @@ namespace CommunicationService.MessageService
             
             string changedBy = "n administrator";
             string action = "you accepted";
-            string actionDate = job.History.Where(x => x.JobStatus == JobStatuses.InProgress).OrderByDescending(x => x.StatusDate).First().StatusDate.ToString("dd/MM/yyyy");            
+            string actionDate = job.History.Where(x => x.JobStatus == JobStatuses.InProgress).OrderByDescending(x => x.StatusDate).First().StatusDate.ToString("dd/MM/yyyy");
+
+            string recipientDetails = $" for {job.Recipient.FirstName} in {textInfo.ToTitleCase(job.Recipient.Address.Locality.ToLower())}";
 
             int? relevantVolunteerUserID = _connectRequestService.GetRelevantVolunteerUserID(job);
             if (relevantVolunteerUserID.HasValue && relevantVolunteerUserID.Value == lastUpdatedBy)
@@ -295,25 +337,20 @@ namespace CommunicationService.MessageService
                     case "Recipient":
                         action = $"was made for you by {job.Requestor.FirstName}";
                         actionDate = job.JobSummary.DateRequested.ToString("dd/MM/yyyy");
+                        recipientDetails = string.Empty;
                         break;
                     case "Requestor":
                         action = "you made";
                         actionDate = job.JobSummary.DateRequested.ToString("dd/MM/yyyy");
                         break;
-                }                
+                }
             }
 
-            string recipientMessage = string.Empty;
-            if (job.JobSummary.RequestorType != RequestorType.Myself)
-            {
-                recipientMessage = $" for {job.Recipient.FirstName} in {textInfo.ToTitleCase(job.Recipient.Address.Locality.ToLower())}";
-            }
-
-            return $"The request for help{recipientMessage}" +
+            return $"The request for help{recipientDetails}" +
                 $" with {Mapping.ActivityMappings[job.JobSummary.SupportActivity]}{ageUKReference}" +
                 $" that {action} on {actionDate}" +
                 $" was {StatusChange(job)}" +
-                $" by a{changedBy} on {datestatuschanged.ToString("dd/MM/yyyy")} at {timeStatusChanged.ToLower()}";
+                $" by a{changedBy} on {datestatuschanged.ToString("dd/MM/yyyy")} at {timeStatusChanged.ToLower()}.";
         }
 
         private string ParagraphTwo(GetJobDetailsResponse job, string recipientOrRequestor, bool isvolunteer, int lastUpdatedBy)
