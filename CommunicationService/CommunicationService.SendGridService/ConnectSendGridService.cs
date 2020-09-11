@@ -58,7 +58,7 @@ namespace CommunicationService.SendGridService
             }
         }
 
-        public async Task<string> GetTemplateId(string templateName)
+        public async Task<Template> GetTemplate(string templateName)
         {
             var queryParams = @"{
                 'generations': 'dynamic'
@@ -74,7 +74,7 @@ namespace CommunicationService.SendGridService
                     var template = templates.templates.Where(x => x.name == templateName).FirstOrDefault();
                     if (template != null)
                     {
-                        return template.id;
+                        return template;
                     }
                     else
                     {
@@ -94,19 +94,19 @@ namespace CommunicationService.SendGridService
 
         public async Task<bool> SendDynamicEmail(string messageId,string templateName, string groupName, EmailBuildData emailBuildData)
         {
-            string templateId = await GetTemplateId(templateName).ConfigureAwait(false);
+            var template = await GetTemplate(templateName).ConfigureAwait(false);
             int groupId = await GetGroupId(groupName).ConfigureAwait(false);
             Personalization personalization = new Personalization()
             {
                 Tos = new List<EmailAddress>() { new EmailAddress(emailBuildData.EmailToAddress, emailBuildData.EmailToName) },
-                TemplateData = emailBuildData.BaseDynamicData
+                TemplateData = emailBuildData.BaseDynamicData,                
             };
 
             var eml = new SendGridMessage()
             {
                 From = new EmailAddress(_sendGridConfig.Value.FromEmail, _sendGridConfig.Value.FromName),
                 ReplyTo  = new EmailAddress(_sendGridConfig.Value.ReplyToEmail, _sendGridConfig.Value.ReplyToName),
-                TemplateId = templateId,
+                TemplateId = template.id,
                 Asm = new ASM()
                 {
                     GroupId = groupId
@@ -117,7 +117,7 @@ namespace CommunicationService.SendGridService
                 },
                 CustomArgs = new Dictionary<string, string>
                 {
-                    { "TemplateId", templateId },
+                    { "TemplateId", template.id },
                     { "RecipientUserID", emailBuildData.RecipientUserID.ToString() },
                     { "TemplateName", templateName },
                     { "GroupName", groupName},

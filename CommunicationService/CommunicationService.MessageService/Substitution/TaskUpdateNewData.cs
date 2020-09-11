@@ -8,6 +8,7 @@ namespace CommunicationService.MessageService.Substitution
     public class TaskUpdateNewData : BaseDynamicData
     {
         public string Title { get; private set; }
+        public string Subject { get; set; }
         public string Recipient { get; private set; }
         public string Paragraph1 { get; private set; }
         public string Paragraph2 { get; private set; }
@@ -16,6 +17,7 @@ namespace CommunicationService.MessageService.Substitution
 
         public TaskUpdateNewData(
             string title,
+            string subject,
             string recipient,
             string paragraph1,
             string paragraph2,
@@ -24,6 +26,7 @@ namespace CommunicationService.MessageService.Substitution
             )
         {
             Title = title;
+            Subject = subject;
             Recipient = recipient;
             Paragraph1 = paragraph1;
             Paragraph2 = paragraph2;
