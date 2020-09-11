@@ -246,7 +246,7 @@ namespace CommunicationService.MessageService
                 case JobStatuses.Open:
                     if (_connectRequestService.PreviousJobStatus(job) == JobStatuses.Done)
                     {
-                        statusChange = "marked as in reopened again";
+                        statusChange = "marked as reopened again";
                     }
                     break;
                 case JobStatuses.InProgress:
