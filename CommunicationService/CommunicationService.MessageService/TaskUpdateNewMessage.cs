@@ -256,7 +256,7 @@ namespace CommunicationService.MessageService
                     }
                     break;
                 default:
-                    throw new Exception($"Unable to calculate variable three for {job.JobSummary.JobStatus}");
+                    break;
             }
             return statusChange;
         }
