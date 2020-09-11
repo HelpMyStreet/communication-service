@@ -58,7 +58,7 @@ namespace CommunicationService.SendGridService
             }
         }
 
-        public async Task<Template> GetTemplateId(string templateName)
+        public async Task<Template> GetTemplate(string templateName)
         {
             var queryParams = @"{
                 'generations': 'dynamic'
@@ -94,7 +94,7 @@ namespace CommunicationService.SendGridService
 
         public async Task<bool> SendDynamicEmail(string messageId,string templateName, string groupName, EmailBuildData emailBuildData)
         {
-            var template = await GetTemplateId(templateName).ConfigureAwait(false);
+            var template = await GetTemplate(templateName).ConfigureAwait(false);
             int groupId = await GetGroupId(groupName).ConfigureAwait(false);
             Personalization personalization = new Personalization()
             {
