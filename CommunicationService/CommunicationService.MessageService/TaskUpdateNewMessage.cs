@@ -406,7 +406,7 @@ namespace CommunicationService.MessageService
                             paragraphOneEnd = " as completed.";
                             break;
                         case JobStatuses.Open:
-                            paragraphOneStart = "We saw that you clicked the Can't Do button against ";
+                            paragraphOneStart = "We saw that you clicked the “Can’t Do” button against ";
                             paragraphOneMid = $" that {action} on {actionDate}";                            
                             break;
                     }
@@ -446,7 +446,7 @@ namespace CommunicationService.MessageService
             int? relevantVolunteerUserID = _connectRequestService.GetRelevantVolunteerUserID(job);
             DateTime dueDate = job.JobSummary.DueDate;
             double daysFromNow = (dueDate.Date - DateTime.Now.Date).TotalDays;
-            string strDaysFromNow = $"{daysFromNow} days from now.";
+            string strDaysFromNow = $"on or before {dueDate.ToString("dd/MM/yyyy")} - {daysFromNow} days from now.";
             string encodedJobId = HelpMyStreet.Utils.Utils.Base64Utils.Base64Encode(job.JobSummary.JobID.ToString()) ;
             string joburl = "<a href=\"http://www.helpmystreet.org/account/accepted-requests?j=" + encodedJobId + "\">here</a>";
             string acceptedurl = "<a href=\"http://www.helpmystreet.org/account/accepted-requests?j=" + encodedJobId + "\">My Accepted Requests</a>";
@@ -467,10 +467,10 @@ namespace CommunicationService.MessageService
                         case JobStatuses.InProgress:
                             if (_connectRequestService.PreviousJobStatus(job) == JobStatuses.Open)
                             {
-                                return $"Your help is needed on or before {dueDate.ToString("dd/MM/yyyy")} - {strDaysFromNow}</br></br>" +
+                                return $"Your help is needed {strDaysFromNow}.</p><p>" +
                                     $"The ball is now in your court, so please do go ahead and make a start whenever you can, using the details included in the request {joburl}" +
-                                    $"(click “Request Details” to see more details / instructions about the request and “Contact Details” to see the contact details of the person needing / requesting the help).</br></br>" +
-                                    $"If you find yourself unable to complete the request, please release it by clicking the Can’t Do button beside it in your {acceptedurl} tab. " +
+                                    $" (click “Request Details” to see more details and instructions about the request, and “Contact Details” to see the contact details of the person needing/requesting the help).</p><p>" +
+                                    $"If you find yourself unable to complete the request, please release it by clicking the “Can’t Do” button beside it in your {acceptedurl} tab. " +
                                     $"This will make it available again for other volunteers to pick up if needed.";
                             }
                             else
@@ -478,10 +478,10 @@ namespace CommunicationService.MessageService
                                 return string.Empty;
                             }
                         case JobStatuses.Done:
-                            return $"Thank you so much for helping out – you are a super-star!</br></br>" +
-                                   $"If you’d like to tell us anything about your experience, or leave a message for anyone involved, please do get in touch at {feedbackurl}";
+                            return $"Thank you so much for helping out – you are a super-star!</p><p>" +
+                                   $"If you’d like to tell us anything about your experience, or leave a message for anyone involved, please do get in touch at {feedbackurl}.";
                         case JobStatuses.Open:
-                            return $"We hope everything is OK with you.  If you did this by mistake, you can reverse it by clicking the Undo button if you still have the page open, or find and accept the task again from your {openRequestsUrl} tab if not. ";
+                            return $"We hope everything is OK with you.  If you did this by mistake, you can reverse it by clicking the “Undo” button if you still have the page open, or find and accept the task again from your {openRequestsUrl} tab if not. ";
                     }
                 }
             }
@@ -561,7 +561,7 @@ namespace CommunicationService.MessageService
                         case JobStatuses.Done:
                             return "If you’ve had any difficulties you’d like us to look into";
                         case JobStatuses.Open:
-                            return "The request in now available again for other volunteers to pick up.  If you found there was a problem with it (for example, you couldn’t reach the person in need or found the help is no longer needed)";
+                            return "The request is now available again for other volunteers to pick up.  If you found there was a problem with it (for example, you couldn’t reach the person in need or found the help is no longer needed)";
                     }
                 }
             }
