@@ -17,6 +17,7 @@ using System.Globalization;
 using Microsoft.Net.Http.Headers;
 using System.Resources;
 using System.Security.Principal;
+using RestSharp.Extensions;
 
 namespace CommunicationService.MessageService
 {
@@ -24,6 +25,8 @@ namespace CommunicationService.MessageService
     {
         private readonly IConnectRequestService _connectRequestService;
         private readonly IConnectUserService _connectUserService;
+        private readonly IConnectGroupService _connectGroupService;
+
         private const int REQUESTOR_DUMMY_USERID = -1;
 
         List<SendMessageRequest> _sendMessageRequests;
@@ -36,10 +39,11 @@ namespace CommunicationService.MessageService
             }
         }
 
-        public TaskUpdateNewMessage(IConnectRequestService connectRequestService, IConnectUserService connectUserService)
+        public TaskUpdateNewMessage(IConnectRequestService connectRequestService, IConnectUserService connectUserService, IConnectGroupService connectGroupService)
         {
             _connectRequestService = connectRequestService;
             _connectUserService = connectUserService;
+            _connectGroupService = connectGroupService;
             _sendMessageRequests = new List<SendMessageRequest>();
         }
 
@@ -74,6 +78,12 @@ namespace CommunicationService.MessageService
                         if (previous == JobStatuses.InProgress)
                         {
                             title = "Is everything OK?";
+                        }                        
+                        break;
+                    case JobStatuses.Cancelled:
+                        if (previous == JobStatuses.InProgress)
+                        {
+                            title = "Request Cancelled";
                         }
                         break;
                     default:
@@ -90,13 +100,23 @@ namespace CommunicationService.MessageService
 
         private string GetSubjectFromJob(GetJobDetailsResponse job, bool isVolunteer, int lastUpdatedBy, string recipientOrRequestor)
         {
-            string subject = string.Empty;
             JobStatuses current = job.JobSummary.JobStatus;
+            JobStatuses previous = _connectRequestService.PreviousJobStatus(job);
+            int? relevantVolunteerUserID = _connectRequestService.GetRelevantVolunteerUserID(job);
 
-            if (isVolunteer)
+            string changedBy;
+            if (relevantVolunteerUserID.HasValue && relevantVolunteerUserID.Value == lastUpdatedBy)
             {
-                JobStatuses previous = _connectRequestService.PreviousJobStatus(job);
+                changedBy = " volunteer";
+            }
+            else
+            {
+                changedBy = "n administrator";
+            }
+            string subject = $"Your HelpMyStreet request has been { StatusChange(job)} by a{changedBy}";
 
+            if (isVolunteer && relevantVolunteerUserID.Value == lastUpdatedBy)
+            {
                 switch (current)
                 {
                     case JobStatuses.InProgress:
@@ -125,27 +145,6 @@ namespace CommunicationService.MessageService
                         subject = string.Empty;
                         break;
                 }
-            }
-            else
-            {
-                if (isVolunteer)
-                {
-                    subject = $"A HelpMyStreet request you accepted has been { StatusChange(job)} by an administrator";
-                }
-                else if(recipientOrRequestor.Length>0)
-                {
-                    int? relevantVolunteerUserID = _connectRequestService.GetRelevantVolunteerUserID(job);
-                    string changedBy = string.Empty;
-                    if (relevantVolunteerUserID.HasValue && relevantVolunteerUserID.Value == lastUpdatedBy)
-                    {
-                        changedBy = " volunteer";
-                    }
-                    else
-                    {
-                        changedBy = "n administrator";
-                    }
-                    subject = $"Your HelpMyStreet request has been { StatusChange(job)} by a{changedBy}";                    
-                }                    
             }
             return subject;
         }
@@ -380,16 +379,16 @@ namespace CommunicationService.MessageService
 
             if(isvolunteer)
             {
+                string paragraphOneStart = string.Empty;
+                string paragraphOneMid = string.Empty;
+                string paragraphOneEnd = ".";
+
                 if (relevantVolunteerUserID.HasValue && relevantVolunteerUserID.Value == lastUpdatedBy)
                 {
-                    string paragraphOneStart = string.Empty;
-                    string paragraphOneMid = string.Empty;
-                    string paragraphOneEnd = ".";
-
                     switch (job.JobSummary.JobStatus)
                     {
                         case JobStatuses.InProgress:
-                            if(_connectRequestService.PreviousJobStatus(job) == JobStatuses.Open)
+                            if (_connectRequestService.PreviousJobStatus(job) == JobStatuses.Open)
                             {
                                 paragraphOneStart = "Thank you so much for accepting ";
                             }
@@ -407,7 +406,7 @@ namespace CommunicationService.MessageService
                             break;
                         case JobStatuses.Open:
                             paragraphOneStart = "We saw that you clicked the “Can’t Do” button against ";
-                            paragraphOneMid = $" that {action} on {actionDate}";                            
+                            paragraphOneMid = $" that {action} on {actionDate}";
                             break;
                     }
 
@@ -415,6 +414,60 @@ namespace CommunicationService.MessageService
                         $"the request for help for {job.Recipient.FirstName} in {textInfo.ToTitleCase(job.Recipient.Address.Locality.ToLower())}" +
                         $" with {Mapping.ActivityMappings[job.JobSummary.SupportActivity]}{ageUKReference}" +
                         $"{paragraphOneMid}" +
+                        $"{paragraphOneEnd}";
+                }
+                else //action made by an administrator
+                {
+                    JobStatuses previousStatus = _connectRequestService.PreviousJobStatus(job);
+                    int? referringGroupId = job.JobSummary.ReferringGroupID;
+                    string group = string.Empty;
+                    if (referringGroupId.HasValue)
+                    {
+                        var groupDetails = _connectGroupService.GetGroupResponse(referringGroupId.Value).Result;
+                        if(groupDetails!=null && groupDetails.Group!=null)
+                        {
+                            group = $" on behalf of { groupDetails.Group.GroupName}";
+                        }
+                    }
+
+                    switch (job.JobSummary.JobStatus)
+                    {
+                        case JobStatuses.InProgress:
+                            if(previousStatus == JobStatuses.Done)
+                            {
+                                paragraphOneStart = "has been placed back in progress";
+                                paragraphOneEnd = "</p><p>This could be because they know it was marked as complete in error, or that they have been notified that the request for help hasn't been completed.";
+
+                            }
+                            break;
+                        case JobStatuses.Done:
+                            if(previousStatus == JobStatuses.InProgress)
+                            {
+                                paragraphOneStart = "was marked as completed";
+                                paragraphOneEnd = "</p><p>This might be because they know you've done it, or they know that the task has already been done by somebody else.";
+                            }
+                            break;
+                        case JobStatuses.Open:
+                            if (previousStatus == JobStatuses.InProgress)
+                            {
+                                paragraphOneStart = "has been moved back to an “Open” status";
+                                paragraphOneEnd = "</p><p>This might be beacuse the admin is aware that you are unable to do it, or suspects that you have accepted a task in error(for example, one that is a long way from where you live)";
+                            }
+                            break;
+                        case JobStatuses.Cancelled:
+                            if(previousStatus == JobStatuses.InProgress)
+                            {
+                                paragraphOneStart = "has been cancelled";
+                                paragraphOneEnd = "</p><p>This is usually because they know it is no longer needed (for example, if the recipient has informed them that they no longer have need of the help).<p>";
+                            }
+                            break;
+                    }
+
+                    return $"The request for help for {job.Recipient.FirstName} in {textInfo.ToTitleCase(job.Recipient.Address.Locality.ToLower())}" +
+                        $" with {Mapping.ActivityMappings[job.JobSummary.SupportActivity]}{ageUKReference}" +
+                        $" that you accepted on {actionDate} " +
+                        $"{paragraphOneStart}" +
+                        $" by an administrator{group}." +
                         $"{paragraphOneEnd}";
                 }
             }
@@ -484,6 +537,31 @@ namespace CommunicationService.MessageService
                             return $"We hope everything is OK with you.  If you did this by mistake, you can reverse it by clicking the “Undo” button if you still have the page open, or find and accept the task again from your {openRequestsUrl} tab if not. ";
                     }
                 }
+                else //action done by an administrator
+                {
+                    JobStatuses previousStatus = _connectRequestService.PreviousJobStatus(job);
+                    switch (job.JobSummary.JobStatus)
+                    {
+                        case JobStatuses.InProgress:
+                            if (previousStatus == JobStatuses.Done)
+                            {
+                                return $"Please review the details included in the request here {acceptedurl} (click “Request Details” to see more details and instructions about the request, and “Contact Details” to see the contact details of the person needing/requesting the help)";
+                            }
+                            break;
+                        case JobStatuses.Done:
+                            if (previousStatus == JobStatuses.InProgress)
+                            {
+                                return $"Either way, thank you so much for agreeing to help out – you are a super-star!</p><p>" +
+                                   $"If you’d like to tell us anything about your experience, or leave a message for anyone involved, please do get in touch at {feedbackurl}.";
+                            }
+                            break;               
+                        case JobStatuses.Cancelled:
+                            return $"Thank you so much for agreeing to help out – you are a super-star! You can checc for other Open Requests to assist with {openRequestsUrl}.";
+                        default:
+                            return string.Empty;
+                    }
+                    
+                }
             }
             else
             {
@@ -535,7 +613,7 @@ namespace CommunicationService.MessageService
                         }
                 }
             }
-            throw new Exception("unable to create paragraph2");
+            return string.Empty;
         }
 
         private string ParagraphThree(GetJobDetailsResponse job, string recipientOrRequestor, bool isvolunteer, int lastUpdatedBy)
@@ -563,6 +641,10 @@ namespace CommunicationService.MessageService
                         case JobStatuses.Open:
                             return "The request is now available again for other volunteers to pick up.  If you found there was a problem with it (for example, you couldn’t reach the person in need or found the help is no longer needed)";
                     }
+                }
+                else
+                {
+                    return inError;
                 }
             }
             else
