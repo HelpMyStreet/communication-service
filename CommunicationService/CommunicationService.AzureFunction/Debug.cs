@@ -19,6 +19,7 @@ using CommunicationService.MessageService;
 using CommunicationService.Core.Services;
 using CommunicationService.Core.Interfaces.Repositories;
 using CommunicationService.Core.Domains;
+using System.Linq;
 
 namespace CommunicationService.AzureFunction
 {
@@ -67,11 +68,13 @@ namespace CommunicationService.AzureFunction
 
                 TaskUpdateNewMessage taskUpdateNewMessage = new TaskUpdateNewMessage(
                     _connectRequestService,
-                    _connectUserService);
+                    _connectUserService,
+                    _connectGroupService);
 
                 var recipients = await taskUpdateNewMessage.IdentifyRecipients(null, req.JobID, null);
+                //SendMessageRequest smr = recipients.ElementAt(0);
 
-                foreach(SendMessageRequest smr in recipients)
+                foreach (SendMessageRequest smr in recipients)
                 {
                     var emailBuildData = await taskUpdateNewMessage.PrepareTemplateData(Guid.NewGuid(),smr.RecipientUserID, smr.JobID,smr.GroupID, smr.AdditionalParameters, TemplateName.TaskUpdateNew);
 
