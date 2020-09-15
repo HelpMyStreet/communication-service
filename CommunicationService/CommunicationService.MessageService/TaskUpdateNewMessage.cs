@@ -451,7 +451,7 @@ namespace CommunicationService.MessageService
                             if (previousStatus == JobStatuses.InProgress)
                             {
                                 paragraphOneStart = "has been moved back to an “Open” status";
-                                paragraphOneEnd = "</p><p>This might be beacuse the admin is aware that you are unable to do it, or suspects that you have accepted a task in error(for example, one that is a long way from where you live)";
+                                paragraphOneEnd = "</p><p>This might be beacuse the admin is aware that you are unable to do it, or suspects that you have accepted a task in error(for example, one that is a long way from where you live).";
                             }
                             break;
                         case JobStatuses.Cancelled:
