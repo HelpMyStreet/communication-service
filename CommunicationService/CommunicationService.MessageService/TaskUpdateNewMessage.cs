@@ -556,7 +556,7 @@ namespace CommunicationService.MessageService
                             }
                             break;               
                         case JobStatuses.Cancelled:
-                            return $"Thank you so much for agreeing to help out – you are a super-star! You can checc for other Open Requests to assist with {openRequestsUrl}.";
+                            return $"Thank you so much for agreeing to help out – you are a super-star! You can check for other Open Requests to assist with {openRequestsUrl}.";
                         default:
                             return string.Empty;
                     }
