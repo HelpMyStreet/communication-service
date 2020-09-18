@@ -262,12 +262,12 @@ namespace CommunicationService.MessageService
 
         public async Task<List<SendMessageRequest>> IdentifyRecipients(int? recipientUserId, int? jobId, int? groupId)
         {
-            var job = await _connectRequestService.GetJobDetailsAsync(jobId.Value);            
+            var job = await _connectRequestService.GetJobDetailsAsync(jobId.Value);
             string volunteerEmailAddress = string.Empty;
             string recipientEmailAddress = string.Empty;
             string requestorEmailAddress = string.Empty;
 
-            if (job==null)
+            if (job == null)
             {
                 throw new Exception($"Job details cannot be retrieved for jobId {jobId}");
             }
@@ -277,13 +277,13 @@ namespace CommunicationService.MessageService
             {
                 var user = await _connectUserService.GetUserByIdAsync(relevantVolunteerUserID.Value);
 
-                if(user!=null)
+                if (user != null)
                 {
-                    volunteerEmailAddress = user.UserPersonalDetails.EmailAddress;                    
+                    volunteerEmailAddress = user.UserPersonalDetails.EmailAddress;
                 }
             }
-            
-            if(job.Recipient!=null)
+
+            if (job.Recipient != null)
             {
                 recipientEmailAddress = job.Recipient.EmailAddress;
             }
@@ -292,7 +292,7 @@ namespace CommunicationService.MessageService
             {
                 requestorEmailAddress = job.Requestor.EmailAddress;
             }
-            
+
             if (relevantVolunteerUserID.HasValue)
             {
                 //We send an email to the volunteer as they did not make this change
@@ -305,8 +305,15 @@ namespace CommunicationService.MessageService
                 });
             }
 
+            bool sendEmailToRequestor = !string.IsNullOrEmpty(requestorEmailAddress);
+
+            if (!string.IsNullOrEmpty(volunteerEmailAddress) && !string.IsNullOrEmpty(requestorEmailAddress))
+            {
+                sendEmailToRequestor =  requestorEmailAddress != volunteerEmailAddress;
+            }
+            
             //Now consider the requester
-            if (!string.IsNullOrEmpty(volunteerEmailAddress) && !string.IsNullOrEmpty(requestorEmailAddress) && requestorEmailAddress != volunteerEmailAddress)
+            if (sendEmailToRequestor)
             {
                 _sendMessageRequests.Add(new SendMessageRequest()
                 {
@@ -443,7 +450,7 @@ namespace CommunicationService.MessageService
                         case JobStatuses.Done:
                             if(previousStatus == JobStatuses.InProgress)
                             {
-                                paragraphOneStart = "was marked as completed";
+                                paragraphOneStart = "was marked as complete";
                                 paragraphOneEnd = "</p><p>This might be because they know you've done it, or they know that the task has already been done by somebody else.";
                             }
                             break;
@@ -568,7 +575,7 @@ namespace CommunicationService.MessageService
                 switch (job.JobSummary.JobStatus)
                 {
                     case JobStatuses.Cancelled:
-                        return "This only usually happens if they think that the help is no longer needed, or is not possible to deliver.";
+                        return "This only usually happens if they think that the help is no longer needed, or it is not possible to complete the request.";
                     case JobStatuses.Done:
                         if (job.JobSummary.SupportActivity == SupportActivities.FaceMask && !isvolunteer)
                         {
@@ -589,11 +596,11 @@ namespace CommunicationService.MessageService
                     case JobStatuses.Open:
                         if (isvolunteer)
                         {
-                            return "This only usually happens if they think that you are unable to deliver the help and unable to release the request yourself.";
+                            return "This only usually happens if they think that you are unable to provide the help and unable to release the request yourself.";
                         }
                         else
                         {
-                            return "This only usually happens if the volunteer that accepted the request was unable to deliver it.  The request is now visible to other volunteers and hopefully another will accept it soon.  We'll let you know if this happens.";
+                            return "This only usually happens if the volunteer that accepted the request was unable to provide it.  The request is now visible to other volunteers and hopefully another will accept it soon.  We'll let you know if this happens.";
                         }
                     case JobStatuses.InProgress:
                         if (isvolunteer)
