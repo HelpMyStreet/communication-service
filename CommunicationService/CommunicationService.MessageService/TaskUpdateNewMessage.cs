@@ -501,6 +501,10 @@ namespace CommunicationService.MessageService
                     case "Requestor":
                         action =  "you made";
                         actionDate = job.JobSummary.DateRequested.ToString("dd/MM/yyyy");
+                        if(job.JobSummary.RequestorType == RequestorType.Myself)
+                        {
+                            recipientDetails = string.Empty;
+                        }
                         break;
                 }
             }
