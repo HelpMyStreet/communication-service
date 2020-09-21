@@ -364,9 +364,11 @@ namespace CommunicationService.MessageService
             string actionDate = job.History.Where(x => x.JobStatus == JobStatuses.InProgress).OrderByDescending(x => x.StatusDate).First().StatusDate.ToString("dd/MM/yyyy");
 
             string recipientDetails = string.Empty;
+            bool orgPresent = false;
 
             if (job.JobSummary.RequestorType == RequestorType.Organisation)
             {
+                orgPresent = true;
                 recipientDetails = $" for {job.JobSummary.RecipientOrganisation} in {textInfo.ToTitleCase(job.Recipient.Address.Locality.ToLower())}";
             }
             else
@@ -418,7 +420,7 @@ namespace CommunicationService.MessageService
                     }
 
                     return $"{paragraphOneStart}" +
-                        $"the request for help for {job.Recipient.FirstName} in {textInfo.ToTitleCase(job.Recipient.Address.Locality.ToLower())}" +
+                        $"the request for help{recipientDetails}" +
                         $" with {Mapping.ActivityMappings[job.JobSummary.SupportActivity]}{ageUKReference}" +
                         $"{paragraphOneMid}" +
                         $"{paragraphOneEnd}";
@@ -480,15 +482,24 @@ namespace CommunicationService.MessageService
             }
             else
             {
-                switch(recipientOrRequestor)
+                switch (recipientOrRequestor)
                 {
                     case "Recipient":
-                        action = $"was made for you by {job.Requestor.FirstName}";
+                        string recipient;
+                        if (orgPresent)
+                        {
+                            recipient = job.JobSummary.RecipientOrganisation;
+                        }
+                        else
+                        {
+                            recipient = "you";
+                        }
+                        action = $"was made for {recipient} you by {job.Requestor.FirstName}";
                         actionDate = job.JobSummary.DateRequested.ToString("dd/MM/yyyy");
                         recipientDetails = string.Empty;
                         break;
                     case "Requestor":
-                        action = "you made";
+                        action =  "you made";
                         actionDate = job.JobSummary.DateRequested.ToString("dd/MM/yyyy");
                         break;
                 }
@@ -506,7 +517,7 @@ namespace CommunicationService.MessageService
             int? relevantVolunteerUserID = _connectRequestService.GetRelevantVolunteerUserID(job);
             DateTime dueDate = job.JobSummary.DueDate;
             double daysFromNow = (dueDate.Date - DateTime.Now.Date).TotalDays;
-            string strDaysFromNow = $"on or before {dueDate.ToString("dd/MM/yyyy")} - {daysFromNow} days from now.";
+            string strDaysFromNow = $"on or before {dueDate.ToString("dd/MM/yyyy")} - {daysFromNow} days from now";
             string encodedJobId = HelpMyStreet.Utils.Utils.Base64Utils.Base64Encode(job.JobSummary.JobID.ToString()) ;
             string joburl = "<a href=\"http://www.helpmystreet.org/account/accepted-requests?j=" + encodedJobId + "\">here</a>";
             string acceptedurl = "<a href=\"http://www.helpmystreet.org/account/accepted-requests?j=" + encodedJobId + "\">My Accepted Requests</a>";
