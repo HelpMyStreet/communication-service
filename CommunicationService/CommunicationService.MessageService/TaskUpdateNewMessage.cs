@@ -494,7 +494,7 @@ namespace CommunicationService.MessageService
                         {
                             recipient = "you";
                         }
-                        action = $"was made for {recipient} you by {job.Requestor.FirstName}";
+                        action = $"was made for {recipient} by {job.Requestor.FirstName}";
                         actionDate = job.JobSummary.DateRequested.ToString("dd/MM/yyyy");
                         recipientDetails = string.Empty;
                         break;
