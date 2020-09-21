@@ -262,12 +262,12 @@ namespace CommunicationService.MessageService
 
         public async Task<List<SendMessageRequest>> IdentifyRecipients(int? recipientUserId, int? jobId, int? groupId)
         {
-            var job = await _connectRequestService.GetJobDetailsAsync(jobId.Value);            
+            var job = await _connectRequestService.GetJobDetailsAsync(jobId.Value);
             string volunteerEmailAddress = string.Empty;
             string recipientEmailAddress = string.Empty;
             string requestorEmailAddress = string.Empty;
 
-            if (job==null)
+            if (job == null)
             {
                 throw new Exception($"Job details cannot be retrieved for jobId {jobId}");
             }
@@ -277,13 +277,13 @@ namespace CommunicationService.MessageService
             {
                 var user = await _connectUserService.GetUserByIdAsync(relevantVolunteerUserID.Value);
 
-                if(user!=null)
+                if (user != null)
                 {
-                    volunteerEmailAddress = user.UserPersonalDetails.EmailAddress;                    
+                    volunteerEmailAddress = user.UserPersonalDetails.EmailAddress;
                 }
             }
-            
-            if(job.Recipient!=null)
+
+            if (job.Recipient != null)
             {
                 recipientEmailAddress = job.Recipient.EmailAddress;
             }
@@ -292,7 +292,7 @@ namespace CommunicationService.MessageService
             {
                 requestorEmailAddress = job.Requestor.EmailAddress;
             }
-            
+
             if (relevantVolunteerUserID.HasValue)
             {
                 //We send an email to the volunteer as they did not make this change
@@ -305,8 +305,15 @@ namespace CommunicationService.MessageService
                 });
             }
 
+            bool sendEmailToRequestor = !string.IsNullOrEmpty(requestorEmailAddress);
+
+            if (!string.IsNullOrEmpty(volunteerEmailAddress) && !string.IsNullOrEmpty(requestorEmailAddress))
+            {
+                sendEmailToRequestor =  requestorEmailAddress != volunteerEmailAddress;
+            }
+            
             //Now consider the requester
-            if (!string.IsNullOrEmpty(volunteerEmailAddress) && !string.IsNullOrEmpty(requestorEmailAddress) && requestorEmailAddress != volunteerEmailAddress)
+            if (sendEmailToRequestor)
             {
                 _sendMessageRequests.Add(new SendMessageRequest()
                 {
@@ -357,9 +364,11 @@ namespace CommunicationService.MessageService
             string actionDate = job.History.Where(x => x.JobStatus == JobStatuses.InProgress).OrderByDescending(x => x.StatusDate).First().StatusDate.ToString("dd/MM/yyyy");
 
             string recipientDetails = string.Empty;
+            bool orgPresent = false;
 
             if (job.JobSummary.RequestorType == RequestorType.Organisation)
             {
+                orgPresent = true;
                 recipientDetails = $" for {job.JobSummary.RecipientOrganisation} in {textInfo.ToTitleCase(job.Recipient.Address.Locality.ToLower())}";
             }
             else
@@ -411,7 +420,7 @@ namespace CommunicationService.MessageService
                     }
 
                     return $"{paragraphOneStart}" +
-                        $"the request for help for {job.Recipient.FirstName} in {textInfo.ToTitleCase(job.Recipient.Address.Locality.ToLower())}" +
+                        $"the request for help{recipientDetails}" +
                         $" with {Mapping.ActivityMappings[job.JobSummary.SupportActivity]}{ageUKReference}" +
                         $"{paragraphOneMid}" +
                         $"{paragraphOneEnd}";
@@ -443,7 +452,7 @@ namespace CommunicationService.MessageService
                         case JobStatuses.Done:
                             if(previousStatus == JobStatuses.InProgress)
                             {
-                                paragraphOneStart = "was marked as completed";
+                                paragraphOneStart = "was marked as complete";
                                 paragraphOneEnd = "</p><p>This might be because they know you've done it, or they know that the task has already been done by somebody else.";
                             }
                             break;
@@ -451,7 +460,7 @@ namespace CommunicationService.MessageService
                             if (previousStatus == JobStatuses.InProgress)
                             {
                                 paragraphOneStart = "has been moved back to an “Open” status";
-                                paragraphOneEnd = "</p><p>This might be beacuse the admin is aware that you are unable to do it, or suspects that you have accepted a task in error(for example, one that is a long way from where you live).";
+                                paragraphOneEnd = "</p><p>This might be beacuse the admin is aware that you are unable to do it, or suspects that you have accepted a task in error (for example, one that is a long way from where you live).";
                             }
                             break;
                         case JobStatuses.Cancelled:
@@ -463,7 +472,7 @@ namespace CommunicationService.MessageService
                             break;
                     }
 
-                    return $"The request for help for {job.Recipient.FirstName} in {textInfo.ToTitleCase(job.Recipient.Address.Locality.ToLower())}" +
+                    return $"The request for help{recipientDetails}" +
                         $" with {Mapping.ActivityMappings[job.JobSummary.SupportActivity]}{ageUKReference}" +
                         $" that you accepted on {actionDate} " +
                         $"{paragraphOneStart}" +
@@ -473,15 +482,24 @@ namespace CommunicationService.MessageService
             }
             else
             {
-                switch(recipientOrRequestor)
+                switch (recipientOrRequestor)
                 {
                     case "Recipient":
-                        action = $"was made for you by {job.Requestor.FirstName}";
+                        string recipient;
+                        if (orgPresent)
+                        {
+                            recipient = job.JobSummary.RecipientOrganisation;
+                        }
+                        else
+                        {
+                            recipient = "you";
+                        }
+                        action = $"was made for {recipient} by {job.Requestor.FirstName}";
                         actionDate = job.JobSummary.DateRequested.ToString("dd/MM/yyyy");
                         recipientDetails = string.Empty;
                         break;
                     case "Requestor":
-                        action = "you made";
+                        action =  "you made";
                         actionDate = job.JobSummary.DateRequested.ToString("dd/MM/yyyy");
                         break;
                 }
@@ -499,7 +517,7 @@ namespace CommunicationService.MessageService
             int? relevantVolunteerUserID = _connectRequestService.GetRelevantVolunteerUserID(job);
             DateTime dueDate = job.JobSummary.DueDate;
             double daysFromNow = (dueDate.Date - DateTime.Now.Date).TotalDays;
-            string strDaysFromNow = $"on or before {dueDate.ToString("dd/MM/yyyy")} - {daysFromNow} days from now.";
+            string strDaysFromNow = $"on or before {dueDate.ToString("dd/MM/yyyy")} - {daysFromNow} days from now";
             string encodedJobId = HelpMyStreet.Utils.Utils.Base64Utils.Base64Encode(job.JobSummary.JobID.ToString()) ;
             string joburl = "<a href=\"http://www.helpmystreet.org/account/accepted-requests?j=" + encodedJobId + "\">here</a>";
             string acceptedurl = "<a href=\"http://www.helpmystreet.org/account/accepted-requests?j=" + encodedJobId + "\">My Accepted Requests</a>";
@@ -556,7 +574,7 @@ namespace CommunicationService.MessageService
                             }
                             break;               
                         case JobStatuses.Cancelled:
-                            return $"Thank you so much for agreeing to help out – you are a super-star! You can checc for other Open Requests to assist with {openRequestsUrl}.";
+                            return $"Thank you so much for agreeing to help out – you are a super-star! You can check for other Open Requests to assist with {openRequestsUrl}.";
                         default:
                             return string.Empty;
                     }
@@ -568,7 +586,7 @@ namespace CommunicationService.MessageService
                 switch (job.JobSummary.JobStatus)
                 {
                     case JobStatuses.Cancelled:
-                        return "This only usually happens if they think that the help is no longer needed, or is not possible to deliver.";
+                        return "This only usually happens if they think that the help is no longer needed, or it is not possible to complete the request.";
                     case JobStatuses.Done:
                         if (job.JobSummary.SupportActivity == SupportActivities.FaceMask && !isvolunteer)
                         {
@@ -589,11 +607,11 @@ namespace CommunicationService.MessageService
                     case JobStatuses.Open:
                         if (isvolunteer)
                         {
-                            return "This only usually happens if they think that you are unable to deliver the help and unable to release the request yourself.";
+                            return "This only usually happens if they think that you are unable to provide the help and unable to release the request yourself.";
                         }
                         else
                         {
-                            return "This only usually happens if the volunteer that accepted the request was unable to deliver it.  The request is now visible to other volunteers and hopefully another will accept it soon.  We'll let you know if this happens.";
+                            return "This only usually happens if the volunteer that accepted the request was unable to provide it.  The request is now visible to other volunteers and hopefully another will accept it soon.  We'll let you know if this happens.";
                         }
                     case JobStatuses.InProgress:
                         if (isvolunteer)
