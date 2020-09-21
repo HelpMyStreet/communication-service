@@ -472,7 +472,7 @@ namespace CommunicationService.MessageService
                             break;
                     }
 
-                    return $"The request for help for {job.Recipient.FirstName} in {textInfo.ToTitleCase(job.Recipient.Address.Locality.ToLower())}" +
+                    return $"The request for help{recipientDetails}" +
                         $" with {Mapping.ActivityMappings[job.JobSummary.SupportActivity]}{ageUKReference}" +
                         $" that you accepted on {actionDate} " +
                         $"{paragraphOneStart}" +
