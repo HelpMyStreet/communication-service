@@ -47,7 +47,7 @@ namespace CommunicationService.MessageService
             _sendMessageRequests = new List<SendMessageRequest>();
         }
 
-        private string GetTitleFromJob(GetJobDetailsResponse job, bool isVolunteer)
+        private string GetTitleFromJob(GetJobDetailsResponse job, bool isVolunteer, bool changedByAdmin)
         {
             string title = string.Empty;
             JobStatuses current = job.JobSummary.JobStatus;
@@ -93,12 +93,12 @@ namespace CommunicationService.MessageService
             }
             else
             {                
-                title = $"Request {Mapping.StatusMappingsNotifications[current]}";
+                title = $"Request {StatusChange(job, changedByAdmin)}";
             }
             return title;
         }
 
-        private string GetSubjectFromJob(GetJobDetailsResponse job, bool isVolunteer, int lastUpdatedBy, string recipientOrRequestor)
+        private string GetSubjectFromJob(GetJobDetailsResponse job, bool isVolunteer, bool changedByAdmin, int lastUpdatedBy)
         {
             JobStatuses current = job.JobSummary.JobStatus;
             JobStatuses previous = _connectRequestService.PreviousJobStatus(job);
@@ -113,9 +113,9 @@ namespace CommunicationService.MessageService
             {
                 changedBy = "n administrator";
             }
-            string subject = $"Your HelpMyStreet request has been { StatusChange(job)} by a{changedBy}";
+            string subject = $"Your HelpMyStreet request has been { StatusChange(job, changedByAdmin)} by a{changedBy}";
 
-            if (isVolunteer && relevantVolunteerUserID.Value == lastUpdatedBy)
+            if (isVolunteer && !changedByAdmin)
             {
                 switch (current)
                 {
@@ -154,6 +154,10 @@ namespace CommunicationService.MessageService
             var britishZone = TimeZoneInfo.FindSystemTimeZoneById("GMT Standard Time");
             var job = _connectRequestService.GetJobDetailsAsync(jobId.Value).Result;
 
+            int lastUpdatedBy = _connectRequestService.GetLastUpdatedBy(job);
+            int? relevantVolunteerUserID = _connectRequestService.GetRelevantVolunteerUserID(job);
+            bool changedByAdmin = relevantVolunteerUserID.HasValue && relevantVolunteerUserID.Value != lastUpdatedBy;
+
             int groupID_ageuk = -3;
             string ageUKReference = string.Empty;
             if (job.JobSummary.ReferringGroupID == groupID_ageuk)
@@ -166,7 +170,7 @@ namespace CommunicationService.MessageService
                 }
             }
 
-            int lastUpdatedBy = _connectRequestService.GetLastUpdatedBy(job);
+            
             string title = string.Empty;
             string subject = string.Empty;
             string recipient = string.Empty;
@@ -180,8 +184,8 @@ namespace CommunicationService.MessageService
             {
                 //This email will be for the volunteer
                 var user = await _connectUserService.GetUserByIdAsync(recipientUserId.Value);
-                title = GetTitleFromJob(job, true);
-                subject = GetSubjectFromJob(job, true, lastUpdatedBy, string.Empty);
+                title = GetTitleFromJob(job, true, changedByAdmin);
+                subject = GetSubjectFromJob(job, true,changedByAdmin, lastUpdatedBy);
                 recipient = user.UserPersonalDetails.FirstName;
                 paragraph1 = ParagraphOne(job, ageUKReference,string.Empty, true, lastUpdatedBy);
                 paragraph2 = ParagraphTwo(job,string.Empty,true, lastUpdatedBy);
@@ -191,14 +195,14 @@ namespace CommunicationService.MessageService
             }
             else
             {
-                title = GetTitleFromJob(job, false);
+                title = GetTitleFromJob(job, false, changedByAdmin);
                
                 //check if we need to send an email to the requester
                 if (additionalParameters != null)
                 {
                     if (additionalParameters.TryGetValue("RecipientOrRequestor", out string recipientOrRequestor))
                     {
-                        subject = GetSubjectFromJob(job, false, lastUpdatedBy, recipientOrRequestor);
+                        subject = GetSubjectFromJob(job, false, changedByAdmin, lastUpdatedBy);
                         paragraph1 = ParagraphOne(job, ageUKReference, recipientOrRequestor, false, lastUpdatedBy);
                         paragraph2 = ParagraphTwo(job, recipientOrRequestor, false, lastUpdatedBy);
                         paragraph3 = ParagraphThree(job, recipientOrRequestor, false, lastUpdatedBy);
@@ -237,21 +241,26 @@ namespace CommunicationService.MessageService
 
         }
 
-        private string StatusChange(GetJobDetailsResponse job)
+        private string StatusChange(GetJobDetailsResponse job, bool actionByAdministrator)
         {
             string statusChange = Mapping.StatusMappingsNotifications[job.JobSummary.JobStatus];
+            JobStatuses previous = _connectRequestService.PreviousJobStatus(job);
             switch (job.JobSummary.JobStatus)
             {
                 case JobStatuses.Open:
-                    if (_connectRequestService.PreviousJobStatus(job) == JobStatuses.Done)
+                    if (previous == JobStatuses.Done)
                     {
-                        statusChange = "marked as reopened again";
+                        statusChange = "marked as open again";
                     }
                     break;
                 case JobStatuses.InProgress:
-                    if(_connectRequestService.PreviousJobStatus(job) == JobStatuses.Done)
+                    if(previous == JobStatuses.Done)
                     {
                         statusChange = "marked as in progress again";
+                    }
+                    if (previous == JobStatuses.Open && actionByAdministrator)
+                    {
+                        statusChange = "assigned to a volunteer";
                     }
                     break;
                 default:
@@ -386,13 +395,15 @@ namespace CommunicationService.MessageService
                 changedBy = "n administrator";
             }
 
-            if(isvolunteer)
+            bool changedByAdmin = relevantVolunteerUserID.HasValue && relevantVolunteerUserID.Value != lastUpdatedBy;
+
+            if (isvolunteer)
             {
                 string paragraphOneStart = string.Empty;
                 string paragraphOneMid = string.Empty;
                 string paragraphOneEnd = ".";
 
-                if (relevantVolunteerUserID.HasValue && relevantVolunteerUserID.Value == lastUpdatedBy)
+                if (!changedByAdmin)
                 {
                     switch (job.JobSummary.JobStatus)
                     {
@@ -448,6 +459,13 @@ namespace CommunicationService.MessageService
                                 paragraphOneEnd = "</p><p>This could be because they know it was marked as complete in error, or that they have been notified that the request for help hasn't been completed.";
 
                             }
+
+                            if (previousStatus == JobStatuses.Open)
+                            {
+                                paragraphOneStart = "has been assigned to you";
+                                paragraphOneEnd = "</p><p>This could be because they know it was marked as open in error.";
+                            }
+
                             break;
                         case JobStatuses.Done:
                             if(previousStatus == JobStatuses.InProgress)
@@ -460,7 +478,7 @@ namespace CommunicationService.MessageService
                             if (previousStatus == JobStatuses.InProgress)
                             {
                                 paragraphOneStart = "has been moved back to an “Open” status";
-                                paragraphOneEnd = "</p><p>This might be beacuse the admin is aware that you are unable to do it, or suspects that you have accepted a task in error (for example, one that is a long way from where you live).";
+                                paragraphOneEnd = "</p><p>This might be because the admin is aware that you are unable to do it, or suspects that you have accepted a task in error (for example, one that is a long way from where you live).";
                             }
                             break;
                         case JobStatuses.Cancelled:
@@ -512,7 +530,7 @@ namespace CommunicationService.MessageService
             return $"The request for help{recipientDetails}" +
                 $" with {Mapping.ActivityMappings[job.JobSummary.SupportActivity]}{ageUKReference}" +
                 $" that {action} on {actionDate}" +
-                $" was {StatusChange(job)}" +
+                $" was {StatusChange(job, changedByAdmin)}" +
                 $" by a{changedBy} on {datestatuschanged.ToString("dd/MM/yyyy")} at {timeStatusChanged.ToLower()}.";
         }
 
@@ -615,7 +633,7 @@ namespace CommunicationService.MessageService
                         }
                         else
                         {
-                            return "This only usually happens if the volunteer that accepted the request was unable to provide it.  The request is now visible to other volunteers and hopefully another will accept it soon.  We'll let you know if this happens.";
+                            return "This only usually happens if the volunteer that accepted the request was unable to complete it.  The request is now visible to other volunteers and hopefully another will accept it soon.  We'll let you know if this happens.";
                         }
                     case JobStatuses.InProgress:
                         if (isvolunteer)
