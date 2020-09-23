@@ -72,9 +72,7 @@ namespace CommunicationService.SendGridService
 
                 if (contacts != null && contacts.contact_count > 0)
                 {
-                    var contactToDelete = contacts.result.Where(x => x.first_name == marketingContact.FirstName
-                    && x.last_name == marketingContact.LastName
-                    && x.email == marketingContact.EmailAddress).FirstOrDefault();
+                    var contactToDelete = contacts.result.Where(x=> x.email == marketingContact.EmailAddress).FirstOrDefault();
 
                     if (contactToDelete != null)
                     {
