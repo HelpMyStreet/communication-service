@@ -9,7 +9,7 @@
 <ul>
     {{#each ChosenJobList}}
     <li>
-        <a href="http://helpmystreet.org/account/open-requests/j={{EncodedJobID}}"><strong>{{Activity}}</strong> in {{PostCode}} ({{DistanceInMiles}} miles away) - {{#if Soon}}<span style="color: #ff4e00">{{else}}<span>{{/if}}Due {{DueDate}}</span></a>
+        <a href="http://helpmystreet.org/account/open-requests?j={{EncodedJobID}}"><strong>{{Activity}}</strong> in {{PostCode}} ({{DistanceInMiles}} miles away) - {{#if Soon}}<span style="color: #ff4e00">{{else}}<span>{{/if}}Due {{DueDate}}</span></a>
         {{#if Urgent}}<strong> - CRITICAL</strong>{{/if}}
     </li>
     {{/each}}

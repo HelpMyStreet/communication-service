@@ -1,0 +1,15 @@
+﻿{
+  "Templates": [
+    {
+      "name": "TaskUpdateNew",
+      "subject": "{{{Subject}}}",
+      "generation": "dynamic",
+      "versions": [
+        {
+          "name": "Fifth Draft",
+          "subject": "{{{Subject}}}"
+        }
+      ]
+    }
+  ]
+}
