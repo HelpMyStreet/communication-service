@@ -17,7 +17,7 @@ namespace CommunicationService.Handlers
 
         public async Task<bool> Handle(DeleteMarketingContactRequest request, CancellationToken cancellationToken)
         {
-            return await _connectSendGridService.DeleteMarketingContact(request.MarketingContact);
+            return await _connectSendGridService.DeleteMarketingContact(request.EmailAddress);
         }
     }
 }
