@@ -50,12 +50,13 @@ public class ProcessMessageQueue
                 AddCommunicationRequestToCosmos(mySbMsg, "start", sendMessageRequest, string.Empty);
 
                 IMessage message = _messageFactory.Create(sendMessageRequest);
-                EmailBuildData emailBuildData = await message.PrepareTemplateData(sendMessageRequest.RecipientUserID, sendMessageRequest.JobID, sendMessageRequest.GroupID, sendMessageRequest.TemplateName);
-                emailBuildData.JobID = sendMessageRequest.JobID;
-                emailBuildData.GroupID = sendMessageRequest.GroupID;
-                emailBuildData.RecipientUserID = sendMessageRequest.RecipientUserID;
+                EmailBuildData emailBuildData = await message.PrepareTemplateData(sendMessageRequest.BatchID, sendMessageRequest.RecipientUserID, sendMessageRequest.JobID, sendMessageRequest.GroupID, sendMessageRequest.AdditionalParameters, sendMessageRequest.TemplateName);
+                
                 if (emailBuildData != null)
                 {
+                    emailBuildData.JobID = sendMessageRequest.JobID;
+                    emailBuildData.GroupID = sendMessageRequest.GroupID;
+                    emailBuildData.RecipientUserID = sendMessageRequest.RecipientUserID;
                     var result = await _connectSendGridService.SendDynamicEmail(mySbMsg.MessageId, sendMessageRequest.TemplateName, message.UnsubscriptionGroupName, emailBuildData);
                     log.LogInformation($"SendDynamicEmail({sendMessageRequest.TemplateName}) returned {result}");
                     if (result)
@@ -153,6 +154,7 @@ public class ProcessMessageQueue
                 message.JobId = sendMessageRequest.JobID;
                 message.CommunicationJob = sendMessageRequest.CommunicationJobType;
                 message.GroupId = sendMessageRequest.GroupID;
+                message.BatchId = sendMessageRequest.BatchID.ToString();
             }
 
             if(!string.IsNullOrEmpty(emailAddress))
@@ -185,6 +187,7 @@ public class ProcessMessageQueue
             {
                 message.RecipientUserID = sendMessageRequest.RecipientUserID;
                 message.TemplateName = sendMessageRequest.TemplateName;
+                message.BatchId = sendMessageRequest.BatchID.ToString();
             }
             _cosmosDbService.AddItemAsync(message);
         }

@@ -13,5 +13,6 @@ namespace CommunicationService.Core.Interfaces.Repositories
         Task<List<EmailHistory>> GetEmailHistory(string templateId, string recipientId);
         Task<List<MigrationHistory>> GetMigrationHistory();
         Task<bool> EmailSent(string messageId);
+        Task<bool> SendGridEventExists(string event_id);
     }
 }

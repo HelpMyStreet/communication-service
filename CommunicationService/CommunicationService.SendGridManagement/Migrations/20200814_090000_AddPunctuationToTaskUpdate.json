@@ -1,0 +1,15 @@
+﻿{
+  "Templates": [
+    {
+      "name": "TaskUpdate",
+      "subject": "A HelpMyStreet Request Has Been Updated",
+      "generation": "dynamic",
+      "versions": [
+        {
+          "name": "Add Punctuation",
+          "subject": "A HelpMyStreet Request Has Been Updated"
+        }
+      ]
+    }
+  ]
+}
