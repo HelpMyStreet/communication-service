@@ -77,6 +77,7 @@
     <None Remove="Migrations\20200910_133000_NewTaskUpdateEmailReDesign.json" />
     <None Remove="Migrations\20200911_095500_NewTaskUpdateEmailFixHtml.json" />
     <None Remove="Migrations\20200914_112700_FixAdminEmail.json" />
+    <None Remove="Migrations\20200921_144500_DailyDigestCorrectUrl.json" />
   </ItemGroup>
 
   <ItemGroup>
@@ -115,6 +116,7 @@
     <EmbeddedResource Include="Emails\RequestorTaskNotification.html" />
     <EmbeddedResource Include="Migrations\20200709_130700_AddRequestorTaskNotification.json" />
     <EmbeddedResource Include="Migrations\20200717_152400_AddUnsubscribeGroupsDailyDigest.json" />
+    <EmbeddedResource Include="Migrations\20200921_144500_DailyDigestCorrectUrl.json" />
     <EmbeddedResource Include="Migrations\20200729_154500_MinorTweaksTaskNotification - Copy.json" />
     <EmbeddedResource Include="Migrations\20200813_160000_AddAgeUKReference.json" />
     <EmbeddedResource Include="Migrations\20200914_112700_FixAdminEmail.json" />
