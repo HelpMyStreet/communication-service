@@ -10,6 +10,9 @@ using System.Threading.Tasks;
 using HelpMyStreet.Utils.Exceptions;
 using HelpMyStreet.Utils.Utils;
 using HelpMyStreet.Utils.Enums;
+using System.Linq;
+using System.Linq.Expressions;
+using System;
 
 namespace CommunicationService.RequestService
 {
@@ -65,6 +68,20 @@ namespace CommunicationService.RequestService
             
         }
 
+        public async Task<GetJobsByStatusesResponse> GetJobsByStatuses(GetJobsByStatusesRequest getJobsByStatusesRequest)
+        {
+            using (HttpResponseMessage response = await _httpClientWrapper.GetAsync(HttpClientConfigName.RequestService, "/api/GetJobsByStatuses", getJobsByStatusesRequest, CancellationToken.None ))
+            {
+                string jsonResponse = await response.Content.ReadAsStringAsync();
+                var sendEmailResponse = JsonConvert.DeserializeObject<ResponseWrapper<GetJobsByStatusesResponse, RequestServiceErrorCode>>(jsonResponse);
+                if (sendEmailResponse.HasContent && sendEmailResponse.IsSuccessful)
+                {
+                    return sendEmailResponse.Content;
+                }
+            }
+            return null;
+        }
+
         public async Task<GetJobsInProgressResponse> GetJobsInProgress()
         {
             string path = $"/api/GetJobsInProgress";
@@ -81,6 +98,56 @@ namespace CommunicationService.RequestService
 
         }
 
+        public int GetLastUpdatedBy(GetJobDetailsResponse getJobDetailsResponse)
+        {
+            var lastHistory = getJobDetailsResponse.History.OrderByDescending(x => x.StatusDate).First();
 
+            if (lastHistory != null)
+            {
+                return lastHistory.CreatedByUserID.Value;
+            }
+            else
+            {
+                throw new Exception($"Unable to retrieve last updated by for job id {getJobDetailsResponse.JobSummary.JobID}");
+            }
+        }
+
+        public int? GetRelevantVolunteerUserID(GetJobDetailsResponse getJobDetailsResponse)
+        {
+            int? result = null;
+            if(getJobDetailsResponse.JobSummary.VolunteerUserID.HasValue)
+            {
+                result = getJobDetailsResponse.JobSummary.VolunteerUserID.Value;
+            }
+            else
+            {
+                var history = getJobDetailsResponse.History.OrderByDescending(x => x.StatusDate).ToList();
+
+                if (history.Count >= 2)
+                {
+                    var previousState = history.ElementAt(1);
+                    if (previousState.JobStatus == JobStatuses.InProgress && previousState.VolunteerUserID.HasValue)
+                    {
+                        result = previousState.VolunteerUserID.Value;
+                    }
+                }
+            }        
+            return result;
+        }
+
+        public JobStatuses PreviousJobStatus(GetJobDetailsResponse getJobDetailsResponse)
+        {
+            var history = getJobDetailsResponse.History.OrderByDescending(x => x.StatusDate).ToList();
+            if (history.Count >= 2)
+            {                
+                var previousState = history.ElementAt(1);
+                return previousState.JobStatus;
+            }
+            else
+            {
+                throw new Exception($"no previous job status for jobid {getJobDetailsResponse.JobSummary.JobID}");
+            }
+
+        }
     }
 }

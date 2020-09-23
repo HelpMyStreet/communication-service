@@ -8,5 +8,7 @@ namespace CommunicationService.Core.Interfaces.Services
         Task<GetGroupMembersResponse> GetGroupMembers(int groupID);
 
         Task<GetUserGroupsResponse> GetUserGroups(int userId);
+
+        Task<GetGroupResponse> GetGroupResponse(int groupId);
     }
 }

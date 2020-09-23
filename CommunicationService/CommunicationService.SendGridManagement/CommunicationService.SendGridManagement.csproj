@@ -10,6 +10,7 @@
     <None Remove="Emails\Layout.txt" />
     <None Remove="Emails\PartialRegistration.html" />
     <None Remove="Emails\TaskReminder.html" />
+    <None Remove="Emails\TaskUpdateNew.html" />
     <None Remove="Emails\ThanksForVerifying.html" />
     <None Remove="Emails\UnableToVerify.html" />
     <None Remove="Emails\Welcome.html" />
@@ -66,11 +67,23 @@
     <None Remove="Migrations\20200803_111500_MinorTweaksTaskNotification - Copy.json" />
     <None Remove="Migrations\20200804_110600_DailyDigestTweaks.json" />
     <None Remove="Migrations\20200806_142000_TaskUpdateTweaks.json" />
+    <None Remove="Migrations\20200813_160000_AddAgeUKReference.json" />
+    <None Remove="Migrations\20200813_170000_TweakAgeUKReference.json" />
+    <None Remove="Migrations\20200814_090000_AddPunctuationToTaskUpdate.json" />
+    <None Remove="Migrations\20200814_091500_SpellingMistake.json" />
+    <None Remove="Migrations\20200903_153000_NewTaskUpdateEmail.json" />
+    <None Remove="Migrations\20200903_160000_NewTaskUpdateEmail.json" />
+    <None Remove="Migrations\20200909_1142000_NewTaskUpdateEmailTweaks.json" />
+    <None Remove="Migrations\20200910_133000_NewTaskUpdateEmailReDesign.json" />
+    <None Remove="Migrations\20200911_095500_NewTaskUpdateEmailFixHtml.json" />
+    <None Remove="Migrations\20200914_112700_FixAdminEmail.json" />
+    <None Remove="Migrations\20200921_144500_DailyDigestCorrectUrl.json" />
   </ItemGroup>
 
   <ItemGroup>
     <EmbeddedResource Include="Emails\Layout.txt" />
     <EmbeddedResource Include="Emails\TaskReminder.html" />
+    <EmbeddedResource Include="Emails\TaskUpdateNew.html" />
     <EmbeddedResource Include="Emails\YotiReminder.html">
     </EmbeddedResource>
     <EmbeddedResource Include="Emails\UnableToVerify.html">
@@ -103,7 +116,18 @@
     <EmbeddedResource Include="Emails\RequestorTaskNotification.html" />
     <EmbeddedResource Include="Migrations\20200709_130700_AddRequestorTaskNotification.json" />
     <EmbeddedResource Include="Migrations\20200717_152400_AddUnsubscribeGroupsDailyDigest.json" />
+    <EmbeddedResource Include="Migrations\20200921_144500_DailyDigestCorrectUrl.json" />
     <EmbeddedResource Include="Migrations\20200729_154500_MinorTweaksTaskNotification - Copy.json" />
+    <EmbeddedResource Include="Migrations\20200813_160000_AddAgeUKReference.json" />
+    <EmbeddedResource Include="Migrations\20200914_112700_FixAdminEmail.json" />
+    <EmbeddedResource Include="Migrations\20200911_095500_NewTaskUpdateEmailFixHtml.json" />
+    <EmbeddedResource Include="Migrations\20200910_133000_NewTaskUpdateEmailReDesign.json" />
+    <EmbeddedResource Include="Migrations\20200909_1142000_NewTaskUpdateEmailTweaks.json" />
+    <EmbeddedResource Include="Migrations\20200903_160000_NewTaskUpdateEmail.json" />
+    <EmbeddedResource Include="Migrations\20200903_153000_NewTaskUpdateEmail.json" />
+    <EmbeddedResource Include="Migrations\20200814_091500_SpellingMistake.json" />
+    <EmbeddedResource Include="Migrations\20200814_090000_AddPunctuationToTaskUpdate.json" />
+    <EmbeddedResource Include="Migrations\20200813_170000_TweakAgeUKReference.json" />
     <EmbeddedResource Include="Migrations\20200806_142000_TaskUpdateTweaks.json" />
     <EmbeddedResource Include="Migrations\20200804_110600_DailyDigestTweaks.json" />
     <EmbeddedResource Include="Migrations\20200729_143000_MinorTweaks.json" />

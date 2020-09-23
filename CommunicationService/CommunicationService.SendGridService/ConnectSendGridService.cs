@@ -3,6 +3,7 @@ using CommunicationService.Core.Domains;
 using CommunicationService.Core.Domains.SendGrid;
 using CommunicationService.Core.Exception;
 using CommunicationService.Core.Interfaces.Services;
+using HelpMyStreet.Contracts.CommunicationService.Request;
 using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
 using SendGrid;
@@ -11,6 +12,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
+using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
@@ -25,6 +27,76 @@ namespace CommunicationService.SendGridService
         {
             _sendGridConfig = sendGridConfig;
             _sendGridClient = sendGridClient;
+        }
+
+        public async Task<bool> AddNewMarketingContact(MarketingContact marketingContact)
+        {
+            MarketingContactDetails marketingContactDetails = new MarketingContactDetails()
+            {
+                contacts = new Contact[1]
+                {
+                   new Contact()
+                   {
+                       first_name = marketingContact.FirstName,
+                       last_name = marketingContact.LastName,
+                       email = marketingContact.EmailAddress
+                   }
+                }
+            };
+
+            string requestBody = JsonConvert.SerializeObject(marketingContactDetails);
+
+            Response response = await _sendGridClient.RequestAsync(SendGridClient.Method.PUT, requestBody, null, "marketing/contacts").ConfigureAwait(false);
+
+
+            if (response != null && response.StatusCode == HttpStatusCode.Accepted)
+            {
+                return true;
+
+            }
+            else
+            {
+                return false;
+            }
+        }
+
+        private async Task<string> GetContactId(MarketingContact marketingContact)
+        {
+            string result = string.Empty;
+            Response response = await _sendGridClient.RequestAsync(SendGridClient.Method.GET, null, null, "marketing/contacts").ConfigureAwait(false);
+
+            if (response != null && response.StatusCode == HttpStatusCode.OK)
+            {
+                string body = await response.Body.ReadAsStringAsync().ConfigureAwait(false);
+                AllContactDetails contacts = JsonConvert.DeserializeObject<AllContactDetails>(body);
+
+                if (contacts != null && contacts.contact_count > 0)
+                {
+                    var contactToDelete = contacts.result.Where(x=> x.email == marketingContact.EmailAddress).FirstOrDefault();
+
+                    if (contactToDelete != null)
+                    {
+                        result = contactToDelete.id;
+                    }
+                }
+            }
+            return result;
+        }
+
+        public async Task<bool> DeleteMarketingContact(MarketingContact marketingContact)
+        {
+            bool result = false;
+            var id = await GetContactId(marketingContact);
+
+            if (!string.IsNullOrEmpty(id))
+            {
+                Response response = await _sendGridClient.RequestAsync(SendGridClient.Method.DELETE, null, null, $"marketing/contacts?ids={id}").ConfigureAwait(false);
+                if (response != null && response.StatusCode == HttpStatusCode.Accepted)
+                {
+                    result = true;
+                }
+            }
+            return result;
         }
 
         public async Task<int> GetGroupId(string groupName)
@@ -58,7 +130,7 @@ namespace CommunicationService.SendGridService
             }
         }
 
-        public async Task<string> GetTemplateId(string templateName)
+        public async Task<Template> GetTemplate(string templateName)
         {
             var queryParams = @"{
                 'generations': 'dynamic'
@@ -74,7 +146,7 @@ namespace CommunicationService.SendGridService
                     var template = templates.templates.Where(x => x.name == templateName).FirstOrDefault();
                     if (template != null)
                     {
-                        return template.id;
+                        return template;
                     }
                     else
                     {
@@ -92,21 +164,21 @@ namespace CommunicationService.SendGridService
             }
         }
 
-        public async Task<bool> SendDynamicEmail(string messageId,string templateName, string groupName, EmailBuildData emailBuildData)
+        public async Task<bool> SendDynamicEmail(string messageId, string templateName, string groupName, EmailBuildData emailBuildData)
         {
-            string templateId = await GetTemplateId(templateName).ConfigureAwait(false);
+            var template = await GetTemplate(templateName).ConfigureAwait(false);
             int groupId = await GetGroupId(groupName).ConfigureAwait(false);
             Personalization personalization = new Personalization()
             {
                 Tos = new List<EmailAddress>() { new EmailAddress(emailBuildData.EmailToAddress, emailBuildData.EmailToName) },
-                TemplateData = emailBuildData.BaseDynamicData
+                TemplateData = emailBuildData.BaseDynamicData,
             };
 
             var eml = new SendGridMessage()
             {
                 From = new EmailAddress(_sendGridConfig.Value.FromEmail, _sendGridConfig.Value.FromName),
-                ReplyTo  = new EmailAddress(_sendGridConfig.Value.ReplyToEmail, _sendGridConfig.Value.ReplyToName),
-                TemplateId = templateId,
+                ReplyTo = new EmailAddress(_sendGridConfig.Value.ReplyToEmail, _sendGridConfig.Value.ReplyToName),
+                TemplateId = template.id,
                 Asm = new ASM()
                 {
                     GroupId = groupId
@@ -117,7 +189,7 @@ namespace CommunicationService.SendGridService
                 },
                 CustomArgs = new Dictionary<string, string>
                 {
-                    { "TemplateId", templateId },
+                    { "TemplateId", template.id },
                     { "RecipientUserID", emailBuildData.RecipientUserID.ToString() },
                     { "TemplateName", templateName },
                     { "GroupName", groupName},

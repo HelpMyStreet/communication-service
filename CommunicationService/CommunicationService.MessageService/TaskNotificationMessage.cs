@@ -39,7 +39,7 @@ namespace CommunicationService.MessageService
             _sendMessageRequests = new List<SendMessageRequest>();
         }
 
-        public async Task<EmailBuildData> PrepareTemplateData(int? recipientUserId, int? jobId, int? groupId, string templateName)
+        public async Task<EmailBuildData> PrepareTemplateData(Guid batchId, int? recipientUserId, int? jobId, int? groupId, Dictionary<string, string> additionalParameters, string templateName)
         {
             var job = _connectRequestService.GetJobDetailsAsync(jobId.Value).Result;
             string encodedJobId = HelpMyStreet.Utils.Utils.Base64Utils.Base64Encode(job.JobSummary.JobID.ToString());

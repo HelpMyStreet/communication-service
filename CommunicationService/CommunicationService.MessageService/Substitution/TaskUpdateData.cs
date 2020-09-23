@@ -19,6 +19,8 @@ namespace CommunicationService.MessageService.Substitution
         public bool IsInProgress { get; private set; }
         public bool ForRequestor { get; private set; }
         public string RecipientFirstName { get; private set; }
+        public bool HasReference { get; private set; }
+        public string Reference { get; private set; }
 
         public TaskUpdateData(
             string firstname,
@@ -32,7 +34,9 @@ namespace CommunicationService.MessageService.Substitution
             bool isOpen,
             bool isInProgress,
             bool forRequestor,
-            string recipientFirstName
+            string recipientFirstName,
+            bool hasReference,
+            string reference
             )
         {
             FirstName = firstname;
@@ -47,6 +51,8 @@ namespace CommunicationService.MessageService.Substitution
             IsInProgress = isInProgress;
             ForRequestor = forRequestor;
             RecipientFirstName = recipientFirstName;
+            HasReference = hasReference;
+            Reference = reference;
         }
     }
 }
