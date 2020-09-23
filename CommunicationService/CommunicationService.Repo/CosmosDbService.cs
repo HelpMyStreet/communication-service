@@ -88,8 +88,25 @@ namespace CommunicationService.Repo
 
         public async Task<bool> EmailSent(string messageId)
         {
-            string queryString = $"SELECT c.id FROM c where c.MessageId='{messageId}' and c.event='processed'";
-            var query = this._container.GetItemQueryIterator<int>(new QueryDefinition(queryString));
+            string queryString = $"SELECT c.id, c.MessageId FROM c where c.MessageId='{messageId}' and c.event='processed'";
+            var query = this._container.GetItemQueryIterator<MigrationHistory>(new QueryDefinition(queryString));
+
+            if (query.HasMoreResults)
+            {
+                var response = await query.ReadNextAsync();
+                if (response.Count > 0)
+                {
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
+        public async Task<bool> SendGridEventExists(string event_id)
+        {
+            string queryString = $"SELECT c._id,c.sg_event_id FROM c where c.sg_event_id='{event_id}'";
+            var query = this._container.GetItemQueryIterator<MigrationHistory>(new QueryDefinition(queryString));
 
             if (query.HasMoreResults)
             {

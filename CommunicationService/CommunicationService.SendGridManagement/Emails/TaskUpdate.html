@@ -12,9 +12,9 @@
 <!--End Section 1 -->
 <p>
     {{#if ForRequestor}}
-    The request you made via HelpMyStreet.org on {{DateRequested}} for help with {{Activity}} was updated to <strong>{{RequestStatus}}</strong> {{TimeUpdated}}.
+    The request you made via HelpMyStreet.org on {{DateRequested}} for help with {{Activity}} {{#if HasReference}}(AgeUK Ref: {{Reference}}) {{/if}} was updated to <strong>{{RequestStatus}}</strong> {{TimeUpdated}}.
     {{else}}
-    The request you made via HelpMyStreet.org on {{DateRequested}} for help for {{RecipientFirstName}} with {{Activity}} was updated to <strong>{{RequestStatus}}</strong> {{TimeUpdated}}.
+    The request you made via HelpMyStreet.org on {{DateRequested}} for help for {{RecipientFirstName}} with {{Activity}} {{#if HasReference}}(AgeUK Ref: {{Reference}}) {{/if}} was updated to <strong>{{RequestStatus}}</strong> {{TimeUpdated}}.
     {{/if}}
 </p>
 
@@ -26,22 +26,22 @@
 </p>
 {{else}}
 <p>
-    If you think this has been done in error, please let us know at <a href="mailto:support@helpmystreet.org">support@helpmystreet.org</a>
+    If you think this has been done in error, please let us know at <a href="mailto:support@helpmystreet.org">support@helpmystreet.org</a>.
 </p>
 {{/if}}
 {{/if}}
 
 {{#if IsInProgress}}
-<p>This means a volunteer has seen and accepted your request.  You may hear from them soon if there’s anything they need to arrange with you.  If you have any questions, or if you need to change or cancel the request, please do contact us at <a href="mailto:support@helpmystreet.org">support@helpmystreet.org</a></p>
+<p>This means a volunteer has seen and accepted your request.  You may hear from them soon if there’s anything they need to arrange with you.  If you have any questions, or if you need to change or cancel the request, please do contact us at <a href="mailto:support@helpmystreet.org">support@helpmystreet.org</a>.</p>
 {{/if}}
 
 {{#if IsOpen}}
 <p>This probably means that the volunteer who had accepted it is now unable to complete it.  It is visible to other volunteers again and will hopefully be accepted soon by one of them.  As soon as it is, you’ll be notified.  Thanks for your patience.</p>
-<p>If you have any questions, or if you need to change or cancel the request, please do contact us at <a href="mailto:support@helpmystreet.org">support@helpmystreet.org</a>
+<p>If you have any questions, or if you need to change or cancel the request, please do contact us at <a href="mailto:support@helpmystreet.org">support@helpmystreet.org</a>.
 <p>
     {{/if}}
     <!--End Section 2 -->
 <p>Thanks for using HelpMyStreet.org. Stay safe!</p>
 <p>Best regards,</p>
 <p>The Help My Street Team</p>
-<p>If you think you have received this email in error or if you want to change your status (e.g. stop receiving emails like this), please let the HelpMyStreet team know by contacting <a href="mailto:support@helpmystreet.org">support@helpmystreet.org</a></p>
+<p>If you think you have received this email in error or if you want to change your status (e.g. stop receiving emails like this), please let the HelpMyStreet team know by contacting <a href="mailto:support@helpmystreet.org">support@helpmystreet.org</a>.</p>

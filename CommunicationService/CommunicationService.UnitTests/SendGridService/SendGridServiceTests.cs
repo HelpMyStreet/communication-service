@@ -94,10 +94,10 @@ namespace CommunicationService.UnitTests.SendGridService
         }
 
         [Test]
-        public async Task GetTemplateId_ReturnsID_WhenTemplateNameIsKnown()
+        public async Task GetTemplate_ReturnsTemplate_WhenTemplateNameIsKnown()
         {
-            var templateId = await _classUnderTest.GetTemplateId("KnownTemplate");
-            Assert.AreEqual(_templateId, templateId);
+            var template = await _classUnderTest.GetTemplate("KnownTemplate");
+            Assert.AreEqual(_templateId, template.id);
         }
 
         [Test]
@@ -105,7 +105,7 @@ namespace CommunicationService.UnitTests.SendGridService
         {
             _templatesResponse = Task.FromResult(new Response(System.Net.HttpStatusCode.OK, new StringContent(string.Empty), null));
 
-            UnknownTemplateException ex = Assert.ThrowsAsync<UnknownTemplateException>(async () => await _classUnderTest.GetTemplateId("UnknownTemplate"));
+            UnknownTemplateException ex = Assert.ThrowsAsync<UnknownTemplateException>(async () => await _classUnderTest.GetTemplate("UnknownTemplate"));
             Assert.AreEqual("No templates found", ex.Message);
         }
 
@@ -113,7 +113,7 @@ namespace CommunicationService.UnitTests.SendGridService
         public void GetTemplateId_ThrowsExceptionTemplateNotFound_WhenTemplateNameIsUnknown()
         {
             string templateName = "UnknownTemplate";
-            UnknownTemplateException ex = Assert.ThrowsAsync<UnknownTemplateException>(async () => await _classUnderTest.GetTemplateId(templateName));
+            UnknownTemplateException ex = Assert.ThrowsAsync<UnknownTemplateException>(async () => await _classUnderTest.GetTemplate(templateName));
             Assert.AreEqual($"{templateName} cannot be found in templates", ex.Message);
         }
 
@@ -122,7 +122,7 @@ namespace CommunicationService.UnitTests.SendGridService
         {
             _templatesResponse = Task.FromResult(new Response(System.Net.HttpStatusCode.BadRequest,new StringContent(string.Empty), null));
 
-            Assert.ThrowsAsync<SendGridException>(async () => await _classUnderTest.GetTemplateId("UnknownTemplate"));
+            Assert.ThrowsAsync<SendGridException>(async () => await _classUnderTest.GetTemplate("UnknownTemplate"));
         }
 
         [Test]
