@@ -12,6 +12,6 @@ namespace CommunicationService.Core.Interfaces.Services
         Task<bool> SendDynamicEmail(string messageId, string templateName, string groupName, EmailBuildData sendGridData);
         Task<int> GetGroupId(string groupName);
         Task<bool> AddNewMarketingContact(MarketingContact marketingContact);
-        Task<bool> DeleteMarketingContact(MarketingContact marketingContact);
+        Task<bool> DeleteMarketingContact(string emailAddress);
     }
 }
