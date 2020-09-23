@@ -1,4 +1,5 @@
 ﻿using CommunicationService.Core.Interfaces.Services;
+using HelpMyStreet.Contracts.Shared;
 using HelpMyStreet.Contracts.UserService.Request;
 using HelpMyStreet.Contracts.UserService.Response;
 using HelpMyStreet.Utils.Enums;
@@ -24,40 +25,46 @@ namespace CommunicationService.UserService
         public async Task<GetUsersResponse> GetUsers()
         {
             string path = $"api/GetUsers";
-            GetUsersResponse usersResponse;
             using (HttpResponseMessage response = await _httpClientWrapper.GetAsync(HttpClientConfigName.UserService, path, CancellationToken.None).ConfigureAwait(false))
             {
-                response.EnsureSuccessStatusCode();
-                string content = await response.Content.ReadAsStringAsync();
-                usersResponse = JsonConvert.DeserializeObject<GetUsersResponse>(content);
+                string jsonResponse = await response.Content.ReadAsStringAsync();
+                var usersResponse = JsonConvert.DeserializeObject<ResponseWrapper<GetUsersResponse, UserServiceErrorCode>>(jsonResponse);
+
+                if (usersResponse.HasContent && usersResponse.IsSuccessful)
+                {
+                    return usersResponse.Content;
+                }
+                else
+                {
+                    throw new System.Exception(usersResponse.Errors.ToString());
+                }
             }
-            return usersResponse;
         }
 
         public async Task<User> GetUserByIdAsync(int userID)
         {
             string path = $"/api/GetUserByID?ID=" + userID;
             string absolutePath = $"{path}";
-            User user = null;
 
             using (HttpResponseMessage response = await _httpClientWrapper.GetAsync(HttpClientConfigName.UserService, absolutePath, CancellationToken.None).ConfigureAwait(false))
             {
-                response.EnsureSuccessStatusCode();
-                string content = await response.Content.ReadAsStringAsync();
-                var getUserByIDResponse = JsonConvert.DeserializeObject<GetUserByIDResponse>(content);
-                if(getUserByIDResponse!=null)
+                string jsonResponse = await response.Content.ReadAsStringAsync();
+                var usersResponse = JsonConvert.DeserializeObject<ResponseWrapper<User, UserServiceErrorCode>>(jsonResponse);
+
+                if (usersResponse.HasContent && usersResponse.IsSuccessful)
                 {
-                    user = getUserByIDResponse.User;
+                    return usersResponse.Content;
+                }
+                else
+                {
+                    throw new System.Exception(usersResponse.Errors.ToString());
                 }
             }
-
-            return user;
         }
 
         public async Task<GetVolunteersByPostcodeAndActivityResponse> GetVolunteersByPostcodeAndActivity(string postcode, List<SupportActivities> activities, CancellationToken cancellationToken)
         {
             string path = $"api/GetVolunteersByPostcodeAndActivity";
-            GetVolunteersByPostcodeAndActivityResponse helperResponse;
             GetVolunteersByPostcodeAndActivityRequest request = new GetVolunteersByPostcodeAndActivityRequest
             {
                 VolunteerFilter = new VolunteerFilter
@@ -69,11 +76,18 @@ namespace CommunicationService.UserService
 
             using (HttpResponseMessage response = await _httpClientWrapper.GetAsync(HttpClientConfigName.UserService, path, request, cancellationToken).ConfigureAwait(false))
             {
-                response.EnsureSuccessStatusCode();
-                string content = await response.Content.ReadAsStringAsync();
-                helperResponse = JsonConvert.DeserializeObject<GetVolunteersByPostcodeAndActivityResponse>(content);
+                string jsonResponse = await response.Content.ReadAsStringAsync();
+                var helperResponse = JsonConvert.DeserializeObject<ResponseWrapper<GetVolunteersByPostcodeAndActivityResponse, UserServiceErrorCode>>(jsonResponse);
+
+                if (helperResponse.HasContent && helperResponse.IsSuccessful)
+                {
+                    return helperResponse.Content;
+                }
+                else
+                {
+                    throw new System.Exception(helperResponse.Errors.ToString());
+                }
             }
-            return helperResponse;
         }
 
         public async Task<List<User>> PostUsersForListOfUserID(List<int> UserIDs)
@@ -93,35 +107,40 @@ namespace CommunicationService.UserService
             string json = JsonConvert.SerializeObject(postUsersForListOfUserIDRequest, Formatting.Indented);
             var httpContent = new StringContent(json);
 
-            PostUsersForListOfUserIDResponse postUsersForListOfUserIDResponse = null;
-
-
-            using (HttpResponseMessage response = await _httpClientWrapper.PostAsync(HttpClientConfigName.UserService, absolutePath, httpContent, CancellationToken.None).ConfigureAwait(false))
+            using (HttpResponseMessage response = await _httpClientWrapper.PostAsync(HttpClientConfigName.UserService, path, httpContent, CancellationToken.None).ConfigureAwait(false))
             {
-                response.EnsureSuccessStatusCode();
-                string content = await response.Content.ReadAsStringAsync();
-                postUsersForListOfUserIDResponse = JsonConvert.DeserializeObject<PostUsersForListOfUserIDResponse>(content);
+                string jsonResponse = await response.Content.ReadAsStringAsync();
+                var postUsersForListOfUserIDResponse = JsonConvert.DeserializeObject<ResponseWrapper<PostUsersForListOfUserIDResponse, UserServiceErrorCode>>(jsonResponse);
 
-                if (postUsersForListOfUserIDResponse!=null && postUsersForListOfUserIDResponse.Users!=null)
+                if (postUsersForListOfUserIDResponse.HasContent && postUsersForListOfUserIDResponse.IsSuccessful)
                 {
-                    result = postUsersForListOfUserIDResponse.Users;
+                    return postUsersForListOfUserIDResponse.Content.Users;
+                }
+                else
+                {
+                    throw new System.Exception(postUsersForListOfUserIDResponse.Errors.ToString());
                 }
             }
-            return result;
         }
 
         public async Task<GetIncompleteRegistrationStatusResponse> GetIncompleteRegistrationStatusAsync()
         {
             string path = $"api/GetIncompleteRegistrationStatus";
-            GetIncompleteRegistrationStatusResponse incompleteRegistrationStatusResponse;
-            
-            using (HttpResponseMessage response = await _httpClientWrapper.GetAsync(HttpClientConfigName.UserService, path,CancellationToken.None).ConfigureAwait(false))
+
+            using (HttpResponseMessage response = await _httpClientWrapper.GetAsync(HttpClientConfigName.UserService, path, CancellationToken.None).ConfigureAwait(false))
             {
-                response.EnsureSuccessStatusCode();
-                string content = await response.Content.ReadAsStringAsync();
-                incompleteRegistrationStatusResponse = JsonConvert.DeserializeObject<GetIncompleteRegistrationStatusResponse>(content);
+                string jsonResponse = await response.Content.ReadAsStringAsync();
+                var incompleteRegistrationStatusResponse = JsonConvert.DeserializeObject<ResponseWrapper<GetIncompleteRegistrationStatusResponse, UserServiceErrorCode>>(jsonResponse);
+
+                if (incompleteRegistrationStatusResponse.HasContent && incompleteRegistrationStatusResponse.IsSuccessful)
+                {
+                    return incompleteRegistrationStatusResponse.Content;
+                }
+                else
+                {
+                    throw new System.Exception(incompleteRegistrationStatusResponse.Errors.ToString());
+                }
             }
-            return incompleteRegistrationStatusResponse;
         }
     }
 }
