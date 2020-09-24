@@ -9,6 +9,8 @@ using MediatR;
 using HelpMyStreet.Contracts.Shared;
 using HelpMyStreet.Contracts.CommunicationService.Response;
 using HelpMyStreet.Contracts.CommunicationService.Request;
+using System.Net;
+using AzureFunctions.Extensions.Swashbuckle.Attribute;
 
 namespace CommunicationService.AzureFunction
 {
@@ -21,10 +23,11 @@ namespace CommunicationService.AzureFunction
             _mediator = mediator;
         }
 
-        [FunctionName("PutNewMarketingContact")]        
+        [FunctionName("PutNewMarketingContact")]
+        [ProducesResponseType((int)HttpStatusCode.OK, Type = typeof(bool))]
         public async Task<IActionResult> Run(
             [HttpTrigger(AuthorizationLevel.Function, "put", Route = null)]
-            PutNewMarketingContactRequest req,
+            [RequestBodyType(typeof(PutNewMarketingContactRequest), "Put New Marketing Contact")] PutNewMarketingContactRequest req,
             ILogger log)
         {
             try

@@ -9,6 +9,8 @@ using MediatR;
 using HelpMyStreet.Contracts.Shared;
 using HelpMyStreet.Contracts.CommunicationService.Response;
 using HelpMyStreet.Contracts.CommunicationService.Request;
+using System.Net;
+using AzureFunctions.Extensions.Swashbuckle.Attribute;
 
 namespace CommunicationService.AzureFunction
 {
@@ -21,10 +23,11 @@ namespace CommunicationService.AzureFunction
             _mediator = mediator;
         }
 
-        [FunctionName("DeleteMarketingContact")]        
+        [FunctionName("DeleteMarketingContact")]
+        [ProducesResponseType((int)HttpStatusCode.OK, Type = typeof(bool))]
         public async Task<IActionResult> Run(
             [HttpTrigger(AuthorizationLevel.Function, "delete", Route = null)]
-            DeleteMarketingContactRequest req,
+            [RequestBodyType(typeof(DeleteMarketingContactRequest), "Delete Marketing Contact")] DeleteMarketingContactRequest req,
             ILogger log)
         {
             try
