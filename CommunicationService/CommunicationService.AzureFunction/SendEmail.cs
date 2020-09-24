@@ -10,6 +10,8 @@ using HelpMyStreet.Contracts.CommunicationService.Request;
 using HelpMyStreet.Contracts.Shared;
 using Microsoft.AspNetCore.Http;
 using NewRelic.Api.Agent;
+using System.Net;
+using AzureFunctions.Extensions.Swashbuckle.Attribute;
 
 namespace CommunicationService.AzureFunction
 {
@@ -24,9 +26,10 @@ namespace CommunicationService.AzureFunction
 
         [Transaction(Web = true)]
         [FunctionName("SendEmail")]
+        [ProducesResponseType((int)HttpStatusCode.OK, Type = typeof(SendEmailResponse))]
         public async Task<IActionResult> Run(
             [HttpTrigger(AuthorizationLevel.Function, "post", Route = null)]
-            SendEmailRequest req,
+            [RequestBodyType(typeof(SendEmailRequest), "Send Email")] SendEmailRequest req,
             ILogger log)
         {
             try

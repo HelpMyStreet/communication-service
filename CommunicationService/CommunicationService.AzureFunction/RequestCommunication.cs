@@ -10,6 +10,8 @@ using HelpMyStreet.Contracts.CommunicationService.Request;
 using HelpMyStreet.Contracts.Shared;
 using Microsoft.AspNetCore.Http;
 using Newtonsoft.Json;
+using System.Net;
+using AzureFunctions.Extensions.Swashbuckle.Attribute;
 
 namespace CommunicationService.AzureFunction
 {
@@ -23,9 +25,10 @@ namespace CommunicationService.AzureFunction
         }
 
         [FunctionName("RequestCommunication")]
+        [ProducesResponseType((int)HttpStatusCode.OK, Type = typeof(RequestCommunicationResponse))]
         public async Task<IActionResult> Run(
             [HttpTrigger(AuthorizationLevel.Function, "post", Route = null)]
-            RequestCommunicationRequest req,
+            [RequestBodyType(typeof(RequestCommunicationRequest), "Request Communication")] RequestCommunicationRequest req,
             ILogger log)
         {
             try
