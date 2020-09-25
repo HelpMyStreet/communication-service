@@ -1,0 +1,21 @@
+﻿{
+  "CreateUpdateUnsubscribeGroups": [
+    {
+      "name": "InterUserMessage",
+      "description": "A personal message"
+    }
+  ],
+  "Templates": [
+    {
+      "name": "InterUserMessage",
+      "subject": "A personal message sent through HelpMyStreet",
+      "generation": "dynamic",
+      "versions": [
+        {
+          "name": "Correct open request link",
+          "subject": "A personal message sent through HelpMyStreet"
+        }
+      ]
+    }
+  ]
+}
