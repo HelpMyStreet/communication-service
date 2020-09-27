@@ -3,6 +3,7 @@ using CommunicationService.Core.Domains.SendGrid;
 using CommunicationService.Core.Interfaces.Repositories;
 using CommunicationService.Core.Interfaces.Services;
 using CommunicationService.MessageService;
+using HelpMyStreet.Contracts.CommunicationService.Cosmos;
 using HelpMyStreet.Contracts.CommunicationService.Request;
 using HelpMyStreet.Contracts.RequestService.Response;
 using HelpMyStreet.Utils.Enums;
@@ -24,13 +25,15 @@ namespace CommunicationService.Handlers
         private readonly IConnectGroupService _connectGroupService;
         private readonly IConnectUserService _connectUserService;
         private readonly IQueueClient _queueClient;
+        private readonly IInterUserMessageRepository _interUserMessageRepository;
 
 
-        public InterUserMessageHandler(IConnectGroupService connectGroupService, IConnectUserService connectUserService, IQueueClient queueClient)
+        public InterUserMessageHandler(IConnectGroupService connectGroupService, IConnectUserService connectUserService, IQueueClient queueClient, IInterUserMessageRepository interUserMessageRepository)
         {
             _connectGroupService = connectGroupService;
             _connectUserService = connectUserService;
             _queueClient = queueClient;
+            _interUserMessageRepository = interUserMessageRepository;
         }
 
 
@@ -118,17 +121,41 @@ namespace CommunicationService.Handlers
             throw new Exception("Unable to get senderDetails");
         }
 
-        public async Task<bool> Handle(InterUserMessageRequest request, CancellationToken cancellationToken)
-        {
-            //var usersFrom = await GetPartipantDetailsFromGroup(request.From);
 
+        private SaveInterUserMessage CreateSaveInterUserMessage(string senderFirstName, RequestRoles senderRequestRole, List<int> recipients, InterUserMessageRequest interUserMessageRequest)
+        {
+            return new SaveInterUserMessage()
+            {
+                Content = interUserMessageRequest.Content,
+                ThreadId = interUserMessageRequest.ThreadId,
+                SenderFirstName  = senderFirstName,
+                SenderRequestRoles = senderRequestRole,
+                JobId = interUserMessageRequest.JobId,
+                RecipientUserIds = recipients,
+                RecipientRequestRoles = interUserMessageRequest.To.RequestRoleType.RequestRole,
+                MessageDate = DateTime.Now,
+                EmailDetails = interUserMessageRequest.To.EmailDetails,
+                id = Guid.NewGuid()
+            };
+        }
+    
+
+    public async Task<bool> Handle(InterUserMessageRequest request, CancellationToken cancellationToken)
+        {
+            string senderFirstName = await GetSenderDetails(request);
             Dictionary<string, string> additionalParameters = new Dictionary<string, string>();
 
             additionalParameters.Add("SenderMessage", request.Content);
-            additionalParameters.Add("SenderFirstName", await GetSenderDetails(request));
+            additionalParameters.Add("SenderFirstName", senderFirstName);
             additionalParameters.Add("FromRequestorRole", request.From.RequestRoleType.RequestRole.ToString());
 
             var recipients = await IdentifyRecipients(request);
+
+            await _interUserMessageRepository.SaveInterUserMessageAsync(CreateSaveInterUserMessage(
+                senderFirstName,
+                request.From.RequestRoleType.RequestRole,
+                recipients, 
+                request));
 
             if(recipients.Count==0)
             {
