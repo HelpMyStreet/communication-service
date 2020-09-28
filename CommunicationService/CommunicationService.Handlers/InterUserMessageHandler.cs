@@ -36,29 +36,6 @@ namespace CommunicationService.Handlers
             _interUserMessageRepository = interUserMessageRepository;
         }
 
-
-        private int? GetGroupId(InterUserMessageRequest request)
-        {
-            int? groupId = request.From?.GroupRoleType?.GroupId;
-
-            if (request.From?.GroupRoleType != null && request.To?.GroupRoleType != null)
-            {
-                if (request.From.GroupRoleType.GroupId != request.To.GroupRoleType.GroupId)
-                {
-                    throw new Exception("GroupId is not the same for both To and From");
-                }
-            }
-
-            if (groupId.HasValue)
-            {
-                return groupId;
-            }
-            else
-            {
-                return request.To?.GroupRoleType.GroupId;
-            }
-        }
-
         private async Task<List<int>> IdentifyUserIDs(MessageParticipant messageParticipant)
         {
             var result = new List<int>();
@@ -81,8 +58,7 @@ namespace CommunicationService.Handlers
             throw new Exception("Unable to get IdentifyUserIds");
         }
 
-
-        private async Task<string> GetSenderDetails(InterUserMessageRequest request)
+        private async Task<string> GetSenderName(InterUserMessageRequest request)
         {
             if (request.From == null)
             {
@@ -138,18 +114,18 @@ namespace CommunicationService.Handlers
 
     public async Task<bool> Handle(InterUserMessageRequest request, CancellationToken cancellationToken)
         {
-            string senderFirstName = await GetSenderDetails(request);
+            string senderName = await GetSenderName(request);
             Dictionary<string, string> additionalParameters = new Dictionary<string, string>();
 
             additionalParameters.Add("SenderMessage", request.Content);
-            additionalParameters.Add("SenderFirstName", senderFirstName);
-            additionalParameters.Add("FromRequestorRole", request.From.RequestRoleType.RequestRole.ToString());
+            additionalParameters.Add("SenderName", senderName);
+            additionalParameters.Add("SenderRequestorRole", request.From.RequestRoleType.RequestRole.ToString());
 
             var recipients = await IdentifyUserIDs(request.To);
-            int? groupID = GetGroupId(request);
+            //int? groupID = GetGroupId(request);
 
             await _interUserMessageRepository.SaveInterUserMessageAsync(await CreateSaveInterUserMessage(
-                senderFirstName,
+                senderName,
                 request.From.RequestRoleType.RequestRole,
                 recipients,
                 request));
@@ -161,21 +137,21 @@ namespace CommunicationService.Handlers
                 {
                     additionalParameters.Add("RecipientDisplayName", request.To.EmailDetails.DisplayName);
                     additionalParameters.Add("RecipientEmailAddress", request.To.EmailDetails.EmailAddress);
+
+                    SendMessageRequest sendMessageRequest = new SendMessageRequest()
+                    {
+                        BatchID = Guid.NewGuid(),
+                        TemplateName = TemplateName.InterUserMessage,
+                        RecipientUserID = -1,
+                        JobID = request.JobId,
+                        GroupID = null,
+                        MessageType = MessageTypes.Email,
+                        CommunicationJobType = CommunicationJobTypes.InterUserMessage,
+                        AdditionalParameters = additionalParameters
+                    };
+
+                    await AddToMessageQueueAsync(sendMessageRequest);
                 }
-
-                SendMessageRequest sendMessageRequest = new SendMessageRequest()
-                {
-                    BatchID = Guid.NewGuid(),
-                    TemplateName = TemplateName.InterUserMessage,
-                    RecipientUserID = -1,
-                    JobID = request.JobId,
-                    GroupID = groupID,
-                    MessageType = MessageTypes.Email,
-                    CommunicationJobType = CommunicationJobTypes.InterUserMessage,
-                    AdditionalParameters = additionalParameters
-                };
-
-                await AddToMessageQueueAsync(sendMessageRequest);
             }
             else
             {
@@ -188,7 +164,7 @@ namespace CommunicationService.Handlers
                         TemplateName = TemplateName.InterUserMessage,
                         RecipientUserID = i,
                         JobID = request.JobId,
-                        GroupID = groupID,
+                        GroupID = null,
                         MessageType = MessageTypes.Email,
                         CommunicationJobType = CommunicationJobTypes.InterUserMessage,
                         AdditionalParameters = additionalParameters

@@ -18,12 +18,10 @@ namespace CommunicationService.MessageService
     {
         private readonly IConnectRequestService _connectRequestService;
         private readonly IConnectUserService _connectUserService;
-        private const string EMAIL_TO_ADDRESS = "EmailToAddress";
-        private const string EMAIL_TO_NAME = "EmailToName";
+        private const string RECIPIENT_EMAIL_ADDRESS = "RecipientEmailAddress";
+        private const string RECIPIENT_DISPLAY_NAME = "RecipientDisplayName";
         private const string RECIPIENT_FIRST_NAME = "RecipientFirstName";
-
-        List<SendMessageRequest> _sendMessageRequests;
-
+       
         public string UnsubscriptionGroupName
         {
             get
@@ -36,7 +34,6 @@ namespace CommunicationService.MessageService
         {
             _connectRequestService = connectRequestService;
             _connectUserService = connectUserService;
-            _sendMessageRequests = new List<SendMessageRequest>();
         }
 
         public async Task<Dictionary<string,string>> GetRecipientDetails(int? recipientUserId, Dictionary<string, string> additionalParameters)
@@ -47,8 +44,8 @@ namespace CommunicationService.MessageService
 
             if(user!=null)
             {
-                result.Add(EMAIL_TO_ADDRESS, user.UserPersonalDetails.EmailAddress);
-                result.Add(EMAIL_TO_NAME, $"{user.UserPersonalDetails.FirstName} {user.UserPersonalDetails.LastName}");
+                result.Add(RECIPIENT_EMAIL_ADDRESS, user.UserPersonalDetails.EmailAddress);
+                result.Add(RECIPIENT_DISPLAY_NAME, $"{user.UserPersonalDetails.FirstName} {user.UserPersonalDetails.LastName}");
                 result.Add(RECIPIENT_FIRST_NAME, user.UserPersonalDetails.FirstName);
                 return result;
             }
@@ -56,8 +53,8 @@ namespace CommunicationService.MessageService
             if(additionalParameters.TryGetValue("RecipientEmailAddress", out string emailAddress) 
                 && additionalParameters.TryGetValue("RecipientDisplayName", out string displayName))
             {
-                result.Add(EMAIL_TO_ADDRESS, emailAddress);
-                result.Add(EMAIL_TO_NAME, displayName);
+                result.Add(RECIPIENT_EMAIL_ADDRESS, emailAddress);
+                result.Add(RECIPIENT_DISPLAY_NAME, displayName);
                 result.Add(RECIPIENT_FIRST_NAME, displayName);
                 return result;
             }
@@ -65,10 +62,10 @@ namespace CommunicationService.MessageService
             throw new Exception("Unable to Get Recipient details");
         }
 
-        private async Task<string> SenderAndContext(string senderName, string fromRequestorRole, int? jobId)
+        private async Task<string> SenderAndContext(string senderName, string senderRequestorRole, int? jobId)
         {
             string result = string.Empty;
-            RequestRoles requestRole = (RequestRoles)Enum.Parse(typeof(RequestRoles), fromRequestorRole);
+            RequestRoles requestRole = (RequestRoles)Enum.Parse(typeof(RequestRoles), senderRequestorRole);
             switch(requestRole)
             {
                 case RequestRoles.Recipient:
@@ -98,9 +95,9 @@ namespace CommunicationService.MessageService
 
         public async Task<EmailBuildData> PrepareTemplateData(Guid batchId, int? recipientUserId, int? jobId, int? groupId, Dictionary<string, string> additionalParameters, string templateName)
         {
-            if (!recipientUserId.HasValue || !jobId.HasValue)
+            if (!recipientUserId.HasValue)
             {
-                throw new Exception($"Recipient or JobID is missing");
+                throw new Exception($"RecipientID is missing");
             }
 
             if (recipientUserId.Value > 0)
@@ -112,25 +109,25 @@ namespace CommunicationService.MessageService
             string subject = "A personal message sent through HelpMyStreet";
             string title = "Personal message received";
             string recipientFirstName = string.Empty;
-            string senderFirstName = string.Empty;
-            additionalParameters.TryGetValue("FromRequestorRole", out string fromRequestorRole);            
+            string senderName = string.Empty;
+            additionalParameters.TryGetValue("SenderRequestorRole", out string senderRequestorRole);            
             string senderMessage = string.Empty;
             string emailToAddress = string.Empty;
-            string emailToName = string.Empty;            
+            string emailToName = string.Empty;
 
             if(recipientDetails!=null)
             {
-                emailToAddress = recipientDetails[EMAIL_TO_ADDRESS];
-                emailToName = recipientDetails[EMAIL_TO_NAME];
+                emailToAddress = recipientDetails[RECIPIENT_EMAIL_ADDRESS];
+                emailToName = recipientDetails[RECIPIENT_DISPLAY_NAME];
                 recipientFirstName = recipientDetails[RECIPIENT_FIRST_NAME];
             }
 
             if (additionalParameters != null)
             {
                 additionalParameters.TryGetValue("SenderMessage", out senderMessage);
-                additionalParameters.TryGetValue("SenderFirstName", out senderFirstName);               
+                additionalParameters.TryGetValue("SenderName", out senderName);               
             }
-            string senderAndContext = await SenderAndContext( senderFirstName, fromRequestorRole, jobId);
+            string senderAndContext = await SenderAndContext( senderName, senderRequestorRole, jobId);
 
             return new EmailBuildData()
             {
@@ -139,23 +136,12 @@ namespace CommunicationService.MessageService
                     subject,
                     recipientFirstName,
                     senderAndContext,
-                    senderFirstName,
+                    senderName,
                     senderMessage
                     ),
                 EmailToAddress = emailToAddress,
                 EmailToName = emailToName
             };
-        }
-
-        private void AddRecipientAndTemplate(string templateName, int userId, int? jobId, int? groupId)
-        {
-            _sendMessageRequests.Add(new SendMessageRequest()
-            {
-                TemplateName = templateName,
-                RecipientUserID = userId,
-                JobID = jobId,
-                GroupID = groupId
-            });
         }
 
         public async Task<List<SendMessageRequest>> IdentifyRecipients(int? recipientUserId, int? jobId, int? groupId)
