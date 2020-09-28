@@ -35,12 +35,10 @@ namespace CommunicationService.MessageService
 
         List<SendMessageRequest> _sendMessageRequests;
 
-        public string UnsubscriptionGroupName
+        public string GetUnsubscriptionGroupName(int? recipientId)
         {
-            get
-            {
+
                 return UnsubscribeGroupName.DailyDigests;
-            }
         }
 
         public DailyDigestMessage(IConnectGroupService connectGroupService, IConnectUserService connectUserService, IConnectRequestService connectRequestService, IOptions<EmailConfig> eMailConfig, IJobFilteringService jobFilteringService, IConnectAddressService connectAddressService, ICosmosDbService cosmosDbService)

@@ -50,6 +50,7 @@ public class ProcessMessageQueue
                 AddCommunicationRequestToCosmos(mySbMsg, "start", sendMessageRequest, string.Empty);
 
                 IMessage message = _messageFactory.Create(sendMessageRequest);
+
                 EmailBuildData emailBuildData = await message.PrepareTemplateData(sendMessageRequest.BatchID, sendMessageRequest.RecipientUserID, sendMessageRequest.JobID, sendMessageRequest.GroupID, sendMessageRequest.AdditionalParameters, sendMessageRequest.TemplateName);
                 
                 if (emailBuildData != null)
@@ -57,7 +58,7 @@ public class ProcessMessageQueue
                     emailBuildData.JobID = sendMessageRequest.JobID;
                     emailBuildData.GroupID = sendMessageRequest.GroupID;
                     emailBuildData.RecipientUserID = sendMessageRequest.RecipientUserID;
-                    var result = await _connectSendGridService.SendDynamicEmail(mySbMsg.MessageId, sendMessageRequest.TemplateName, message.UnsubscriptionGroupName, emailBuildData);
+                    var result = await _connectSendGridService.SendDynamicEmail(mySbMsg.MessageId, sendMessageRequest.TemplateName, message.GetUnsubscriptionGroupName(sendMessageRequest.RecipientUserID), emailBuildData);
                     log.LogInformation($"SendDynamicEmail({sendMessageRequest.TemplateName}) returned {result}");
                     if (result)
                     {
