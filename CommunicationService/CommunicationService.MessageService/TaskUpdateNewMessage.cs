@@ -5,6 +5,7 @@ using CommunicationService.Core.Interfaces.Services;
 using CommunicationService.MessageService.Substitution;
 using HelpMyStreet.Contracts.UserService.Response;
 using HelpMyStreet.Utils.Enums;
+using HelpMyStreet.Utils.Models;
 using System;
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
@@ -26,7 +27,6 @@ namespace CommunicationService.MessageService
         private readonly IConnectRequestService _connectRequestService;
         private readonly IConnectUserService _connectUserService;
         private readonly IConnectGroupService _connectGroupService;
-
         public const int REQUESTOR_DUMMY_USERID = -1;
 
         List<SendMessageRequest> _sendMessageRequests;
@@ -250,6 +250,7 @@ namespace CommunicationService.MessageService
         {
             string statusChange = Mapping.StatusMappingsNotifications[job.JobSummary.JobStatus];
             JobStatuses previous = _connectRequestService.PreviousJobStatus(job);
+             
             switch (job.JobSummary.JobStatus)
             {
                 case JobStatuses.Open:
@@ -277,6 +278,12 @@ namespace CommunicationService.MessageService
         public async Task<List<SendMessageRequest>> IdentifyRecipients(int? recipientUserId, int? jobId, int? groupId)
         {
             var job = await _connectRequestService.GetJobDetailsAsync(jobId.Value);
+
+            if (job.JobSummary.RequestorType == RequestorType.Myself)
+            {
+                return _sendMessageRequests;
+            }
+
             string volunteerEmailAddress = string.Empty;
             string recipientEmailAddress = string.Empty;
             string requestorEmailAddress = string.Empty;
