@@ -21,15 +21,20 @@ namespace CommunicationService.MessageService
         private readonly IConnectGroupService _connectGroupService;
         List<SendMessageRequest> _sendMessageRequests;
 
-        private const int REQUESTOR_DUMMY_USERID = -1;
+        public const int REQUESTOR_DUMMY_USERID = -1;
 
-        public string UnsubscriptionGroupName
+        public string GetUnsubscriptionGroupName(int? recipientUserId)
         {
-            get
+            if (recipientUserId == REQUESTOR_DUMMY_USERID)
             {
+                return UnsubscribeGroupName.ReqTaskNotification;
+            }
+            else {
                 return UnsubscribeGroupName.TaskNotification;
             }
+                    
         }
+
 
         public TaskNotificationMessage(IConnectUserService connectUserService, IConnectRequestService connectRequestService, IConnectGroupService connectGroupService)
         {
