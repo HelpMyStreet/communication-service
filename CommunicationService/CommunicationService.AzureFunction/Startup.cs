@@ -116,6 +116,9 @@ namespace CommunicationService.AzureFunction
             CosmosConfig cosmosConfig = config.GetSection("CosmosConfig").Get<CosmosConfig>();
             builder.Services.AddSingleton<ICosmosDbService>(InitializeCosmosClientInstance(cosmosConfig));
 
+            InterUserMessageConfig interUserMessageConfig = config.GetSection("InterUserMessageConfig").Get<InterUserMessageConfig>();
+            builder.Services.AddSingleton<IInterUserMessageRepository>(InitializeCosmosClientInstance(interUserMessageConfig));
+
             SendGridManagement.EmailTemplateUploader emailTemplateUploader =
                 new SendGridManagement.EmailTemplateUploader(new SendGridClient(sendGridConfig.ApiKey), InitializeCosmosClientInstance(cosmosConfig));
 
@@ -133,6 +136,16 @@ namespace CommunicationService.AzureFunction
             //await database.Database.CreateContainerIfNotExistsAsync(containerName, "/id");
 
             return cosmosDbService;
+        }
+
+        private static InterUserMessageRepository InitializeCosmosClientInstance(InterUserMessageConfig interUserMessageConfig)
+        {
+            Microsoft.Azure.Cosmos.Fluent.CosmosClientBuilder clientBuilder = new Microsoft.Azure.Cosmos.Fluent.CosmosClientBuilder(interUserMessageConfig.ConnectionString);
+            Microsoft.Azure.Cosmos.CosmosClient client = clientBuilder
+                                .WithConnectionModeDirect()
+                                .Build();
+            InterUserMessageRepository interUserMessageRepository = new InterUserMessageRepository(client, interUserMessageConfig.DatabaseName, interUserMessageConfig.ContainerName);
+            return interUserMessageRepository;
         }
     }
 }

@@ -64,6 +64,8 @@ namespace CommunicationService.MessageService
                     return new DailyDigestMessage(_connectGroupService, _connectUserService, _connectRequestService, _emailConfig, _jobFilteringService,_connectAddressService, _cosmosDbService);
                 case CommunicationJobTypes.SendTaskReminder:
                     return new TaskReminderMessage(_connectRequestService, _connectUserService);
+                case CommunicationJobTypes.InterUserMessage:
+                    return new InterUserMessage(_connectRequestService, _connectUserService);
                 default:
                     throw new Exception("Unknown Email Type");
             }
