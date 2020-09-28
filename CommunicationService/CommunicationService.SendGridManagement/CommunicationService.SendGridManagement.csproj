@@ -81,6 +81,7 @@
     <None Remove="Migrations\20200921_144500_DailyDigestCorrectUrl.json" />
     <None Remove="Migrations\20200925_141500_InterUserMessage.json" />
     <None Remove="Migrations\20200925_161500_InterUserMessage.json" />
+    <None Remove="Migrations\20200928_161000_AddRequestorUnsubscribe.json" />
   </ItemGroup>
 
   <ItemGroup>
@@ -164,6 +165,7 @@
     <EmbeddedResource Include="Migrations\20200714_14346_UpdateTaskReminder.json" />
     <EmbeddedResource Include="Migrations\20200714_135500_AddTaskReminder.json" />
     <EmbeddedResource Include="Migrations\20200710_140200_FixMoreHandlebars.json" />
+    <EmbeddedResource Include="Migrations\20200928_161000_AddRequestorUnsubscribe.json" />
   </ItemGroup>
 
   <ItemGroup>
