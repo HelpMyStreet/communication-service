@@ -38,7 +38,7 @@ namespace CommunicationService.AzureFunction
             }
             catch (Exception exc)
             {
-                log.LogError("Exception occured in Request Communication", exc);
+                log.LogError("Exception occured in Inter User Message", exc);
                 return new ObjectResult(ResponseWrapper<bool, CommunicationServiceErrorCode>.CreateUnsuccessfulResponse(CommunicationServiceErrorCode.InternalServerError, "Internal Error")) { StatusCode = StatusCodes.Status500InternalServerError };
             }
         }
