@@ -5,7 +5,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="HelpMyStreet.Contracts" Version="1.1.406" />
+    <PackageReference Include="HelpMyStreet.Contracts" Version="1.1.409" />
   </ItemGroup>
 
   <ItemGroup>

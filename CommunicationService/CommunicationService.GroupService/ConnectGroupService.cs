@@ -1,4 +1,5 @@
 ﻿using CommunicationService.Core.Interfaces.Services;
+using HelpMyStreet.Contracts.GroupService.Request;
 using HelpMyStreet.Contracts.GroupService.Response;
 using HelpMyStreet.Contracts.RequestService.Response;
 using HelpMyStreet.Contracts.Shared;
@@ -41,20 +42,22 @@ namespace CommunicationService.GroupService
 
         public async Task<List<int>> GetGroupMembersForGivenRole(int groupID, GroupRoles groupRoles)
         {
-            string path = $"/api/GetGroupMemberRoles?GroupId={groupID}&userID=-1";// authorisingUserID
+            GetGroupMembersForGivenRoleRequest request = new GetGroupMembersForGivenRoleRequest()
+            {
+                AuthorisingUserID = -1,
+                GroupId = groupID,
+                GroupRole =  new RoleRequest() { GroupRole = groupRoles }
+            };
+            string path = $"/api/GetGroupMembersForGivenRole";
             string absolutePath = $"{path}";
-            using (HttpResponseMessage response = await _httpClientWrapper.GetAsync(HttpClientConfigName.GroupService, absolutePath, CancellationToken.None).ConfigureAwait(false))
+            using (HttpResponseMessage response = await _httpClientWrapper.GetAsync(HttpClientConfigName.GroupService, absolutePath, request, CancellationToken.None).ConfigureAwait(false))
             {
                 string jsonResponse = await response.Content.ReadAsStringAsync();
-                var getGroupMemberRolesResponse = JsonConvert.DeserializeObject<ResponseWrapper<GetGroupMemberRolesResponse, GroupServiceErrorCode>>(jsonResponse);
-                if (getGroupMemberRolesResponse.HasContent && getGroupMemberRolesResponse.IsSuccessful)
+                var getGroupMembersForGivenRoleResponse = JsonConvert.DeserializeObject<ResponseWrapper<GetGroupMembersForGivenRoleResponse, GroupServiceErrorCode>>(jsonResponse);
+                if (getGroupMembersForGivenRoleResponse.HasContent && getGroupMembersForGivenRoleResponse.IsSuccessful)
                 {
-                    GetGroupMemberRolesResponse resp = getGroupMemberRolesResponse.Content;
-
-                    var users = resp.GroupMemberRoles.Where(x => x.Value.Contains((int)groupRoles))
-                        .Select(x => x.Key).ToList();
-
-                    return users;
+                    GetGroupMembersForGivenRoleResponse resp = getGroupMembersForGivenRoleResponse.Content;
+                    return resp.UserIDs;
                 }
                 return null;
             }
