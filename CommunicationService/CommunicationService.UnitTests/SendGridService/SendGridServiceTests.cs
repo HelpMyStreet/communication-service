@@ -35,7 +35,8 @@ namespace CommunicationService.UnitTests.SendGridService
             {
                 ApiKey = "TestKey",
                 FromName = "Test Name",
-                FromEmail = "Test Email"
+                FromEmail = "Test Email",
+                BaseUrl = "Base Url"
             };
 
             _sendGridConfig = new Mock<IOptions<SendGridConfig>>();
@@ -130,7 +131,11 @@ namespace CommunicationService.UnitTests.SendGridService
         {
             _sendEmailResponse = Task.FromResult(new Response(System.Net.HttpStatusCode.OK,new StringContent(string.Empty),null));
 
-            bool success = await _classUnderTest.SendDynamicEmail("messageId","KnownTemplate","KnownGroup",new Core.Domains.EmailBuildData());
+            bool success = await _classUnderTest.SendDynamicEmail("messageId","KnownTemplate","KnownGroup",
+                new Core.Domains.EmailBuildData()
+                {
+                    BaseDynamicData = new Core.Domains.BaseDynamicData()
+                });
             Assert.AreEqual(true, success);
         }
 
@@ -139,7 +144,11 @@ namespace CommunicationService.UnitTests.SendGridService
         {
             _sendEmailResponse = Task.FromResult(new Response(System.Net.HttpStatusCode.Accepted, new StringContent(string.Empty), null));
 
-            bool success = await _classUnderTest.SendDynamicEmail("messageId", "KnownTemplate", "KnownGroup", new Core.Domains.EmailBuildData());
+            bool success = await _classUnderTest.SendDynamicEmail("messageId", "KnownTemplate", "KnownGroup", 
+                new Core.Domains.EmailBuildData()
+                {
+                    BaseDynamicData = new Core.Domains.BaseDynamicData()
+                });
             Assert.AreEqual(true, success);
         }
 
@@ -148,7 +157,10 @@ namespace CommunicationService.UnitTests.SendGridService
         {
             _sendEmailResponse = Task.FromResult(new Response(System.Net.HttpStatusCode.BadRequest, new StringContent(string.Empty), null));
 
-            bool success = await _classUnderTest.SendDynamicEmail("messageId", "KnownTemplate", "KnownGroup", new Core.Domains.EmailBuildData());
+            bool success = await _classUnderTest.SendDynamicEmail("messageId", "KnownTemplate", "KnownGroup", new Core.Domains.EmailBuildData()
+            {
+                BaseDynamicData = new Core.Domains.BaseDynamicData()
+            });
             Assert.AreEqual(false, success);
         }
 
