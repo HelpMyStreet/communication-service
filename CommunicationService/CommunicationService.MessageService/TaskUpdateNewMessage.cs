@@ -18,6 +18,8 @@ using Microsoft.Net.Http.Headers;
 using System.Resources;
 using System.Security.Principal;
 using RestSharp.Extensions;
+using Microsoft.Extensions.Options;
+using CommunicationService.Core.Configuration;
 
 namespace CommunicationService.MessageService
 {
@@ -26,6 +28,7 @@ namespace CommunicationService.MessageService
         private readonly IConnectRequestService _connectRequestService;
         private readonly IConnectUserService _connectUserService;
         private readonly IConnectGroupService _connectGroupService;
+        private readonly IOptions<SendGridConfig> _sendGridConfig;
 
         private const int REQUESTOR_DUMMY_USERID = -1;
 
@@ -39,11 +42,12 @@ namespace CommunicationService.MessageService
             }
         }
 
-        public TaskUpdateNewMessage(IConnectRequestService connectRequestService, IConnectUserService connectUserService, IConnectGroupService connectGroupService)
+        public TaskUpdateNewMessage(IConnectRequestService connectRequestService, IConnectUserService connectUserService, IConnectGroupService connectGroupService, IOptions<SendGridConfig> sendGridConfig)
         {
             _connectRequestService = connectRequestService;
             _connectUserService = connectUserService;
             _connectGroupService = connectGroupService;
+            _sendGridConfig = sendGridConfig;
             _sendMessageRequests = new List<SendMessageRequest>();
         }
 
@@ -536,15 +540,16 @@ namespace CommunicationService.MessageService
 
         private string ParagraphTwo(GetJobDetailsResponse job, string recipientOrRequestor, bool isvolunteer, int lastUpdatedBy)
         {
+            string baseUrl = _sendGridConfig.Value.BaseUrl;
             int? relevantVolunteerUserID = _connectRequestService.GetRelevantVolunteerUserID(job);
             DateTime dueDate = job.JobSummary.DueDate;
             double daysFromNow = (dueDate.Date - DateTime.Now.Date).TotalDays;
             string strDaysFromNow = $"on or before {dueDate.ToString("dd/MM/yyyy")} - {daysFromNow} days from now";
             string encodedJobId = HelpMyStreet.Utils.Utils.Base64Utils.Base64Encode(job.JobSummary.JobID.ToString()) ;
-            string joburl = "<a href=\"http://www.helpmystreet.org/account/accepted-requests?j=" + encodedJobId + "\">here</a>";
-            string acceptedurl = "<a href=\"http://www.helpmystreet.org/account/accepted-requests?j=" + encodedJobId + "\">My Accepted Requests</a>";
+            string joburl = "<a href=\"" + baseUrl + "/account/accepted-requests?j=" + encodedJobId + "\">here</a>";
+            string acceptedurl = "<a href=\"" + baseUrl + "/account/accepted-requests?j=" + encodedJobId + "\">My Accepted Requests</a>";
             string feedbackurl = "<a href=\"mailto:feedback@helpmystreet.org\">feedback@helpmystreet.org</a>";
-            string openRequestsUrl = "<a href=\"http://www.helpmystreet.org/account/open-requests?j="+ encodedJobId + "\">Open Requests</a>";
+            string openRequestsUrl = "<a href=\"" + baseUrl + "/account/open-requests?j="+ encodedJobId + "\">Open Requests</a>";
 
             if (daysFromNow==0)
             {
