@@ -66,23 +66,23 @@ namespace CommunicationService.AzureFunction
                 var request = JsonConvert.SerializeObject(req);
                 log.LogInformation($"RequestCommunicationRequest {request}");
 
-                TaskUpdateNewMessage taskUpdateNewMessage = new TaskUpdateNewMessage(
-                    _connectRequestService,
+                TaskNotificationMessage taskNotificationMessage = new TaskNotificationMessage(
                     _connectUserService,
+                    _connectRequestService,
                     _connectGroupService);
 
-                var recipients = await taskUpdateNewMessage.IdentifyRecipients(null, req.JobID, null);
-                //SendMessageRequest smr = recipients.ElementAt(0);
+                var recipients = await taskNotificationMessage.IdentifyRecipients(null, req.JobID, req.GroupID);
+                SendMessageRequest smr = recipients.ElementAt(0);
 
-                foreach (SendMessageRequest smr in recipients)
-                {
-                    var emailBuildData = await taskUpdateNewMessage.PrepareTemplateData(Guid.NewGuid(),smr.RecipientUserID, smr.JobID,smr.GroupID, smr.AdditionalParameters, TemplateName.TaskUpdateNew);
+                //foreach (SendMessageRequest smr in recipients)
+                //{
+                    var emailBuildData = await taskNotificationMessage.PrepareTemplateData(Guid.NewGuid(),smr.RecipientUserID, smr.JobID,smr.GroupID, smr.AdditionalParameters, TemplateName.TaskUpdateNew);
 
                     emailBuildData.EmailToAddress = "jawwad@factor-50.co.uk";
                     emailBuildData.EmailToName = "Jawwad Mukhtar";
                     var json2 = JsonConvert.SerializeObject(emailBuildData.BaseDynamicData);
-                    _connectSendGridService.SendDynamicEmail(string.Empty, TemplateName.TaskUpdateNew, UnsubscribeGroupName.TaskNotification, emailBuildData);
-                }
+                    _connectSendGridService.SendDynamicEmail(string.Empty, TemplateName.TaskNotification, UnsubscribeGroupName.TaskNotification, emailBuildData);
+                //}
 
                 int i = 1;
 
