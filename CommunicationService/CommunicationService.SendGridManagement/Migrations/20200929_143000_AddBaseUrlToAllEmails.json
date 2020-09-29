@@ -1,0 +1,125 @@
+﻿{
+  "Templates": [
+    {
+      "name": "TaskNotification",
+      "subject": "A New HelpMyStreet Request Has Been Raised",
+      "generation": "dynamic",
+      "versions": [
+        {
+          "name": "Add BaseUrl",
+          "subject": "A New HelpMyStreet Request Has Been Raised"
+        }
+      ]
+    },
+    {
+      "name": "InterUserMessage",
+      "subject": "A personal message sent through HelpMyStreet",
+      "generation": "dynamic",
+      "versions": [
+        {
+          "name": "Add BaseUrl",
+          "subject": "A personal message sent through HelpMyStreet"
+        }
+      ]
+    },
+    {
+      "name": "DailyDigest",
+      "subject": "Help Needed Near You",
+      "generation": "dynamic",
+      "versions": [
+        {
+          "name": "Add BaseUrl",
+          "subject": "Help Needed Near You"
+        }
+      ]
+    },
+    {
+      "name": "TaskUpdateNew",
+      "subject": "{{{Subject}}}",
+      "generation": "dynamic",
+      "versions": [
+        {
+          "name": "Add BaseUrl",
+          "subject": "{{{Subject}}}"
+        }
+      ]
+    },
+    {
+      "name": "RequestorTaskNotification",
+      "subject": "Your New Help Request",
+      "generation": "dynamic",
+      "versions": [
+        {
+          "name": "Add BaseUrl",
+          "subject": "Your New Help Request"
+        }
+      ]
+    },
+    {
+      "name": "YotiReminder",
+      "subject": "Welcome to Help My Street! Verify your identity to access requests",
+      "generation": "dynamic",
+      "versions": [
+        {
+          "name": "Add BaseUrl",
+          "subject": "Welcome to Help My Street! Verify your identity to access requests"
+        }
+      ]
+    },
+    {
+      "name": "Welcome",
+      "subject": "Welcome to Help My Street!",
+      "generation": "dynamic",
+      "versions": [
+        {
+          "name": "Add BaseUrl",
+          "subject": "Welcome to Help My Street!"
+        }
+      ]
+    },
+    {
+      "name": "UnableToVerify",
+      "subject": "Your HelpMyStreet registration",
+      "generation": "dynamic",
+      "versions": [
+        {
+          "name": "Add BaseUrl",
+          "subject": "Your HelpMyStreet registration"
+        }
+      ]
+    },
+    {
+      "name": "ThanksForVerifying",
+      "subject": "Thanks for verifying your identity with Help My Street!",
+      "generation": "dynamic",
+      "versions": [
+        {
+          "name": "Add BaseUrl",
+          "subject": "Thanks for verifying your identity with Help My Street!"
+        }
+      ]
+    },
+    {
+      "name": "PartialRegistration",
+      "subject": "Your registration – Help My Street",
+      "generation": "dynamic",
+      "versions": [
+        {
+          "name": "Add BaseUrl",
+          "subject": "Your registration – Help My Street"
+        }
+      ]
+    },
+    {
+      "name": "TaskReminder",
+      "subject": "Request reminder",
+      "generation": "dynamic",
+      "versions": [
+        {
+          "name": "Add BaseUrl",
+          "subject": "Request reminder"
+        }
+      ]
+    }
+  ]
+}
