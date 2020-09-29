@@ -49,11 +49,11 @@ namespace CommunicationService.UserService
             using (HttpResponseMessage response = await _httpClientWrapper.GetAsync(HttpClientConfigName.UserService, absolutePath, CancellationToken.None).ConfigureAwait(false))
             {
                 string jsonResponse = await response.Content.ReadAsStringAsync();
-                var usersResponse = JsonConvert.DeserializeObject<ResponseWrapper<User, UserServiceErrorCode>>(jsonResponse);
+                var usersResponse = JsonConvert.DeserializeObject<ResponseWrapper<GetUserByIDResponse, UserServiceErrorCode>>(jsonResponse);
 
                 if (usersResponse.HasContent && usersResponse.IsSuccessful)
                 {
-                    return usersResponse.Content;
+                    return usersResponse.Content.User;
                 }
                 else
                 {
