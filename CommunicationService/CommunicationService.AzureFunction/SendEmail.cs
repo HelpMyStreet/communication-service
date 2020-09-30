@@ -5,13 +5,13 @@ using Microsoft.Azure.WebJobs.Extensions.Http;
 using Microsoft.Extensions.Logging;
 using MediatR;
 using System;
+using System.Net;
+using AzureFunctions.Extensions.Swashbuckle.Attribute;
 using HelpMyStreet.Contracts.CommunicationService.Response;
 using HelpMyStreet.Contracts.CommunicationService.Request;
 using HelpMyStreet.Contracts.Shared;
 using Microsoft.AspNetCore.Http;
 using NewRelic.Api.Agent;
-using System.Net;
-using AzureFunctions.Extensions.Swashbuckle.Attribute;
 
 namespace CommunicationService.AzureFunction
 {
@@ -29,7 +29,7 @@ namespace CommunicationService.AzureFunction
         [ProducesResponseType((int)HttpStatusCode.OK, Type = typeof(SendEmailResponse))]
         public async Task<IActionResult> Run(
             [HttpTrigger(AuthorizationLevel.Function, "post", Route = null)]
-            [RequestBodyType(typeof(SendEmailRequest), "Send Email")] SendEmailRequest req,
+            [RequestBodyType(typeof(SendEmailRequest), "product request")] SendEmailRequest req,
             ILogger log)
         {
             try
