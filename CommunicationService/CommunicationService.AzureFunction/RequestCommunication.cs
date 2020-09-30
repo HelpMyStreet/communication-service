@@ -5,13 +5,13 @@ using Microsoft.Azure.WebJobs.Extensions.Http;
 using Microsoft.Extensions.Logging;
 using MediatR;
 using System;
-using System.Net;
-using AzureFunctions.Extensions.Swashbuckle.Attribute;
 using HelpMyStreet.Contracts.CommunicationService.Response;
 using HelpMyStreet.Contracts.CommunicationService.Request;
 using HelpMyStreet.Contracts.Shared;
 using Microsoft.AspNetCore.Http;
 using Newtonsoft.Json;
+using System.Net;
+using AzureFunctions.Extensions.Swashbuckle.Attribute;
 
 namespace CommunicationService.AzureFunction
 {
@@ -28,7 +28,7 @@ namespace CommunicationService.AzureFunction
         [ProducesResponseType((int)HttpStatusCode.OK, Type = typeof(RequestCommunicationResponse))]
         public async Task<IActionResult> Run(
             [HttpTrigger(AuthorizationLevel.Function, "post", Route = null)]
-            [RequestBodyType(typeof(RequestCommunicationRequest), "product request")] RequestCommunicationRequest req,
+            [RequestBodyType(typeof(RequestCommunicationRequest), "Request Communication")] RequestCommunicationRequest req,
             ILogger log)
         {
             try
