@@ -20,12 +20,10 @@ namespace CommunicationService.MessageService
         private const int REGISTRATION_STEP4 = 4;
         List<SendMessageRequest> _sendMessageRequests;
 
-        public string UnsubscriptionGroupName
+        public string GetUnsubscriptionGroupName(int? receipientId)
         {
-            get
-            {
+
                 return UnsubscribeGroupName.RegistrationUpdates;
-            }
         }
 
         public RegistrationChaserMessage(IConnectUserService connectUserService, ICosmosDbService cosmosDbService, IOptions<EmailConfig> emailConfig)

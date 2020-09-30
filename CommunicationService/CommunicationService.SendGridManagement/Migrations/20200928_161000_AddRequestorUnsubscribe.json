@@ -1,0 +1,8 @@
+﻿{
+  "CreateUpdateUnsubscribeGroups": [
+    {
+      "name": "Requestor Task Notification",
+      "description": "Enable unsubscription for just requestors vs requestees"
+    }
+  ]
+}
