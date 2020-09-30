@@ -108,6 +108,7 @@ namespace CommunicationService.AzureFunction
             builder.Services.AddSingleton<IConnectAddressService, ConnectAddressService>();
             builder.Services.AddSingleton<IConnectSendGridService, ConnectSendGridService>();
             builder.Services.AddSingleton<IDistanceCalculator, DistanceCalculator>();
+            builder.Services.AddSingleton<IPurgeService, PurgeService>();
 
             builder.Services.AddDbContext<ApplicationDbContext>(options =>
                    options.UseInMemoryDatabase(databaseName: "CommunicationService.AzureFunction"));
@@ -118,6 +119,9 @@ namespace CommunicationService.AzureFunction
 
             InterUserMessageConfig interUserMessageConfig = config.GetSection("InterUserMessageConfig").Get<InterUserMessageConfig>();
             builder.Services.AddSingleton<IInterUserMessageRepository>(InitializeCosmosClientInstance(interUserMessageConfig));
+
+            LinkConfig linkConfig = config.GetSection("LinkConfig").Get<LinkConfig>();
+            builder.Services.AddSingleton<ILinkRepository>(InitializeCosmosClientInstance(linkConfig));
 
             SendGridManagement.EmailTemplateUploader emailTemplateUploader =
                 new SendGridManagement.EmailTemplateUploader(new SendGridClient(sendGridConfig.ApiKey), InitializeCosmosClientInstance(cosmosConfig));
@@ -146,6 +150,16 @@ namespace CommunicationService.AzureFunction
                                 .Build();
             InterUserMessageRepository interUserMessageRepository = new InterUserMessageRepository(client, interUserMessageConfig.DatabaseName, interUserMessageConfig.ContainerName);
             return interUserMessageRepository;
+        }
+
+        private static LinkRepository InitializeCosmosClientInstance(LinkConfig linkConfig)
+        {
+            Microsoft.Azure.Cosmos.Fluent.CosmosClientBuilder clientBuilder = new Microsoft.Azure.Cosmos.Fluent.CosmosClientBuilder(linkConfig.ConnectionString);
+            Microsoft.Azure.Cosmos.CosmosClient client = clientBuilder
+                                .WithConnectionModeDirect()
+                                .Build();
+            LinkRepository linkRepository = new LinkRepository(client, linkConfig.DatabaseName, linkConfig.ContainerName);
+            return linkRepository;
         }
     }
 }
