@@ -377,16 +377,17 @@ namespace CommunicationService.MessageService
             string actionDate = job.History.Where(x => x.JobStatus == JobStatuses.InProgress).OrderByDescending(x => x.StatusDate).First().StatusDate.ToString("dd/MM/yyyy");
 
             string recipientDetails = string.Empty;
+            string locality = job.Recipient.Address.Locality == null ? string.Empty : $" in {textInfo.ToTitleCase(job.Recipient.Address.Locality.ToLower())}";
             bool orgPresent = false;
 
             if (job.JobSummary.RequestorType == RequestorType.Organisation)
             {
                 orgPresent = true;
-                recipientDetails = $" for {job.JobSummary.RecipientOrganisation} in {textInfo.ToTitleCase(job.Recipient.Address.Locality.ToLower())}";
+                recipientDetails = $" for {job.JobSummary.RecipientOrganisation}{locality}";
             }
             else
             {
-                recipientDetails = $" for {job.Recipient.FirstName} in {textInfo.ToTitleCase(job.Recipient.Address.Locality.ToLower())}";
+                recipientDetails = $" for {job.Recipient.FirstName}{locality}";
             }
 
             int? relevantVolunteerUserID = _connectRequestService.GetRelevantVolunteerUserID(job);
