@@ -29,7 +29,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CommunicationService.UnitTe
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CommunicationService.GroupService", "CommunicationService\CommunicationService.GroupService\CommunicationService.GroupService.csproj", "{16298A88-E67A-4D6D-B2CB-ECFE1DD37C7A}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CommunicationService.AddressService", "CommunicationService\CommunicationService.AddressService\CommunicationService.AddressService.csproj", "{B8AE38AC-D4CA-4C60-956C-29CD29C68F31}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CommunicationService.AddressService", "CommunicationService\CommunicationService.AddressService\CommunicationService.AddressService.csproj", "{B8AE38AC-D4CA-4C60-956C-29CD29C68F31}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

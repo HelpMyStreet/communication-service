@@ -49,7 +49,6 @@ namespace CommunicationService.SendGridService
 
             Response response = await _sendGridClient.RequestAsync(SendGridClient.Method.PUT, requestBody, null, "marketing/contacts").ConfigureAwait(false);
 
-
             if (response != null && response.StatusCode == HttpStatusCode.Accepted)
             {
                 return true;
@@ -61,33 +60,34 @@ namespace CommunicationService.SendGridService
             }
         }
 
-        private async Task<string> GetContactId(MarketingContact marketingContact)
+        private async Task<string> GetContactId(string emailAddress)
         {
             string result = string.Empty;
-            Response response = await _sendGridClient.RequestAsync(SendGridClient.Method.GET, null, null, "marketing/contacts").ConfigureAwait(false);
+            SearchContacts searchContacts = new SearchContacts()
+            {
+                query = $"email LIKE '{ emailAddress }'"
+            };
+
+            string requestBody = JsonConvert.SerializeObject(searchContacts);
+            Response response = await _sendGridClient.RequestAsync(SendGridClient.Method.POST, requestBody, null, "marketing/contacts/search").ConfigureAwait(false);
 
             if (response != null && response.StatusCode == HttpStatusCode.OK)
             {
                 string body = await response.Body.ReadAsStringAsync().ConfigureAwait(false);
                 AllContactDetails contacts = JsonConvert.DeserializeObject<AllContactDetails>(body);
 
-                if (contacts != null && contacts.contact_count > 0)
+                if (contacts != null && contacts.contact_count == 1)
                 {
-                    var contactToDelete = contacts.result.Where(x=> x.email == marketingContact.EmailAddress).FirstOrDefault();
-
-                    if (contactToDelete != null)
-                    {
-                        result = contactToDelete.id;
-                    }
+                    result = contacts.result.First().id;
                 }
             }
             return result;
         }
 
-        public async Task<bool> DeleteMarketingContact(MarketingContact marketingContact)
+        public async Task<bool> DeleteMarketingContact(string emailAddress)
         {
             bool result = false;
-            var id = await GetContactId(marketingContact);
+            var id = await GetContactId(emailAddress);
 
             if (!string.IsNullOrEmpty(id))
             {
@@ -169,6 +169,7 @@ namespace CommunicationService.SendGridService
         {
             var template = await GetTemplate(templateName).ConfigureAwait(false);
             int groupId = await GetGroupId(groupName).ConfigureAwait(false);
+            emailBuildData.BaseDynamicData.BaseUrl = _sendGridConfig.Value.BaseUrl;
             Personalization personalization = new Personalization()
             {
                 Tos = new List<EmailAddress>() { new EmailAddress(emailBuildData.EmailToAddress, emailBuildData.EmailToName) },
