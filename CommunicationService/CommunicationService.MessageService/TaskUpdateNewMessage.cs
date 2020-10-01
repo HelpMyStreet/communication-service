@@ -1,4 +1,4 @@
-﻿using CommunicationService.Core.Domains;
+using CommunicationService.Core.Domains;
 using CommunicationService.Core.Interfaces;
 using CommunicationService.Core.Interfaces.Repositories;
 using CommunicationService.Core.Interfaces.Services;
@@ -19,6 +19,8 @@ using Microsoft.Net.Http.Headers;
 using System.Resources;
 using System.Security.Principal;
 using RestSharp.Extensions;
+using Microsoft.Extensions.Options;
+using CommunicationService.Core.Configuration;
 
 namespace CommunicationService.MessageService
 {
@@ -27,6 +29,8 @@ namespace CommunicationService.MessageService
         private readonly IConnectRequestService _connectRequestService;
         private readonly IConnectUserService _connectUserService;
         private readonly IConnectGroupService _connectGroupService;
+        private readonly IOptions<SendGridConfig> _sendGridConfig;
+
         public const int REQUESTOR_DUMMY_USERID = -1;
 
         List<SendMessageRequest> _sendMessageRequests;
@@ -44,11 +48,12 @@ namespace CommunicationService.MessageService
 
         }
 
-        public TaskUpdateNewMessage(IConnectRequestService connectRequestService, IConnectUserService connectUserService, IConnectGroupService connectGroupService)
+        public TaskUpdateNewMessage(IConnectRequestService connectRequestService, IConnectUserService connectUserService, IConnectGroupService connectGroupService, IOptions<SendGridConfig> sendGridConfig)
         {
             _connectRequestService = connectRequestService;
             _connectUserService = connectUserService;
             _connectGroupService = connectGroupService;
+            _sendGridConfig = sendGridConfig;
             _sendMessageRequests = new List<SendMessageRequest>();
         }
 
@@ -385,16 +390,17 @@ namespace CommunicationService.MessageService
             string actionDate = job.History.Where(x => x.JobStatus == JobStatuses.InProgress).OrderByDescending(x => x.StatusDate).First().StatusDate.ToString("dd/MM/yyyy");
 
             string recipientDetails = string.Empty;
+            string locality = job.Recipient.Address.Locality == null ? string.Empty : $" in {textInfo.ToTitleCase(job.Recipient.Address.Locality.ToLower())}";
             bool orgPresent = false;
 
             if (job.JobSummary.RequestorType == RequestorType.Organisation)
             {
                 orgPresent = true;
-                recipientDetails = $" for {job.JobSummary.RecipientOrganisation} in {textInfo.ToTitleCase(job.Recipient.Address.Locality.ToLower())}";
+                recipientDetails = $" for {job.JobSummary.RecipientOrganisation}{locality}";
             }
             else
             {
-                recipientDetails = $" for {job.Recipient.FirstName} in {textInfo.ToTitleCase(job.Recipient.Address.Locality.ToLower())}";
+                recipientDetails = $" for {job.Recipient.FirstName}{locality}";
             }
 
             int? relevantVolunteerUserID = _connectRequestService.GetRelevantVolunteerUserID(job);
@@ -548,15 +554,16 @@ namespace CommunicationService.MessageService
 
         private string ParagraphTwo(GetJobDetailsResponse job, string recipientOrRequestor, bool isvolunteer, int lastUpdatedBy)
         {
+            string baseUrl = _sendGridConfig.Value.BaseUrl;
             int? relevantVolunteerUserID = _connectRequestService.GetRelevantVolunteerUserID(job);
             DateTime dueDate = job.JobSummary.DueDate;
             double daysFromNow = (dueDate.Date - DateTime.Now.Date).TotalDays;
             string strDaysFromNow = $"on or before {dueDate.ToString("dd/MM/yyyy")} - {daysFromNow} days from now";
             string encodedJobId = HelpMyStreet.Utils.Utils.Base64Utils.Base64Encode(job.JobSummary.JobID.ToString()) ;
-            string joburl = "<a href=\"http://www.helpmystreet.org/account/accepted-requests?j=" + encodedJobId + "\">here</a>";
-            string acceptedurl = "<a href=\"http://www.helpmystreet.org/account/accepted-requests?j=" + encodedJobId + "\">My Accepted Requests</a>";
+            string joburl = "<a href=\"" + baseUrl + "/account/accepted-requests?j=" + encodedJobId + "\">here</a>";
+            string acceptedurl = "<a href=\"" + baseUrl + "/account/accepted-requests?j=" + encodedJobId + "\">My Accepted Requests</a>";
             string feedbackurl = "<a href=\"mailto:feedback@helpmystreet.org\">feedback@helpmystreet.org</a>";
-            string openRequestsUrl = "<a href=\"http://www.helpmystreet.org/account/open-requests?j="+ encodedJobId + "\">Open Requests</a>";
+            string openRequestsUrl = "<a href=\"" + baseUrl + "/account/open-requests?j="+ encodedJobId + "\">Open Requests</a>";
 
             if (daysFromNow==0)
             {
