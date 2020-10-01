@@ -6,5 +6,6 @@ namespace CommunicationService.Core.Domains
 {
     public class BaseDynamicData
     {
+        public string BaseUrl { get; set; }
     }
 }

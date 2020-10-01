@@ -6,6 +6,7 @@ using Microsoft.Extensions.Logging;
 using MediatR;
 using System;
 using System.Net;
+
 using AzureFunctions.Extensions.Swashbuckle.Attribute;
 using HelpMyStreet.Contracts.CommunicationService.Response;
 using HelpMyStreet.Contracts.CommunicationService.Request;

@@ -9,7 +9,7 @@
 <ul>
     {{#each ChosenJobList}}
     <li>
-        <a href="http://helpmystreet.org/account/open-requests?j={{EncodedJobID}}"><strong>{{Activity}}</strong> in {{PostCode}} ({{DistanceInMiles}} miles away) - {{#if Soon}}<span style="color: #ff4e00">{{else}}<span>{{/if}}Due {{DueDate}}</span></a>
+        <a href="{{BaseUrl}}/account/open-requests?j={{EncodedJobID}}"><strong>{{Activity}}</strong> in {{PostCode}} ({{DistanceInMiles}} miles away) - {{#if Soon}}<span style="color: #ff4e00">{{else}}<span>{{/if}}Due {{DueDate}}</span></a>
         {{#if Urgent}}<strong> - CRITICAL</strong>{{/if}}
     </li>
     {{/each}}
@@ -27,7 +27,7 @@
     {{/each}}
 </ul>
 {{/if}}
-<p>Please click <a href="http://www.helpmystreet.org/account/open-requests">here</a> to view open requests at HelpMyStreet and accept any that you can help with.</p>
+<p>Please click <a href="{{BaseUrl}}/account/open-requests">here</a> to view open requests at HelpMyStreet and accept any that you can help with.</p>
 <p>Thanks!</p>
 <p>Best wishes,</p>
 <p>The Help My Street Team</p>

@@ -168,6 +168,7 @@ namespace CommunicationService.SendGridService
         {
             var template = await GetTemplate(templateName).ConfigureAwait(false);
             int groupId = await GetGroupId(groupName).ConfigureAwait(false);
+            emailBuildData.BaseDynamicData.BaseUrl = _sendGridConfig.Value.BaseUrl;
             Personalization personalization = new Personalization()
             {
                 Tos = new List<EmailAddress>() { new EmailAddress(emailBuildData.EmailToAddress, emailBuildData.EmailToName) },
