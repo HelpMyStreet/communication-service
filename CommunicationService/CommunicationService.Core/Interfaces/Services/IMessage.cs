@@ -8,9 +8,10 @@ namespace CommunicationService.Core.Interfaces
 {
 	public interface IMessage
 	{
-		string UnsubscriptionGroupName { get;}
+		string GetUnsubscriptionGroupName(int? recipientUserId);
 		Task<List<SendMessageRequest>> IdentifyRecipients(int? recipientUserId, int? jobId, int? groupId);
 		Task<EmailBuildData> PrepareTemplateData(Guid batchId, int? recipientUserId, int? jobId, int? groupId, Dictionary<string, string> additionalParameters,  string templateName);
+
 	}
 
 }

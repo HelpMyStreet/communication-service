@@ -10,5 +10,7 @@ namespace CommunicationService.MessageService
         public static string TaskNotification = "Task Notifications";
         public static string DailyDigests = "Daily Digests";
         public static string TaskReminder = "TaskReminder";
+        public static string InterUserMessage = "InterUserMessage";
+        public static string ReqTaskNotification = "Requestor Task Notification";
     }
 }

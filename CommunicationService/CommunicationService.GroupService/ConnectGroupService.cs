@@ -1,10 +1,14 @@
 ﻿using CommunicationService.Core.Interfaces.Services;
+using HelpMyStreet.Contracts.GroupService.Request;
 using HelpMyStreet.Contracts.GroupService.Response;
 using HelpMyStreet.Contracts.RequestService.Response;
 using HelpMyStreet.Contracts.Shared;
 using HelpMyStreet.Utils.Enums;
+using HelpMyStreet.Utils.Models;
 using HelpMyStreet.Utils.Utils;
 using Newtonsoft.Json;
+using System.Collections.Generic;
+using System.Linq;
 using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
@@ -31,6 +35,29 @@ namespace CommunicationService.GroupService
                 if (getJobsResponse.HasContent && getJobsResponse.IsSuccessful)
                 {
                     return getJobsResponse.Content;
+                }
+                return null;
+            }
+        }
+
+        public async Task<List<int>> GetGroupMembersForGivenRole(int groupID, GroupRoles groupRoles)
+        {
+            GetGroupMembersForGivenRoleRequest request = new GetGroupMembersForGivenRoleRequest()
+            {
+                AuthorisingUserID = -1,
+                GroupId = groupID,
+                GroupRole =  new RoleRequest() { GroupRole = groupRoles }
+            };
+            string path = $"/api/GetGroupMembersForGivenRole";
+            string absolutePath = $"{path}";
+            using (HttpResponseMessage response = await _httpClientWrapper.GetAsync(HttpClientConfigName.GroupService, absolutePath, request, CancellationToken.None).ConfigureAwait(false))
+            {
+                string jsonResponse = await response.Content.ReadAsStringAsync();
+                var getGroupMembersForGivenRoleResponse = JsonConvert.DeserializeObject<ResponseWrapper<GetGroupMembersForGivenRoleResponse, GroupServiceErrorCode>>(jsonResponse);
+                if (getGroupMembersForGivenRoleResponse.HasContent && getGroupMembersForGivenRoleResponse.IsSuccessful)
+                {
+                    GetGroupMembersForGivenRoleResponse resp = getGroupMembersForGivenRoleResponse.Content;
+                    return resp.UserIDs;
                 }
                 return null;
             }
