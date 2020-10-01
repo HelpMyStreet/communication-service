@@ -84,6 +84,7 @@
     <None Remove="Migrations\20200928_143000_AddBaseUrlToTaskNotification.json" />
     <None Remove="Migrations\20200929_143000_AddBaseUrlToAllEmails.json" />
     <None Remove="Migrations\20200930_120000_AddBaseUrlToAllEmails.json" />
+    <None Remove="Migrations\20200928_161000_AddRequestorUnsubscribe.json" />
   </ItemGroup>
 
   <ItemGroup>
@@ -170,6 +171,7 @@
     <EmbeddedResource Include="Migrations\20200714_14346_UpdateTaskReminder.json" />
     <EmbeddedResource Include="Migrations\20200714_135500_AddTaskReminder.json" />
     <EmbeddedResource Include="Migrations\20200710_140200_FixMoreHandlebars.json" />
+    <EmbeddedResource Include="Migrations\20200928_161000_AddRequestorUnsubscribe.json" />
   </ItemGroup>
 
   <ItemGroup>
