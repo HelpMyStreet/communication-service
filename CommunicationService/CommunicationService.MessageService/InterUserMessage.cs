@@ -22,12 +22,10 @@ namespace CommunicationService.MessageService
         private const string RECIPIENT_DISPLAY_NAME = "RecipientDisplayName";
         private const string RECIPIENT_FIRST_NAME = "RecipientFirstName";
        
-        public string UnsubscriptionGroupName
+        public string GetUnsubscriptionGroupName(int? recipientId)
         {
-            get
-            {
+
                 return UnsubscribeGroupName.InterUserMessage;
-            }
         }
 
         public InterUserMessage(IConnectRequestService connectRequestService, IConnectUserService connectUserService)

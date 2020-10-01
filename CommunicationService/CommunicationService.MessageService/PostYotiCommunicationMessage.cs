@@ -18,12 +18,9 @@ namespace CommunicationService.MessageService
         private const int REGISTRATION_STEP4 = 4;
         List<SendMessageRequest> _sendMessageRequests;
 
-        public string UnsubscriptionGroupName
+        public string GetUnsubscriptionGroupName(int? recipientId)
         {
-            get
-            {
                 return UnsubscribeGroupName.RegistrationUpdates;
-            }
         }
 
         private string GetTitleFromTemplateName(string templateName)

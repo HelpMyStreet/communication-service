@@ -17,12 +17,9 @@ namespace CommunicationService.MessageService
 
         List<SendMessageRequest> _sendMessageRequests;
 
-        public string UnsubscriptionGroupName
+        public string GetUnsubscriptionGroupName(int? receipientId)
         {
-            get
-            {
                 return UnsubscribeGroupName.TaskReminder;
-            }
         }
 
         public TaskReminderMessage(IConnectRequestService connectRequestService, IConnectUserService connectUserService)
