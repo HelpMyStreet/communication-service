@@ -3,10 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Azure.WebJobs;
 using Microsoft.Azure.WebJobs.Extensions.Http;
 using Microsoft.Extensions.Logging;
-using MediatR;
 using System;
-using System.Net;
-using AzureFunctions.Extensions.Swashbuckle.Attribute;
 using HelpMyStreet.Contracts.CommunicationService.Response;
 using HelpMyStreet.Contracts.CommunicationService.Request;
 using HelpMyStreet.Contracts.Shared;
@@ -58,7 +55,7 @@ namespace CommunicationService.AzureFunction
         [FunctionName("Debug")]
         public async Task<IActionResult> Run(
             [HttpTrigger(AuthorizationLevel.Function, "post", Route = null)]
-            [RequestBodyType(typeof(RequestCommunicationRequest), "product request")] RequestCommunicationRequest req,
+            RequestCommunicationRequest req,
             ILogger log)
         {
             try
