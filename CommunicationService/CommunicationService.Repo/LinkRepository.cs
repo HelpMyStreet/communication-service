@@ -1,14 +1,11 @@
-﻿using CommunicationService.Core;
-using CommunicationService.Core.Domains;
+﻿using CommunicationService.Core.Domains;
 using CommunicationService.Core.Exception;
 using CommunicationService.Core.Interfaces.Repositories;
-using HelpMyStreet.Contracts.CommunicationService.Cosmos;
 using Microsoft.Azure.Cosmos;
 using System;
 using System.Collections.Generic;
 using System.Dynamic;
 using System.Linq;
-using System.Runtime.InteropServices;
 using System.Threading.Tasks;
 
 namespace CommunicationService.Repo
@@ -78,6 +75,30 @@ namespace CommunicationService.Repo
             {
                 throw new UnauthorisedLinkException();
             }
+        }
+
+        public async Task<string> CreateLink(string url, int expiryDays)
+        {
+            try
+            {
+                Guid guid = Guid.NewGuid();
+                dynamic message;
+
+                message = new ExpandoObject();
+                message.id = guid;
+                message.url = url;
+                message.expiryDate = DateTime.UtcNow.AddDays(expiryDays).ToString("yyyy-MM-dd");
+
+                await this._container.CreateItemAsync(message);
+
+                return guid.ToString();
+            }
+            catch (Exception exc)
+            {
+                string m = exc.ToString();
+            }
+
+            throw new NotImplementedException();
         }
     }
 }
