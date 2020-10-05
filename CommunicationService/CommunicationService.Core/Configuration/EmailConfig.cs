@@ -11,5 +11,6 @@ namespace CommunicationService.Core.Configuration
         public int DigestOtherJobsDistance { get; set; }
         public bool ShowUserIDInEmailTitle { get; set; }
         public int? ServiceBusSleepInMilliseconds { get; set; }
+        public int ExpiryDays { get; set; }
     }
 }
