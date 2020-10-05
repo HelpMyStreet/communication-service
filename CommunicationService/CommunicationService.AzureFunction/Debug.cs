@@ -30,6 +30,7 @@ namespace CommunicationService.AzureFunction
         private readonly IConnectAddressService _connectAddressService;
         private readonly IConnectSendGridService _connectSendGridService;
         private readonly ICosmosDbService _cosmosDbService;
+        private readonly ILinkRepository _linkRepository;
 
         public Debug(
             IConnectGroupService connectGroupService, 
@@ -39,7 +40,9 @@ namespace CommunicationService.AzureFunction
             IJobFilteringService jobFilteringService, 
             IConnectAddressService connectAddressService, 
             IConnectSendGridService connectSendGridService,
-            ICosmosDbService cosmosDbService)
+            ICosmosDbService cosmosDbService,
+            ILinkRepository linkRepository
+            )
         {
             _connectGroupService = connectGroupService;
             _connectUserService = connectUserService;
@@ -49,6 +52,7 @@ namespace CommunicationService.AzureFunction
             _connectAddressService = connectAddressService;
             _connectSendGridService = connectSendGridService;
             _cosmosDbService = cosmosDbService;
+            _linkRepository = linkRepository;
         }
  
 
@@ -63,25 +67,44 @@ namespace CommunicationService.AzureFunction
                 var request = JsonConvert.SerializeObject(req);
                 log.LogInformation($"RequestCommunicationRequest {request}");
 
-                TaskNotificationMessage taskNotificationMessage = new TaskNotificationMessage(
-                    _connectUserService,
+                TestLinkSubstitutionMessage message = new TestLinkSubstitutionMessage(
                     _connectRequestService,
-                    _connectGroupService);
+                    _linkRepository,
+                    _emailConfig
+                    );
 
-                var recipients = await taskNotificationMessage.IdentifyRecipients(null, req.JobID, req.GroupID);
-                SendMessageRequest smr = recipients.ElementAt(0);
+                var recipients = await message.IdentifyRecipients(null, req.JobID, req.GroupID);
 
-                //foreach (SendMessageRequest smr in recipients)
-                //{
-                    var emailBuildData = await taskNotificationMessage.PrepareTemplateData(Guid.NewGuid(),smr.RecipientUserID, smr.JobID,smr.GroupID, smr.AdditionalParameters, TemplateName.TaskUpdateNew);
+                foreach (SendMessageRequest smr in recipients)
+                {
+                    var emailBuildData = await message.PrepareTemplateData(Guid.NewGuid(), smr.RecipientUserID, smr.JobID, smr.GroupID, smr.AdditionalParameters, TemplateName.TaskUpdateNew);
 
                     emailBuildData.EmailToAddress = "jawwad@factor-50.co.uk";
                     emailBuildData.EmailToName = "Jawwad Mukhtar";
                     var json2 = JsonConvert.SerializeObject(emailBuildData.BaseDynamicData);
-                    _connectSendGridService.SendDynamicEmail(string.Empty, TemplateName.TaskNotification, UnsubscribeGroupName.TaskNotification, emailBuildData);
+                    int x = 1;
+                    _connectSendGridService.SendDynamicEmail(string.Empty, TemplateName.TestLinkSubstitutionMessage, UnsubscribeGroupName.TaskNotification, emailBuildData);
+                }
+
+                //TaskNotificationMessage taskNotificationMessage = new TaskNotificationMessage(
+                //    _connectUserService,
+                //    _connectRequestService,
+                //    _connectGroupService);
+
+                //var recipients = await taskNotificationMessage.IdentifyRecipients(null, req.JobID, req.GroupID);
+               // SendMessageRequest smr = recipients.ElementAt(0);
+
+                //foreach (SendMessageRequest smr in recipients)
+                //{
+                //    var emailBuildData = await taskNotificationMessage.PrepareTemplateData(Guid.NewGuid(),smr.RecipientUserID, smr.JobID,smr.GroupID, smr.AdditionalParameters, TemplateName.TaskUpdateNew);
+
+                //    emailBuildData.EmailToAddress = "jawwad@factor-50.co.uk";
+                //    emailBuildData.EmailToName = "Jawwad Mukhtar";
+                //    var json2 = JsonConvert.SerializeObject(emailBuildData.BaseDynamicData);
+                //    _connectSendGridService.SendDynamicEmail(string.Empty, TemplateName.TaskNotification, UnsubscribeGroupName.TaskNotification, emailBuildData);
                 //}
 
-                int i = 1;
+                //int i = 1;
 
                 return new OkResult();
             }

@@ -12,6 +12,7 @@
     <None Remove="Emails\PartialRegistration.html" />
     <None Remove="Emails\TaskReminder.html" />
     <None Remove="Emails\TaskUpdateNew.html" />
+    <None Remove="Emails\TestLinkSubsitution.html" />
     <None Remove="Emails\ThanksForVerifying.html" />
     <None Remove="Emails\UnableToVerify.html" />
     <None Remove="Emails\Welcome.html" />
@@ -92,6 +93,7 @@
     <EmbeddedResource Include="Emails\TaskReminder.html" />
     <EmbeddedResource Include="Emails\TaskUpdateNew.html" />
     <EmbeddedResource Include="Emails\InterUserMessage.html" />
+    <EmbeddedResource Include="Emails\TestLinkSubsitution.html" />
     <EmbeddedResource Include="Emails\YotiReminder.html">
     </EmbeddedResource>
     <EmbeddedResource Include="Emails\UnableToVerify.html">
