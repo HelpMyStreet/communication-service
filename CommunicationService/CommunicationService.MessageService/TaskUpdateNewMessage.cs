@@ -284,11 +284,6 @@ namespace CommunicationService.MessageService
         {
             var job = await _connectRequestService.GetJobDetailsAsync(jobId.Value);
 
-            if (job.JobSummary.RequestorType == RequestorType.Myself)
-            {
-                return _sendMessageRequests;
-            }
-
             string volunteerEmailAddress = string.Empty;
             string recipientEmailAddress = string.Empty;
             string requestorEmailAddress = string.Empty;
