@@ -6,11 +6,11 @@ using Microsoft.Extensions.Logging;
 using System;
 using Microsoft.AspNetCore.Http;
 using MediatR;
-using System.Net;
-using AzureFunctions.Extensions.Swashbuckle.Attribute;
 using HelpMyStreet.Contracts.Shared;
 using HelpMyStreet.Contracts.CommunicationService.Response;
 using HelpMyStreet.Contracts.CommunicationService.Request;
+using System.Net;
+using AzureFunctions.Extensions.Swashbuckle.Attribute;
 
 namespace CommunicationService.AzureFunction
 {
@@ -27,7 +27,7 @@ namespace CommunicationService.AzureFunction
         [ProducesResponseType((int)HttpStatusCode.OK, Type = typeof(bool))]
         public async Task<IActionResult> Run(
             [HttpTrigger(AuthorizationLevel.Function, "delete", Route = null)]
-            [RequestBodyType(typeof(DeleteMarketingContactRequest), "DeleteMarketingContact request")] DeleteMarketingContactRequest req,
+            [RequestBodyType(typeof(DeleteMarketingContactRequest), "Delete Marketing Contact")] DeleteMarketingContactRequest req,
             ILogger log)
         {
             try

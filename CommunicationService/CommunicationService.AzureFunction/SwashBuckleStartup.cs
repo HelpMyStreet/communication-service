@@ -1,22 +1,17 @@
-﻿using AzureFunctions.Extensions.Swashbuckle;
+﻿using System.Reflection;
+using AzureFunctions.Extensions.Swashbuckle;
 using CommunicationService.AzureFunction;
-using Microsoft.Azure.WebJobs;
+using Microsoft.Azure.Functions.Extensions.DependencyInjection;
 using Microsoft.Azure.WebJobs.Hosting;
-using System;
-using System.Collections.Generic;
-using System.Reflection;
-using System.Text;
 
 [assembly: WebJobsStartup(typeof(SwashBuckleStartup))]
 namespace CommunicationService.AzureFunction
 {
-    internal class SwashBuckleStartup : IWebJobsStartup
+    internal class SwashBuckleStartup : FunctionsStartup
     {
-        public void Configure(IWebJobsBuilder builder)
+        public override void Configure(IFunctionsHostBuilder builder)
         {
-            //Register the extension
             builder.AddSwashBuckle(Assembly.GetExecutingAssembly());
-
         }
     }
 }
