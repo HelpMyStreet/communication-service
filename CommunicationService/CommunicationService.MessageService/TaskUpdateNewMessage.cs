@@ -284,6 +284,8 @@ namespace CommunicationService.MessageService
         {
             var job = await _connectRequestService.GetJobDetailsAsync(jobId.Value);
 
+            //if source is diy and question answered yes will complete my self
+
             if (job.JobSummary.RequestorType == RequestorType.Myself)
             {
                 return _sendMessageRequests;
