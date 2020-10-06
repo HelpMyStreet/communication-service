@@ -1,11 +1,11 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>netstandard2.0</TargetFramework>
+    <TargetFramework>netcoreapp3.1</TargetFramework>
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="HelpMyStreet.Contracts" Version="1.1.411" />
+	  <PackageReference Include="HelpMyStreet.CoreV3.Contracts" Version="1.1.416" />
   </ItemGroup>
 
   <ItemGroup>
