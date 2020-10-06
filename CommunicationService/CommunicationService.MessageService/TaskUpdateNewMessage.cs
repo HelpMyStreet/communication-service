@@ -36,16 +36,8 @@ namespace CommunicationService.MessageService
         List<SendMessageRequest> _sendMessageRequests;
 
         public string GetUnsubscriptionGroupName(int? recipientUserId)
-        {
-            if (recipientUserId == REQUESTOR_DUMMY_USERID)
-            {
-                return UnsubscribeGroupName.ReqTaskNotification;
-            }
-            else
-            {
-                return UnsubscribeGroupName.TaskNotification;
-            }
-
+        { 
+            return UnsubscribeGroupName.TaskUpdate;
         }
 
         public TaskUpdateNewMessage(IConnectRequestService connectRequestService, IConnectUserService connectUserService, IConnectGroupService connectGroupService, IOptions<SendGridConfig> sendGridConfig)
