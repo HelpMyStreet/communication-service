@@ -80,7 +80,7 @@ namespace CommunicationService.MessageService
                 case CommunicationJobTypes.InterUserMessage:
                     return new InterUserMessage(_connectRequestService, _connectUserService);
                 default:
-                    return new TestLinkSubstitutionMessage(_connectRequestService, _linkRepository,_emailConfig);
+                    return new TestLinkSubstitutionMessage(_connectRequestService, _linkRepository,_emailConfig, _sendGridConfig);
                     //throw new Exception("Unknown Email Type");
             }
         }

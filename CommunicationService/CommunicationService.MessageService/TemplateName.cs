@@ -18,7 +18,7 @@ namespace CommunicationService.MessageService
         public const string TaskReminder = "TaskReminder";
         public const string TaskUpdateNew = "TaskUpdateNew";
         public const string InterUserMessage = "InterUserMessage";
-        public const string TestLinkSubstitutionMessage = "TestLinkSubstitutionMessage";
+        public const string TestLinkSubstitution = "TestLinkSubstitution";
     }
 }
 
