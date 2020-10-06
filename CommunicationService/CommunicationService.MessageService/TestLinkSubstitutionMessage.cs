@@ -50,9 +50,9 @@ namespace CommunicationService.MessageService
         {
             var job = _connectRequestService.GetJobDetailsAsync(jobId.Value).Result;
             string encodedJobId = HelpMyStreet.Utils.Utils.Base64Utils.Base64Encode(job.JobSummary.JobID.ToString());
-            string protectedUrl = $"/account/accepted-requests?j={encodedJobId}";            
-            var token = await _linkRepository.CreateLink(protectedUrl, _emailConfig.Value.ExpiryDays);
-            string url = _sendGridConfig.Value.BaseUrl + "/link/" + token;
+            string tailUrl = $"/account/accepted-requests?j={encodedJobId}";            
+            var token = await _linkRepository.CreateLink(tailUrl, _emailConfig.Value.ExpiryDays);
+            string protectedUrl = _sendGridConfig.Value.BaseUrl + "/link/" + token;
 
             return new EmailBuildData()
             {
@@ -60,7 +60,7 @@ namespace CommunicationService.MessageService
                 (
                     "Test Link Substitution",
                     job.Requestor.FirstName,
-                    url
+                    protectedUrl
                 ),
                 EmailToAddress = job.Requestor.EmailAddress,
                 EmailToName = $"{job.Requestor.FirstName} {job.Requestor.LastName}"
