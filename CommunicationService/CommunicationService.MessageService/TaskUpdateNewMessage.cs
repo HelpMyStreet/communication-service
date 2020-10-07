@@ -36,16 +36,8 @@ namespace CommunicationService.MessageService
         List<SendMessageRequest> _sendMessageRequests;
 
         public string GetUnsubscriptionGroupName(int? recipientUserId)
-        {
-            if (recipientUserId == REQUESTOR_DUMMY_USERID)
-            {
-                return UnsubscribeGroupName.ReqTaskNotification;
-            }
-            else
-            {
-                return UnsubscribeGroupName.TaskNotification;
-            }
-
+        { 
+            return UnsubscribeGroupName.TaskUpdate;
         }
 
         public TaskUpdateNewMessage(IConnectRequestService connectRequestService, IConnectUserService connectUserService, IConnectGroupService connectGroupService, IOptions<SendGridConfig> sendGridConfig)
@@ -283,11 +275,6 @@ namespace CommunicationService.MessageService
         public async Task<List<SendMessageRequest>> IdentifyRecipients(int? recipientUserId, int? jobId, int? groupId)
         {
             var job = await _connectRequestService.GetJobDetailsAsync(jobId.Value);
-
-            if (job.JobSummary.RequestorType == RequestorType.Myself)
-            {
-                return _sendMessageRequests;
-            }
 
             string volunteerEmailAddress = string.Empty;
             string recipientEmailAddress = string.Empty;
