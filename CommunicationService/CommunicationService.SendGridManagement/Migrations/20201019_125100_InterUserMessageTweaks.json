@@ -1,0 +1,15 @@
+﻿{
+  "Templates": [
+    {
+      "name": "InterUserMessage",
+      "subject": "A personal message sent through HelpMyStreet",
+      "generation": "dynamic",
+      "versions": [
+        {
+          "name": "Tweak signature 3",
+          "subject": "A personal message sent through HelpMyStreet"
+        }
+      ]
+    }
+  ]
+}

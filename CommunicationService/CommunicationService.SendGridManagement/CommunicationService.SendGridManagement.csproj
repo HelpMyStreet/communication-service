@@ -87,6 +87,12 @@
     <None Remove="Migrations\20200930_120000_AddBaseUrlToAllEmails.json" />
     <None Remove="Migrations\20200928_161000_AddRequestorUnsubscribe.json" />
     <None Remove="Migrations\20201005_151500_TestLinkSubstitution.json" />
+    <None Remove="Migrations\20201013_15100_InterUserMessage.json" />
+    <None Remove="Migrations\20201014_090000_InterUserMessage.json" />
+    <None Remove="Migrations\20201014_093000_InterUserMessage.json" />
+    <None Remove="Migrations\20201019_124500_InterUserMessageTweaks.json" />
+    <None Remove="Migrations\20201019_125000_InterUserMessageTweaks.json" />
+    <None Remove="Migrations\20201019_125100_InterUserMessageTweaks.json" />
   </ItemGroup>
 
   <ItemGroup>
@@ -127,6 +133,12 @@
     <EmbeddedResource Include="Emails\RequestorTaskNotification.html" />
     <EmbeddedResource Include="Migrations\20200709_130700_AddRequestorTaskNotification.json" />
     <EmbeddedResource Include="Migrations\20200717_152400_AddUnsubscribeGroupsDailyDigest.json" />
+    <EmbeddedResource Include="Migrations\20201019_125100_InterUserMessageTweaks.json" />
+    <EmbeddedResource Include="Migrations\20201019_125000_InterUserMessageTweaks.json" />
+    <EmbeddedResource Include="Migrations\20201019_124500_InterUserMessageTweaks.json" />
+    <EmbeddedResource Include="Migrations\20201014_093000_InterUserMessage.json" />
+    <EmbeddedResource Include="Migrations\20201014_090000_InterUserMessage.json" />
+    <EmbeddedResource Include="Migrations\20201013_15100_InterUserMessage.json" />
     <EmbeddedResource Include="Migrations\20201005_151500_TestLinkSubstitution.json" />
     <EmbeddedResource Include="Migrations\20200930_120000_AddBaseUrlToAllEmails.json" />
     <EmbeddedResource Include="Migrations\20200929_143000_AddBaseUrlToAllEmails.json" />

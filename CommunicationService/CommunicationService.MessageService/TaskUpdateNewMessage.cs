@@ -284,12 +284,12 @@ namespace CommunicationService.MessageService
         {
             var job = await _connectRequestService.GetJobDetailsAsync(jobId.Value);
 
-            //if source is diy and question answered yes will complete my self
+            ////if source is diy and question answered yes will complete my self
 
-            if (job.JobSummary.RequestorType == RequestorType.Myself)
-            {
-                return _sendMessageRequests;
-            }
+            //if (job.JobSummary.RequestorType == RequestorType.Myself)
+            //{
+            //    return _sendMessageRequests;
+            //}
 
             string volunteerEmailAddress = string.Empty;
             string recipientEmailAddress = string.Empty;
