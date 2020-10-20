@@ -21,6 +21,7 @@ using System.Security.Principal;
 using RestSharp.Extensions;
 using Microsoft.Extensions.Options;
 using CommunicationService.Core.Configuration;
+using HelpMyStreet.Utils.Extensions;
 
 namespace CommunicationService.MessageService
 {
@@ -213,7 +214,8 @@ namespace CommunicationService.MessageService
                     if (additionalParameters.TryGetValue("RecipientOrRequestor", out string recipientOrRequestor))
                     {
                         subject = GetSubjectFromJob(job, false, changedByAdmin, lastUpdatedBy);
-                        paragraph1 = ParagraphOne(job, ageUKReference, recipientOrRequestor, false, lastUpdatedBy);
+
+                        paragraph1 = ParagraphOne(job, ageUKReference, recipientOrRequestor, lastUpdatedBy);
                         paragraph2 = ParagraphTwo(job, recipientOrRequestor, false, lastUpdatedBy);
                         paragraph3 = ParagraphThree(job, recipientOrRequestor, false, lastUpdatedBy);
 
@@ -284,13 +286,6 @@ namespace CommunicationService.MessageService
         {
             var job = await _connectRequestService.GetJobDetailsAsync(jobId.Value);
 
-            ////if source is diy and question answered yes will complete my self
-
-            //if (job.JobSummary.RequestorType == RequestorType.Myself)
-            //{
-            //    return _sendMessageRequests;
-            //}
-
             string volunteerEmailAddress = string.Empty;
             string recipientEmailAddress = string.Empty;
             string requestorEmailAddress = string.Empty;
@@ -340,7 +335,7 @@ namespace CommunicationService.MessageService
                 sendEmailToRequestor =  requestorEmailAddress != volunteerEmailAddress;
             }
             
-            //Now consider the requester
+            //Now consider the recipient
             if (sendEmailToRequestor)
             {
                 _sendMessageRequests.Add(new SendMessageRequest()
@@ -367,7 +362,7 @@ namespace CommunicationService.MessageService
                     JobID = jobId,
                     AdditionalParameters = new Dictionary<string, string>()
                      {
-                        {"RecipientOrRequestor", "Recipient"}
+                        {"RecipientOrRequestor", "Requestor"}
                      }
                 });
             }
@@ -392,17 +387,17 @@ namespace CommunicationService.MessageService
             string actionDate = job.History.Where(x => x.JobStatus == JobStatuses.InProgress).OrderByDescending(x => x.StatusDate).First().StatusDate.ToString("dd/MM/yyyy");
 
             string recipientDetails = string.Empty;
-            string locality = job.Recipient.Address.Locality == null ? string.Empty : $" in {textInfo.ToTitleCase(job.Recipient.Address.Locality.ToLower())}";
+            string locality = job.Recipient.Address.Locality == null ? string.Empty : $" in <strong>{textInfo.ToTitleCase(job.Recipient.Address.Locality.ToLower())}</strong>";
             bool orgPresent = false;
 
             if (job.JobSummary.RequestorType == RequestorType.Organisation)
             {
                 orgPresent = true;
-                recipientDetails = $" for {job.JobSummary.RecipientOrganisation}{locality}";
+                recipientDetails = $" for <strong>{job.JobSummary.RecipientOrganisation}</strong>{locality}";
             }
             else
             {
-                recipientDetails = $" for {job.Recipient.FirstName}{locality}";
+                recipientDetails = $" for <strong>{job.Recipient.FirstName}</strong>{locality}";
             }
 
             int? relevantVolunteerUserID = _connectRequestService.GetRelevantVolunteerUserID(job);
@@ -435,24 +430,24 @@ namespace CommunicationService.MessageService
                             else
                             {
                                 paragraphOneStart = "This is just to confirm that ";
-                                paragraphOneMid = $" that {action} on {actionDate}";
+                                paragraphOneMid = $" that {action} on <strong>{actionDate}</strong>";
                                 paragraphOneEnd = " has been placed back in progress with you, as you requested.";
                             }
                             break;
                         case JobStatuses.Done:
                             paragraphOneStart = "We saw that you marked ";
-                            paragraphOneMid = $" that {action} on {actionDate}";
-                            paragraphOneEnd = " as completed.";
+                            paragraphOneMid = $" that {action} on <strong>{actionDate}</strong>";
+                            paragraphOneEnd = " as complete.";
                             break;
                         case JobStatuses.Open:
                             paragraphOneStart = "We saw that you clicked the “Can’t Do” button against ";
-                            paragraphOneMid = $" that {action} on {actionDate}";
+                            paragraphOneMid = $" that {action} on <strong>{actionDate}</strong>";
                             break;
                     }
 
                     return $"{paragraphOneStart}" +
                         $"the request for help{recipientDetails}" +
-                        $" with {Mapping.ActivityMappings[job.JobSummary.SupportActivity]}{ageUKReference}" +
+                        $" with <strong>{Mapping.FriendlyActivityMappings[job.JobSummary.SupportActivity]}{ageUKReference}</strong>" +
                         $"{paragraphOneMid}" +
                         $"{paragraphOneEnd}";
                 }
@@ -511,7 +506,7 @@ namespace CommunicationService.MessageService
                     }
 
                     return $"The request for help{recipientDetails}" +
-                        $" with {Mapping.ActivityMappings[job.JobSummary.SupportActivity]}{ageUKReference}" +
+                        $" with <strong>{Mapping.FriendlyActivityMappings[job.JobSummary.SupportActivity]}</strong>{ageUKReference}" +
                         $" that you accepted on {actionDate} " +
                         $"{paragraphOneStart}" +
                         $" by an administrator{group}." +
@@ -549,7 +544,7 @@ namespace CommunicationService.MessageService
 
             return $"The request for help{recipientDetails}" +
                 $" with {Mapping.ActivityMappings[job.JobSummary.SupportActivity]}{ageUKReference}" +
-                $" that {action} on {actionDate}" +
+                $" that {action} on <strong>{actionDate}</strong>" +
                 $" was {StatusChange(job, changedByAdmin)}" +
                 $" by a{changedBy} on {datestatuschanged.ToString("dd/MM/yyyy")} at {timeStatusChanged.ToLower()}.";
         }
@@ -564,8 +559,8 @@ namespace CommunicationService.MessageService
             string encodedJobId = HelpMyStreet.Utils.Utils.Base64Utils.Base64Encode(job.JobSummary.JobID.ToString()) ;
             string joburl = "<a href=\"" + baseUrl + "/account/accepted-requests?j=" + encodedJobId + "\">here</a>";
             string acceptedurl = "<a href=\"" + baseUrl + "/account/accepted-requests?j=" + encodedJobId + "\">My Accepted Requests</a>";
-            string feedbackurl = "<a href=\"mailto:feedback@helpmystreet.org\">feedback@helpmystreet.org</a>";
             string openRequestsUrl = "<a href=\"" + baseUrl + "/account/open-requests?j="+ encodedJobId + "\">Open Requests</a>";
+            string supporturl = "<a href=\"mailto:support@helpmystreet.org\">support@helpmystreet.org</a>";
 
             if (daysFromNow==0)
             {
@@ -592,8 +587,7 @@ namespace CommunicationService.MessageService
                                 return string.Empty;
                             }
                         case JobStatuses.Done:
-                            return $"Thank you so much for helping out – you are a super-star!</p><p>" +
-                                   $"If you’d like to tell us anything about your experience, or leave a message for anyone involved, please do get in touch at {feedbackurl}.";
+                            return $"Thank you so much for helping out – you are a super-star!</p><p>";
                         case JobStatuses.Open:
                             return $"We hope everything is OK with you.  If you did this by mistake, you can reverse it by clicking the “Undo” button if you still have the page open, or find and accept the task again from your {openRequestsUrl} tab if not. ";
                     }
@@ -612,8 +606,7 @@ namespace CommunicationService.MessageService
                         case JobStatuses.Done:
                             if (previousStatus == JobStatuses.InProgress)
                             {
-                                return $"Either way, thank you so much for agreeing to help out – you are a super-star!</p><p>" +
-                                   $"If you’d like to tell us anything about your experience, or leave a message for anyone involved, please do get in touch at {feedbackurl}.";
+                                return $"Either way, thank you so much for agreeing to help out – you are a super-star!</p><p>";
                             }
                             break;               
                         case JobStatuses.Cancelled:
@@ -633,14 +626,21 @@ namespace CommunicationService.MessageService
                     case JobStatuses.Done:
                         if (job.JobSummary.SupportActivity == SupportActivities.FaceMask && !isvolunteer)
                         {
-                            switch(recipientOrRequestor)
+                            if (job.JobSummary.RequestorType == RequestorType.Organisation)
                             {
-                                case "Recipient":
-                                    return "If your face coverings aren’t with you already, then they should be on their way, possibly being hand delivered or in the post.";
-                                case "Requestor":
-                                    return "If the face coverings aren’t with them already, then they should be on their way, possibly being hand delivered or in the post.";
-                                default:
-                                    return string.Empty;
+                                return $"If the face coverings aren’t with {job.JobSummary.RecipientOrganisation} already, they should be on their way (possibly being hand delivered or in the post). If they haven’t arrived after 5 days, please let us know by contacting {supporturl}.";
+                            }
+                            else
+                            {
+                                switch (recipientOrRequestor)
+                                {
+                                    case "Recipient":
+                                        return $"If the face coverings aren’t with you already, they should be on their way (possibly being hand delivered or in the post). If they haven’t arrived after 5 days, please let us know by contacting {supporturl}.";
+                                    case "Requestor":
+                                        return $"If the face coverings aren’t with them already, then they should be on their way, possibly being hand delivered or in the post. If they haven’t arrived after 5 days, please let us know by contacting {supporturl}.";                                        
+                                    default:
+                                        return string.Empty;
+                                }
                             }
                         }
                         else
@@ -680,7 +680,8 @@ namespace CommunicationService.MessageService
         private string ParagraphThree(GetJobDetailsResponse job, string recipientOrRequestor, bool isvolunteer, int lastUpdatedBy)
         {
             int? relevantVolunteerUserID = _connectRequestService.GetRelevantVolunteerUserID(job);
-            string inError = "If you think that this has been done in error";
+            string inError = string.Empty;
+            string supporturl = "<a href=\"mailto:support@helpmystreet.org\">support@helpmystreet.org</a>";
 
             if (isvolunteer)
             {
@@ -691,16 +692,16 @@ namespace CommunicationService.MessageService
                         case JobStatuses.InProgress:
                             if (_connectRequestService.PreviousJobStatus(job) == JobStatuses.Open)
                             {
-                                return $"If you have any technical difficulties or are unsure what you need to do, if you think there is a problem with the request (for example, you can't reach the person in need or find the help is no longer needed)";
+                                return $"If there is a problem with the request (for example, you can't reach the person in need or find the help is no longer needed), please do let us know at {supporturl}.";
                             }
                             else
                             {
                                 return inError;
                             }
                         case JobStatuses.Done:
-                            return "If you’ve had any difficulties you’d like us to look into";
+                            return string.Empty;
                         case JobStatuses.Open:
-                            return "The request is now available again for other volunteers to pick up.  If you found there was a problem with it (for example, you couldn’t reach the person in need or found the help is no longer needed)";
+                            return $"The request is now available again for other volunteers to pick up.  If you found there was a problem with it (for example, you couldn’t reach the person in need or found the help is no longer needed), please do let us know at {supporturl}.";
                     }
                 }
                 else
@@ -720,9 +721,9 @@ namespace CommunicationService.MessageService
                             switch (recipientOrRequestor)
                             {
                                 case "Recipient":
-                                    return "If you haven’t received them after a few days, if you have any other questions or concerns";
+                                    return string.Empty;
                                 case "Requestor":
-                                    return "If they haven’t arrived after a few days, if you have any other questions or concerns";
+                                    return string.Empty;
                                 default:
                                     return inError;
                             }
@@ -745,5 +746,54 @@ namespace CommunicationService.MessageService
             }
             throw new Exception("unable to create paragraph3");
         }
+
+        #region Completed
+
+        private string ParagraphOne(GetJobDetailsResponse job, string ageUKReference, string recipientOrRequestor, int lastUpdatedBy)
+        {
+            CultureInfo cultureInfo = Thread.CurrentThread.CurrentCulture;
+            TextInfo textInfo = cultureInfo.TextInfo;
+            var britishZone = TimeZoneInfo.FindSystemTimeZoneById("GMT Standard Time");
+            DateTime datestatuschanged;
+
+            datestatuschanged = TimeZoneInfo.ConvertTime(job.JobSummary.DateStatusLastChanged, TimeZoneInfo.Local, britishZone);
+            var timeStatusChanged = datestatuschanged.ToString("t");
+            timeStatusChanged = Regex.Replace(timeStatusChanged, @"\s+", "");
+
+            if (job.JobSummary.JobStatus == JobStatuses.Done)
+            {
+                if (recipientOrRequestor == "Recipient")
+                {
+                    return $"Good news!</p><p>The request you made via HelpMyStreet on {job.JobSummary.DateRequested.ToString("dd/MM/yyyy")} "
+                        + $"for help with <strong>{Mapping.FriendlyActivityMappings[job.JobSummary.SupportActivity]}</strong> "
+                        + $"was updated to <strong>Completed</strong> { job.JobSummary.DateStatusLastChanged.FriendlyPastDate()} at {timeStatusChanged}.";
+                }
+                else if (recipientOrRequestor == "Requestor")
+                {
+                    if (job.JobSummary.RequestorType == RequestorType.Organisation)
+                    {
+                        return $"Good news!</p><p>The request you made via HelpMyStreet on {job.JobSummary.DateRequested.ToString("dd/MM/yyyy")} "
+                        + $"for help for {job.JobSummary.RecipientOrganisation} with <strong>{Mapping.FriendlyActivityMappings[job.JobSummary.SupportActivity]}</strong> "
+                        + $"was updated to <strong>Completed</strong> { job.JobSummary.DateStatusLastChanged.FriendlyPastDate()} at {timeStatusChanged}.";
+                    }
+                    else
+                    {
+                        return $"We just wanted to let you know that {job.Requestor.FirstName} requested some help for you with <strong>{Mapping.FriendlyActivityMappings[job.JobSummary.SupportActivity]}</strong>. "
+                            + $"This request was picked up and completed by one of our volunteers.";
+                    }
+                }
+                else
+                {
+                    return string.Empty;
+                }
+            }
+            else
+            {
+                return ParagraphOne(job, ageUKReference, recipientOrRequestor, false, lastUpdatedBy);
+            }
+        }
+
+        #endregion
+
     }
 }

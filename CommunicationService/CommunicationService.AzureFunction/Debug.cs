@@ -88,16 +88,16 @@ namespace CommunicationService.AzureFunction
                 //    );
 
                 var recipients = await message.IdentifyRecipients(null, req.JobID, req.GroupID);
-                SendMessageRequest smr = recipients.ElementAt(1);
-                //foreach (SendMessageRequest smr in recipients)
-                //{
+                //SendMessageRequest smr = recipients.ElementAt(1);
+                foreach (SendMessageRequest smr in recipients)
+                {
                     var emailBuildData = await message.PrepareTemplateData(Guid.NewGuid(),smr.RecipientUserID, smr.JobID,smr.GroupID, smr.AdditionalParameters, smr.TemplateName);
 
-                    emailBuildData.EmailToAddress = "jawwad.mukhtar@gmail.com";
+                    emailBuildData.EmailToAddress = "jawwad@factor-50.co.uk";
                     emailBuildData.EmailToName = "Jawwad Mukhtar";
                     var json2 = JsonConvert.SerializeObject(emailBuildData.BaseDynamicData);
                     _connectSendGridService.SendDynamicEmail(string.Empty, smr.TemplateName, UnsubscribeGroupName.TaskNotification, emailBuildData);
-                //}
+                }
 
                 int i = 1;
 
