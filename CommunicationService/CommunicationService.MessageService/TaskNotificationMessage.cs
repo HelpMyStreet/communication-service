@@ -6,6 +6,7 @@ using CommunicationService.MessageService.Substitution;
 using HelpMyStreet.Contracts.GroupService.Response;
 using HelpMyStreet.Contracts.UserService.Response;
 using HelpMyStreet.Utils.Enums;
+using HelpMyStreet.Utils.Extensions;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -59,7 +60,7 @@ namespace CommunicationService.MessageService
                         job.Requestor.FirstName,
                         true,
                         encodedJobId,
-                        Mapping.ActivityMappings[job.JobSummary.SupportActivity],
+                        job.JobSummary.SupportActivity.FriendlyNameShort(),
                         job.JobSummary.PostCode,
                         0,
                         job.JobSummary.DueDate.ToString("dd/MM/yyyy"),
@@ -102,7 +103,7 @@ namespace CommunicationService.MessageService
                                 user.UserPersonalDetails.FirstName,
                                 false,
                                 encodedJobId,
-                                Mapping.ActivityMappings[job.JobSummary.SupportActivity],
+                                job.JobSummary.SupportActivity.FriendlyNameShort(),
                                 job.JobSummary.PostCode,
                                 Math.Round(volunteer.DistanceInMiles, 1),
                                 job.JobSummary.DueDate.ToString("dd/MM/yyyy"),
