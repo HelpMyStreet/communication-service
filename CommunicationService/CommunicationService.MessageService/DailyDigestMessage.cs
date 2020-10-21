@@ -18,6 +18,7 @@ using HelpMyStreet.Contracts.AddressService.Response;
 using CommunicationService.Core.Interfaces.Repositories;
 using System.Dynamic;
 using HelpMyStreet.Contracts.RequestService.Response;
+using HelpMyStreet.Utils.Extensions;
 
 namespace CommunicationService.MessageService
 {
@@ -186,7 +187,7 @@ namespace CommunicationService.MessageService
                 string encodedJobId = HelpMyStreet.Utils.Utils.Base64Utils.Base64Encode(job.JobID.ToString());
 
                 chosenJobsList.Add(new DailyDigestDataJob(
-                    Mapping.ActivityMappings[job.SupportActivity],
+                    job.SupportActivity.FriendlyNameShort(),
                     job.PostCode,
                     job.DueDate.ToString("dd/MM/yyyy"),
                     job.DueDate < DateTime.Now.AddDays(1),
@@ -203,7 +204,7 @@ namespace CommunicationService.MessageService
             foreach (var job in otherJobsStats)
             {
                 otherJobsList.Add(new DailyDigestDataJob(
-                    Mapping.ActivityMappings[job.Key],
+                    job.Key.FriendlyNameShort(),
                     string.Empty,
                     job.Min.ToString("dd/MM/yyyy"),
                     false,

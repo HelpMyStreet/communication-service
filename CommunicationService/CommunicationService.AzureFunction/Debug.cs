@@ -30,6 +30,8 @@ namespace CommunicationService.AzureFunction
         private readonly IConnectAddressService _connectAddressService;
         private readonly IConnectSendGridService _connectSendGridService;
         private readonly ICosmosDbService _cosmosDbService;
+        private readonly IOptions<SendGridConfig> _sendGridConfig;
+        private readonly ILinkRepository _linkRepository;
 
         public Debug(
             IConnectGroupService connectGroupService, 
@@ -39,7 +41,9 @@ namespace CommunicationService.AzureFunction
             IJobFilteringService jobFilteringService, 
             IConnectAddressService connectAddressService, 
             IConnectSendGridService connectSendGridService,
-            ICosmosDbService cosmosDbService)
+            ICosmosDbService cosmosDbService,
+            IOptions<SendGridConfig> sendGridConfig,
+            ILinkRepository linkRepository)
         {
             _connectGroupService = connectGroupService;
             _connectUserService = connectUserService;
@@ -49,6 +53,8 @@ namespace CommunicationService.AzureFunction
             _connectAddressService = connectAddressService;
             _connectSendGridService = connectSendGridService;
             _cosmosDbService = cosmosDbService;
+            _sendGridConfig = sendGridConfig;
+            _linkRepository = linkRepository;
         }
  
 
@@ -63,23 +69,35 @@ namespace CommunicationService.AzureFunction
                 var request = JsonConvert.SerializeObject(req);
                 log.LogInformation($"RequestCommunicationRequest {request}");
 
-                TaskNotificationMessage taskNotificationMessage = new TaskNotificationMessage(
-                    _connectUserService,
-                    _connectRequestService,
-                    _connectGroupService);
+                TaskUpdateNewMessage message = new TaskUpdateNewMessage(
+                        _connectRequestService,
+                        _connectUserService,
+                        _connectGroupService,
+                        _sendGridConfig
+                    );
 
-                var recipients = await taskNotificationMessage.IdentifyRecipients(null, req.JobID, req.GroupID);
-                SendMessageRequest smr = recipients.ElementAt(0);
+                //RegistrationChaserMessage message = new RegistrationChaserMessage(
+                //    _connectUserService, _cosmosDbService, _emailConfig);
 
-                //foreach (SendMessageRequest smr in recipients)
-                //{
-                    var emailBuildData = await taskNotificationMessage.PrepareTemplateData(Guid.NewGuid(),smr.RecipientUserID, smr.JobID,smr.GroupID, smr.AdditionalParameters, TemplateName.TaskUpdateNew);
+
+                //TestLinkSubstitutionMessage message = new TestLinkSubstitutionMessage(
+                //    _connectRequestService,
+                //    _linkRepository,
+                //    _emailConfig,
+                //    _sendGridConfig
+                //    );
+
+                var recipients = await message.IdentifyRecipients(null, req.JobID, req.GroupID);
+                //SendMessageRequest smr = recipients.ElementAt(1);
+                foreach (SendMessageRequest smr in recipients)
+                {
+                    var emailBuildData = await message.PrepareTemplateData(Guid.NewGuid(),smr.RecipientUserID, smr.JobID,smr.GroupID, smr.AdditionalParameters, smr.TemplateName);
 
                     emailBuildData.EmailToAddress = "jawwad@factor-50.co.uk";
                     emailBuildData.EmailToName = "Jawwad Mukhtar";
                     var json2 = JsonConvert.SerializeObject(emailBuildData.BaseDynamicData);
-                    _connectSendGridService.SendDynamicEmail(string.Empty, TemplateName.TaskNotification, UnsubscribeGroupName.TaskNotification, emailBuildData);
-                //}
+                    _connectSendGridService.SendDynamicEmail(string.Empty, smr.TemplateName, UnsubscribeGroupName.TaskNotification, emailBuildData);
+                }
 
                 int i = 1;
 

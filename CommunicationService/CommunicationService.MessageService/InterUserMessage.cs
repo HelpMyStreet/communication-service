@@ -1,14 +1,10 @@
 ﻿using CommunicationService.Core.Domains;
 using CommunicationService.Core.Interfaces;
-using CommunicationService.Core.Interfaces.Repositories;
 using CommunicationService.Core.Interfaces.Services;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using HelpMyStreet.Utils.Models;
 using CommunicationService.MessageService.Substitution;
-using System.Globalization;
-using Polly.Caching;
 using HelpMyStreet.Utils.Enums;
 using HelpMyStreet.Utils.Extensions;
 
@@ -85,7 +81,7 @@ namespace CommunicationService.MessageService
                 if (job != null)
                 {
                     DateTime dtStatusChanged = job.JobSummary.DateStatusLastChanged;
-                    result = $"{result} The request was for { Mapping.ActivityMappings[job.JobSummary.SupportActivity]} and was {Mapping.StatusMappingsNotifications[job.JobSummary.JobStatus]} {dtStatusChanged.FriendlyPastDate()}";
+                    result = $"{result} The request was for <strong>{ job.JobSummary.SupportActivity.FriendlyNameForEmail()}</strong> and was {Mapping.StatusMappingsNotifications[job.JobSummary.JobStatus]} <strong>{dtStatusChanged.FriendlyPastDate()}</strong>";
                 }
             }
             return result;
