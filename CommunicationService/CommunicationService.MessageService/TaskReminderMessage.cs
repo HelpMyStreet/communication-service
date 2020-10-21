@@ -7,6 +7,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using HelpMyStreet.Utils.Models;
 using CommunicationService.MessageService.Substitution;
+using HelpMyStreet.Utils.Extensions;
 
 namespace CommunicationService.MessageService
 {
@@ -58,7 +59,7 @@ namespace CommunicationService.MessageService
                     encodedJobId,
                     GetTitleFromDays(job.JobSummary.DueDays),
                     user.UserPersonalDetails.FirstName,
-                    Mapping.ActivityMappings[job.JobSummary.SupportActivity],
+                    job.JobSummary.SupportActivity.FriendlyNameShort(),
                     job.JobSummary.PostCode,
                     job.JobSummary.DueDays,
                     job.JobSummary.DueDate.ToString("dd/MM/yyyy"),
