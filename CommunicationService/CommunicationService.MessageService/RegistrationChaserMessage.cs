@@ -40,9 +40,9 @@ namespace CommunicationService.MessageService
             switch (templateName)
             {
                 case TemplateName.PartialRegistration:
-                    return "Almost there, complete your registration to start helping your street";
+                    return "Almost there, complete your registration to start helping";
                 case TemplateName.YotiReminder:
-                    return "Welcome to Help My Street!";
+                    return "Welcome to HelpMyStreet!";
                 default:
                     throw new Exception($"{templateName} is unknown");
             }
