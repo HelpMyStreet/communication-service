@@ -28,9 +28,9 @@ namespace CommunicationService.MessageService
             switch(templateName)
             {
                 case TemplateName.Welcome:
-                    return "Welcome to Help My Street!";
+                    return "Welcome to HelpMyStreet!";
                 case TemplateName.ThanksForVerifying:
-                    return "Thanks for verifying, now you’re ready to start accepting requests!";
+                    return "Thanks for verifying your ID";
                 case TemplateName.UnableToVerify:
                     return "Hmm, something’s not quite right – can we help?";
                 default:
