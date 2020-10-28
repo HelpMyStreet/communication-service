@@ -98,6 +98,7 @@
     <None Remove="Migrations\20201020_102000_TaskUpdateNewTweaks.json" />
     <None Remove="Migrations\20201026_150000_UpdateRegistrationEmails.json" />
     <None Remove="Migrations\20201026_151500_UpdateRegistrationEmails.json" />
+    <None Remove="Migrations\20201028_090000_UpdateTaskReminderEmails.json" />
   </ItemGroup>
 
   <ItemGroup>
@@ -138,6 +139,7 @@
     <EmbeddedResource Include="Emails\RequestorTaskNotification.html" />
     <EmbeddedResource Include="Migrations\20200709_130700_AddRequestorTaskNotification.json" />
     <EmbeddedResource Include="Migrations\20200717_152400_AddUnsubscribeGroupsDailyDigest.json" />
+    <EmbeddedResource Include="Migrations\20201028_090000_UpdateTaskReminderEmails.json" />
     <EmbeddedResource Include="Migrations\20201026_151500_UpdateRegistrationEmails.json" />
     <EmbeddedResource Include="Migrations\20201026_150000_UpdateRegistrationEmails.json" />
     <EmbeddedResource Include="Migrations\20201020_102000_TaskUpdateNewTweaks.json" />
@@ -201,9 +203,9 @@
   </ItemGroup>
 
   <ItemGroup>
-	  <PackageReference Include="Microsoft.Extensions.Configuration" Version="3.1.7" />
-	  <PackageReference Include="Microsoft.Extensions.Configuration.Binder" Version="3.1.7" />
-	  <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="3.1.7" />
+	  <PackageReference Include="Microsoft.Extensions.Configuration" Version="3.1.9" />
+	  <PackageReference Include="Microsoft.Extensions.Configuration.Binder" Version="3.1.9" />
+	  <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="3.1.9" />
   </ItemGroup>
 
   <ItemGroup>
