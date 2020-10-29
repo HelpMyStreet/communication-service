@@ -557,7 +557,7 @@ namespace CommunicationService.MessageService
             int? relevantVolunteerUserID = _connectRequestService.GetRelevantVolunteerUserID(job);
             DateTime dueDate = job.JobSummary.DueDate;
             double daysFromNow = (dueDate.Date - DateTime.Now.Date).TotalDays;
-            string strDaysFromNow = $"on or before {dueDate.ToString(DATE_FORMAT)} - {daysFromNow} days from now";
+            string strDaysFromNow = string.Empty;
             string encodedJobId = HelpMyStreet.Utils.Utils.Base64Utils.Base64Encode(job.JobSummary.JobID.ToString()) ;
             string joburl = "<a href=\"" + baseUrl + "/account/accepted-requests?j=" + encodedJobId + "\">here</a>";
             string acceptedurl = "<a href=\"" + baseUrl + "/account/accepted-requests?j=" + encodedJobId + "\">My Accepted Requests</a>";
@@ -565,9 +565,14 @@ namespace CommunicationService.MessageService
             string supporturl = "<a href=\"mailto:support@helpmystreet.org\">support@helpmystreet.org</a>";
             string completedRequestsUrl = "<a href=\"" + baseUrl + "/account/completed-requests?j=" + encodedJobId + "\">My Completed Requests</a>";
 
-            if (daysFromNow==0)
+            switch (job.JobSummary.DueDateType)
             {
-                strDaysFromNow = "today";
+                case DueDateType.Before:
+                    strDaysFromNow = daysFromNow == 0 ? "today" : $"on or before {dueDate.ToString(DATE_FORMAT)} - {daysFromNow} days from now";
+                    break;
+                case DueDateType.On:
+                    strDaysFromNow = $"on {dueDate.ToString(DATE_FORMAT)}";
+                    break;
             }
 
             if (isvolunteer)
