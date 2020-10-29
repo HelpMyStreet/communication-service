@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Text;
 
@@ -13,6 +13,5 @@ namespace CommunicationService.MessageService
         public static string InterUserMessage = "InterUserMessage";
         public static string ReqTaskNotification = "Requestor Task Notification";
         public static string TaskUpdate = "TaskUpdate";
-
     }
 }

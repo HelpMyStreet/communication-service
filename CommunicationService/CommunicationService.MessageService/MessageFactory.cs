@@ -27,8 +27,18 @@ namespace CommunicationService.MessageService
         private readonly IConnectAddressService _connectAddressService;
         private readonly IOptions<EmailConfig> _emailConfig;
         private readonly IOptions<SendGridConfig> _sendGridConfig;
+        private readonly ILinkRepository _linkRepository;
 
-        public MessageFactory(IConnectUserService connectUserService, IConnectRequestService connectRequestService, IConnectGroupService connectGroupService, IQueueClient queueClient, ICosmosDbService cosmosDbService, IOptions<EmailConfig> emailConfig, IJobFilteringService jobFilteringService, IConnectAddressService connectAddressService, IOptions<SendGridConfig> sendGridConfig)
+        public MessageFactory(IConnectUserService connectUserService, 
+            IConnectRequestService connectRequestService, 
+            IConnectGroupService connectGroupService, 
+            IQueueClient queueClient, 
+            ICosmosDbService cosmosDbService, 
+            IOptions<EmailConfig> emailConfig, 
+            IJobFilteringService jobFilteringService, 
+            IConnectAddressService connectAddressService, 
+            IOptions<SendGridConfig> sendGridConfig,
+            ILinkRepository linkRepository)
         {
             _connectUserService = connectUserService;
             _connectRequestService = connectRequestService;
@@ -39,6 +49,7 @@ namespace CommunicationService.MessageService
             _jobFilteringService = jobFilteringService;
             _connectAddressService = connectAddressService;
             _sendGridConfig = sendGridConfig;
+            _linkRepository = linkRepository;
         }
         public IMessage Create(RequestCommunicationRequest sendCommunicationRequest)
         {
@@ -68,7 +79,7 @@ namespace CommunicationService.MessageService
                     return new TaskReminderMessage(_connectRequestService, _connectUserService);
                 case CommunicationJobTypes.InterUserMessage:
                     return new InterUserMessage(_connectRequestService, _connectUserService);
-                default:
+                default:                   
                     throw new Exception("Unknown Email Type");
             }
         }

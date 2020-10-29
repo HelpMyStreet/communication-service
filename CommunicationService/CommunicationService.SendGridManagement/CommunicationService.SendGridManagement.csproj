@@ -12,6 +12,7 @@
     <None Remove="Emails\PartialRegistration.html" />
     <None Remove="Emails\TaskReminder.html" />
     <None Remove="Emails\TaskUpdateNew.html" />
+    <None Remove="Emails\TestLinkSubstitution.html" />
     <None Remove="Emails\ThanksForVerifying.html" />
     <None Remove="Emails\UnableToVerify.html" />
     <None Remove="Emails\Welcome.html" />
@@ -85,6 +86,19 @@
     <None Remove="Migrations\20200929_143000_AddBaseUrlToAllEmails.json" />
     <None Remove="Migrations\20200930_120000_AddBaseUrlToAllEmails.json" />
     <None Remove="Migrations\20200928_161000_AddRequestorUnsubscribe.json" />
+    <None Remove="Migrations\20201005_151500_TestLinkSubstitution.json" />
+    <None Remove="Migrations\20201013_15100_InterUserMessage.json" />
+    <None Remove="Migrations\20201014_090000_InterUserMessage.json" />
+    <None Remove="Migrations\20201014_093000_InterUserMessage.json" />
+    <None Remove="Migrations\20201019_124500_InterUserMessageTweaks.json" />
+    <None Remove="Migrations\20201019_125000_InterUserMessageTweaks.json" />
+    <None Remove="Migrations\20201019_125100_InterUserMessageTweaks.json" />
+    <None Remove="Migrations\20201020_091500_TaskUpdateNewTweaks.json" />
+    <None Remove="Migrations\20201020_1015000_TaskUpdateNewTweaks.json" />
+    <None Remove="Migrations\20201020_102000_TaskUpdateNewTweaks.json" />
+    <None Remove="Migrations\20201026_150000_UpdateRegistrationEmails.json" />
+    <None Remove="Migrations\20201026_151500_UpdateRegistrationEmails.json" />
+    <None Remove="Migrations\20201028_090000_UpdateTaskReminderEmails.json" />
     <None Remove="Migrations\20201006_100000_AddTaskUpdateUnsubscribe.json" />
   </ItemGroup>
 
@@ -93,6 +107,7 @@
     <EmbeddedResource Include="Emails\TaskReminder.html" />
     <EmbeddedResource Include="Emails\TaskUpdateNew.html" />
     <EmbeddedResource Include="Emails\InterUserMessage.html" />
+    <EmbeddedResource Include="Emails\TestLinkSubstitution.html" />
     <EmbeddedResource Include="Emails\YotiReminder.html">
     </EmbeddedResource>
     <EmbeddedResource Include="Emails\UnableToVerify.html">
@@ -125,6 +140,19 @@
     <EmbeddedResource Include="Emails\RequestorTaskNotification.html" />
     <EmbeddedResource Include="Migrations\20200709_130700_AddRequestorTaskNotification.json" />
     <EmbeddedResource Include="Migrations\20200717_152400_AddUnsubscribeGroupsDailyDigest.json" />
+    <EmbeddedResource Include="Migrations\20201028_090000_UpdateTaskReminderEmails.json" />
+    <EmbeddedResource Include="Migrations\20201026_151500_UpdateRegistrationEmails.json" />
+    <EmbeddedResource Include="Migrations\20201026_150000_UpdateRegistrationEmails.json" />
+    <EmbeddedResource Include="Migrations\20201020_102000_TaskUpdateNewTweaks.json" />
+    <EmbeddedResource Include="Migrations\20201020_1015000_TaskUpdateNewTweaks.json" />
+    <EmbeddedResource Include="Migrations\20201020_091500_TaskUpdateNewTweaks.json" />
+    <EmbeddedResource Include="Migrations\20201019_125100_InterUserMessageTweaks.json" />
+    <EmbeddedResource Include="Migrations\20201019_125000_InterUserMessageTweaks.json" />
+    <EmbeddedResource Include="Migrations\20201019_124500_InterUserMessageTweaks.json" />
+    <EmbeddedResource Include="Migrations\20201014_093000_InterUserMessage.json" />
+    <EmbeddedResource Include="Migrations\20201014_090000_InterUserMessage.json" />
+    <EmbeddedResource Include="Migrations\20201013_15100_InterUserMessage.json" />
+    <EmbeddedResource Include="Migrations\20201005_151500_TestLinkSubstitution.json" />
     <EmbeddedResource Include="Migrations\20201006_100000_AddTaskUpdateUnsubscribe.json" />
     <EmbeddedResource Include="Migrations\20200930_120000_AddBaseUrlToAllEmails.json" />
     <EmbeddedResource Include="Migrations\20200929_143000_AddBaseUrlToAllEmails.json" />
@@ -177,9 +205,9 @@
   </ItemGroup>
 
   <ItemGroup>
-	  <PackageReference Include="Microsoft.Extensions.Configuration" Version="3.1.7" />
-	  <PackageReference Include="Microsoft.Extensions.Configuration.Binder" Version="3.1.7" />
-	  <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="3.1.7" />
+	  <PackageReference Include="Microsoft.Extensions.Configuration" Version="3.1.9" />
+	  <PackageReference Include="Microsoft.Extensions.Configuration.Binder" Version="3.1.9" />
+	  <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="3.1.9" />
   </ItemGroup>
 
   <ItemGroup>
