@@ -7,6 +7,8 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using HelpMyStreet.Utils.Models;
 using CommunicationService.MessageService.Substitution;
+using HelpMyStreet.Utils.Extensions;
+using HelpMyStreet.Utils.Enums;
 
 namespace CommunicationService.MessageService
 {
@@ -14,6 +16,7 @@ namespace CommunicationService.MessageService
     {
         private readonly IConnectRequestService _connectRequestService;
         private readonly IConnectUserService _connectUserService;
+        private const string DATE_FORMAT = "dddd, dd MMMM";
 
         List<SendMessageRequest> _sendMessageRequests;
 
@@ -29,7 +32,7 @@ namespace CommunicationService.MessageService
             _sendMessageRequests = new List<SendMessageRequest>();
         }
 
-        private string GetTitleFromDays(int days)
+        private string GetTitleFromDays(int days, DueDateType dueDateType)
         {
             if (days == 0)
             {
@@ -37,7 +40,15 @@ namespace CommunicationService.MessageService
             }
             else
             {
-                return $"A request for help you accepted is due within {days} days";
+                switch (dueDateType)
+                {
+                    case DueDateType.Before:
+                        return $"A request for help you accepted is due within {days} days";
+                    case DueDateType.On:
+                        return $"A request for help you accepted is due in {days} days";
+                    default:
+                        throw new Exception("Unknown title");
+                }
             }
         }
 
@@ -52,18 +63,29 @@ namespace CommunicationService.MessageService
 
             string encodedJobId = HelpMyStreet.Utils.Utils.Base64Utils.Base64Encode(job.JobSummary.JobID.ToString());
 
+            string dueDateMessage = string.Empty;
+
+            switch (job.JobSummary.DueDateType)
+            {
+                case DueDateType.Before:
+                    dueDateMessage = $"The help is needed on or before {job.JobSummary.DueDate.ToString(DATE_FORMAT)} – {job.JobSummary.DueDays} days from now.";
+                    break;
+                case DueDateType.On:
+                    dueDateMessage = $"The help is needed on {job.JobSummary.DueDate.ToString(DATE_FORMAT)} – {job.JobSummary.DueDays} days from now."; ;
+                    break;
+            }
+
             return new EmailBuildData()
             {
                 BaseDynamicData = new TaskReminderData(
                     encodedJobId,
-                    GetTitleFromDays(job.JobSummary.DueDays),
+                    GetTitleFromDays(job.JobSummary.DueDays, job.JobSummary.DueDateType),
                     user.UserPersonalDetails.FirstName,
-                    Mapping.ActivityMappings[job.JobSummary.SupportActivity],
+                    job.JobSummary.SupportActivity.FriendlyNameShort(),
                     job.JobSummary.PostCode,
-                    job.JobSummary.DueDays,
-                    job.JobSummary.DueDate.ToString("dd/MM/yyyy"),
                     job.JobSummary.DueDays == 0 ? true : false,
-                    job.JobSummary.DateStatusLastChanged.ToString("dd/MM/yyyy")
+                    job.JobSummary.DateStatusLastChanged.ToString(DATE_FORMAT),
+                    dueDateMessage
                     ),
                 EmailToAddress = user.UserPersonalDetails.EmailAddress,
                 EmailToName = $"{user.UserPersonalDetails.FirstName} {user.UserPersonalDetails.LastName}"

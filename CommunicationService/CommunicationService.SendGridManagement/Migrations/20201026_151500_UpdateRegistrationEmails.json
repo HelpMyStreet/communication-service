@@ -1,0 +1,17 @@
+﻿{
+  "Templates": [
+    {
+      "name": "PartialRegistration",
+      "subject": "Your registration – HelpMyStreet",
+      "generation": "dynamic",
+      "versions": [
+        {
+          "name": "Rewording",
+          "subject": "Your registration – HelpMyStreet"
+        }
+      ]
+    }
+  ]
+}
+
+

@@ -1,0 +1,8 @@
+﻿{
+  "CreateUpdateUnsubscribeGroups": [
+    {
+      "name": "InterUserMessage",
+      "description": "A personal message"
+    }
+  ]
+}
