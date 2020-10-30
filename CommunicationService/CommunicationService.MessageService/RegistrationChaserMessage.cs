@@ -95,18 +95,7 @@ namespace CommunicationService.MessageService
                 {
                     foreach(var u in validUsersWithRange)
                     {
-                        var user = await _connectUserService.GetUserByIdAsync(u.UserId);
-                        if (!user.IsVerified.HasValue)
-                        {
-                            if (u.RegistrationStep == REGISTRATION_STEP4)
-                            {
-                                AddRecipientAndTemplate(TemplateName.YotiReminder, u.UserId, jobId, groupId);
-                            }
-                            else
-                            {
-                                AddRecipientAndTemplate(TemplateName.PartialRegistration, u.UserId, jobId, groupId);
-                            }
-                        }
+                        AddRecipientAndTemplate(TemplateName.PartialRegistration, u.UserId, jobId, groupId);
                     }
                 }
 
