@@ -549,7 +549,7 @@ namespace CommunicationService.MessageService
             int? relevantVolunteerUserID = _connectRequestService.GetRelevantVolunteerUserID(job);
             DateTime dueDate = job.JobSummary.DueDate;
             double daysFromNow = (dueDate.Date - DateTime.Now.Date).TotalDays;
-            string strDaysFromNow = string.Empty;
+            string strDaysFromNow = "Just to remind you, your help is needed ";
             string encodedJobId = HelpMyStreet.Utils.Utils.Base64Utils.Base64Encode(job.JobSummary.JobID.ToString()) ;
             string joburl = "<a href=\"" + baseUrl + "/account/accepted-requests?j=" + encodedJobId + "\">here</a>";
             string acceptedurl = "<a href=\"" + baseUrl + "/account/accepted-requests?j=" + encodedJobId + "\">My Accepted Requests</a>";
@@ -557,14 +557,21 @@ namespace CommunicationService.MessageService
             string supporturl = "<a href=\"mailto:support@helpmystreet.org\">support@helpmystreet.org</a>";
             string completedRequestsUrl = "<a href=\"" + baseUrl + "/account/completed-requests?j=" + encodedJobId + "\">My Completed Requests</a>";
 
-            switch (job.JobSummary.DueDateType)
+            if (job.JobSummary.DueDays < 0)
             {
-                case DueDateType.Before:
-                    strDaysFromNow = daysFromNow == 0 ? "today" : $"on or before {dueDate.ToString(DATE_FORMAT)} - {daysFromNow} days from now";
-                    break;
-                case DueDateType.On:
-                    strDaysFromNow = $"on {dueDate.ToString(DATE_FORMAT)}";
-                    break;
+                strDaysFromNow = "This request is now <strong>overdue</strong>. Please get in touch with the help recipient urgently to see if they still need support.";
+            }
+            else
+            {                
+                switch (job.JobSummary.DueDateType)
+                {
+                    case DueDateType.Before:
+                        strDaysFromNow += daysFromNow == 0 ? "today" : $"on or before {dueDate.ToString(DATE_FORMAT)} - {daysFromNow} days from now";
+                        break;
+                    case DueDateType.On:
+                        strDaysFromNow += $"on {dueDate.ToString(DATE_FORMAT)}";
+                        break;
+                }
             }
 
             if (isvolunteer)
@@ -576,7 +583,7 @@ namespace CommunicationService.MessageService
                         case JobStatuses.InProgress:
                             if (_connectRequestService.PreviousJobStatus(job) == JobStatuses.Open)
                             {
-                                return $"Just to remind you, your help is needed {strDaysFromNow}.</p><p>" +
+                                return $"{strDaysFromNow}.</p><p>" +
                                     $"To complete the request, use the details available in {acceptedurl}. " +
                                     $"If for any reason you can’t complete the request before it’s due, let us know by updating the accepted request and clicking “Can’t Do”.";
                             }
