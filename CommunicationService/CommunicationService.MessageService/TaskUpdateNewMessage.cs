@@ -22,6 +22,8 @@ using RestSharp.Extensions;
 using Microsoft.Extensions.Options;
 using CommunicationService.Core.Configuration;
 using HelpMyStreet.Utils.Extensions;
+using HelpMyStreet.Utils.Utils;
+using HelpMyStreet.Contracts.FeedbackService.Request;
 
 namespace CommunicationService.MessageService
 {
@@ -30,6 +32,8 @@ namespace CommunicationService.MessageService
         private readonly IConnectRequestService _connectRequestService;
         private readonly IConnectUserService _connectUserService;
         private readonly IConnectGroupService _connectGroupService;
+        private readonly ILinkRepository _linkRepository;
+        private readonly IOptions<LinkConfig> _linkConfig;
         private readonly IOptions<SendGridConfig> _sendGridConfig;
         private const string DATE_FORMAT = "dddd, dd MMMM";
 
@@ -38,24 +42,19 @@ namespace CommunicationService.MessageService
         List<SendMessageRequest> _sendMessageRequests;
 
         public string GetUnsubscriptionGroupName(int? recipientUserId)
-        {
-            if (recipientUserId == REQUESTOR_DUMMY_USERID)
-            {
-                return UnsubscribeGroupName.ReqTaskNotification;
-            }
-            else
-            {
-                return UnsubscribeGroupName.TaskNotification;
-            }
-
+        { 
+            return UnsubscribeGroupName.TaskUpdate;
         }
 
-        public TaskUpdateNewMessage(IConnectRequestService connectRequestService, IConnectUserService connectUserService, IConnectGroupService connectGroupService, IOptions<SendGridConfig> sendGridConfig)
+        public TaskUpdateNewMessage(IConnectRequestService connectRequestService, IConnectUserService connectUserService, IConnectGroupService connectGroupService, ILinkRepository linkRepository, IOptions<LinkConfig> linkConfig, IOptions<SendGridConfig> sendGridConfig)
         {
             _connectRequestService = connectRequestService;
             _connectUserService = connectUserService;
             _connectGroupService = connectGroupService;
+            _linkRepository = linkRepository;
+            _linkConfig = linkConfig;
             _sendGridConfig = sendGridConfig;
+
             _sendMessageRequests = new List<SendMessageRequest>();
         }
 
@@ -557,7 +556,7 @@ namespace CommunicationService.MessageService
             int? relevantVolunteerUserID = _connectRequestService.GetRelevantVolunteerUserID(job);
             DateTime dueDate = job.JobSummary.DueDate;
             double daysFromNow = (dueDate.Date - DateTime.Now.Date).TotalDays;
-            string strDaysFromNow = string.Empty;
+            string strDaysFromNow = "Just to remind you, your help is needed ";
             string encodedJobId = HelpMyStreet.Utils.Utils.Base64Utils.Base64Encode(job.JobSummary.JobID.ToString()) ;
             string joburl = "<a href=\"" + baseUrl + "/account/accepted-requests?j=" + encodedJobId + "\">here</a>";
             string acceptedurl = "<a href=\"" + baseUrl + "/account/accepted-requests?j=" + encodedJobId + "\">My Accepted Requests</a>";
@@ -565,14 +564,21 @@ namespace CommunicationService.MessageService
             string supporturl = "<a href=\"mailto:support@helpmystreet.org\">support@helpmystreet.org</a>";
             string completedRequestsUrl = "<a href=\"" + baseUrl + "/account/completed-requests?j=" + encodedJobId + "\">My Completed Requests</a>";
 
-            switch (job.JobSummary.DueDateType)
+            if (job.JobSummary.DueDays < 0)
             {
-                case DueDateType.Before:
-                    strDaysFromNow = daysFromNow == 0 ? "today" : $"on or before {dueDate.ToString(DATE_FORMAT)} - {daysFromNow} days from now";
-                    break;
-                case DueDateType.On:
-                    strDaysFromNow = $"on {dueDate.ToString(DATE_FORMAT)}";
-                    break;
+                strDaysFromNow = "This request is now <strong>overdue</strong>. Please get in touch with the help recipient urgently to see if they still need support.";
+            }
+            else
+            {                
+                switch (job.JobSummary.DueDateType)
+                {
+                    case DueDateType.Before:
+                        strDaysFromNow += daysFromNow == 0 ? "today" : $"on or before {dueDate.ToString(DATE_FORMAT)} - {daysFromNow} days from now";
+                        break;
+                    case DueDateType.On:
+                        strDaysFromNow += $"on {dueDate.ToString(DATE_FORMAT)}";
+                        break;
+                }
             }
 
             if (isvolunteer)
@@ -584,7 +590,7 @@ namespace CommunicationService.MessageService
                         case JobStatuses.InProgress:
                             if (_connectRequestService.PreviousJobStatus(job) == JobStatuses.Open)
                             {
-                                return $"Just to remind you, your help is needed {strDaysFromNow}.</p><p>" +
+                                return $"{strDaysFromNow}.</p><p>" +
                                     $"To complete the request, use the details available in {acceptedurl}. " +
                                     $"If for any reason you can’t complete the request before it’s due, let us know by updating the accepted request and clicking “Can’t Do”.";
                             }
@@ -730,22 +736,16 @@ namespace CommunicationService.MessageService
                 {
                     case JobStatuses.Cancelled:
                         return inError;
-                    case JobStatuses.Done:
+                    case JobStatuses.Done:                       
                         if (job.JobSummary.SupportActivity == SupportActivities.FaceMask && !isvolunteer)
                         {
-                            switch (recipientOrRequestor)
-                            {
-                                case "Recipient":
-                                    return string.Empty;
-                                case "Requestor":
-                                    return string.Empty;
-                                default:
-                                    return inError;
-                            }
+                            return string.Empty;
                         }
                         else
                         {
-                            return inError;
+                            return "<strong>Tell us how it went?</strong></p><p>How was your experience with HelpMyStreet?</p><p>"
+                                + "<a href=\"" + GetProtectedUrl(job.JobSummary.JobID,recipientOrRequestor,FeedbackRating.HappyFace) + "\">Happy</a></p>"
+                                + "<p><a href=\"" + GetProtectedUrl(job.JobSummary.JobID, recipientOrRequestor, FeedbackRating.SadFace) + "\">Sad</a>";
                         }
                     case JobStatuses.Open:
                     case JobStatuses.InProgress:
@@ -760,6 +760,28 @@ namespace CommunicationService.MessageService
                 }
             }
             throw new Exception("unable to create paragraph3");
+        }
+
+        private string GetProtectedUrl(int jobId, string recipientOrRequestor,FeedbackRating feedbackRating)
+        {
+            string encodedJobId = Base64Utils.Base64Encode(jobId.ToString());
+            string encodedRequestRoleType;
+            switch (recipientOrRequestor)
+            {
+                case "Recipient":
+                    encodedRequestRoleType = Base64Utils.Base64Encode((int)RequestRoles.Recipient);
+                    break;
+                case "Requestor":
+                    encodedRequestRoleType = Base64Utils.Base64Encode((int)RequestRoles.Requestor);
+                    break;
+                default:
+                    encodedRequestRoleType =  string.Empty;
+                    break;
+            }
+
+            string tailUrl = $"/Feedback/PostTaskFeedbackCapture?j={encodedJobId}&r={encodedRequestRoleType}&f={Base64Utils.Base64Encode((int)feedbackRating)}";
+            var token = _linkRepository.CreateLink(tailUrl, _linkConfig.Value.ExpiryDays).Result;
+            return _sendGridConfig.Value.BaseUrl + "/link/" + token;
         }
 
         #region Completed
