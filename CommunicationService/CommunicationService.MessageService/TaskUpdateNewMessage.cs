@@ -737,16 +737,9 @@ namespace CommunicationService.MessageService
                     case JobStatuses.Cancelled:
                         return inError;
                     case JobStatuses.Done:                       
-                        if (job.JobSummary.SupportActivity == SupportActivities.FaceMask && !isvolunteer)
-                        {
-                            return string.Empty;
-                        }
-                        else
-                        {
                             return "<strong>Tell us how it went?</strong></p><p>How was your experience with HelpMyStreet?</p><p>"
                                 + "<a href=\"" + GetProtectedUrl(job.JobSummary.JobID,recipientOrRequestor,FeedbackRating.HappyFace) + "\">Happy</a></p>"
                                 + "<p><a href=\"" + GetProtectedUrl(job.JobSummary.JobID, recipientOrRequestor, FeedbackRating.SadFace) + "\">Sad</a>";
-                        }
                     case JobStatuses.Open:
                     case JobStatuses.InProgress:
                         if (isvolunteer)
@@ -781,7 +774,7 @@ namespace CommunicationService.MessageService
 
             string tailUrl = $"/Feedback/PostTaskFeedbackCapture?j={encodedJobId}&r={encodedRequestRoleType}&f={Base64Utils.Base64Encode((int)feedbackRating)}";
             var token = _linkRepository.CreateLink(tailUrl, _linkConfig.Value.ExpiryDays).Result;
-            return _sendGridConfig.Value.BaseUrl + "/link/" + token;
+            return _sendGridConfig.Value.BaseUrl + "link/" + token;
         }
 
         #region Completed
