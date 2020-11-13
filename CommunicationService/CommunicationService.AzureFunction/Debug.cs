@@ -31,6 +31,7 @@ namespace CommunicationService.AzureFunction
         private readonly IConnectSendGridService _connectSendGridService;
         private readonly ICosmosDbService _cosmosDbService;
         private readonly IOptions<SendGridConfig> _sendGridConfig;
+        private readonly IOptions<LinkConfig> _linkConfig;
         private readonly ILinkRepository _linkRepository;
 
         public Debug(
@@ -43,6 +44,7 @@ namespace CommunicationService.AzureFunction
             IConnectSendGridService connectSendGridService,
             ICosmosDbService cosmosDbService,
             IOptions<SendGridConfig> sendGridConfig,
+            IOptions<LinkConfig> linkConfig,
             ILinkRepository linkRepository)
         {
             _connectGroupService = connectGroupService;
@@ -54,6 +56,7 @@ namespace CommunicationService.AzureFunction
             _connectSendGridService = connectSendGridService;
             _cosmosDbService = cosmosDbService;
             _sendGridConfig = sendGridConfig;
+            _linkConfig = linkConfig;
             _linkRepository = linkRepository;
         }
  
@@ -73,6 +76,8 @@ namespace CommunicationService.AzureFunction
                         _connectRequestService,
                         _connectUserService,
                         _connectGroupService,
+                        _linkRepository,
+                        _linkConfig,
                         _sendGridConfig
                     );
 
@@ -88,16 +93,16 @@ namespace CommunicationService.AzureFunction
                 //    );
 
                 var recipients = await message.IdentifyRecipients(null, req.JobID, req.GroupID);
-                //SendMessageRequest smr = recipients.ElementAt(1);
-                foreach (SendMessageRequest smr in recipients)
-                {
+                SendMessageRequest smr = recipients.ElementAt(1);
+                //foreach (SendMessageRequest smr in recipients)
+                //{
                     var emailBuildData = await message.PrepareTemplateData(Guid.NewGuid(),smr.RecipientUserID, smr.JobID,smr.GroupID, smr.AdditionalParameters, smr.TemplateName);
 
                     emailBuildData.EmailToAddress = "jawwad@factor-50.co.uk";
                     emailBuildData.EmailToName = "Jawwad Mukhtar";
                     var json2 = JsonConvert.SerializeObject(emailBuildData.BaseDynamicData);
                     _connectSendGridService.SendDynamicEmail(string.Empty, smr.TemplateName, UnsubscribeGroupName.TaskNotification, emailBuildData);
-                }
+                //}
 
                 int i = 1;
 
