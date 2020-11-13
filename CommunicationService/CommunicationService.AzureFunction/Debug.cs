@@ -93,7 +93,7 @@ namespace CommunicationService.AzureFunction
                 //    );
 
                 var recipients = await message.IdentifyRecipients(null, req.JobID, req.GroupID);
-                SendMessageRequest smr = recipients.ElementAt(1);
+                SendMessageRequest smr = recipients.ElementAt(2);
                 //foreach (SendMessageRequest smr in recipients)
                 //{
                     var emailBuildData = await message.PrepareTemplateData(Guid.NewGuid(),smr.RecipientUserID, smr.JobID,smr.GroupID, smr.AdditionalParameters, smr.TemplateName);
