@@ -27,6 +27,7 @@ namespace CommunicationService.MessageService
         private readonly IConnectAddressService _connectAddressService;
         private readonly IOptions<EmailConfig> _emailConfig;
         private readonly IOptions<SendGridConfig> _sendGridConfig;
+        private readonly IOptions<LinkConfig> _linkConfig;
         private readonly ILinkRepository _linkRepository;
 
         public MessageFactory(IConnectUserService connectUserService, 
@@ -38,6 +39,7 @@ namespace CommunicationService.MessageService
             IJobFilteringService jobFilteringService, 
             IConnectAddressService connectAddressService, 
             IOptions<SendGridConfig> sendGridConfig,
+            IOptions<LinkConfig> linkConfig,
             ILinkRepository linkRepository)
         {
             _connectUserService = connectUserService;
@@ -49,6 +51,7 @@ namespace CommunicationService.MessageService
             _jobFilteringService = jobFilteringService;
             _connectAddressService = connectAddressService;
             _sendGridConfig = sendGridConfig;
+            _linkConfig = linkConfig;
             _linkRepository = linkRepository;
         }
         public IMessage Create(RequestCommunicationRequest sendCommunicationRequest)
@@ -72,7 +75,7 @@ namespace CommunicationService.MessageService
                 case CommunicationJobTypes.SendNewTaskNotification:
                     return new TaskNotificationMessage(_connectUserService, _connectRequestService, _connectGroupService);
                 case CommunicationJobTypes.SendTaskStateChangeUpdate:
-                    return new TaskUpdateNewMessage(_connectRequestService, _connectUserService, _connectGroupService, _sendGridConfig);
+                    return new TaskUpdateNewMessage(_connectRequestService, _connectUserService, _connectGroupService, _linkRepository, _linkConfig, _sendGridConfig);
                 case CommunicationJobTypes.SendOpenTaskDigest:
                     return new DailyDigestMessage(_connectGroupService, _connectUserService, _connectRequestService, _emailConfig, _jobFilteringService,_connectAddressService, _cosmosDbService);
                 case CommunicationJobTypes.SendTaskReminder:
