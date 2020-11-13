@@ -566,7 +566,7 @@ namespace CommunicationService.MessageService
 
             if (job.JobSummary.DueDays < 0)
             {
-                strDaysFromNow = "This request is now <strong>overdue</strong>. Please get in touch with the help recipient urgently to see if they still need support.";
+                strDaysFromNow = "This request is now <strong>overdue</strong>. Please get in touch with the help recipient urgently to see if they still need support";
             }
             else
             {                
