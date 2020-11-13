@@ -59,12 +59,12 @@ namespace CommunicationService.Repo
                 if(link!=null)
                 {
                     if(link.expiryDate > DateTime.Now.Date)
-                    {
-                        await DeleteLink(token);
+                    {                        
                         return link.url;
                     }
                     else
                     {
+                        await DeleteLink(token);
                         throw new UnauthorisedLinkException();
                     }
                 }

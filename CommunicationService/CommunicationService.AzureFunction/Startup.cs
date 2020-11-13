@@ -120,6 +120,9 @@ namespace CommunicationService.AzureFunction
             InterUserMessageConfig interUserMessageConfig = config.GetSection("InterUserMessageConfig").Get<InterUserMessageConfig>();
             builder.Services.AddSingleton<IInterUserMessageRepository>(InitializeCosmosClientInstance(interUserMessageConfig));
 
+            IConfigurationSection linkConfigSettings = config.GetSection("LinkConfig");
+            builder.Services.Configure<LinkConfig>(linkConfigSettings);
+
             LinkConfig linkConfig = config.GetSection("LinkConfig").Get<LinkConfig>();
             builder.Services.AddSingleton<ILinkRepository>(InitializeCosmosClientInstance(linkConfig));
 
