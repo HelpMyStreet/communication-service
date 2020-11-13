@@ -780,9 +780,9 @@ namespace CommunicationService.MessageService
                     break;
             }
 
-            string tailUrlHappy = $"/Feedback/PostTaskFeedbackCapture?j={encodedJobId}&r={encodedRequestRoleType}&f={Base64Utils.Base64Encode((int)feedbackRating)}";
-            var tokenHappy = _linkRepository.CreateLink(tailUrlHappy, _linkConfig.Value.ExpiryDays).Result;
-            return _sendGridConfig.Value.BaseUrl + "/link/" + tokenHappy;
+            string tailUrl = $"/Feedback/PostTaskFeedbackCapture?j={encodedJobId}&r={encodedRequestRoleType}&f={Base64Utils.Base64Encode((int)feedbackRating)}";
+            var token = _linkRepository.CreateLink(tailUrl, _linkConfig.Value.ExpiryDays).Result;
+            return _sendGridConfig.Value.BaseUrl + "/link/" + token;
         }
 
         #region Completed
