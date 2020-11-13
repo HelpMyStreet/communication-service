@@ -566,7 +566,7 @@ namespace CommunicationService.MessageService
 
             if (job.JobSummary.DueDays < 0)
             {
-                strDaysFromNow = "This request is now <strong>overdue</strong>. Please get in touch with the help recipient urgently to see if they still need support.";
+                strDaysFromNow = "This request is now <strong>overdue</strong>. Please get in touch with the help recipient urgently to see if they still need support";
             }
             else
             {                
@@ -737,16 +737,9 @@ namespace CommunicationService.MessageService
                     case JobStatuses.Cancelled:
                         return inError;
                     case JobStatuses.Done:                       
-                        if (job.JobSummary.SupportActivity == SupportActivities.FaceMask && !isvolunteer)
-                        {
-                            return string.Empty;
-                        }
-                        else
-                        {
                             return "<strong>Tell us how it went?</strong></p><p>How was your experience with HelpMyStreet?</p><p>"
                                 + "<a href=\"" + GetProtectedUrl(job.JobSummary.JobID,recipientOrRequestor,FeedbackRating.HappyFace) + "\">Happy</a></p>"
                                 + "<p><a href=\"" + GetProtectedUrl(job.JobSummary.JobID, recipientOrRequestor, FeedbackRating.SadFace) + "\">Sad</a>";
-                        }
                     case JobStatuses.Open:
                     case JobStatuses.InProgress:
                         if (isvolunteer)
@@ -781,7 +774,7 @@ namespace CommunicationService.MessageService
 
             string tailUrl = $"/Feedback/PostTaskFeedbackCapture?j={encodedJobId}&r={encodedRequestRoleType}&f={Base64Utils.Base64Encode((int)feedbackRating)}";
             var token = _linkRepository.CreateLink(tailUrl, _linkConfig.Value.ExpiryDays).Result;
-            return _sendGridConfig.Value.BaseUrl + "/link/" + token;
+            return _sendGridConfig.Value.BaseUrl + "link/" + token;
         }
 
         #region Completed
@@ -817,7 +810,7 @@ namespace CommunicationService.MessageService
                 }
                 else if (recipientOrRequestor == "Requestor")
                 {
-                    string recipientDetails = job.JobSummary.RequestorType == RequestorType.Organisation ? job.JobSummary.RecipientOrganisation : job.Requestor.FirstName;
+                    string recipientDetails = job.JobSummary.RequestorType == RequestorType.Organisation ? job.JobSummary.RecipientOrganisation : job.Recipient.FirstName;
 
                     return $"Good news!</p><p>The request you made via HelpMyStreet on <strong>{job.JobSummary.DateRequested.ToString(DATE_FORMAT)}</strong> "
                        + $"for help for <strong>{recipientDetails}</strong> with <strong>{job.JobSummary.SupportActivity.FriendlyNameForEmail()}</strong> "
