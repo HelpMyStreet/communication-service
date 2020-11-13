@@ -99,6 +99,7 @@
     <None Remove="Migrations\20201026_150000_UpdateRegistrationEmails.json" />
     <None Remove="Migrations\20201026_151500_UpdateRegistrationEmails.json" />
     <None Remove="Migrations\20201028_090000_UpdateTaskReminderEmails.json" />
+    <None Remove="Migrations\20201006_100000_AddTaskUpdateUnsubscribe.json" />
   </ItemGroup>
 
   <ItemGroup>
@@ -152,6 +153,7 @@
     <EmbeddedResource Include="Migrations\20201014_090000_InterUserMessage.json" />
     <EmbeddedResource Include="Migrations\20201013_15100_InterUserMessage.json" />
     <EmbeddedResource Include="Migrations\20201005_151500_TestLinkSubstitution.json" />
+    <EmbeddedResource Include="Migrations\20201006_100000_AddTaskUpdateUnsubscribe.json" />
     <EmbeddedResource Include="Migrations\20200930_120000_AddBaseUrlToAllEmails.json" />
     <EmbeddedResource Include="Migrations\20200929_143000_AddBaseUrlToAllEmails.json" />
     <EmbeddedResource Include="Migrations\20200928_143000_AddBaseUrlToTaskNotification.json" />
