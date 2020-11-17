@@ -352,7 +352,7 @@ namespace CommunicationService.MessageService
             }
 
 
-            //Now consider the recipient
+            //Now consider the requestor
             if (sendEmailToRequestor)
             {
                 _sendMessageRequests.Add(new SendMessageRequest()
