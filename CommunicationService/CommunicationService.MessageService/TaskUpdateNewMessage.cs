@@ -321,15 +321,10 @@ namespace CommunicationService.MessageService
                 });
             }
 
-            bool sendEmailToRequestor = !string.IsNullOrEmpty(requestorEmailAddress);
+            bool sendEmailToRecipient = !string.IsNullOrEmpty(recipientEmailAddress);
 
-            if (!string.IsNullOrEmpty(volunteerEmailAddress) && !string.IsNullOrEmpty(requestorEmailAddress))
-            {
-                sendEmailToRequestor =  requestorEmailAddress != volunteerEmailAddress;
-            }
-            
             //Now consider the recipient
-            if (sendEmailToRequestor)
+            if (sendEmailToRecipient)
             {
                 _sendMessageRequests.Add(new SendMessageRequest()
                 {
@@ -344,8 +339,21 @@ namespace CommunicationService.MessageService
                 });
             }
 
-            //And finally the reicpient (of help)
-            if (!string.IsNullOrEmpty(recipientEmailAddress) && !string.IsNullOrEmpty(requestorEmailAddress) && recipientEmailAddress != requestorEmailAddress)
+            bool sendEmailToRequestor = !string.IsNullOrEmpty(requestorEmailAddress);
+
+            if (!string.IsNullOrEmpty(volunteerEmailAddress) && sendEmailToRequestor)
+            {
+                sendEmailToRequestor = requestorEmailAddress != volunteerEmailAddress;
+            }
+
+            if (sendEmailToRecipient && sendEmailToRequestor && recipientEmailAddress == requestorEmailAddress)
+            {
+                sendEmailToRequestor = false;
+            }
+
+
+            //Now consider the recipient
+            if (sendEmailToRequestor)
             {
                 _sendMessageRequests.Add(new SendMessageRequest()
                 {
@@ -359,6 +367,22 @@ namespace CommunicationService.MessageService
                      }
                 });
             }
+
+            ////And finally the requestor (of help)
+            //if (!string.IsNullOrEmpty(requestorEmailAddress) && !string.IsNullOrEmpty(requestorEmailAddress) && recipientEmailAddress != requestorEmailAddress)
+            //{
+            //    _sendMessageRequests.Add(new SendMessageRequest()
+            //    {
+            //        TemplateName = TemplateName.TaskUpdateNew,
+            //        RecipientUserID = REQUESTOR_DUMMY_USERID,
+            //        GroupID = groupId,
+            //        JobID = jobId,
+            //        AdditionalParameters = new Dictionary<string, string>()
+            //         {
+            //            {"RecipientOrRequestor", "Requestor"}
+            //         }
+            //    });
+            //}
 
             return _sendMessageRequests;
         }
