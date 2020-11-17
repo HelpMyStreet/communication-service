@@ -368,22 +368,6 @@ namespace CommunicationService.MessageService
                 });
             }
 
-            ////And finally the requestor (of help)
-            //if (!string.IsNullOrEmpty(requestorEmailAddress) && !string.IsNullOrEmpty(requestorEmailAddress) && recipientEmailAddress != requestorEmailAddress)
-            //{
-            //    _sendMessageRequests.Add(new SendMessageRequest()
-            //    {
-            //        TemplateName = TemplateName.TaskUpdateNew,
-            //        RecipientUserID = REQUESTOR_DUMMY_USERID,
-            //        GroupID = groupId,
-            //        JobID = jobId,
-            //        AdditionalParameters = new Dictionary<string, string>()
-            //         {
-            //            {"RecipientOrRequestor", "Requestor"}
-            //         }
-            //    });
-            //}
-
             return _sendMessageRequests;
         }
 
