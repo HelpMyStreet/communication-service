@@ -802,7 +802,7 @@ namespace CommunicationService.MessageService
                 }
                 else if (recipientOrRequestor == "Requestor")
                 {
-                    string recipientDetails = job.JobSummary.RequestorType == RequestorType.Organisation ? job.JobSummary.RecipientOrganisation : job.Requestor.FirstName;
+                    string recipientDetails = job.JobSummary.RequestorType == RequestorType.Organisation ? job.JobSummary.RecipientOrganisation : job.Recipient.FirstName;
 
                     return $"Good news!</p><p>The request you made via HelpMyStreet on <strong>{job.JobSummary.DateRequested.ToString(DATE_FORMAT)}</strong> "
                        + $"for help for <strong>{recipientDetails}</strong> with <strong>{job.JobSummary.SupportActivity.FriendlyNameForEmail()}</strong> "
