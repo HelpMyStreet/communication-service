@@ -321,15 +321,10 @@ namespace CommunicationService.MessageService
                 });
             }
 
-            bool sendEmailToRequestor = !string.IsNullOrEmpty(requestorEmailAddress);
+            bool sendEmailToRecipient = !string.IsNullOrEmpty(recipientEmailAddress);
 
-            if (!string.IsNullOrEmpty(volunteerEmailAddress) && !string.IsNullOrEmpty(requestorEmailAddress))
-            {
-                sendEmailToRequestor =  requestorEmailAddress != volunteerEmailAddress;
-            }
-            
             //Now consider the recipient
-            if (sendEmailToRequestor)
+            if (sendEmailToRecipient)
             {
                 _sendMessageRequests.Add(new SendMessageRequest()
                 {
@@ -344,8 +339,21 @@ namespace CommunicationService.MessageService
                 });
             }
 
-            //And finally the reicpient (of help)
-            if (!string.IsNullOrEmpty(recipientEmailAddress) && !string.IsNullOrEmpty(requestorEmailAddress) && recipientEmailAddress != requestorEmailAddress)
+            bool sendEmailToRequestor = !string.IsNullOrEmpty(requestorEmailAddress);
+
+            if (!string.IsNullOrEmpty(volunteerEmailAddress) && sendEmailToRequestor)
+            {
+                sendEmailToRequestor = requestorEmailAddress != volunteerEmailAddress;
+            }
+
+            if (sendEmailToRecipient && sendEmailToRequestor && recipientEmailAddress == requestorEmailAddress)
+            {
+                sendEmailToRequestor = false;
+            }
+
+
+            //Now consider the requestor
+            if (sendEmailToRequestor)
             {
                 _sendMessageRequests.Add(new SendMessageRequest()
                 {
@@ -794,7 +802,7 @@ namespace CommunicationService.MessageService
                 }
                 else if (recipientOrRequestor == "Requestor")
                 {
-                    string recipientDetails = job.JobSummary.RequestorType == RequestorType.Organisation ? job.JobSummary.RecipientOrganisation : job.Requestor.FirstName;
+                    string recipientDetails = job.JobSummary.RequestorType == RequestorType.Organisation ? job.JobSummary.RecipientOrganisation : job.Recipient.FirstName;
 
                     return $"Good news!</p><p>The request you made via HelpMyStreet on <strong>{job.JobSummary.DateRequested.ToString(DATE_FORMAT)}</strong> "
                        + $"for help for <strong>{recipientDetails}</strong> with <strong>{job.JobSummary.SupportActivity.FriendlyNameForEmail()}</strong> "
