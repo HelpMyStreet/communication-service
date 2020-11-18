@@ -100,6 +100,7 @@
     <None Remove="Migrations\20201026_151500_UpdateRegistrationEmails.json" />
     <None Remove="Migrations\20201028_090000_UpdateTaskReminderEmails.json" />
     <None Remove="Migrations\20201006_100000_AddTaskUpdateUnsubscribe.json" />
+    <None Remove="Migrations\20201118_121600_UpdateTaskNotificationEmail.json" />
   </ItemGroup>
 
   <ItemGroup>
@@ -140,6 +141,7 @@
     <EmbeddedResource Include="Emails\RequestorTaskNotification.html" />
     <EmbeddedResource Include="Migrations\20200709_130700_AddRequestorTaskNotification.json" />
     <EmbeddedResource Include="Migrations\20200717_152400_AddUnsubscribeGroupsDailyDigest.json" />
+    <EmbeddedResource Include="Migrations\20201118_121600_UpdateTaskNotificationEmail.json" />
     <EmbeddedResource Include="Migrations\20201028_090000_UpdateTaskReminderEmails.json" />
     <EmbeddedResource Include="Migrations\20201026_151500_UpdateRegistrationEmails.json" />
     <EmbeddedResource Include="Migrations\20201026_150000_UpdateRegistrationEmails.json" />
