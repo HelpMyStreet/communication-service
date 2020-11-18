@@ -5,8 +5,8 @@
   </PropertyGroup>
 
   <ItemGroup>
-	  <PackageReference Include="HelpMyStreet.CoreV3.Contracts" Version="1.1.461" />
-	  <PackageReference Include="HelpMyStreet.CoreV3.Utils" Version="1.1.461" />
+	  <PackageReference Include="HelpMyStreet.CoreV3.Contracts" Version="1.1.489" />
+	  <PackageReference Include="HelpMyStreet.CoreV3.Utils" Version="1.1.489" />
     <PackageReference Include="Marvin.StreamExtensions" Version="1.1.0" />
     <PackageReference Include="MediatR" Version="8.1.0" />
     <PackageReference Include="Microsoft.Extensions.Http" Version="3.1.9" />
