@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using CommunicationService.MessageService.Substitution;
 using HelpMyStreet.Utils.Enums;
 using HelpMyStreet.Utils.Extensions;
+using HelpMyStreet.Contracts.RequestService.Response;
 
 namespace CommunicationService.MessageService
 {
@@ -54,6 +55,93 @@ namespace CommunicationService.MessageService
             }
 
             throw new Exception("Unable to Get Recipient details");
+        }
+
+        private string SenderAndContextRecipient(string senderName, RequestRoles toRole)
+        {
+            switch (toRole)
+            {
+                case RequestRoles.Requestor:
+                    return senderName + ", the person who you requested help for.";                  
+                case RequestRoles.Volunteer:
+                    return senderName + ", the person who you helped.";
+                case RequestRoles.GroupAdmin:
+                    return senderName + ", the person who needed help.";
+                default:
+                    throw new Exception($"Invalid Request Role {toRole}");
+            }
+        }
+
+        private string SenderAndContextRequestor(string senderName, string helpRecipient, RequestRoles toRole)
+        {
+            switch (toRole)
+            {
+                case RequestRoles.Recipient:
+                    return senderName + ", the person who requested help for you.";                    
+                case RequestRoles.Volunteer:
+                case RequestRoles.GroupAdmin:
+                    return senderName + ", the person who requested help for " + helpRecipient + ".";
+                default:
+                    throw new Exception($"Invalid Request Role {toRole}");
+            }
+        }
+
+        private string SenderAndContextVolunteer(string senderName, string helpRecipient, RequestRoles toRole)
+        {
+            switch (toRole)
+            {
+                case RequestRoles.Recipient:
+                    return senderName + ", the volunteer who accepted the request for help.";
+                case RequestRoles.Requestor:
+                    return senderName + ", the volunteer who accepted the request for " + helpRecipient + ".";                    
+                case RequestRoles.GroupAdmin:
+                    return senderName + ", the volunteer who helped " + helpRecipient + ".";
+                default:
+                    throw new Exception($"Invalid Request Role {toRole}");
+            }
+        }
+
+        private string SenderAndContextGroupAdmin(string senderName, string groupName)
+        {
+            return senderName + " at " + groupName + ".";
+        }
+
+        private async Task<string> SenderAndContext(string senderName, string senderRequestorRole, string toRequestorRole, string groupName, int? jobId)
+        {
+            string result = string.Empty ;
+            RequestRoles senderRole = (RequestRoles)Enum.Parse(typeof(RequestRoles), senderRequestorRole);
+            RequestRoles toRole = (RequestRoles)Enum.Parse(typeof(RequestRoles), toRequestorRole);
+            string helpRecipient = string.Empty;
+
+            GetJobDetailsResponse job = null;
+            if (jobId.HasValue)
+            {
+                job = await _connectRequestService.GetJobDetailsAsync(jobId.Value);
+                helpRecipient = job.Recipient?.FirstName;
+            }
+
+            switch (senderRole)
+            {
+                case RequestRoles.Recipient:
+                    result = SenderAndContextRecipient(senderName, toRole);
+                    break;
+                case RequestRoles.Requestor:
+                    result = SenderAndContextRequestor(senderName, helpRecipient, toRole);
+                    break;
+                case RequestRoles.Volunteer:
+                    result = SenderAndContextVolunteer(senderName, helpRecipient, toRole);
+                    break;
+                case RequestRoles.GroupAdmin:
+                    result = SenderAndContextGroupAdmin(senderName, groupName);
+                    break;                    
+            }   
+
+            if (job!=null)
+            {
+                DateTime dtStatusChanged = job.JobSummary.DateStatusLastChanged;
+                result = $"{result} The request was for <strong>{ job.JobSummary.SupportActivity.FriendlyNameForEmail()}</strong> and was {Mapping.StatusMappingsNotifications[job.JobSummary.JobStatus]} <strong>{dtStatusChanged.FriendlyPastDate()}</strong>";
+            }            
+            return result;
         }
 
         private async Task<string> SenderAndContext(string senderName, string senderRequestorRole, int? jobId)
@@ -104,12 +192,14 @@ namespace CommunicationService.MessageService
             string title = "Personal message received";
             string recipientFirstName = string.Empty;
             string senderName = string.Empty;
-            additionalParameters.TryGetValue("SenderRequestorRole", out string senderRequestorRole);            
+            additionalParameters.TryGetValue("SenderRequestorRole", out string senderRequestorRole);
             string senderMessage = string.Empty;
             string emailToAddress = string.Empty;
             string emailToName = string.Empty;
+            additionalParameters.TryGetValue("ToRequestorRole", out string toRequestorRole);
+            additionalParameters.TryGetValue("GroupName", out string groupName);
 
-            if(recipientDetails!=null)
+            if (recipientDetails!=null)
             {
                 emailToAddress = recipientDetails[RECIPIENT_EMAIL_ADDRESS];
                 emailToName = recipientDetails[RECIPIENT_DISPLAY_NAME];
@@ -121,7 +211,7 @@ namespace CommunicationService.MessageService
                 additionalParameters.TryGetValue("SenderMessage", out senderMessage);
                 additionalParameters.TryGetValue("SenderName", out senderName);               
             }
-            string senderAndContext = await SenderAndContext( senderName, senderRequestorRole, jobId);
+            string senderAndContext = await SenderAndContext( senderName, senderRequestorRole, toRequestorRole, groupName, jobId);
 
             return new EmailBuildData()
             {
