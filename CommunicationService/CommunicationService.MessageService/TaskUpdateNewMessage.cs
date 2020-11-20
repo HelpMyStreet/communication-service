@@ -385,7 +385,12 @@ namespace CommunicationService.MessageService
 
             string changedBy = "n administrator";
             string action = "you accepted";
-            string actionDate = job.History.Where(x => x.JobStatus == JobStatuses.InProgress).OrderByDescending(x => x.StatusDate).First().StatusDate.ToString(DATE_FORMAT);
+            string actionDate = job.JobSummary.DateRequested.ToString(DATE_FORMAT);
+
+            if(job.History.Count(x => x.JobStatus == JobStatuses.InProgress)>0)
+            {
+                actionDate = job.History.Where(x => x.JobStatus == JobStatuses.InProgress).OrderByDescending(x => x.StatusDate).First().StatusDate.ToString(DATE_FORMAT);
+            }
 
             string recipientDetails = string.Empty;
             string locality = job.Recipient.Address.Locality == null ? string.Empty : $" in <strong>{textInfo.ToTitleCase(job.Recipient.Address.Locality.ToLower())}</strong>";
