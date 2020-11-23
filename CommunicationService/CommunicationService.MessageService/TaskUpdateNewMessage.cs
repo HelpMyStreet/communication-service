@@ -739,11 +739,11 @@ namespace CommunicationService.MessageService
                     case JobStatuses.Cancelled:
                         return inError;
                     case JobStatuses.Done:
-                        return $"<br/><p><strong>Tell us how it went</strong></p><p>How was your experience with HelpMyStreet?</p>" +
+                        return $"<br/><p style='color:#001489;font-weight:bold;font-size:14.0pt'>Tell us how it went</p><p>How was your experience with HelpMyStreet?</p>" +
                         $"<table>" +
                         $"<tr style='margin-left:10px'>" +
-                        $"<td><a href='{GetProtectedUrl(job.JobSummary.JobID, recipientOrRequestor, FeedbackRating.HappyFace)}'><img src='{happyFaceImage}' alt='Great' width='145' height='140'></a></td>" +
-                        $"<td><a href='{GetProtectedUrl(job.JobSummary.JobID, recipientOrRequestor, FeedbackRating.SadFace)}'><img src='{sadFaceImage}' alt='Not So Great' width='145' height='140'></a></td>" +
+                        $"<td><a href='{GetProtectedUrl(job.JobSummary.JobID, recipientOrRequestor, FeedbackRating.HappyFace)}'><img src='{happyFaceImage}' alt='Great' width='145' height='132'></a></td>" +
+                        $"<td><a href='{GetProtectedUrl(job.JobSummary.JobID, recipientOrRequestor, FeedbackRating.SadFace)}'><img src='{sadFaceImage}' alt='Not So Great' width='145' height='132'></a></td>" +
                         $"</tr>" +
                         $"</table><br/>";
                     case JobStatuses.Open:
