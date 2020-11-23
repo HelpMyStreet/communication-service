@@ -49,8 +49,7 @@ namespace CommunicationService.MessageService.Substitution
         public bool OtherJobs { get; private set; }
         public List<DailyDigestDataJob> ChosenJobList { get; private set; }
         public List<DailyDigestDataJob> OtherJobsList { get; private set; }
-        public bool IsVerified { get; private set; }
-
+        
         public DailyDigestData(
             string title,
             string firstName,
@@ -58,8 +57,7 @@ namespace CommunicationService.MessageService.Substitution
             int chosenJobs,
             bool otherJobs,
             List<DailyDigestDataJob> chosenJobsList,
-            List<DailyDigestDataJob> otherJobsList,
-            bool isVerified
+            List<DailyDigestDataJob> otherJobsList
             )
 
         {
@@ -70,10 +68,6 @@ namespace CommunicationService.MessageService.Substitution
             OtherJobs = otherJobs;
             ChosenJobList = chosenJobsList;
             OtherJobsList = otherJobsList;
-            IsVerified = isVerified;
         }
-        
-    
-
     }
 }
