@@ -144,37 +144,6 @@ namespace CommunicationService.MessageService
             return result;
         }
 
-        private async Task<string> SenderAndContext(string senderName, string senderRequestorRole, int? jobId)
-        {
-            string result = string.Empty;
-            RequestRoles requestRole = (RequestRoles)Enum.Parse(typeof(RequestRoles), senderRequestorRole);
-            switch(requestRole)
-            {
-                case RequestRoles.Recipient:
-                    result = $"{senderName}, the person you helped.";
-                    break;
-                case RequestRoles.Requestor:
-                    result = $"{senderName}, the person you requested help for.";
-                    break;
-                case RequestRoles.Volunteer:
-                    result = $"{senderName}, the person who requested help for you.";
-                    break;
-                default:
-                    break;
-            }
-
-            if(jobId.HasValue)
-            {
-                var job = await _connectRequestService.GetJobDetailsAsync(jobId.Value);
-                if (job != null)
-                {
-                    DateTime dtStatusChanged = job.JobSummary.DateStatusLastChanged;
-                    result = $"{result} The request was for <strong>{ job.JobSummary.SupportActivity.FriendlyNameForEmail()}</strong> and was {Mapping.StatusMappingsNotifications[job.JobSummary.JobStatus]} <strong>{dtStatusChanged.FriendlyPastDate()}</strong>";
-                }
-            }
-            return result;
-        }
-
         public async Task<EmailBuildData> PrepareTemplateData(Guid batchId, int? recipientUserId, int? jobId, int? groupId, Dictionary<string, string> additionalParameters, string templateName)
         {
             if (!recipientUserId.HasValue)

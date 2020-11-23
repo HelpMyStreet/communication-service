@@ -121,6 +121,10 @@ namespace CommunicationService.Handlers
                 {
                     returnValue = group.Group.GroupName;
                 }
+                else
+                {
+                    throw new Exception($"Unable to find group name for { request.From.GroupRoleType.GroupId.Value }");
+                }
             }
             return returnValue;
         }
