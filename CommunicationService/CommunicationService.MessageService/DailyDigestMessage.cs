@@ -224,8 +224,7 @@ namespace CommunicationService.MessageService
                     criteriaJobs.Count(),
                     otherJobs.Count() > 0,
                     chosenJobsList,
-                    otherJobsList,
-                    user.IsVerified ?? false
+                    otherJobsList
                     ),
                 EmailToAddress = user.UserPersonalDetails.EmailAddress,
                 EmailToName = user.UserPersonalDetails.DisplayName

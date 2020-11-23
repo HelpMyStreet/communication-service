@@ -328,15 +328,10 @@ namespace CommunicationService.MessageService
                 });
             }
 
-            bool sendEmailToRequestor = !string.IsNullOrEmpty(requestorEmailAddress);
+            bool sendEmailToRecipient = !string.IsNullOrEmpty(recipientEmailAddress);
 
-            if (!string.IsNullOrEmpty(volunteerEmailAddress) && !string.IsNullOrEmpty(requestorEmailAddress))
-            {
-                sendEmailToRequestor =  requestorEmailAddress != volunteerEmailAddress;
-            }
-            
             //Now consider the recipient
-            if (sendEmailToRequestor)
+            if (sendEmailToRecipient)
             {
                 _sendMessageRequests.Add(new SendMessageRequest()
                 {
@@ -351,8 +346,21 @@ namespace CommunicationService.MessageService
                 });
             }
 
-            //And finally the reicpient (of help)
-            if (!string.IsNullOrEmpty(recipientEmailAddress) && !string.IsNullOrEmpty(requestorEmailAddress) && recipientEmailAddress != requestorEmailAddress)
+            bool sendEmailToRequestor = !string.IsNullOrEmpty(requestorEmailAddress);
+
+            if (!string.IsNullOrEmpty(volunteerEmailAddress) && sendEmailToRequestor)
+            {
+                sendEmailToRequestor = requestorEmailAddress != volunteerEmailAddress;
+            }
+
+            if (sendEmailToRecipient && sendEmailToRequestor && recipientEmailAddress == requestorEmailAddress)
+            {
+                sendEmailToRequestor = false;
+            }
+
+
+            //Now consider the requestor
+            if (sendEmailToRequestor)
             {
                 _sendMessageRequests.Add(new SendMessageRequest()
                 {
@@ -384,7 +392,12 @@ namespace CommunicationService.MessageService
 
             string changedBy = "n administrator";
             string action = "you accepted";
-            string actionDate = job.History.Where(x => x.JobStatus == JobStatuses.InProgress).OrderByDescending(x => x.StatusDate).First().StatusDate.ToString(DATE_FORMAT);
+            string actionDate = job.JobSummary.DateRequested.ToString(DATE_FORMAT);
+
+            if(job.History.Count(x => x.JobStatus == JobStatuses.InProgress)>0)
+            {
+                actionDate = job.History.Where(x => x.JobStatus == JobStatuses.InProgress).OrderByDescending(x => x.StatusDate).First().StatusDate.ToString(DATE_FORMAT);
+            }
 
             string recipientDetails = string.Empty;
             string locality = job.Recipient.Address.Locality == null ? string.Empty : $" in <strong>{textInfo.ToTitleCase(job.Recipient.Address.Locality.ToLower())}</strong>";
