@@ -519,7 +519,7 @@ namespace CommunicationService.MessageService
                     }
 
                     return $"The request for help{recipientDetails}" +
-                        $" with <strong>{job.JobSummary.SupportActivity.FriendlyNameForEmail()}</strong>{ageUKReference}" +
+                        $" with <strong>{job.JobSummary.SupportActivity.FriendlyNameForEmail()}{ageUKReference}</strong>" +
                         $" that you accepted on {actionDate} " +
                         $"{paragraphOneStart}" +
                         $" by an administrator{group}." +
@@ -817,11 +817,11 @@ namespace CommunicationService.MessageService
                     {
                         case RequestorType.Myself:
                             return $"Good news!</p><p>The request you made via HelpMyStreet on <strong>{job.JobSummary.DateRequested.ToString(DATE_FORMAT)}</strong> "
-                            + $"for help with <strong>{job.JobSummary.SupportActivity.FriendlyNameForEmail()}</strong> "
+                            + $"for help with <strong>{job.JobSummary.SupportActivity.FriendlyNameForEmail()}{ageUKReference}</strong> "
                             + $"was updated to <strong>Completed</strong> { job.JobSummary.DateStatusLastChanged.FriendlyPastDate()}.";
                         case RequestorType.OnBehalf:
                             return $"Good news!</p><p>The request <strong>{job.Requestor.FirstName}</strong> made for you via HelpMyStreet on <strong>{job.JobSummary.DateRequested.ToString(DATE_FORMAT)}</strong> "
-                            + $"for help with <strong>{job.JobSummary.SupportActivity.FriendlyNameForEmail()}</strong> "
+                            + $"for help with <strong>{job.JobSummary.SupportActivity.FriendlyNameForEmail()}{ageUKReference}</strong> "
                             + $"was updated to <strong>Completed</strong> { job.JobSummary.DateStatusLastChanged.FriendlyPastDate()}.";
                         default:
                             return string.Empty;
@@ -832,7 +832,7 @@ namespace CommunicationService.MessageService
                     string recipientDetails = job.JobSummary.RequestorType == RequestorType.Organisation ? job.JobSummary.RecipientOrganisation : job.Recipient.FirstName;
 
                     return $"Good news!</p><p>The request you made via HelpMyStreet on <strong>{job.JobSummary.DateRequested.ToString(DATE_FORMAT)}</strong> "
-                       + $"for help for <strong>{recipientDetails}</strong> with <strong>{job.JobSummary.SupportActivity.FriendlyNameForEmail()}</strong> "
+                       + $"for help for <strong>{recipientDetails}</strong> with <strong>{job.JobSummary.SupportActivity.FriendlyNameForEmail()}{ageUKReference}</strong> "
                        + $"was updated to <strong>Completed</strong> { job.JobSummary.DateStatusLastChanged.FriendlyPastDate()} at {timeStatusChanged}.";
                 }
                 else
