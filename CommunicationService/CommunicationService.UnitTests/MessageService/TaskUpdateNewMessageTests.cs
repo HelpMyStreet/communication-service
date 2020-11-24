@@ -21,7 +21,9 @@ namespace CommunicationService.UnitTests.MessageService
         private Mock<IConnectRequestService> _requestService;
         private Mock<IConnectUserService> _userService;
         private Mock<IConnectGroupService> _groupService;
+        private Mock<ILinkRepository> _linkRepository;
         private Mock<IOptions<SendGridConfig>> _sendGridConfig;
+        private Mock<IOptions<LinkConfig>> _linkConfig;
 
         private GetJobDetailsResponse _job;
         private User _user;
@@ -33,12 +35,16 @@ namespace CommunicationService.UnitTests.MessageService
             SetupRequestService();
             SetupUserService();
             SetupGroupService();
+            SetupLinkRepository();
             SetupSendGridConfig();
+            SetupLinkConfig();
 
             _classUnderTest = new TaskUpdateNewMessage(
                 _requestService.Object,
                 _userService.Object,
                 _groupService.Object,
+                _linkRepository.Object,
+                _linkConfig.Object,
                 _sendGridConfig.Object);
         }
 
@@ -62,9 +68,17 @@ namespace CommunicationService.UnitTests.MessageService
         {
             _groupService = new Mock<IConnectGroupService>();
         }
+        private void SetupLinkRepository()
+        {
+            _linkRepository = new Mock<ILinkRepository>();
+        }
         private void SetupSendGridConfig()
         {
             _sendGridConfig = new Mock<IOptions<SendGridConfig>>();
+        }
+        private void SetupLinkConfig()
+        {
+            _linkConfig = new Mock<IOptions<LinkConfig>>();
         }
 
         #endregion Setup
