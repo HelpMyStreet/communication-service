@@ -99,7 +99,7 @@ namespace CommunicationService.Handlers
             {
                 Content = interUserMessageRequest.Content,
                 ThreadId = interUserMessageRequest.ThreadId,
-                SenderFirstName  = senderFirstName,
+                SenderFirstName = senderFirstName,
                 SenderRequestRoles = senderRequestRole,
                 JobId = interUserMessageRequest.JobId,
                 RecipientUserIds = recipients,
@@ -107,8 +107,26 @@ namespace CommunicationService.Handlers
                 MessageDate = DateTime.Now,
                 EmailDetails = interUserMessageRequest.To.EmailDetails,
                 id = Guid.NewGuid(),
-                SenderUserIds  = await IdentifyUserIDs(interUserMessageRequest.From),
+                SenderUserIds = await IdentifyUserIDs(interUserMessageRequest.From),
             };
+        }
+
+        private async Task<string> GetGroupName(InterUserMessageRequest request)
+        {
+            string returnValue = string.Empty;
+            if(request.From.GroupRoleType!=null && request.From.GroupRoleType.GroupId.HasValue)
+            {
+                var group = await _connectGroupService.GetGroupResponse(request.From.GroupRoleType.GroupId.Value);
+                if (group != null)
+                {
+                    returnValue = group.Group.GroupName;
+                }
+                else
+                {
+                    throw new Exception($"Unable to find group name for { request.From.GroupRoleType.GroupId.Value }");
+                }
+            }
+            return returnValue;
         }
     
 
@@ -120,9 +138,10 @@ namespace CommunicationService.Handlers
             additionalParameters.Add("SenderMessage", request.Content);
             additionalParameters.Add("SenderName", senderName);
             additionalParameters.Add("SenderRequestorRole", request.From.RequestRoleType.RequestRole.ToString());
+            additionalParameters.Add("ToRequestorRole", request.To.RequestRoleType.RequestRole.ToString());
+            additionalParameters.Add("GroupName", await GetGroupName(request));
 
-            var recipients = await IdentifyUserIDs(request.To);
-            //int? groupID = GetGroupId(request);
+            var recipients = await IdentifyUserIDs(request.To);            
 
             await _interUserMessageRepository.SaveInterUserMessageAsync(await CreateSaveInterUserMessage(
                 senderName,

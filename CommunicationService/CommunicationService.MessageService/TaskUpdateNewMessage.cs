@@ -22,6 +22,8 @@ using RestSharp.Extensions;
 using Microsoft.Extensions.Options;
 using CommunicationService.Core.Configuration;
 using HelpMyStreet.Utils.Extensions;
+using HelpMyStreet.Utils.Utils;
+using HelpMyStreet.Contracts.FeedbackService.Request;
 
 namespace CommunicationService.MessageService
 {
@@ -30,6 +32,8 @@ namespace CommunicationService.MessageService
         private readonly IConnectRequestService _connectRequestService;
         private readonly IConnectUserService _connectUserService;
         private readonly IConnectGroupService _connectGroupService;
+        private readonly ILinkRepository _linkRepository;
+        private readonly IOptions<LinkConfig> _linkConfig;
         private readonly IOptions<SendGridConfig> _sendGridConfig;
         private const string DATE_FORMAT = "dddd, dd MMMM";
 
@@ -42,12 +46,15 @@ namespace CommunicationService.MessageService
             return UnsubscribeGroupName.TaskUpdate;
         }
 
-        public TaskUpdateNewMessage(IConnectRequestService connectRequestService, IConnectUserService connectUserService, IConnectGroupService connectGroupService, IOptions<SendGridConfig> sendGridConfig)
+        public TaskUpdateNewMessage(IConnectRequestService connectRequestService, IConnectUserService connectUserService, IConnectGroupService connectGroupService, ILinkRepository linkRepository, IOptions<LinkConfig> linkConfig, IOptions<SendGridConfig> sendGridConfig)
         {
             _connectRequestService = connectRequestService;
             _connectUserService = connectUserService;
             _connectGroupService = connectGroupService;
+            _linkRepository = linkRepository;
+            _linkConfig = linkConfig;
             _sendGridConfig = sendGridConfig;
+
             _sendMessageRequests = new List<SendMessageRequest>();
         }
 
@@ -572,7 +579,7 @@ namespace CommunicationService.MessageService
 
             if (job.JobSummary.DueDays < 0)
             {
-                strDaysFromNow = "This request is now <strong>overdue</strong>. Please get in touch with the help recipient urgently to see if they still need support.";
+                strDaysFromNow = "This request is now <strong>overdue</strong>. Please get in touch with the help recipient urgently to see if they still need support";
             }
             else
             {                
@@ -737,28 +744,21 @@ namespace CommunicationService.MessageService
                 }
             }
             else
-            {                
+            {
+                var happyFaceImage = $"{_sendGridConfig.Value.BaseUrl}/img/email-resources/great.png";
+                var sadFaceImage = $"{_sendGridConfig.Value.BaseUrl}/img/email-resources/not-so-great.png";
                 switch (job.JobSummary.JobStatus)
                 {
                     case JobStatuses.Cancelled:
                         return inError;
                     case JobStatuses.Done:
-                        if (job.JobSummary.SupportActivity == SupportActivities.FaceMask && !isvolunteer)
-                        {
-                            switch (recipientOrRequestor)
-                            {
-                                case "Recipient":
-                                    return string.Empty;
-                                case "Requestor":
-                                    return string.Empty;
-                                default:
-                                    return inError;
-                            }
-                        }
-                        else
-                        {
-                            return inError;
-                        }
+                        return $"<br/><p><strong>Tell us how it went</strong></p><p>How was your experience with HelpMyStreet?</p>" +
+                        $"<table>" +
+                        $"<tr style='margin-left:10px'>" +
+                        $"<td><a href='{GetProtectedUrl(job.JobSummary.JobID, recipientOrRequestor, FeedbackRating.HappyFace)}'><img src='{happyFaceImage}' alt='Great' width='145' height='132'></a></td>" +
+                        $"<td><a href='{GetProtectedUrl(job.JobSummary.JobID, recipientOrRequestor, FeedbackRating.SadFace)}'><img src='{sadFaceImage}' alt='Not So Great' width='145' height='132'></a></td>" +
+                        $"</tr>" +
+                        $"</table><br/>";
                     case JobStatuses.Open:
                     case JobStatuses.InProgress:
                         if (isvolunteer)
@@ -772,6 +772,28 @@ namespace CommunicationService.MessageService
                 }
             }
             throw new Exception("unable to create paragraph3");
+        }
+
+        private string GetProtectedUrl(int jobId, string recipientOrRequestor,FeedbackRating feedbackRating)
+        {
+            string encodedJobId = Base64Utils.Base64Encode(jobId.ToString());
+            string encodedRequestRoleType;
+            switch (recipientOrRequestor)
+            {
+                case "Recipient":
+                    encodedRequestRoleType = Base64Utils.Base64Encode((int)RequestRoles.Recipient);
+                    break;
+                case "Requestor":
+                    encodedRequestRoleType = Base64Utils.Base64Encode((int)RequestRoles.Requestor);
+                    break;
+                default:
+                    encodedRequestRoleType =  string.Empty;
+                    break;
+            }
+
+            string tailUrl = $"/Feedback/PostTaskFeedbackCapture?j={encodedJobId}&r={encodedRequestRoleType}&f={Base64Utils.Base64Encode((int)feedbackRating)}";
+            var token = _linkRepository.CreateLink(tailUrl, _linkConfig.Value.ExpiryDays).Result;
+            return _sendGridConfig.Value.BaseUrl + "link/" + token;
         }
 
         #region Completed
