@@ -79,9 +79,9 @@ namespace CommunicationService.Handlers
                 return request.From.EmailDetails.DisplayName;
             }
 
-            if (request.To.GroupRoleType != null)
+            if (request.From.GroupRoleType != null)
             {
-                var group = await _connectGroupService.GetGroupResponse(request.To.GroupRoleType.GroupId.Value);
+                var group = await _connectGroupService.GetGroupResponse(request.From.GroupRoleType.GroupId.Value);
 
                 if (group != null)
                 {

@@ -63,6 +63,23 @@ namespace CommunicationService.GroupService
             }
         }
 
+        public async Task<GetGroupNewRequestNotificationStrategyResponse> GetGroupNewRequestNotificationStrategy(int groupId)
+        {
+            string path = $"/api/GetGroupNewRequestNotificationStrategy?groupId={groupId}";
+            string absolutePath = $"{path}";
+
+            using (HttpResponseMessage response = await _httpClientWrapper.GetAsync(HttpClientConfigName.GroupService, absolutePath, CancellationToken.None).ConfigureAwait(false))
+            {
+                string jsonResponse = await response.Content.ReadAsStringAsync();
+                var getJobsResponse = JsonConvert.DeserializeObject<ResponseWrapper<GetGroupNewRequestNotificationStrategyResponse, GroupServiceErrorCode>>(jsonResponse);
+                if (getJobsResponse.HasContent && getJobsResponse.IsSuccessful)
+                {
+                    return getJobsResponse.Content;
+                }
+                return null;
+            }
+        }
+
         public async Task<GetGroupResponse> GetGroupResponse(int groupId)
         {
             string path = $"/api/GetGroup?groupID=" + groupId;
