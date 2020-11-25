@@ -106,7 +106,7 @@ namespace CommunicationService.MessageService
             return senderName + " at " + groupName + ".";
         }
 
-        private async Task<string> SenderAndContext(string senderName, string senderRequestorRole, string toRequestorRole, string groupName, int? jobId)
+        private async Task<string> SenderAndContext(string senderName, string senderRequestorRole, string toRequestorRole, string senderGroupName, int? jobId)
         {
             string result = string.Empty ;
             RequestRoles senderRole = (RequestRoles)Enum.Parse(typeof(RequestRoles), senderRequestorRole);
@@ -132,7 +132,7 @@ namespace CommunicationService.MessageService
                     result = SenderAndContextVolunteer(senderName, helpRecipient, toRole);
                     break;
                 case RequestRoles.GroupAdmin:
-                    result = SenderAndContextGroupAdmin(senderName, groupName);
+                    result = SenderAndContextGroupAdmin(senderName, senderGroupName);
                     break;                    
             }   
 
@@ -142,6 +142,30 @@ namespace CommunicationService.MessageService
                 result = $"{result} The request was for <strong>{ job.JobSummary.SupportActivity.FriendlyNameForEmail()}</strong> and was {Mapping.StatusMappingsNotifications[job.JobSummary.JobStatus]} <strong>{dtStatusChanged.FriendlyPastDate()}</strong>";
             }            
             return result;
+        }
+
+        private string GetTitle(string toGroupName)
+        {
+            if (string.IsNullOrEmpty(toGroupName))
+            {
+                return "Personal message received";
+            }
+            else
+            {
+                return $"Message received for {toGroupName}";
+            }
+        }
+
+        private string GetSubject(string toGroupName)
+        {
+            if (string.IsNullOrEmpty(toGroupName))
+            {
+                return "A personal message sent through HelpMyStreet";
+            }
+            else
+            {
+                return $"A message for {toGroupName} sent through HelpMyStreet";
+            }
         }
 
         public async Task<EmailBuildData> PrepareTemplateData(Guid batchId, int? recipientUserId, int? jobId, int? groupId, Dictionary<string, string> additionalParameters, string templateName)
@@ -157,8 +181,6 @@ namespace CommunicationService.MessageService
             }
             var recipientDetails = await GetRecipientDetails(recipientUserId, additionalParameters);
 
-            string subject = "A personal message sent through HelpMyStreet";
-            string title = "Personal message received";
             string recipientFirstName = string.Empty;
             string senderName = string.Empty;
             additionalParameters.TryGetValue("SenderRequestorRole", out string senderRequestorRole);
@@ -166,7 +188,11 @@ namespace CommunicationService.MessageService
             string emailToAddress = string.Empty;
             string emailToName = string.Empty;
             additionalParameters.TryGetValue("ToRequestorRole", out string toRequestorRole);
-            additionalParameters.TryGetValue("GroupName", out string groupName);
+            additionalParameters.TryGetValue("SenderGroupName", out string senderGroupName);
+            additionalParameters.TryGetValue("ToGroupName", out string toGroupName);
+            string subject = GetSubject(toGroupName);
+            string title = GetTitle(toGroupName);
+
 
             if (recipientDetails!=null)
             {
@@ -180,7 +206,7 @@ namespace CommunicationService.MessageService
                 additionalParameters.TryGetValue("SenderMessage", out senderMessage);
                 additionalParameters.TryGetValue("SenderName", out senderName);               
             }
-            string senderAndContext = await SenderAndContext( senderName, senderRequestorRole, toRequestorRole, groupName, jobId);
+            string senderAndContext = await SenderAndContext( senderName, senderRequestorRole, toRequestorRole, senderGroupName, jobId);
 
             return new EmailBuildData()
             {
