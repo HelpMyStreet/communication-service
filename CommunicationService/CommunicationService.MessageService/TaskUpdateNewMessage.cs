@@ -793,7 +793,7 @@ namespace CommunicationService.MessageService
 
             string tailUrl = $"/Feedback/PostTaskFeedbackCapture?j={encodedJobId}&r={encodedRequestRoleType}&f={Base64Utils.Base64Encode((int)feedbackRating)}";
             var token = _linkRepository.CreateLink(tailUrl, _linkConfig.Value.ExpiryDays).Result;
-            return _sendGridConfig.Value.BaseUrl + "link/" + token;
+            return _sendGridConfig.Value.BaseUrl + "/link/" + token;
         }
 
         #region Completed
