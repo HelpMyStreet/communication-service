@@ -79,7 +79,7 @@ namespace CommunicationService.Handlers
                 return request.From.EmailDetails.DisplayName;
             }
 
-            if (request.To.GroupRoleType != null)
+            if (request.From.GroupRoleType != null)
             {
                 var group = await _connectGroupService.GetGroupResponse(request.To.GroupRoleType.GroupId.Value);
 
@@ -111,19 +111,19 @@ namespace CommunicationService.Handlers
             };
         }
 
-        private async Task<string> GetGroupName(InterUserMessageRequest request)
+        private async Task<string> GetGroupName(MessageParticipant participant)
         {
             string returnValue = string.Empty;
-            if(request.From.GroupRoleType!=null && request.From.GroupRoleType.GroupId.HasValue)
+            if(participant.GroupRoleType!=null && participant.GroupRoleType.GroupId.HasValue)
             {
-                var group = await _connectGroupService.GetGroupResponse(request.From.GroupRoleType.GroupId.Value);
+                var group = await _connectGroupService.GetGroupResponse(participant.GroupRoleType.GroupId.Value);
                 if (group != null)
                 {
                     returnValue = group.Group.GroupName;
                 }
                 else
                 {
-                    throw new Exception($"Unable to find group name for { request.From.GroupRoleType.GroupId.Value }");
+                    throw new Exception($"Unable to find group name for { participant.GroupRoleType.GroupId.Value }");
                 }
             }
             return returnValue;
@@ -139,7 +139,8 @@ namespace CommunicationService.Handlers
             additionalParameters.Add("SenderName", senderName);
             additionalParameters.Add("SenderRequestorRole", request.From.RequestRoleType.RequestRole.ToString());
             additionalParameters.Add("ToRequestorRole", request.To.RequestRoleType.RequestRole.ToString());
-            additionalParameters.Add("GroupName", await GetGroupName(request));
+            additionalParameters.Add("SenderGroupName", await GetGroupName(request.From));
+            additionalParameters.Add("ToGroupName", await GetGroupName(request.To));
 
             var recipients = await IdentifyUserIDs(request.To);            
 

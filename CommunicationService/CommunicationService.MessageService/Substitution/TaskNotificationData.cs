@@ -14,8 +14,6 @@ namespace CommunicationService.MessageService.Substitution
         public string PostCode { get; private set; }
         public double DistanceFromPostCode { get; private set; }
         public string DueDate { get; private set; }
-        public bool IsNotVerified { get; private set; }
-        public bool IsStreetChampionOfPostcode { get; private set; }
         public bool IsHealthCritical { get; private set; }
         public bool IsFaceMask { get; private set; }
 
@@ -27,8 +25,6 @@ namespace CommunicationService.MessageService.Substitution
             string postcode,
             double distanceFromPostcode,
             string dueDate,
-            bool isNotVerified,
-            bool isStreetChampionOfPostcode,
             bool isHealthCritical,
             bool isFaceMask
             )
@@ -40,8 +36,6 @@ namespace CommunicationService.MessageService.Substitution
             PostCode = postcode;
             DistanceFromPostCode = distanceFromPostcode;
             DueDate = dueDate;
-            IsNotVerified = isNotVerified;
-            IsStreetChampionOfPostcode = isStreetChampionOfPostcode;
             IsHealthCritical = isHealthCritical;
             IsFaceMask = isFaceMask;
         }

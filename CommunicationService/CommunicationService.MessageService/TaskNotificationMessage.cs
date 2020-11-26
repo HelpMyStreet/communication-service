@@ -64,8 +64,6 @@ namespace CommunicationService.MessageService
                         job.JobSummary.PostCode,
                         0,
                         job.JobSummary.DueDate.ToString("dd/MM/yyyy"),
-                        false,
-                        false,
                         job.JobSummary.IsHealthCritical,
                         isFaceMask
                     ),
@@ -90,10 +88,6 @@ namespace CommunicationService.MessageService
                 {
 
                     var volunteer = volunteers.Volunteers.FirstOrDefault(x => x.UserID == user.ID);
-                    if (volunteer != null)
-                    {
-                        isStreetChampionForGivenPostCode = volunteer.IsStreetChampionForGivenPostCode.Value;
-                    }
                     if (user != null && job != null)
                     {
                         return new EmailBuildData()
@@ -107,8 +101,6 @@ namespace CommunicationService.MessageService
                                 job.JobSummary.PostCode,
                                 Math.Round(volunteer.DistanceInMiles, 1),
                                 job.JobSummary.DueDate.ToString("dd/MM/yyyy"),
-                                user.IsVerified.HasValue ? !user.IsVerified.Value : true,
-                                isStreetChampionForGivenPostCode,
                                 job.JobSummary.IsHealthCritical,
                                 isFaceMask
                             ),
