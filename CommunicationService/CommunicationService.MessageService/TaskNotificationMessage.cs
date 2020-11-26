@@ -81,9 +81,7 @@ namespace CommunicationService.MessageService
                         new List<SupportActivities>() { job.JobSummary.SupportActivity },
                         CancellationToken.None
                     ).Result;
-
-                bool isStreetChampionForGivenPostCode = false;
-
+                
                 if (volunteers != null)
                 {
 
@@ -128,6 +126,16 @@ namespace CommunicationService.MessageService
             groupUsers = groupMembers.Users;
             
             var job = await _connectRequestService.GetJobDetailsAsync(jobId.Value);
+
+            var strategy = await _connectGroupService.GetGroupNewRequestNotificationStrategy(job.JobSummary.ReferringGroupID);
+
+            if(strategy==null)
+            {
+                throw new Exception($"No strategy for {job.JobSummary.ReferringGroupID}");
+            }
+
+            int recipientCount = 0;
+
             List<SupportActivities> supportActivities = new List<SupportActivities>();
             if (job != null)
             {
@@ -139,12 +147,21 @@ namespace CommunicationService.MessageService
 
                 if (volunteers != null)
                 {
+                    volunteers.Volunteers = volunteers.Volunteers.OrderBy(x => x.DistanceInMiles);
                     foreach (VolunteerSummary vs in volunteers.Volunteers)
                     {
-                        if (groupUsers.Contains(vs.UserID))
+                        if (recipientCount < strategy.MaxVolunteer)
                         {
-                            AddRecipientAndTemplate(TemplateName.TaskNotification, vs.UserID, jobId, groupId);
-                        }   
+                            if (groupUsers.Contains(vs.UserID))
+                            {
+                                AddRecipientAndTemplate(TemplateName.TaskNotification, vs.UserID, jobId, groupId);
+                                recipientCount++;
+                            }
+                        }
+                        else
+                        {
+                            return _sendMessageRequests;
+                        }
                     }
                 }
             }
