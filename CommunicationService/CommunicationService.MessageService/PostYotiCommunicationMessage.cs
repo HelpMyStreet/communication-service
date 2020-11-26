@@ -15,7 +15,6 @@ namespace CommunicationService.MessageService
     {
         private readonly IConnectUserService _connectUserService;
         private readonly ICosmosDbService _cosmosDbService;
-        private const int REGISTRATION_STEP4 = 4;
         List<SendMessageRequest> _sendMessageRequests;
 
         public string GetUnsubscriptionGroupName(int? recipientId)
@@ -82,33 +81,7 @@ namespace CommunicationService.MessageService
 
         public async Task<List<SendMessageRequest>> IdentifyRecipients(int? recipientUserId, int? jobId, int? groupId)
         {
-            var user = await _connectUserService.GetUserByIdAsync(recipientUserId.Value);
-
-            if (user != null)
-            {
-                if(user.IsVerified.HasValue)
-                {
-                    if (user.IsVerified.Value)
-                    {
-                        List<EmailHistory> reminderhistory = await _cosmosDbService.GetEmailHistory(TemplateName.YotiReminder, user.ID.ToString());
-                        if (reminderhistory.Count == 0)
-                        {
-                            AddRecipientAndTemplate(TemplateName.Welcome, recipientUserId.Value, jobId, groupId);
-                        }
-                        else
-                        {
-                            AddRecipientAndTemplate(TemplateName.ThanksForVerifying, recipientUserId.Value, jobId, groupId);
-                        }
-                    }
-                    else
-                    {
-                        if(user.RegistrationHistory.Max(x=> x.Key)==REGISTRATION_STEP4)
-                        {
-                            AddRecipientAndTemplate(TemplateName.UnableToVerify, recipientUserId.Value, jobId, groupId);
-                        }
-                    }
-                }   
-            }
+            AddRecipientAndTemplate(TemplateName.Welcome, recipientUserId.Value, jobId, groupId);            
             return _sendMessageRequests;
         }
     }

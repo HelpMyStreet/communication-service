@@ -328,15 +328,10 @@ namespace CommunicationService.MessageService
                 });
             }
 
-            bool sendEmailToRequestor = !string.IsNullOrEmpty(requestorEmailAddress);
+            bool sendEmailToRecipient = !string.IsNullOrEmpty(recipientEmailAddress);
 
-            if (!string.IsNullOrEmpty(volunteerEmailAddress) && !string.IsNullOrEmpty(requestorEmailAddress))
-            {
-                sendEmailToRequestor =  requestorEmailAddress != volunteerEmailAddress;
-            }
-            
             //Now consider the recipient
-            if (sendEmailToRequestor)
+            if (sendEmailToRecipient)
             {
                 _sendMessageRequests.Add(new SendMessageRequest()
                 {
@@ -351,8 +346,21 @@ namespace CommunicationService.MessageService
                 });
             }
 
-            //And finally the reicpient (of help)
-            if (!string.IsNullOrEmpty(recipientEmailAddress) && !string.IsNullOrEmpty(requestorEmailAddress) && recipientEmailAddress != requestorEmailAddress)
+            bool sendEmailToRequestor = !string.IsNullOrEmpty(requestorEmailAddress);
+
+            if (!string.IsNullOrEmpty(volunteerEmailAddress) && sendEmailToRequestor)
+            {
+                sendEmailToRequestor = requestorEmailAddress != volunteerEmailAddress;
+            }
+
+            if (sendEmailToRecipient && sendEmailToRequestor && recipientEmailAddress == requestorEmailAddress)
+            {
+                sendEmailToRequestor = false;
+            }
+
+
+            //Now consider the requestor
+            if (sendEmailToRequestor)
             {
                 _sendMessageRequests.Add(new SendMessageRequest()
                 {
@@ -384,7 +392,12 @@ namespace CommunicationService.MessageService
 
             string changedBy = "n administrator";
             string action = "you accepted";
-            string actionDate = job.History.Where(x => x.JobStatus == JobStatuses.InProgress).OrderByDescending(x => x.StatusDate).First().StatusDate.ToString(DATE_FORMAT);
+            string actionDate = job.JobSummary.DateRequested.ToString(DATE_FORMAT);
+
+            if(job.History.Count(x => x.JobStatus == JobStatuses.InProgress)>0)
+            {
+                actionDate = job.History.Where(x => x.JobStatus == JobStatuses.InProgress).OrderByDescending(x => x.StatusDate).First().StatusDate.ToString(DATE_FORMAT);
+            }
 
             string recipientDetails = string.Empty;
             string locality = job.Recipient.Address.Locality == null ? string.Empty : $" in <strong>{textInfo.ToTitleCase(job.Recipient.Address.Locality.ToLower())}</strong>";
@@ -506,7 +519,7 @@ namespace CommunicationService.MessageService
                     }
 
                     return $"The request for help{recipientDetails}" +
-                        $" with <strong>{job.JobSummary.SupportActivity.FriendlyNameForEmail()}</strong>{ageUKReference}" +
+                        $" with <strong>{job.JobSummary.SupportActivity.FriendlyNameForEmail()}{ageUKReference}</strong>" +
                         $" that you accepted on {actionDate} " +
                         $"{paragraphOneStart}" +
                         $" by an administrator{group}." +
@@ -780,7 +793,7 @@ namespace CommunicationService.MessageService
 
             string tailUrl = $"/Feedback/PostTaskFeedbackCapture?j={encodedJobId}&r={encodedRequestRoleType}&f={Base64Utils.Base64Encode((int)feedbackRating)}";
             var token = _linkRepository.CreateLink(tailUrl, _linkConfig.Value.ExpiryDays).Result;
-            return _sendGridConfig.Value.BaseUrl + "link/" + token;
+            return _sendGridConfig.Value.BaseUrl + "/link/" + token;
         }
 
         #region Completed
@@ -804,11 +817,11 @@ namespace CommunicationService.MessageService
                     {
                         case RequestorType.Myself:
                             return $"Good news!</p><p>The request you made via HelpMyStreet on <strong>{job.JobSummary.DateRequested.ToString(DATE_FORMAT)}</strong> "
-                            + $"for help with <strong>{job.JobSummary.SupportActivity.FriendlyNameForEmail()}</strong> "
+                            + $"for help with <strong>{job.JobSummary.SupportActivity.FriendlyNameForEmail()}{ageUKReference}</strong> "
                             + $"was updated to <strong>Completed</strong> { job.JobSummary.DateStatusLastChanged.FriendlyPastDate()}.";
                         case RequestorType.OnBehalf:
                             return $"Good news!</p><p>The request <strong>{job.Requestor.FirstName}</strong> made for you via HelpMyStreet on <strong>{job.JobSummary.DateRequested.ToString(DATE_FORMAT)}</strong> "
-                            + $"for help with <strong>{job.JobSummary.SupportActivity.FriendlyNameForEmail()}</strong> "
+                            + $"for help with <strong>{job.JobSummary.SupportActivity.FriendlyNameForEmail()}{ageUKReference}</strong> "
                             + $"was updated to <strong>Completed</strong> { job.JobSummary.DateStatusLastChanged.FriendlyPastDate()}.";
                         default:
                             return string.Empty;
@@ -819,7 +832,7 @@ namespace CommunicationService.MessageService
                     string recipientDetails = job.JobSummary.RequestorType == RequestorType.Organisation ? job.JobSummary.RecipientOrganisation : job.Recipient.FirstName;
 
                     return $"Good news!</p><p>The request you made via HelpMyStreet on <strong>{job.JobSummary.DateRequested.ToString(DATE_FORMAT)}</strong> "
-                       + $"for help for <strong>{recipientDetails}</strong> with <strong>{job.JobSummary.SupportActivity.FriendlyNameForEmail()}</strong> "
+                       + $"for help for <strong>{recipientDetails}</strong> with <strong>{job.JobSummary.SupportActivity.FriendlyNameForEmail()}{ageUKReference}</strong> "
                        + $"was updated to <strong>Completed</strong> { job.JobSummary.DateStatusLastChanged.FriendlyPastDate()} at {timeStatusChanged}.";
                 }
                 else
