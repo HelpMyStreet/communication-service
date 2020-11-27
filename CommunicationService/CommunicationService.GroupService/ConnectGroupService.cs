@@ -24,6 +24,38 @@ namespace CommunicationService.GroupService
             _httpClientWrapper = httpClientWrapper;
         }
 
+        public async Task<GetGroupCredentialsResponse> GetGroupCredentials(int groupId)
+        {
+            string path = $"/api/GetGroupCredentials?groupID=" + groupId;
+            string absolutePath = $"{path}";
+            using (HttpResponseMessage response = await _httpClientWrapper.GetAsync(HttpClientConfigName.GroupService, absolutePath, CancellationToken.None).ConfigureAwait(false))
+            {
+                string jsonResponse = await response.Content.ReadAsStringAsync();
+                var getJobsResponse = JsonConvert.DeserializeObject<ResponseWrapper<GetGroupCredentialsResponse, GroupServiceErrorCode>>(jsonResponse);
+                if (getJobsResponse.HasContent && getJobsResponse.IsSuccessful)
+                {
+                    return getJobsResponse.Content;
+                }
+                return null;
+            }
+        }
+
+        public async Task<GetGroupMemberDetailsResponse> GetGroupMemberDetails(int groupId, int userId)
+        {
+            string path = $"/api/GetGroupMemberDetails?groupID=" + groupId + "&userId=" + userId + "&authorisingUserId=" + userId;
+            string absolutePath = $"{path}";
+            using (HttpResponseMessage response = await _httpClientWrapper.GetAsync(HttpClientConfigName.GroupService, absolutePath, CancellationToken.None).ConfigureAwait(false))
+            {
+                string jsonResponse = await response.Content.ReadAsStringAsync();
+                var getJobsResponse = JsonConvert.DeserializeObject<ResponseWrapper<GetGroupMemberDetailsResponse, GroupServiceErrorCode>>(jsonResponse);
+                if (getJobsResponse.HasContent && getJobsResponse.IsSuccessful)
+                {
+                    return getJobsResponse.Content;
+                }
+                return null;
+            }
+        }
+
         public async Task<GetGroupMembersResponse> GetGroupMembers(int groupID)
         {
             string path = $"/api/GetGroupMembers?groupID=" + groupID;

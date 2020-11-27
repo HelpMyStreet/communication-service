@@ -100,7 +100,7 @@ namespace CommunicationService.UnitTests.SendGridService
             _getGroupNewRequestNotificationStrategyResponse = null;
             Exception ex = Assert.ThrowsAsync<Exception>(() => _classUnderTest.IdentifyRecipients
             (
-             recipientUserId, jobId, groupId
+             recipientUserId, jobId, groupId,null
             ));
 
             Assert.AreEqual($"No strategy for {GROUPID}", ex.Message);
@@ -137,7 +137,7 @@ namespace CommunicationService.UnitTests.SendGridService
                 Volunteers = volunteerSummaries
             };
 
-            List<Core.Domains.SendMessageRequest> result = await _classUnderTest.IdentifyRecipients(recipientUserId, jobId, groupId);
+            List<Core.Domains.SendMessageRequest> result = await _classUnderTest.IdentifyRecipients(recipientUserId, jobId, groupId, null);
 
             Assert.AreEqual(maxVolunteer, result.Count(x => x.TemplateName == TemplateName.TaskNotification));
             Assert.AreEqual(1, result.Count(x => x.TemplateName == TemplateName.RequestorTaskNotification));
@@ -156,7 +156,7 @@ namespace CommunicationService.UnitTests.SendGridService
 
             Exception ex = Assert.ThrowsAsync<Exception>(() => _classUnderTest.IdentifyRecipients
             (
-             recipientUserId,jobId,groupId   
+             recipientUserId, jobId, groupId, null  
             ));
 
             Assert.AreEqual($"GroupID or JobID is missing", ex.Message);
