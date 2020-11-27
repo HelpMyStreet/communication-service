@@ -91,7 +91,7 @@ namespace CommunicationService.UnitTests.SendGridService
         }
 
         [Test]
-        public async Task MissingStrategy_ThrowsException()
+        public void MissingStrategy_ThrowsException()
         {
             int? jobId = 1;
             int? groupId = GROUPID;

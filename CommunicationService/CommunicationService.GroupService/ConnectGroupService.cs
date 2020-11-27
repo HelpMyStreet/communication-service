@@ -59,8 +59,7 @@ namespace CommunicationService.GroupService
         public async Task<GetGroupMembersResponse> GetGroupMembers(int groupID)
         {
             string path = $"/api/GetGroupMembers?groupID=" + groupID;
-            string absolutePath = $"{path}";
-            using (HttpResponseMessage response = await _httpClientWrapper.GetAsync(HttpClientConfigName.GroupService, absolutePath, CancellationToken.None).ConfigureAwait(false))
+            using (HttpResponseMessage response = await _httpClientWrapper.GetAsync(HttpClientConfigName.GroupService, path, CancellationToken.None).ConfigureAwait(false))
             {
                 string jsonResponse = await response.Content.ReadAsStringAsync();
                 var getJobsResponse = JsonConvert.DeserializeObject<ResponseWrapper<GetGroupMembersResponse, GroupServiceErrorCode>>(jsonResponse);
@@ -80,9 +79,9 @@ namespace CommunicationService.GroupService
                 GroupId = groupID,
                 GroupRole =  new RoleRequest() { GroupRole = groupRoles }
             };
-            string path = $"/api/GetGroupMembersForGivenRole";
-            string absolutePath = $"{path}";
-            using (HttpResponseMessage response = await _httpClientWrapper.GetAsync(HttpClientConfigName.GroupService, absolutePath, request, CancellationToken.None).ConfigureAwait(false))
+            string path = $"/api/GetGroupMembersForGivenRole";    
+            
+            using (HttpResponseMessage response = await _httpClientWrapper.GetAsync(HttpClientConfigName.GroupService, path, request, CancellationToken.None).ConfigureAwait(false))
             {
                 string jsonResponse = await response.Content.ReadAsStringAsync();
                 var getGroupMembersForGivenRoleResponse = JsonConvert.DeserializeObject<ResponseWrapper<GetGroupMembersForGivenRoleResponse, GroupServiceErrorCode>>(jsonResponse);
@@ -97,10 +96,9 @@ namespace CommunicationService.GroupService
 
         public async Task<GetGroupNewRequestNotificationStrategyResponse> GetGroupNewRequestNotificationStrategy(int groupId)
         {
-            string path = $"/api/GetGroupNewRequestNotificationStrategy?groupId={groupId}";
-            string absolutePath = $"{path}";
+            string path = $"/api/GetGroupNewRequestNotificationStrategy?groupId={groupId}";            
 
-            using (HttpResponseMessage response = await _httpClientWrapper.GetAsync(HttpClientConfigName.GroupService, absolutePath, CancellationToken.None).ConfigureAwait(false))
+            using (HttpResponseMessage response = await _httpClientWrapper.GetAsync(HttpClientConfigName.GroupService, path, CancellationToken.None).ConfigureAwait(false))
             {
                 string jsonResponse = await response.Content.ReadAsStringAsync();
                 var getJobsResponse = JsonConvert.DeserializeObject<ResponseWrapper<GetGroupNewRequestNotificationStrategyResponse, GroupServiceErrorCode>>(jsonResponse);
@@ -115,8 +113,8 @@ namespace CommunicationService.GroupService
         public async Task<GetGroupResponse> GetGroupResponse(int groupId)
         {
             string path = $"/api/GetGroup?groupID=" + groupId;
-            string absolutePath = $"{path}";
-            using (HttpResponseMessage response = await _httpClientWrapper.GetAsync(HttpClientConfigName.GroupService, absolutePath, CancellationToken.None).ConfigureAwait(false))
+
+            using (HttpResponseMessage response = await _httpClientWrapper.GetAsync(HttpClientConfigName.GroupService, path, CancellationToken.None).ConfigureAwait(false))
             {
                 string jsonResponse = await response.Content.ReadAsStringAsync();
                 var getJobsResponse = JsonConvert.DeserializeObject<ResponseWrapper<GetGroupResponse, GroupServiceErrorCode>>(jsonResponse);
@@ -130,10 +128,9 @@ namespace CommunicationService.GroupService
 
         public async Task<GetUserGroupsResponse> GetUserGroups(int userId)
         {
-            string path = $"/api/GetUserGroups?userId={userId}";
-            string absolutePath = $"{path}";
+            string path = $"/api/GetUserGroups?userId={userId}";         
 
-            using (HttpResponseMessage response = await _httpClientWrapper.GetAsync(HttpClientConfigName.GroupService, absolutePath, CancellationToken.None).ConfigureAwait(false))
+            using (HttpResponseMessage response = await _httpClientWrapper.GetAsync(HttpClientConfigName.GroupService, path, CancellationToken.None).ConfigureAwait(false))
             {
                 string jsonResponse = await response.Content.ReadAsStringAsync();
                 var getJobsResponse = JsonConvert.DeserializeObject<ResponseWrapper<GetUserGroupsResponse, GroupServiceErrorCode>>(jsonResponse);
