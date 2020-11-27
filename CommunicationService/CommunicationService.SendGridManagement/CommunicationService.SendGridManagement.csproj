@@ -146,6 +146,7 @@
     <EmbeddedResource Include="Emails\RequestorTaskNotification.html" />
     <EmbeddedResource Include="Migrations\20200709_130700_AddRequestorTaskNotification.json" />
     <EmbeddedResource Include="Migrations\20200717_152400_AddUnsubscribeGroupsDailyDigest.json" />
+    <EmbeddedResource Include="Migrations\20201127_134500_UpdateInterUserMessage.json" />
     <EmbeddedResource Include="Migrations\20201126_160000_InterUserMessageSubject.json" />
     <EmbeddedResource Include="Migrations\20201126_144500_NewCredentials2.json" />
     <EmbeddedResource Include="Migrations\20201126_141500_NewCredentials.json" />

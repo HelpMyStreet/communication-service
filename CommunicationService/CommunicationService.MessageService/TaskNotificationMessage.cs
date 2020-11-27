@@ -134,8 +134,6 @@ namespace CommunicationService.MessageService
                 throw new Exception($"No strategy for {job.JobSummary.ReferringGroupID}");
             }
 
-            int recipientCount = 0;
-
             List<SupportActivities> supportActivities = new List<SupportActivities>();
             if (job != null)
             {
@@ -147,25 +145,18 @@ namespace CommunicationService.MessageService
 
                 if (volunteers != null)
                 {
-                    volunteers.Volunteers = volunteers.Volunteers.OrderBy(x => x.DistanceInMiles);
-                    foreach (VolunteerSummary vs in volunteers.Volunteers)
-                    {
-                        if (recipientCount < strategy.MaxVolunteer)
-                        {
-                            if (groupUsers.Contains(vs.UserID))
+                    volunteers.Volunteers
+                        .Where(v => groupUsers.Contains(v.UserID))
+                        .OrderBy(v => v.DistanceInMiles)
+                        .Take(strategy.MaxVolunteer)
+                        .ToList()
+                        .ForEach(v =>
                             {
-                                AddRecipientAndTemplate(TemplateName.TaskNotification, vs.UserID, jobId, groupId);
-                                recipientCount++;
-                            }
-                        }
-                        else
-                        {
-                            return _sendMessageRequests;
-                        }
-                    }
+                                AddRecipientAndTemplate(TemplateName.TaskNotification, v.UserID, jobId, groupId);
+                            });
                 }
             }
-            return _sendMessageRequests;
+            return _sendMessageRequests; 
         }
 
         private void AddRecipientAndTemplate(string templateName, int userId, int? jobId, int? groupId)
