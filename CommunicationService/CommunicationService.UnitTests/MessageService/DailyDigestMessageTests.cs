@@ -162,7 +162,7 @@ namespace CommunicationService.UnitTests.SendGridService
             _getUsersResponse = new GetUsersResponse();
             _getUsersResponse.UserDetails = userDetails;
 
-            var result = await _classUnderTest.IdentifyRecipients(recipientUserId, jobId, groupId);
+            var result = await _classUnderTest.IdentifyRecipients(recipientUserId, jobId, groupId, null);
             Assert.AreEqual(userDetails.Count(x => x.SupportRadiusMiles.HasValue), result.Count);
         }
 

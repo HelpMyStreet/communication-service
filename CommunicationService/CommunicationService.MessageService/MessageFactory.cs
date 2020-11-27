@@ -82,6 +82,8 @@ namespace CommunicationService.MessageService
                     return new TaskReminderMessage(_connectRequestService, _connectUserService);
                 case CommunicationJobTypes.InterUserMessage:
                     return new InterUserMessage(_connectRequestService, _connectUserService);
+                case CommunicationJobTypes.NewCredentials:
+                    return new NewCredentialsMessage(_connectUserService, _connectGroupService);
                 default:                   
                     throw new Exception("Unknown Email Type");
             }

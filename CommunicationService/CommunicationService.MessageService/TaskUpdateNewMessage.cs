@@ -282,7 +282,7 @@ namespace CommunicationService.MessageService
             return statusChange;
         }
 
-        public async Task<List<SendMessageRequest>> IdentifyRecipients(int? recipientUserId, int? jobId, int? groupId)
+        public async Task<List<SendMessageRequest>> IdentifyRecipients(int? recipientUserId, int? jobId, int? groupId, Dictionary<string, string> additionalParameters)
         {
             var job = await _connectRequestService.GetJobDetailsAsync(jobId.Value);
 

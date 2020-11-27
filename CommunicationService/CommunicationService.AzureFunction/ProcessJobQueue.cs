@@ -36,7 +36,7 @@ namespace CommunicationService.AzureFunction
             RequestCommunicationRequest requestCommunicationRequest  = JsonConvert.DeserializeObject<RequestCommunicationRequest>(converted);
             AddCommunicationRequestToCosmos(mySbMsg, "start", requestCommunicationRequest);
             IMessage message = _messageFactory.Create(requestCommunicationRequest);
-            List<SendMessageRequest> messageDetails = await message.IdentifyRecipients(requestCommunicationRequest.RecipientUserID, requestCommunicationRequest.JobID, requestCommunicationRequest.GroupID);
+            List<SendMessageRequest> messageDetails = await message.IdentifyRecipients(requestCommunicationRequest.RecipientUserID, requestCommunicationRequest.JobID, requestCommunicationRequest.GroupID, requestCommunicationRequest.AdditionalParameters);
 
             if (messageDetails.Count == 0)
             {
