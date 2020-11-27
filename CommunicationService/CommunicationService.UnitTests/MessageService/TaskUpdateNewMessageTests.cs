@@ -120,7 +120,7 @@ namespace CommunicationService.UnitTests.MessageService
             };
 
 
-            List<SendMessageRequest> recipients = _classUnderTest.IdentifyRecipients(recipientUserId, jobId, groupId).Result;
+            List<SendMessageRequest> recipients = _classUnderTest.IdentifyRecipients(recipientUserId, jobId, groupId, null).Result;
 
             Assert.AreEqual(recipients.Count, 3);
             Assert.AreEqual(recipients[0].AdditionalParameters, null);
@@ -147,7 +147,7 @@ namespace CommunicationService.UnitTests.MessageService
             };
 
 
-            List<SendMessageRequest> recipients = _classUnderTest.IdentifyRecipients(recipientUserId, jobId, groupId).Result;
+            List<SendMessageRequest> recipients = _classUnderTest.IdentifyRecipients(recipientUserId, jobId, groupId, null).Result;
 
             Assert.AreEqual(recipients.Count, 1);
             Assert.AreEqual(recipients[0].AdditionalParameters["RecipientOrRequestor"], "Requestor");
@@ -173,7 +173,7 @@ namespace CommunicationService.UnitTests.MessageService
             };
 
 
-            List<SendMessageRequest> recipients = _classUnderTest.IdentifyRecipients(recipientUserId, jobId, groupId).Result;
+            List<SendMessageRequest> recipients = _classUnderTest.IdentifyRecipients(recipientUserId, jobId, groupId, null).Result;
 
             Assert.AreEqual(recipients.Count, 1);
             Assert.AreEqual(recipients[0].AdditionalParameters["RecipientOrRequestor"], "Recipient");
@@ -204,7 +204,7 @@ namespace CommunicationService.UnitTests.MessageService
             };
 
 
-            List<SendMessageRequest> recipients = _classUnderTest.IdentifyRecipients(recipientUserId, jobId, groupId).Result;
+            List<SendMessageRequest> recipients = _classUnderTest.IdentifyRecipients(recipientUserId, jobId, groupId, null).Result;
 
             Assert.AreEqual(recipients.Count, 1);
             Assert.AreEqual(recipients[0].AdditionalParameters["RecipientOrRequestor"], "Recipient");
