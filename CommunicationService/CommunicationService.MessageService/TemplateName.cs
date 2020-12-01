@@ -20,6 +20,7 @@ namespace CommunicationService.MessageService
         public const string InterUserMessage = "InterUserMessage";
         public const string TestLinkSubstitution = "TestLinkSubstitution";
         public const string NewCredentials = "NewCredentials";
+        public const string TaskUpdateSimplified = "TaskUpdateSimplified";
     }
 }
 
