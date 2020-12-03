@@ -14,6 +14,6 @@ namespace CommunicationService.Core.Interfaces.Services
 
         Task<GetUserGroupsResponse> GetUserGroups(int userId);
 
-        Task<GetGroupResponse> GetGroupResponse(int groupId);
+        Task<GetGroupResponse> GetGroup(int groupId);
     }
 }

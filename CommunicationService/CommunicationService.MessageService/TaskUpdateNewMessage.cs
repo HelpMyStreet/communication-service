@@ -471,7 +471,7 @@ namespace CommunicationService.MessageService
                     string group = string.Empty;
                     if (referringGroupId.HasValue)
                     {
-                        var groupDetails = _connectGroupService.GetGroupResponse(referringGroupId.Value).Result;
+                        var groupDetails = _connectGroupService.GetGroup(referringGroupId.Value).Result;
                         if(groupDetails!=null && groupDetails.Group!=null)
                         {
                             group = $" on behalf of { groupDetails.Group.GroupName}";
