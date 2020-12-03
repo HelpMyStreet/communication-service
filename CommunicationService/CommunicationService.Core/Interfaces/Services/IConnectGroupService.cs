@@ -8,6 +8,10 @@ namespace CommunicationService.Core.Interfaces.Services
 {
     public interface IConnectGroupService
     {
+        Task<GetGroupCredentialsResponse> GetGroupCredentials(int groupId);
+
+        Task<GetGroupMemberDetailsResponse> GetGroupMemberDetails(int groupId, int userId);
+
         Task<GetGroupMembersResponse> GetGroupMembers(int groupID);
 
         Task<List<int>> GetGroupMembersForGivenRole(int groupID, GroupRoles groupRoles);
@@ -15,5 +19,7 @@ namespace CommunicationService.Core.Interfaces.Services
         Task<GetUserGroupsResponse> GetUserGroups(int userId);
 
         Task<GetGroupResponse> GetGroup(int groupId);
+
+        Task<GetGroupNewRequestNotificationStrategyResponse> GetGroupNewRequestNotificationStrategy(int groupId);
     }
 }

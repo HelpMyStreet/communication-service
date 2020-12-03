@@ -62,11 +62,11 @@ namespace CommunicationService.MessageService
             switch (toRole)
             {
                 case RequestRoles.Requestor:
-                    return senderName + ", the person who you requested help for.";                  
+                    return $"<strong>{senderName}</strong>, the person who you requested help for.";                  
                 case RequestRoles.Volunteer:
-                    return senderName + ", the person who you helped.";
+                    return $"<strong>{senderName}</strong>, the person who you helped.";
                 case RequestRoles.GroupAdmin:
-                    return senderName + ", the person who needed help.";
+                    return $"<strong>{senderName}</strong>, the person who needed help.";
                 default:
                     throw new Exception($"Invalid Request Role {toRole}");
             }
@@ -77,10 +77,10 @@ namespace CommunicationService.MessageService
             switch (toRole)
             {
                 case RequestRoles.Recipient:
-                    return senderName + ", the person who requested help for you.";                    
+                    return $"<strong>{senderName}</strong>, the person who requested help for you.";                    
                 case RequestRoles.Volunteer:
                 case RequestRoles.GroupAdmin:
-                    return senderName + ", the person who requested help for " + helpRecipient + ".";
+                    return $"<strong>{senderName}</strong>, the person who requested help for <strong>{helpRecipient}</strong>.";
                 default:
                     throw new Exception($"Invalid Request Role {toRole}");
             }
@@ -91,11 +91,11 @@ namespace CommunicationService.MessageService
             switch (toRole)
             {
                 case RequestRoles.Recipient:
-                    return senderName + ", the volunteer who accepted the request for help.";
+                    return $"<strong>{senderName}</strong>, the volunteer who accepted the request for help.";
                 case RequestRoles.Requestor:
-                    return senderName + ", the volunteer who accepted the request for " + helpRecipient + ".";                    
+                    return $"<strong>{senderName}</strong>, the volunteer who accepted the request for <strong>{helpRecipient}</strong>.";
                 case RequestRoles.GroupAdmin:
-                    return senderName + ", the volunteer who helped " + helpRecipient + ".";
+                    return $"<strong>{senderName}</strong>, the volunteer who helped <strong>{helpRecipient}</strong>.";
                 default:
                     throw new Exception($"Invalid Request Role {toRole}");
             }
@@ -103,7 +103,7 @@ namespace CommunicationService.MessageService
 
         private string SenderAndContextGroupAdmin(string senderName, string groupName)
         {
-            return senderName + " at " + groupName + ".";
+            return $"<strong>{senderName}</strong> at <strong>{groupName}</strong>.";
         }
 
         private async Task<string> SenderAndContext(string senderName, string senderRequestorRole, string toRequestorRole, string senderGroupName, int? jobId)
@@ -223,7 +223,7 @@ namespace CommunicationService.MessageService
             };
         }
 
-        public async Task<List<SendMessageRequest>> IdentifyRecipients(int? recipientUserId, int? jobId, int? groupId)
+        public async Task<List<SendMessageRequest>> IdentifyRecipients(int? recipientUserId, int? jobId, int? groupId, Dictionary<string, string> additionalParameters)
         {
             return null;
         }

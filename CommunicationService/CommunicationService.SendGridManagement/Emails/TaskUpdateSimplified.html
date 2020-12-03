@@ -1,0 +1,49 @@
+﻿<p>Hi {{Recipient}},</p>
+
+<p>We just wanted to let you know that a request you’re involved with has been updated by a {{UpdatedBy}}. <strong>{{FieldUpdated}}</strong> has changed, take a look at the latest details below.</p>
+
+{{#if ShowJobUrl}}
+<p>To view the request on our website, {{{JobUrl}}}.</p>
+{{/if}}
+
+<table class="taskdetails">
+    {{#each ImportantDataList}}
+    <tr>
+        <td><strong>{{Name}}:</strong></td>
+        <td>{{{Value}}}</td>
+    </tr>
+    {{/each}}
+    <tr></tr>
+    <tr></tr>
+    {{#each OtherDataList}}
+    <tr>
+        <td><strong>{{Name}}:</strong></td>
+        <td>{{{Value}}}</td>
+    </tr>
+    {{/each}}
+</table>
+<br>
+
+{{#if FaceCoveringComplete}}
+<p>If your face coverings have been posted they may take a few days to arrive.</p>
+{{/if}}
+
+{{#if PreviouStatusCompleteAndNowInProgress}}
+<p>This request was marked as ‘Complete’ but is now ‘In Progress’. It may have been marked as complete by mistake, or something else might be needed. Please keep an eye out for more updates.</p>
+{{/if}}
+
+{{#if PreviouStatusInProgressAndNowOpen}}
+<p>This request was marked as ‘In Progress’ but is now ‘Open’. It may be because the volunteer is no longer able to help, or there has been a problem with the request. Please keep an eye out for further updates.</p>
+{{/if}}
+
+<p>If you have any comments or queries, please get in touch by emailing support@helpmystreet.org.</p>
+
+{{#if ShowFeedback}}
+<p>{{{FeedbackForm}}}</p>
+{{/if}}
+
+<p>Thanks for using HelpMyStreet!</p>
+
+<p>Best wishes,</p>
+
+<p>The HelpMyStreet team</p>

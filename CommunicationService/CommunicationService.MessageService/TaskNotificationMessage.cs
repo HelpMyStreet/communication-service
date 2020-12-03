@@ -79,7 +79,7 @@ namespace CommunicationService.MessageService
             throw new Exception("unable to retrieve user details");
         }
 
-        public async Task<List<SendMessageRequest>> IdentifyRecipients(int? recipientUserId, int? jobId, int? groupId)
+        public async Task<List<SendMessageRequest>> IdentifyRecipients(int? recipientUserId, int? jobId, int? groupId, Dictionary<string, string> additionalParameters)
         {
             List<int> groupUsers = new List<int>();
 
@@ -92,6 +92,14 @@ namespace CommunicationService.MessageService
             groupUsers = groupMembers.Users;
             
             var job = await _connectRequestService.GetJobDetailsAsync(jobId.Value);
+
+            var strategy = await _connectGroupService.GetGroupNewRequestNotificationStrategy(job.JobSummary.ReferringGroupID);
+
+            if(strategy==null)
+            {
+                throw new Exception($"No strategy for {job.JobSummary.ReferringGroupID}");
+            }
+
             List<SupportActivities> supportActivities = new List<SupportActivities>();
             if (job != null)
             {
@@ -100,16 +108,18 @@ namespace CommunicationService.MessageService
 
                 if (volunteers != null)
                 {
-                    foreach (VolunteerSummary vs in volunteers.Volunteers)
-                    {
-                        if (groupUsers.Contains(vs.UserID))
-                        {
-                            AddRecipientAndTemplate(TemplateName.TaskNotification, vs.UserID, jobId, groupId);
-                        }   
-                    }
+                    volunteers.Volunteers
+                        .Where(v => groupUsers.Contains(v.UserID))
+                        .OrderBy(v => v.DistanceInMiles)
+                        .Take(strategy.MaxVolunteer)
+                        .ToList()
+                        .ForEach(v =>
+                            {
+                                AddRecipientAndTemplate(TemplateName.TaskNotification, v.UserID, jobId, groupId);
+                            });
                 }
             }
-            return _sendMessageRequests;
+            return _sendMessageRequests; 
         }
 
         private void AddRecipientAndTemplate(string templateName, int userId, int? jobId, int? groupId)
