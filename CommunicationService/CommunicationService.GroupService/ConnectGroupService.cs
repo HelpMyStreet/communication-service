@@ -63,7 +63,7 @@ namespace CommunicationService.GroupService
             }
         }
 
-        public async Task<GetGroupResponse> GetGroupResponse(int groupId)
+        public async Task<GetGroupResponse> GetGroup(int groupId)
         {
             string path = $"/api/GetGroup?groupID=" + groupId;
             string absolutePath = $"{path}";
