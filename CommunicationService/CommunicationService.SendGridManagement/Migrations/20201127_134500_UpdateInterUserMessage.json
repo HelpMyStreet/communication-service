@@ -1,0 +1,15 @@
+﻿{
+  "Templates": [
+    {
+      "name": "InterUserMessage",
+      "subject": "{{{Subject}}}",
+      "generation": "dynamic",
+      "versions": [
+        {
+          "name": "Formattting",
+          "subject": "{{{Subject}}}"
+        }
+      ]
+    }
+  ]
+}
