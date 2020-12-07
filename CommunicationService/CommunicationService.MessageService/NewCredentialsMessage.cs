@@ -49,7 +49,7 @@ namespace CommunicationService.MessageService
             }
 
             var groupMemberDetails = await _connectGroupService.GetGroupMemberDetails(groupId.Value, recipientUserId.Value);
-            var group = await _connectGroupService.GetGroupResponse(groupId.Value);
+            var group = await _connectGroupService.GetGroup(groupId.Value);
 
             if(groupMemberDetails==null)
             {

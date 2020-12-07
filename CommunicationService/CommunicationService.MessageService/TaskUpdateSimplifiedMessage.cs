@@ -145,7 +145,7 @@ namespace CommunicationService.MessageService
             if (job.JobSummary.RequestorDefinedByGroup || recipientUserId != REQUESTOR_DUMMY_USERID)
             {
                 showJobUrl = true;
-                var groups = await _connectGroupService.GetGroupResponse(job.JobSummary.ReferringGroupID);
+                var groups = await _connectGroupService.GetGroup(job.JobSummary.ReferringGroupID);
                 string baseUrl = _sendGridConfig.Value.BaseUrl;
                 string encodedJobId = Base64Utils.Base64Encode(job.JobSummary.JobID.ToString());
                 joburl = "<a href=\"" + baseUrl + "/account/g/" + groups.Group.GroupKey + "/requests?j=" + encodedJobId + "\">click here</a>";
