@@ -1,0 +1,8 @@
+﻿{
+  "CreateUpdateUnsubscribeGroups": [
+    {
+      "name": "New Request Pending Approval Notification",
+      "description": "Add unsubscribe group for New Request Pending Approval Notification"
+    }
+  ]
+}

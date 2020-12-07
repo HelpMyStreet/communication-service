@@ -14,5 +14,6 @@ namespace CommunicationService.MessageService
         public static string ReqTaskNotification = "Requestor Task Notification";
         public static string TaskUpdate = "TaskUpdate";
         public static string NewCredentials = "NewCredentials";
+        public static string NewTaskPendingApprovalNotification = "New Request Pending Approval Notification";
     }
 }

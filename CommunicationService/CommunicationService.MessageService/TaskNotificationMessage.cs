@@ -22,20 +22,10 @@ namespace CommunicationService.MessageService
         private readonly IConnectGroupService _connectGroupService;
         List<SendMessageRequest> _sendMessageRequests;
 
-        public const int REQUESTOR_DUMMY_USERID = -1;
-
         public string GetUnsubscriptionGroupName(int? recipientUserId)
         {
-            if (recipientUserId == REQUESTOR_DUMMY_USERID)
-            {
-                return UnsubscribeGroupName.ReqTaskNotification;
-            }
-            else {
-                return UnsubscribeGroupName.TaskNotification;
-            }
-                    
+            return UnsubscribeGroupName.TaskNotification;
         }
-
 
         public TaskNotificationMessage(IConnectUserService connectUserService, IConnectRequestService connectRequestService, IConnectGroupService connectGroupService)
         {
@@ -51,63 +41,39 @@ namespace CommunicationService.MessageService
             string encodedJobId = HelpMyStreet.Utils.Utils.Base64Utils.Base64Encode(job.JobSummary.JobID.ToString());
             bool isFaceMask = job.JobSummary.SupportActivity == SupportActivities.FaceMask;
 
-            if (recipientUserId == REQUESTOR_DUMMY_USERID)
-            {
-                return new EmailBuildData()
-                {
-                    BaseDynamicData = new TaskNotificationData
-                    (
-                        job.Requestor.FirstName,
-                        true,
-                        encodedJobId,
-                        job.JobSummary.SupportActivity.FriendlyNameShort(),
-                        job.JobSummary.PostCode,
-                        0,
-                        job.JobSummary.DueDate.ToString("dd/MM/yyyy"),
-                        job.JobSummary.IsHealthCritical,
-                        isFaceMask
-                    ),
-                    EmailToAddress = job.Requestor.EmailAddress,
-                    EmailToName = $"{job.Requestor.FirstName} {job.Requestor.LastName}",
-                    RecipientUserID = REQUESTOR_DUMMY_USERID,
-                };
-            }
-            else
-            {
-                var user = await _connectUserService.GetUserByIdAsync(recipientUserId.Value);
-                var volunteers = _connectUserService.GetVolunteersByPostcodeAndActivity
-                    (
-                        job.JobSummary.PostCode,
-                        new List<SupportActivities>() { job.JobSummary.SupportActivity },
-                        CancellationToken.None
-                    ).Result;
-                
-                if (volunteers != null)
-                {
+            var user = await _connectUserService.GetUserByIdAsync(recipientUserId.Value);
+            var volunteers = _connectUserService.GetVolunteersByPostcodeAndActivity
+                (
+                    job.JobSummary.PostCode,
+                    new List<SupportActivities>() { job.JobSummary.SupportActivity },
+                    CancellationToken.None
+                ).Result;
 
-                    var volunteer = volunteers.Volunteers.FirstOrDefault(x => x.UserID == user.ID);
-                    if (user != null && job != null)
+            if (volunteers != null)
+            {
+
+                var volunteer = volunteers.Volunteers.FirstOrDefault(x => x.UserID == user.ID);
+                if (user != null && job != null)
+                {
+                    return new EmailBuildData()
                     {
-                        return new EmailBuildData()
-                        {
-                            BaseDynamicData = new TaskNotificationData
-                            (
-                                user.UserPersonalDetails.FirstName,
-                                false,
-                                encodedJobId,
-                                job.JobSummary.SupportActivity.FriendlyNameShort(),
-                                job.JobSummary.PostCode,
-                                Math.Round(volunteer.DistanceInMiles, 1),
-                                job.JobSummary.DueDate.ToString("dd/MM/yyyy"),
-                                job.JobSummary.IsHealthCritical,
-                                isFaceMask
-                            ),
-                            EmailToAddress = user.UserPersonalDetails.EmailAddress,
-                            EmailToName = $"{user.UserPersonalDetails.FirstName} {user.UserPersonalDetails.LastName}"
-                        };
-                    }
-
+                        BaseDynamicData = new TaskNotificationData
+                        (
+                            user.UserPersonalDetails.FirstName,
+                            false,
+                            encodedJobId,
+                            job.JobSummary.SupportActivity.FriendlyNameShort(),
+                            job.JobSummary.PostCode,
+                            Math.Round(volunteer.DistanceInMiles, 1),
+                            job.JobSummary.DueDate.ToString("dd/MM/yyyy"),
+                            job.JobSummary.IsHealthCritical,
+                            isFaceMask
+                        ),
+                        EmailToAddress = user.UserPersonalDetails.EmailAddress,
+                        EmailToName = $"{user.UserPersonalDetails.FirstName} {user.UserPersonalDetails.LastName}"
+                    };
                 }
+
             }
 
             throw new Exception("unable to retrieve user details");
@@ -137,9 +103,6 @@ namespace CommunicationService.MessageService
             List<SupportActivities> supportActivities = new List<SupportActivities>();
             if (job != null)
             {
-                // Add dummy recipient to represent requestor, who will not necessarily exist within our DB and so has no userID to lookup/refer to
-                AddRecipientAndTemplate(TemplateName.RequestorTaskNotification, REQUESTOR_DUMMY_USERID, jobId, groupId);
-                // Continue
                 supportActivities.Add(job.JobSummary.SupportActivity);
                 var volunteers = await _connectUserService.GetVolunteersByPostcodeAndActivity(job.JobSummary.PostCode, supportActivities, CancellationToken.None);
 
