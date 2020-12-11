@@ -1,0 +1,21 @@
+﻿{
+  "Templates": [
+    {
+      "name": "TaskDetail",
+      "subject": "You Asked For Some Details?",
+      "generation": "dynamic",
+      "versions": [
+        {
+          "name": "E-mail with specific task details",
+          "subject": "You Asked For Some Details?"
+        }
+      ]
+    }
+  ],
+  "CreateUpdateUnsubscribeGroups": [
+    {
+      "name": "TaskDetails",
+      "description": "A copy of a task details"
+    }
+  ]
+}

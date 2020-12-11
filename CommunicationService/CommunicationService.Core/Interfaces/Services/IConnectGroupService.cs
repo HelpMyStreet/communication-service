@@ -21,5 +21,7 @@ namespace CommunicationService.Core.Interfaces.Services
         Task<GetGroupResponse> GetGroup(int groupId);
 
         Task<GetGroupNewRequestNotificationStrategyResponse> GetGroupNewRequestNotificationStrategy(int groupId);
+
+        Task<Instructions> GetGroupSupportActivityInstructions(int groupId, SupportActivities supportActivity);
     }
 }
