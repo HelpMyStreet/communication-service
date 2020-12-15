@@ -124,6 +124,8 @@
     <None Remove="Migrations\20201203_155400_AddNewTaskPendingApprovalNotificationUnsubscribe.json" />
     <None Remove="Migrations\20201203_155600_RequestorTaskConfirmationTweaks.json" />
     <None Remove="Migrations\20201203_155600_RequestorTaskConfirmationTweaks %28copy%29.json" />
+    <None Remove="Migrations\20201215_120600_UpdateTaskDetail.json" />
+    <None Remove="Migrations\20201215_120600_UpdateTaskDetail.json" />
   </ItemGroup>
 
   <ItemGroup>
@@ -251,6 +253,7 @@
     <EmbeddedResource Include="Migrations\20200710_140200_FixMoreHandlebars.json" />
     <EmbeddedResource Include="Migrations\20200928_161000_AddRequestorUnsubscribe.json" />
     <EmbeddedResource Include="Migrations\20201211_120600_AddTaskDetail.json" />
+    <EmbeddedResource Include="Migrations\20201215_120600_UpdateTaskDetail.json" />
   </ItemGroup>
 
   <ItemGroup>
