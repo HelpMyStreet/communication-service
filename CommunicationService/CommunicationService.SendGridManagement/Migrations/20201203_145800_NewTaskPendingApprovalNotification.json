@@ -1,0 +1,17 @@
+﻿{
+  "Templates": [
+    {
+      "name": "NewTaskPendingApprovalNotification",
+      "subject": "A new HelpMyStreet request is pending approval",
+      "generation": "dynamic",
+      "versions": [
+        {
+          "name": "NewTaskPendingApprovalNotification",
+          "subject": "A new HelpMyStreet request is pending approval"
+        }
+      ]
+    }
+  ]
+}
+
+

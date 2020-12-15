@@ -1,0 +1,15 @@
+﻿{
+  "Templates": [
+    {
+      "name": "RequestorTaskNotification",
+      "subject": "Your New Help Request",
+      "generation": "dynamic",
+      "versions": [
+        {
+          "name": "New content for requests pending approval",
+          "subject": "Your New Help Request"
+        }
+      ]
+    }
+  ]
+}

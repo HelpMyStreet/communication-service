@@ -10,6 +10,7 @@
     <None Remove="Emails\Layout.html" />
     <None Remove="Emails\Layout.txt" />
     <None Remove="Emails\NewCredentials.html" />
+    <None Remove="Emails\NewTaskPendingApprovalNotification.html" />
     <None Remove="Emails\PartialRegistration.html" />
     <None Remove="Emails\TaskReminder.html" />
     <None Remove="Emails\TaskUpdateNew.html" />
@@ -120,10 +121,14 @@
     <None Remove="Migrations\20201201_120000_NewSimplifiedUpdateTaskMessage.json" />
     <None Remove="Migrations\20201201_121000_NewSimplifiedUpdateTaskMessage.json" />
     <None Remove="Migrations\20201202_132500_NewSimplifiedUpdateTaskMessage.json" />
+    <None Remove="Migrations\20201203_145800_NewTaskPendingApprovalNotification.json" />
+    <None Remove="Migrations\20201203_155400_AddNewTaskPendingApprovalNotificationUnsubscribe.json" />
+    <None Remove="Migrations\20201203_155600_RequestorTaskConfirmationTweaks.json" />
   </ItemGroup>
 
   <ItemGroup>
     <EmbeddedResource Include="Emails\Layout.txt" />
+    <EmbeddedResource Include="Emails\NewTaskPendingApprovalNotification.html" />
     <EmbeddedResource Include="Emails\TaskReminder.html" />
     <EmbeddedResource Include="Emails\TaskUpdateSimplified.html" />
     <EmbeddedResource Include="Emails\TaskUpdateNew.html" />
@@ -180,6 +185,9 @@
     <EmbeddedResource Include="Migrations\20201126_160000_InterUserMessageSubject.json" />
     <EmbeddedResource Include="Migrations\20201126_144500_NewCredentials2.json" />
     <EmbeddedResource Include="Migrations\20201126_141500_NewCredentials.json" />
+    <EmbeddedResource Include="Migrations\20201203_155600_RequestorTaskConfirmationTweaks.json" />
+    <EmbeddedResource Include="Migrations\20201203_155400_AddNewTaskPendingApprovalNotificationUnsubscribe.json" />
+    <EmbeddedResource Include="Migrations\20201203_145800_NewTaskPendingApprovalNotification.json" />
     <EmbeddedResource Include="Migrations\20201118_121600_UpdateTaskNotificationEmail.json" />
     <EmbeddedResource Include="Migrations\20201028_090000_UpdateTaskReminderEmails.json" />
     <EmbeddedResource Include="Migrations\20201026_151500_UpdateRegistrationEmails.json" />

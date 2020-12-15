@@ -81,7 +81,7 @@ namespace CommunicationService.Handlers
 
             if (request.From.GroupRoleType != null)
             {
-                var group = await _connectGroupService.GetGroupResponse(request.From.GroupRoleType.GroupId.Value);
+                var group = await _connectGroupService.GetGroup(request.From.GroupRoleType.GroupId.Value);
 
                 if (group != null)
                 {
@@ -116,7 +116,7 @@ namespace CommunicationService.Handlers
             string returnValue = string.Empty;
             if(participant.GroupRoleType!=null && participant.GroupRoleType.GroupId.HasValue)
             {
-                var group = await _connectGroupService.GetGroupResponse(participant.GroupRoleType.GroupId.Value);
+                var group = await _connectGroupService.GetGroup(participant.GroupRoleType.GroupId.Value);
                 if (group != null)
                 {
                     returnValue = group.Group.GroupName;
