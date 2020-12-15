@@ -58,13 +58,13 @@ namespace CommunicationService.MessageService
             switch (job.JobSummary.DueDateType)
             {
                 case DueDateType.Before:
-                    strDaysFromNow += daysFromNow == 0 ? "today" : $"on or before {dueDate.ToString(DATE_FORMAT)}";
+                    strDaysFromNow += daysFromNow == 0 ? "Today" : $"On or before {dueDate.ToString(DATE_FORMAT)}";
                     break;
                 case DueDateType.On:
-                    strDaysFromNow += $"on {dueDate.ToString(DATE_FORMAT)}";
+                    strDaysFromNow += $"On {dueDate.ToString(DATE_FORMAT)}";
                     break;
             }
-            return strDaysFromNow.ToTitleCase();
+            return strDaysFromNow;
         }
 
 
@@ -111,6 +111,16 @@ namespace CommunicationService.MessageService
             }
         }
 
+        private string GetJobUrl(string groupKey, int jobId)
+        {
+            string baseUrl = _sendGridConfig.Value.BaseUrl;
+            string encodedJobId = Base64Utils.Base64Encode(jobId.ToString());
+
+            string tailUrl = $"/j/{encodedJobId}";
+            var token = _linkRepository.CreateLink(tailUrl, _linkConfig.Value.ExpiryDays).Result;
+            return $"<a href='{baseUrl}/link/{token}'>click here</a>";
+        }
+
         public async Task<EmailBuildData> PrepareTemplateData(Guid batchId, int? recipientUserId, int? jobId, int? groupId, Dictionary<string, string> additionalParameters, string templateName)
         {
             CultureInfo cultureInfo = Thread.CurrentThread.CurrentCulture;
@@ -141,14 +151,12 @@ namespace CommunicationService.MessageService
             JobStatuses previous = _connectRequestService.PreviousJobStatus(job);
             bool showJobUrl = false;
             string joburl = string.Empty;
+            var groups = await _connectGroupService.GetGroup(job.JobSummary.ReferringGroupID);
 
             if (job.JobSummary.RequestorDefinedByGroup || recipientUserId != REQUESTOR_DUMMY_USERID)
             {
                 showJobUrl = true;
-                var groups = await _connectGroupService.GetGroup(job.JobSummary.ReferringGroupID);
-                string baseUrl = _sendGridConfig.Value.BaseUrl;
-                string encodedJobId = Base64Utils.Base64Encode(job.JobSummary.JobID.ToString());
-                joburl = "<a href=\"" + baseUrl + "/account/g/" + groups.Group.GroupKey + "/requests?j=" + encodedJobId + "\">click here</a>";
+                joburl = GetJobUrl(groups.Group.GroupKey, jobId.Value);
             }
 
             List<TaskDataItem> importantDataList = new List<TaskDataItem>();
@@ -215,7 +223,16 @@ namespace CommunicationService.MessageService
                     requestedBy = job.Requestor.FirstName + requestLocality;
                 }
             }
-            otherDataList.Add(new TaskDataItem() { Name = "Requested By", Value =  requestedBy.ToTitleCase() });
+
+            if (job.JobSummary.RequestorType != RequestorType.Myself && !job.JobSummary.RequestorDefinedByGroup)
+            {
+                otherDataList.Add(new TaskDataItem() { Name = "Requested By", Value = requestedBy.ToTitleCase() });
+            }
+
+            if((Groups) job.JobSummary.ReferringGroupID !=  Groups.Generic)
+            {
+                otherDataList.Add(new TaskDataItem() { Name = "Help requested from", Value = groups.Group.GroupName });
+            }
 
             string recipientLocality = job.Recipient.Address.Locality == null ? string.Empty : $" ({textInfo.ToTitleCase(job.Recipient.Address.Locality.ToLower())})";
             string recipientDetails = job.JobSummary.RequestorType == RequestorType.Organisation ? job.JobSummary.RecipientOrganisation : job.Recipient.FirstName + recipientLocality;
@@ -232,10 +249,10 @@ namespace CommunicationService.MessageService
                 BaseDynamicData = new TaskUpdateSimplifiedData
                 (
                     $"A {job.JobSummary.SupportActivity.FriendlyNameForEmail()} request has been updated",
-                    $"A  {job.JobSummary.SupportActivity.FriendlyNameForEmail()} request has been updated",
+                    $"A {job.JobSummary.SupportActivity.FriendlyNameForEmail()} request has been updated",
                     recipient,
                     changedByAdmin ? "group administrator" : "volunteer",
-                    fieldUpdated,
+                    fieldUpdated.ToLower(),
                     showJobUrl,
                     joburl,
                     importantDataList,
@@ -243,7 +260,7 @@ namespace CommunicationService.MessageService
                     faceCoveringComplete: job.JobSummary.SupportActivity == SupportActivities.FaceMask && job.JobSummary.JobStatus == JobStatuses.Done,
                     previouStatusCompleteAndNowInProgress: previous == JobStatuses.Done && job.JobSummary.JobStatus == JobStatuses.InProgress,
                     previouStatusInProgressAndNowOpen:  previous == JobStatuses.InProgress && job.JobSummary.JobStatus == JobStatuses.Open,
-                    showFeedback: job.JobSummary.JobStatus == JobStatuses.Done ? true : false,
+                    showFeedback: job.JobSummary.JobStatus == JobStatuses.Done && recipientUserId== REQUESTOR_DUMMY_USERID ? true : false,
                     GetFeedback(job, recipientOrRequestor)
                 ),
                 EmailToAddress = emailToAddress,

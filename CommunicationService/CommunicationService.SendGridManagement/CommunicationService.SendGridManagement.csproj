@@ -120,6 +120,7 @@
     <None Remove="Migrations\20201201_110000_NewSimplifiedUpdateTaskMessage.json" />
     <None Remove="Migrations\20201201_120000_NewSimplifiedUpdateTaskMessage.json" />
     <None Remove="Migrations\20201201_121000_NewSimplifiedUpdateTaskMessage.json" />
+    <None Remove="Migrations\20201202_132500_NewSimplifiedUpdateTaskMessage.json" />
     <None Remove="Migrations\20201203_145800_NewTaskPendingApprovalNotification.json" />
     <None Remove="Migrations\20201203_155400_AddNewTaskPendingApprovalNotificationUnsubscribe.json" />
     <None Remove="Migrations\20201203_155600_RequestorTaskConfirmationTweaks.json" />
@@ -166,6 +167,7 @@
     <EmbeddedResource Include="Emails\RequestorTaskNotification.html" />
     <EmbeddedResource Include="Migrations\20200709_130700_AddRequestorTaskNotification.json" />
     <EmbeddedResource Include="Migrations\20200717_152400_AddUnsubscribeGroupsDailyDigest.json" />
+    <EmbeddedResource Include="Migrations\20201202_132500_NewSimplifiedUpdateTaskMessage.json" />
     <EmbeddedResource Include="Migrations\20201201_121000_NewSimplifiedUpdateTaskMessage.json" />
     <EmbeddedResource Include="Migrations\20201201_120000_NewSimplifiedUpdateTaskMessage.json" />
     <EmbeddedResource Include="Migrations\20201201_110000_NewSimplifiedUpdateTaskMessage.json" />
