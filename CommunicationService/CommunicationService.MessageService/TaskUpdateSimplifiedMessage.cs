@@ -151,7 +151,7 @@ namespace CommunicationService.MessageService
             JobStatuses previous = _connectRequestService.PreviousJobStatus(job);
             bool showJobUrl = false;
             string joburl = string.Empty;
-            var groups = await _connectGroupService.GetGroupResponse(job.JobSummary.ReferringGroupID);
+            var groups = await _connectGroupService.GetGroup(job.JobSummary.ReferringGroupID);
 
             if (job.JobSummary.RequestorDefinedByGroup || recipientUserId != REQUESTOR_DUMMY_USERID)
             {
