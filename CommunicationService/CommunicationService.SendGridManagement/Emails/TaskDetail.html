@@ -2,20 +2,13 @@
 
 <p>Please see the details you requested below:</p>
 
-<p><strong>Activity: </strong></p>{{Activity}}
-<p><strong>Organisation: </strong></p>{{Organisation}}
+<p><strong>Activity: </strong>{{Activity}}</p>
+{{#if HasOrganisation}}
+<p><strong>Organisation: </strong>{{Organisation}}</p>
+{{/if}}
 
 <p><strong>Request Details:</strong></p>
-<table>
+{{FurtherDetails}}
 
-    <tr><td>Shopping List</td></tr>
-    {{ShoppingList}}
-
-    <tr><td></td></tr>
-    <tr>Further Details</tr>
-    {{FurtherDetails}}
-
-</table>
-
-<p><strong>Volunteering Instructions</strong></p>
+<p><strong>Volunteer Instructions:</strong></p>
 {{VolunteeringInstructions}}

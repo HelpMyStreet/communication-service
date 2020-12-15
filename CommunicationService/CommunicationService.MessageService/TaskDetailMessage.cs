@@ -3,6 +3,7 @@ using CommunicationService.Core.Interfaces;
 using CommunicationService.Core.Interfaces.Services;
 using CommunicationService.MessageService.Substitution;
 using CommunicationService.Core.Configuration;
+using CommunicationService.Core.Helpers;
 using Microsoft.Extensions.Options;
 using HelpMyStreet.Contracts.RequestService.Request;
 using HelpMyStreet.Utils.Enums;
@@ -20,6 +21,8 @@ using System.Dynamic;
 using HelpMyStreet.Contracts.RequestService.Response;
 using HelpMyStreet.Utils.Extensions;
 using System.Text.RegularExpressions;
+using Westwind.AspNetCore.Markdown;
+using System.Web;
 
 namespace CommunicationService.MessageService
 {
@@ -36,8 +39,9 @@ namespace CommunicationService.MessageService
         public string GetUnsubscriptionGroupName(int? recipientId)
         {
 
-                return UnsubscribeGroupName.TaskDetail;
+            return null;
         }
+
 
         public TaskDetailMessage(IConnectGroupService connectGroupService, IConnectUserService connectUserService, IConnectRequestService connectRequestService, IOptions<EmailConfig> eMailConfig, ICosmosDbService cosmosDbService)
         {
@@ -69,42 +73,31 @@ namespace CommunicationService.MessageService
             }
 
             var job = await _connectRequestService.GetJobDetailsAsync(jobId.Value);
-            var groupName = "";
             var volunteerInstructions = "";
-
-            if (groupId.HasValue) {
-                var group = await _connectGroupService.GetGroup(groupId.Value);
-                if (group != null)
-                groupName = group.Group.GroupName;
+            var group = await _connectGroupService.GetGroup(job.JobSummary.ReferringGroupID);
+           
+            if (group != null) {
                 var instructions = await _connectGroupService.GetGroupSupportActivityInstructions(groupId.Value, job.JobSummary.SupportActivity);
                 
-                volunteerInstructions = $"{instructions.Intro} <br />";
+                volunteerInstructions = $"{Markdown.ParseHtmlString(instructions.Intro)}";
                 if (instructions.Steps.Count > 0) {
-                    var steps = string.Join("", instructions.Steps.Select(x => $"<li>{x.Heading}: {x.Detail}</li>"));
+                    var steps = string.Join("", instructions.Steps.Select(x => $"<li>{Markdown.ParseHtmlString(x.Heading)}: {Markdown.ParseHtmlString(x.Detail)}</li>"));
                     volunteerInstructions += $"<ol>{steps}</ol>";
                 }
             }
 
-            var lineBreakRegex = new Regex(@"(\n|\r){1,2}");
             var allQuestions = job.JobSummary.Questions.Where(q => q.ShowOnTaskManagement(false) && !string.IsNullOrEmpty(q.Answer));
-            var shopping = lineBreakRegex.Split(allQuestions.Where(x => x.Id == (int)Questions.Shopping_List).FirstOrDefault().Answer).ToList();
-            var shoppingList = string.Join("", shopping.Select(x => $"<tr><td>{x}</td></tr>"));
-            var otherQuestions = allQuestions.Where(x => x.Id != (int)Questions.Shopping_List);
-
-            var otherQuestionsList = string.Join("", otherQuestions.Select(x => $"<tr><td>{x.FriendlyName()}: </td></tr>" +
-            $"{string.Join("",lineBreakRegex.Split(x.Answer).Select(y => $"<tr><td{y}</td></tr>"))}"));
-
-
-
+            var otherQuestionsList = string.Join("", allQuestions.Select(x => $"<p><u>{x.FriendlyName()}</u></p>" +
+            $"<p>{x.Answer.ToHtmlSafeStringWithLineBreaks()}</p>"));
 
             return new EmailBuildData()
             {
                 BaseDynamicData = new TaskDetailData() {
-                    Organisation = groupName,
+                    Organisation = job.JobSummary.RecipientOrganisation,
                     Activity = job.JobSummary.SupportActivity.FriendlyNameShort(),
-                    ShoppingList = shoppingList,
                     FurtherDetails = otherQuestionsList,
-                    VolunteerInstructions = volunteerInstructions
+                    VolunteerInstructions = volunteerInstructions,
+                    HasOrganisation = !String.IsNullOrEmpty(job.JobSummary.RecipientOrganisation)
                 },
 
                 EmailToAddress = user.UserPersonalDetails.EmailAddress,

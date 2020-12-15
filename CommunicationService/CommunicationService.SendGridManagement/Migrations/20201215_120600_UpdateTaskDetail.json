@@ -1,0 +1,15 @@
+﻿{
+  "Templates": [
+    {
+      "name": "TaskDetail",
+      "subject": "You Asked For Some Details?",
+      "generation": "dynamic",
+      "versions": [
+        {
+          "name": "Update to non table layout",
+          "subject": "You Asked For Some Details?"
+        }
+      ]
+    }
+  ],
+}

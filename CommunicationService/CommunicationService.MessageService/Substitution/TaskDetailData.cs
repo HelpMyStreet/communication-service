@@ -8,9 +8,8 @@ namespace CommunicationService.MessageService.Substitution
     {
         public string Organisation { get; set; }
         public string Activity { get; set; }
-        public string ShoppingList { get; set; }
         public string FurtherDetails { get; set; }
         public string VolunteerInstructions { get; set; }
-
+        public bool HasOrganisation { get; set; }
     }
 }
