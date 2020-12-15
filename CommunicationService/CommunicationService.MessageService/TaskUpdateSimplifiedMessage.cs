@@ -281,7 +281,10 @@ namespace CommunicationService.MessageService
                 throw new Exception($"Job details cannot be retrieved for jobId {jobId}");
             }
 
+            int lastUpdatedBy = _connectRequestService.GetLastUpdatedBy(job);
             int? relevantVolunteerUserID = _connectRequestService.GetRelevantVolunteerUserID(job);
+            bool changedByAdmin = relevantVolunteerUserID.HasValue && relevantVolunteerUserID.Value != lastUpdatedBy;
+
             if (relevantVolunteerUserID.HasValue)
             {
                 var user = await _connectUserService.GetUserByIdAsync(relevantVolunteerUserID.Value);
@@ -302,7 +305,7 @@ namespace CommunicationService.MessageService
                 requestorEmailAddress = job.Requestor.EmailAddress;
             }
 
-            if (relevantVolunteerUserID.HasValue)
+            if (relevantVolunteerUserID.HasValue && changedByAdmin)
             {
                 Dictionary<string, string> param = new Dictionary<string, string>(additionalParameters);
                 //We send an email to the volunteer as they did not make this change
