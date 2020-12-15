@@ -84,6 +84,7 @@ namespace CommunicationService.MessageService
                     job.JobSummary.SupportActivity.FriendlyNameShort(),
                     job.JobSummary.PostCode,
                     job.JobSummary.DueDays == 0 ? true : false,
+                    job.JobSummary.DueDays == 1 ? true : false,
                     job.JobSummary.DateStatusLastChanged.ToString(DATE_FORMAT),
                     dueDateMessage
                     ),
@@ -111,13 +112,16 @@ namespace CommunicationService.MessageService
             {
                 foreach(JobSummary summary in jobs.JobSummaries)
                 {
-                    switch(summary.DueDays)
+                    switch(summary.DueDays, summary.DueDateType)
                     {
-                        case 0:
+                        case (0, DueDateType.Before):
                             AddRecipientAndTemplate(TemplateName.TaskReminder, summary.VolunteerUserID.Value, summary.JobID, groupId);
                             break;
-                        case 3:
-                        case 7:
+                        case (1, DueDateType.On):
+                            AddRecipientAndTemplate(TemplateName.TaskReminder, summary.VolunteerUserID.Value, summary.JobID, groupId);
+                            break;
+                        case (3, DueDateType.Before):
+                        case (7, DueDateType.Before):
                             if ((DateTime.Now - summary.DateStatusLastChanged).TotalHours > 24)
                             {
                                 AddRecipientAndTemplate(TemplateName.TaskReminder, summary.VolunteerUserID.Value, summary.JobID, groupId);
