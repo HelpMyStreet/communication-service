@@ -272,10 +272,6 @@ namespace CommunicationService.MessageService
         {
             var job = await _connectRequestService.GetJobDetailsAsync(jobId.Value);
 
-            string volunteerEmailAddress = string.Empty;
-            string recipientEmailAddress = string.Empty;
-            string requestorEmailAddress = string.Empty;
-
             if (job == null)
             {
                 throw new Exception($"Job details cannot be retrieved for jobId {jobId}");
@@ -285,6 +281,7 @@ namespace CommunicationService.MessageService
             int? relevantVolunteerUserID = _connectRequestService.GetRelevantVolunteerUserID(job);
             bool changedByAdmin = relevantVolunteerUserID.HasValue && relevantVolunteerUserID.Value != lastUpdatedBy;
 
+            string volunteerEmailAddress = string.Empty;
             if (relevantVolunteerUserID.HasValue)
             {
                 var user = await _connectUserService.GetUserByIdAsync(relevantVolunteerUserID.Value);
@@ -293,16 +290,6 @@ namespace CommunicationService.MessageService
                 {
                     volunteerEmailAddress = user.UserPersonalDetails.EmailAddress;
                 }
-            }
-
-            if (job.Recipient != null)
-            {
-                recipientEmailAddress = job.Recipient.EmailAddress;
-            }
-
-            if (job.Requestor != null)
-            {
-                requestorEmailAddress = job.Requestor.EmailAddress;
             }
 
             if (relevantVolunteerUserID.HasValue && changedByAdmin)
@@ -319,10 +306,11 @@ namespace CommunicationService.MessageService
                 });
             }
 
-            bool sendEmailToRecipient = !string.IsNullOrEmpty(recipientEmailAddress);
+            string recipientEmailAddress = job.Recipient?.EmailAddress;
+            string requestorEmailAddress = job.Requestor?.EmailAddress;
 
             //Now consider the recipient
-            if (sendEmailToRecipient)
+            if (!string.IsNullOrEmpty(recipientEmailAddress))
             {
                 Dictionary<string, string> param = new Dictionary<string, string>(additionalParameters);
                 param.Add("RecipientOrRequestor", "Recipient");
@@ -336,21 +324,9 @@ namespace CommunicationService.MessageService
                 });
             }
 
-            bool sendEmailToRequestor = !string.IsNullOrEmpty(requestorEmailAddress);
-
-            if (!string.IsNullOrEmpty(volunteerEmailAddress) && sendEmailToRequestor)
-            {
-                sendEmailToRequestor = requestorEmailAddress != volunteerEmailAddress;
-            }
-
-            if (sendEmailToRecipient && sendEmailToRequestor && recipientEmailAddress == requestorEmailAddress)
-            {
-                sendEmailToRequestor = false;
-            }
-
-
             //Now consider the requestor
-            if (sendEmailToRequestor)
+            if (!string.IsNullOrEmpty(requestorEmailAddress)
+                && requestorEmailAddress != volunteerEmailAddress && requestorEmailAddress != recipientEmailAddress)
             {
                 Dictionary<string, string> param = new Dictionary<string, string>(additionalParameters);
                 param.Add("RecipientOrRequestor", "Requestor");

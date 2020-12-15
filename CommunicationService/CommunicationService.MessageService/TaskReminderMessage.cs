@@ -71,7 +71,7 @@ namespace CommunicationService.MessageService
                     dueDateMessage = $"The help is needed on or before {job.JobSummary.DueDate.ToString(DATE_FORMAT)} – {job.JobSummary.DueDays} days from now.";
                     break;
                 case DueDateType.On:
-                    dueDateMessage = $"The help is needed on {job.JobSummary.DueDate.ToString(DATE_FORMAT)} – {job.JobSummary.DueDays} days from now."; ;
+                    dueDateMessage = $"The help is needed on {job.JobSummary.DueDate.ToString(DATE_FORMAT)} – {job.JobSummary.DueDays} days from now.";
                     break;
             }
 
