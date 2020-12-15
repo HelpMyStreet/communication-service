@@ -140,7 +140,7 @@ namespace CommunicationService.UnitTests.SendGridService
             List<Core.Domains.SendMessageRequest> result = await _classUnderTest.IdentifyRecipients(recipientUserId, jobId, groupId, null);
 
             Assert.AreEqual(maxVolunteer, result.Count(x => x.TemplateName == TemplateName.TaskNotification));
-            Assert.AreEqual(1, result.Count(x => x.TemplateName == TemplateName.RequestorTaskNotification));
+            Assert.AreEqual(0, result.Count(x => x.TemplateName == TemplateName.RequestorTaskNotification));
 
             var expected = volunteerSummaries.Where(x => _getGroupMembersResponse.Users.Any(u => u == x.UserID)).OrderBy(x => x.DistanceInMiles).Take(10).Select(x=> x.UserID).ToList();
             var actual = result.Where(x => x.TemplateName == TemplateName.TaskNotification).Select(x => x.RecipientUserID).ToList();
