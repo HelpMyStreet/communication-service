@@ -68,7 +68,7 @@ namespace CommunicationService.MessageService
         }
 
 
-        private string GetProtectedUrl(int jobId, string recipientOrRequestor, FeedbackRating feedbackRating)
+        private string GetProtectedUrl(int jobId, string recipientOrRequestor, FeedbackRating? feedbackRating)
         {
             string encodedJobId = Base64Utils.Base64Encode(jobId.ToString());
             string encodedRequestRoleType;
@@ -85,7 +85,11 @@ namespace CommunicationService.MessageService
                     break;
             }
 
-            string tailUrl = $"/Feedback/PostTaskFeedbackCapture?j={encodedJobId}&r={encodedRequestRoleType}&f={Base64Utils.Base64Encode((int)feedbackRating)}";
+            string tailUrl = $"/Feedback/PostTaskFeedbackCapture?j={encodedJobId}&r={encodedRequestRoleType}";
+            if (feedbackRating.HasValue)
+            {
+                tailUrl += $"&f={Base64Utils.Base64Encode((int)feedbackRating)}";
+            }
             var token = _linkRepository.CreateLink(tailUrl, _linkConfig.Value.ExpiryDays).Result;
             return _sendGridConfig.Value.BaseUrl + "/link/" + token;
         }
@@ -100,10 +104,11 @@ namespace CommunicationService.MessageService
                 return $"<p style='color:#001489;font-weight:bold;font-size:24px'>Tell us how it went</p><p>How was your experience with HelpMyStreet?</p>" +
                             $"<table>" +
                             $"<tr style='margin-left:10px'>" +
-                            $"<td><a href='{GetProtectedUrl(job.JobSummary.JobID, recipientOrRequestor, FeedbackRating.HappyFace)}'><img src='{happyFaceImage}' alt='Great' width='200' height='182'></a></td>" +
-                            $"<td><a href='{GetProtectedUrl(job.JobSummary.JobID, recipientOrRequestor, FeedbackRating.SadFace)}'><img src='{sadFaceImage}' alt='Not So Great' width='200' height='182'></a></td>" +
+                            $"<td><a href='{GetProtectedUrl(job.JobSummary.JobID, recipientOrRequestor, FeedbackRating.HappyFace)}'><img src='{happyFaceImage}' alt='Great' width='200'></a></td>" +
+                            $"<td><a href='{GetProtectedUrl(job.JobSummary.JobID, recipientOrRequestor, FeedbackRating.SadFace)}'><img src='{sadFaceImage}' alt='Not So Great' width='200'></a></td>" +
                             $"</tr>" +
-                            $"</table>";
+                            $"</table>" +
+                            $"<p>If you have any comments or queries, please click <a href='{GetProtectedUrl(job.JobSummary.JobID, recipientOrRequestor, null)}'>here</a>, or get in touch by emailing support@helpmystreet.org.</p>";
             }
             else
             {
