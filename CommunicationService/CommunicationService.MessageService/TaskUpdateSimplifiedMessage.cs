@@ -226,7 +226,7 @@ namespace CommunicationService.MessageService
 
             if (job.JobSummary.RequestorType != RequestorType.Myself && !job.JobSummary.RequestorDefinedByGroup)
             {
-                otherDataList.Add(new TaskDataItem() { Name = "Requested By", Value = requestedBy.ToTitleCase() });
+                otherDataList.Add(new TaskDataItem() { Name = "Requested by", Value = requestedBy.ToTitleCase() });
             }
 
             if((Groups) job.JobSummary.ReferringGroupID !=  Groups.Generic)
@@ -236,7 +236,7 @@ namespace CommunicationService.MessageService
 
             string recipientLocality = job.Recipient.Address.Locality == null ? string.Empty : $" ({textInfo.ToTitleCase(job.Recipient.Address.Locality.ToLower())})";
             string recipientDetails = job.JobSummary.RequestorType == RequestorType.Organisation ? job.JobSummary.RecipientOrganisation : job.Recipient.FirstName + recipientLocality;
-            otherDataList.Add(new TaskDataItem() { Name = "Help Recipient", Value = job.Recipient.EmailAddress == emailToAddress ? $"You  ({emailToName})" : recipientDetails.ToTitleCase() });
+            otherDataList.Add(new TaskDataItem() { Name = "Help recipient", Value = job.Recipient.EmailAddress == emailToAddress ? $"You  ({emailToName})" : recipientDetails.ToTitleCase() });
 
             if (job.JobSummary.VolunteerUserID.HasValue)
             {
