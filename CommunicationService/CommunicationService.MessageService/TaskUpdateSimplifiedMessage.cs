@@ -27,6 +27,7 @@ namespace CommunicationService.MessageService
         private readonly IOptions<LinkConfig> _linkConfig;
         private readonly IOptions<SendGridConfig> _sendGridConfig;
         private const string DATE_FORMAT = "dddd, dd MMMM";
+        private readonly TextInfo _textInfo;
 
         public const int REQUESTOR_DUMMY_USERID = -1;
 
@@ -47,6 +48,9 @@ namespace CommunicationService.MessageService
             _sendGridConfig = sendGridConfig;
 
             _sendMessageRequests = new List<SendMessageRequest>();
+
+            CultureInfo cultureInfo = Thread.CurrentThread.CurrentCulture;
+            _textInfo = cultureInfo.TextInfo;
         }
 
         private string GetDueDate(GetJobDetailsResponse job)
@@ -65,6 +69,88 @@ namespace CommunicationService.MessageService
                     break;
             }
             return strDaysFromNow;
+        }
+
+        private string GetRequestedBy(RequestRoles requestRole, GetJobDetailsResponse job)
+        {
+            string requestor = string.Empty;
+
+            if (job.JobSummary.RequestorDefinedByGroup)
+            {
+                requestor = job.Requestor.Address.AddressLine1;
+            }
+            else if (requestRole == RequestRoles.Requestor || (requestRole == RequestRoles.Recipient && job.JobSummary.RequestorType == RequestorType.Myself))
+            {
+                requestor = $"You ({job.Requestor.FirstName})";
+            }
+            else if (!string.IsNullOrEmpty(job.Requestor.Address.Locality))
+            {
+                requestor = $"{job.Requestor.FirstName} ({job.Requestor.Address.Locality.ToLower()})";
+            }
+            else
+            {
+                requestor = job.Requestor.FirstName;
+            }
+
+            return _textInfo.ToTitleCase(requestor);
+        }
+
+        private string GetHelpRecipient(RequestRoles requestRole, GetJobDetailsResponse job)
+        {
+            string recipient = string.Empty;
+
+            if (job.JobSummary.RequestorType == RequestorType.Organisation)
+            {
+                recipient = job.JobSummary.RecipientOrganisation;
+            }
+            else if (requestRole == RequestRoles.Recipient || (requestRole == RequestRoles.Requestor && job.JobSummary.RequestorType == RequestorType.Myself))
+            {
+                recipient = $"You ({job.Recipient.FirstName})";
+            }
+            else if (!string.IsNullOrEmpty(job.Recipient.Address.Locality))
+            {
+                recipient = $"{job.Recipient.FirstName} ({job.Recipient.Address.Locality.ToLower()})";
+            }
+            else
+            {
+                recipient = job.Recipient.FirstName;
+            }
+
+            return _textInfo.ToTitleCase(recipient);
+        }
+
+        public async Task<string> GetHelpRequestedFrom(GetJobDetailsResponse job)
+        {
+            string requestedFrom = string.Empty;
+
+            if ((Groups)job.JobSummary.ReferringGroupID != Groups.Generic && !job.JobSummary.RequestorDefinedByGroup)
+            {
+                var group = await _connectGroupService.GetGroup(job.JobSummary.ReferringGroupID);
+                requestedFrom = group.Group.GroupName;
+            }
+
+            return requestedFrom;
+        }
+
+        private async Task<string> GetVolunteer(RequestRoles requestRole, GetJobDetailsResponse job)
+        {
+            string volunteer = string.Empty;
+
+            if (job.JobSummary.VolunteerUserID.HasValue)
+            {
+                var user = await _connectUserService.GetUserByIdAsync(job.JobSummary.VolunteerUserID.Value);
+
+                if (requestRole == RequestRoles.Volunteer)
+                {
+                    volunteer = $"You ({user.UserPersonalDetails.FirstName})";
+                }
+                else
+                {
+                    volunteer = user.UserPersonalDetails.FirstName;
+                }
+            }
+
+            return _textInfo.ToTitleCase(volunteer);
         }
 
 
@@ -116,8 +202,6 @@ namespace CommunicationService.MessageService
 
         public async Task<EmailBuildData> PrepareTemplateData(Guid batchId, int? recipientUserId, int? jobId, int? groupId, Dictionary<string, string> additionalParameters, string templateName)
         {
-            CultureInfo cultureInfo = Thread.CurrentThread.CurrentCulture;
-            TextInfo textInfo = cultureInfo.TextInfo;
             var job = _connectRequestService.GetJobDetailsAsync(jobId.Value).Result;
             int lastUpdatedBy = _connectRequestService.GetLastUpdatedBy(job);
             int? relevantVolunteerUserID = _connectRequestService.GetRelevantVolunteerUserID(job);
@@ -135,12 +219,12 @@ namespace CommunicationService.MessageService
                 }
             }
 
+            additionalParameters.TryGetValue("FieldUpdated", out string fieldUpdated);
             RequestRoles emailRecipientRequestRole = (RequestRoles)Enum.Parse(typeof(RequestRoles), additionalParameters["RequestRole"]);
 
             string emailToAddress = string.Empty;
             string emailToName = string.Empty;
             string recipient = string.Empty;
-            additionalParameters.TryGetValue("FieldUpdated", out string fieldUpdated);
 
             JobStatuses previous = _connectRequestService.PreviousJobStatus(job);
             bool showJobUrl = false;
@@ -159,8 +243,6 @@ namespace CommunicationService.MessageService
             {
                 importantDataList.Add(new TaskDataItem() { Name = "Request Ref", Value = reference });
             }
-
-            string requestedBy = string.Empty;
 
             List<TaskDataItem> otherDataList = new List<TaskDataItem>();
             otherDataList.Add(new TaskDataItem() { Name = "Request Type", Value = job.JobSummary.SupportActivity.FriendlyNameForEmail().ToTitleCase() });
@@ -187,44 +269,29 @@ namespace CommunicationService.MessageService
             }
 
             additionalParameters.TryGetValue("Changed", out string changed);
-            requestedBy = job.Requestor.EmailAddress == emailToAddress ? $"You  ({emailToName})" : string.Empty;
 
-            if(string.IsNullOrEmpty(requestedBy))
+            string requestedBy = GetRequestedBy(emailRecipientRequestRole, job);
+            if (!string.IsNullOrEmpty(requestedBy))
             {
-                if(job.JobSummary.RequestorType == RequestorType.Organisation)
-                {
-                    requestedBy = job.JobSummary.RecipientOrganisation;
-                }
-                else if (job.JobSummary.RequestorDefinedByGroup)
-                {
-                    requestedBy = $"{job.Requestor.FirstName} {job.Requestor.LastName}";
-                }
-                else
-                {
-                    string requestLocality = job.Requestor.Address.Locality == null ? string.Empty : $" ({textInfo.ToTitleCase(job.Requestor.Address.Locality.ToLower())})";
-                    requestedBy = job.Requestor.FirstName + requestLocality;
-                }
+                otherDataList.Add(new TaskDataItem() { Name = "Requested by", Value = requestedBy });
             }
 
-            if (job.JobSummary.RequestorType != RequestorType.Myself && !job.JobSummary.RequestorDefinedByGroup)
+            string requestedFrom = await GetHelpRequestedFrom(job);
+            if (!string.IsNullOrEmpty(requestedFrom))
             {
-                otherDataList.Add(new TaskDataItem() { Name = "Requested by", Value = requestedBy.ToTitleCase() });
+                otherDataList.Add(new TaskDataItem() { Name = "Help requested from", Value = requestedFrom });
             }
 
-            if ((Groups)job.JobSummary.ReferringGroupID != Groups.Generic)
+            string helpRecipient = GetHelpRecipient(emailRecipientRequestRole, job);
+            if (!string.IsNullOrEmpty(helpRecipient) && !helpRecipient.Equals(requestedBy))
             {
-                var group = await _connectGroupService.GetGroup(job.JobSummary.ReferringGroupID);
-                otherDataList.Add(new TaskDataItem() { Name = "Help requested from", Value = group.Group.GroupName });
+                otherDataList.Add(new TaskDataItem() { Name = "Help recipient", Value = helpRecipient });
             }
 
-            string recipientLocality = job.Recipient.Address.Locality == null ? string.Empty : $" ({textInfo.ToTitleCase(job.Recipient.Address.Locality.ToLower())})";
-            string recipientDetails = job.JobSummary.RequestorType == RequestorType.Organisation ? job.JobSummary.RecipientOrganisation : job.Recipient.FirstName + recipientLocality;
-            otherDataList.Add(new TaskDataItem() { Name = "Help recipient", Value = job.Recipient.EmailAddress == emailToAddress ? $"You  ({emailToName})" : recipientDetails.ToTitleCase() });
-
-            if (job.JobSummary.VolunteerUserID.HasValue)
+            string volunteer = await GetVolunteer(emailRecipientRequestRole, job);
+            if (!string.IsNullOrEmpty(volunteer))
             {
-                var volunteer = await _connectUserService.GetUserByIdAsync(job.JobSummary.VolunteerUserID.Value);
-                otherDataList.Add(new TaskDataItem() { Name = "Volunteer", Value = emailToAddress == volunteer.UserPersonalDetails.EmailAddress ? $"You ({emailToName})" : volunteer.UserPersonalDetails.FirstName });
+                otherDataList.Add(new TaskDataItem() { Name = "Volunteer", Value = volunteer });
             }
 
             return new EmailBuildData()
