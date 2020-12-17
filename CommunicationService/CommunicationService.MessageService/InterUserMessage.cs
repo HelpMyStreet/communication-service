@@ -139,7 +139,7 @@ namespace CommunicationService.MessageService
             if (job!=null)
             {
                 DateTime dtStatusChanged = job.JobSummary.DateStatusLastChanged;
-                result = $"{result} The request was for <strong>{ job.JobSummary.SupportActivity.FriendlyNameForEmail()}</strong> and was {Mapping.StatusMappingsNotifications[job.JobSummary.JobStatus]} <strong>{dtStatusChanged.FriendlyPastDate()}</strong>";
+                result = $"{result} The request was for <strong>{ job.JobSummary.SupportActivity.FriendlyNameShort()}</strong> and was {Mapping.StatusMappingsNotifications[job.JobSummary.JobStatus]} <strong>{dtStatusChanged.FriendlyPastDate()}</strong>";
             }            
             return result;
         }

@@ -3,7 +3,7 @@
 <p>We just wanted to let you know that your request has been updated by a {{UpdatedBy}}. The <strong>{{FieldUpdated}}</strong> has changed; take a look at the latest details below.</p>
 
 {{#if ShowJobUrl}}
-<p>To view the request on our website, {{{JobUrl}}}.</p>
+<p>To view the request on our website, <a href='{{{JobUrl}}}'>click here</a>.</p>
 {{/if}}
 
 <table class="taskdetails">
@@ -21,7 +21,7 @@
     </tr>
     {{/each}}
 </table>
-<br/>
+<br />
 
 {{#if FaceCoveringComplete}}
 <p>If the face coverings have been posted they may take a few days to arrive.</p>
@@ -35,12 +35,11 @@
 <p>This request was marked as ‘In Progress’ but is now ‘Open’. It may be because the volunteer is no longer able to help, or there has been a problem with the request. Please look out for further updates.</p>
 {{/if}}
 
-{{#if ShowFeedback}}
-<br />
-<p>{{{FeedbackForm}}}</p>
+{{#if StatusNowCancelled}}
+<p>This request has been cancelled. It may be because the help is no longer needed, or because the help cannot be provided.</p>
 {{/if}}
 
-<p>If you have any comments or queries, please get in touch by emailing support@helpmystreet.org.</p>
+{{{FeedbackForm}}}
 
 <p>Thanks for using HelpMyStreet!</p>
 
