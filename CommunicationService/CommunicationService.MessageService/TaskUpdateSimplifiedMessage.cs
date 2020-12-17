@@ -264,7 +264,7 @@ namespace CommunicationService.MessageService
             additionalParameters.TryGetValue("FieldUpdated", out string fieldUpdated);
             JobStatuses previousStatus = _connectRequestService.PreviousJobStatus(job);
             RequestRoles changedByRole = GetChangedByRole(job);
-            string supportActivity = job.JobSummary.SupportActivity.FriendlyNameForEmail();
+            string supportActivity = job.JobSummary.SupportActivity.FriendlyNameShort();
 
             bool showJobUrl = emailRecipientRequestRole == RequestRoles.Volunteer || emailRecipientRequestRole == RequestRoles.GroupAdmin;
             string jobUrl = showJobUrl ? GetJobUrl(jobId.Value) : string.Empty;
