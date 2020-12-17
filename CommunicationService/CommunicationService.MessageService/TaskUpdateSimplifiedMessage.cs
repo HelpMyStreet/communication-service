@@ -203,30 +203,14 @@ namespace CommunicationService.MessageService
         public async Task<EmailBuildData> PrepareTemplateData(Guid batchId, int? recipientUserId, int? jobId, int? groupId, Dictionary<string, string> additionalParameters, string templateName)
         {
             var job = _connectRequestService.GetJobDetailsAsync(jobId.Value).Result;
-            int lastUpdatedBy = _connectRequestService.GetLastUpdatedBy(job);
-            int? relevantVolunteerUserID = _connectRequestService.GetRelevantVolunteerUserID(job);
-            bool changedByAdmin = relevantVolunteerUserID.HasValue && relevantVolunteerUserID.Value != lastUpdatedBy;
-
-            int groupID_ageuk = (int)Groups.AgeUKLSL;
-            string reference = string.Empty;
-            if (job.JobSummary.ReferringGroupID == groupID_ageuk)
-            {
-                var question = job.JobSummary.Questions.FirstOrDefault(x => x.Id == (int)Questions.AgeUKReference);
-
-                if (question != null)
-                {
-                    reference = $" ({question.Answer})";
-                }
-            }
+            int lastUpdatedByUserId = _connectRequestService.GetLastUpdatedBy(job);
+            int? currentOrLastVolunteerUserID = _connectRequestService.GetRelevantVolunteerUserID(job);
+            bool changedByAdmin = currentOrLastVolunteerUserID.HasValue && currentOrLastVolunteerUserID.Value != lastUpdatedByUserId;
 
             additionalParameters.TryGetValue("FieldUpdated", out string fieldUpdated);
             RequestRoles emailRecipientRequestRole = (RequestRoles)Enum.Parse(typeof(RequestRoles), additionalParameters["RequestRole"]);
 
-            string emailToAddress = string.Empty;
-            string emailToName = string.Empty;
-            string recipient = string.Empty;
-
-            JobStatuses previous = _connectRequestService.PreviousJobStatus(job);
+            JobStatuses previousStatus = _connectRequestService.PreviousJobStatus(job);
             bool showJobUrl = false;
             string joburl = string.Empty;
 
@@ -239,32 +223,41 @@ namespace CommunicationService.MessageService
             List<TaskDataItem> importantDataList = new List<TaskDataItem>();
             importantDataList.Add(new TaskDataItem() { Name = "Status", Value = job.JobSummary.JobStatus.FriendlyName().ToTitleCase() });
 
-            if (reference.Length > 0)
+            if (job.JobSummary.ReferringGroupID == (int)Groups.AgeUKLSL)
             {
-                importantDataList.Add(new TaskDataItem() { Name = "Request Ref", Value = reference });
+                var question = job.JobSummary.Questions.FirstOrDefault(x => x.Id == (int)Questions.AgeUKReference);
+
+                if (!string.IsNullOrEmpty(question?.Answer))
+                {
+                    importantDataList.Add(new TaskDataItem() { Name = "Request Ref", Value = $" ({question.Answer})" });
+                }
             }
 
             List<TaskDataItem> otherDataList = new List<TaskDataItem>();
             otherDataList.Add(new TaskDataItem() { Name = "Request Type", Value = job.JobSummary.SupportActivity.FriendlyNameForEmail().ToTitleCase() });
             otherDataList.Add(new TaskDataItem() { Name = "Help Needed", Value = GetDueDate(job) });
 
+            string emailToAddress = string.Empty;
+            string emailToFullName = string.Empty;
+            string emailToFirstName = string.Empty;
+
             switch (emailRecipientRequestRole)
             {
                 case RequestRoles.Volunteer:
                     var user = await _connectUserService.GetUserByIdAsync(recipientUserId.Value);
-                    recipient = user.UserPersonalDetails.FirstName;
+                    emailToFirstName = user.UserPersonalDetails.FirstName;
                     emailToAddress = user.UserPersonalDetails.EmailAddress;
-                    emailToName = $"{user.UserPersonalDetails.FirstName} {user.UserPersonalDetails.LastName}";
+                    emailToFullName = $"{user.UserPersonalDetails.FirstName} {user.UserPersonalDetails.LastName}";
                     break;
                 case RequestRoles.Requestor:
-                    recipient = job.Requestor.FirstName;
+                    emailToFirstName = job.Requestor.FirstName;
                     emailToAddress = job.Requestor.EmailAddress;
-                    emailToName = $"{job.Requestor.FirstName} {job.Requestor.LastName}";
+                    emailToFullName = $"{job.Requestor.FirstName} {job.Requestor.LastName}";
                     break;
                 case RequestRoles.Recipient:
-                    recipient = job.Recipient.FirstName;
+                    emailToFirstName = job.Recipient.FirstName;
                     emailToAddress = job.Recipient.EmailAddress;
-                    emailToName = $"{job.Recipient.FirstName} {job.Recipient.LastName}";
+                    emailToFullName = $"{job.Recipient.FirstName} {job.Recipient.LastName}";
                     break;
             }
 
@@ -300,7 +293,7 @@ namespace CommunicationService.MessageService
                 (
                     $"A {job.JobSummary.SupportActivity.FriendlyNameForEmail()} request has been updated",
                     $"A {job.JobSummary.SupportActivity.FriendlyNameForEmail()} request has been updated",
-                    recipient,
+                    emailToFirstName,
                     changedByAdmin ? "group administrator" : "volunteer",
                     fieldUpdated.ToLower(),
                     showJobUrl,
@@ -308,12 +301,12 @@ namespace CommunicationService.MessageService
                     importantDataList,
                     otherDataList,
                     faceCoveringComplete: job.JobSummary.SupportActivity == SupportActivities.FaceMask && job.JobSummary.JobStatus == JobStatuses.Done,
-                    previouStatusCompleteAndNowInProgress: previous == JobStatuses.Done && job.JobSummary.JobStatus == JobStatuses.InProgress,
-                    previouStatusInProgressAndNowOpen:  previous == JobStatuses.InProgress && job.JobSummary.JobStatus == JobStatuses.Open,
+                    previouStatusCompleteAndNowInProgress: previousStatus == JobStatuses.Done && job.JobSummary.JobStatus == JobStatuses.InProgress,
+                    previouStatusInProgressAndNowOpen:  previousStatus == JobStatuses.InProgress && job.JobSummary.JobStatus == JobStatuses.Open,
                     GetFeedback(job, emailRecipientRequestRole)
                 ),
                 EmailToAddress = emailToAddress,
-                EmailToName = emailToName
+                EmailToName = emailToFullName
             };
         }
 
