@@ -68,22 +68,10 @@ namespace CommunicationService.MessageService
         }
 
 
-        private string GetProtectedUrl(int jobId, string recipientOrRequestor, FeedbackRating? feedbackRating)
+        private string GetProtectedUrl(int jobId, RequestRoles requestRole, FeedbackRating? feedbackRating)
         {
             string encodedJobId = Base64Utils.Base64Encode(jobId.ToString());
-            string encodedRequestRoleType;
-            switch (recipientOrRequestor)
-            {
-                case "Recipient":
-                    encodedRequestRoleType = Base64Utils.Base64Encode((int)RequestRoles.Recipient);
-                    break;
-                case "Requestor":
-                    encodedRequestRoleType = Base64Utils.Base64Encode((int)RequestRoles.Requestor);
-                    break;
-                default:
-                    encodedRequestRoleType = string.Empty;
-                    break;
-            }
+            string encodedRequestRoleType = Base64Utils.Base64Encode((int)requestRole);
 
             string tailUrl = $"/Feedback/PostTaskFeedbackCapture?j={encodedJobId}&r={encodedRequestRoleType}";
             if (feedbackRating.HasValue)
@@ -94,7 +82,7 @@ namespace CommunicationService.MessageService
             return _sendGridConfig.Value.BaseUrl + "/link/" + token;
         }
 
-        private string GetFeedback(GetJobDetailsResponse job, string recipientOrRequestor)
+        private string GetFeedback(GetJobDetailsResponse job, RequestRoles requestRole)
         {
             var happyFaceImage = $"{_sendGridConfig.Value.BaseUrl}/img/email-resources/great.png";
             var sadFaceImage = $"{_sendGridConfig.Value.BaseUrl}/img/email-resources/not-so-great.png";
@@ -104,11 +92,11 @@ namespace CommunicationService.MessageService
                 return $"<p style='color:#001489;font-weight:bold;font-size:24px'>Tell us how it went</p><p>How was your experience with HelpMyStreet?</p>" +
                             $"<table>" +
                             $"<tr style='margin-left:10px'>" +
-                            $"<td><a href='{GetProtectedUrl(job.JobSummary.JobID, recipientOrRequestor, FeedbackRating.HappyFace)}'><img src='{happyFaceImage}' alt='Great' width='200'></a></td>" +
-                            $"<td><a href='{GetProtectedUrl(job.JobSummary.JobID, recipientOrRequestor, FeedbackRating.SadFace)}'><img src='{sadFaceImage}' alt='Not So Great' width='200'></a></td>" +
+                            $"<td><a href='{GetProtectedUrl(job.JobSummary.JobID, requestRole, FeedbackRating.HappyFace)}'><img src='{happyFaceImage}' alt='Great' width='200'></a></td>" +
+                            $"<td><a href='{GetProtectedUrl(job.JobSummary.JobID, requestRole, FeedbackRating.SadFace)}'><img src='{sadFaceImage}' alt='Not So Great' width='200'></a></td>" +
                             $"</tr>" +
                             $"</table>" +
-                            $"<p>If you have any comments or queries, please click <a href='{GetProtectedUrl(job.JobSummary.JobID, recipientOrRequestor, null)}'>here</a>, or get in touch by emailing support@helpmystreet.org.</p>";
+                            $"<p>If you have any comments or queries, please click <a href='{GetProtectedUrl(job.JobSummary.JobID, requestRole, null)}'>here</a>, or get in touch by emailing support@helpmystreet.org.</p>";
             }
             else
             {
@@ -150,7 +138,6 @@ namespace CommunicationService.MessageService
             string emailToAddress = string.Empty;
             string emailToName = string.Empty;
             string recipient = string.Empty;
-            string recipientOrRequestor = string.Empty;
             additionalParameters.TryGetValue("FieldUpdated", out string fieldUpdated);
 
             JobStatuses previous = _connectRequestService.PreviousJobStatus(job);
@@ -177,36 +164,27 @@ namespace CommunicationService.MessageService
             List<TaskDataItem> otherDataList = new List<TaskDataItem>();
             otherDataList.Add(new TaskDataItem() { Name = "Request Type", Value = job.JobSummary.SupportActivity.FriendlyNameForEmail().ToTitleCase() });
             otherDataList.Add(new TaskDataItem() { Name = "Help Needed", Value = GetDueDate(job) });
-            
-            if (recipientUserId != REQUESTOR_DUMMY_USERID)
+
+            RequestRoles emailRecipientRequestRole = (RequestRoles)Enum.Parse(typeof(RequestRoles), additionalParameters["RequestRole"]);
+
+            switch (emailRecipientRequestRole)
             {
-                //This email will be for the volunteer
-                var user = await _connectUserService.GetUserByIdAsync(recipientUserId.Value);
-                recipient = user.UserPersonalDetails.FirstName;
-                emailToAddress = user.UserPersonalDetails.EmailAddress;
-                emailToName = $"{user.UserPersonalDetails.FirstName} {user.UserPersonalDetails.LastName}";
-            }
-            else
-            {                               
-                //check if we need to send an email to the requester
-                if (additionalParameters != null)
-                {
-                    if (additionalParameters.TryGetValue("RecipientOrRequestor", out recipientOrRequestor))
-                    {
-                        if (recipientOrRequestor == "Requestor")
-                        {
-                            recipient = job.Requestor.FirstName;
-                            emailToAddress = job.Requestor.EmailAddress;
-                            emailToName = $"{job.Requestor.FirstName} {job.Requestor.LastName}";
-                        }
-                        else if (recipientOrRequestor == "Recipient")
-                        {
-                            recipient = job.Recipient.FirstName;
-                            emailToAddress = job.Recipient.EmailAddress;
-                            emailToName = $"{job.Recipient.FirstName} {job.Recipient.LastName}";
-                        }
-                    }
-                }
+                case RequestRoles.Volunteer:
+                    var user = await _connectUserService.GetUserByIdAsync(recipientUserId.Value);
+                    recipient = user.UserPersonalDetails.FirstName;
+                    emailToAddress = user.UserPersonalDetails.EmailAddress;
+                    emailToName = $"{user.UserPersonalDetails.FirstName} {user.UserPersonalDetails.LastName}";
+                    break;
+                case RequestRoles.Requestor:
+                    recipient = job.Requestor.FirstName;
+                    emailToAddress = job.Requestor.EmailAddress;
+                    emailToName = $"{job.Requestor.FirstName} {job.Requestor.LastName}";
+                    break;
+                case RequestRoles.Recipient:
+                    recipient = job.Recipient.FirstName;
+                    emailToAddress = job.Recipient.EmailAddress;
+                    emailToName = $"{job.Recipient.FirstName} {job.Recipient.LastName}";
+                    break;
             }
 
             additionalParameters.TryGetValue("Changed", out string changed);
@@ -266,7 +244,7 @@ namespace CommunicationService.MessageService
                     previouStatusCompleteAndNowInProgress: previous == JobStatuses.Done && job.JobSummary.JobStatus == JobStatuses.InProgress,
                     previouStatusInProgressAndNowOpen:  previous == JobStatuses.InProgress && job.JobSummary.JobStatus == JobStatuses.Open,
                     showFeedback: job.JobSummary.JobStatus == JobStatuses.Done && recipientUserId== REQUESTOR_DUMMY_USERID ? true : false,
-                    GetFeedback(job, recipientOrRequestor)
+                    GetFeedback(job, emailRecipientRequestRole)
                 ),
                 EmailToAddress = emailToAddress,
                 EmailToName = emailToName
@@ -299,7 +277,10 @@ namespace CommunicationService.MessageService
 
             if (relevantVolunteerUserID.HasValue && changedByAdmin)
             {
-                Dictionary<string, string> param = new Dictionary<string, string>(additionalParameters);
+                var param = new Dictionary<string, string>(additionalParameters)
+                {
+                    { "RequestRole", RequestRoles.Volunteer.ToString() }
+                };
                 //We send an email to the volunteer as they did not make this change
                 _sendMessageRequests.Add(new SendMessageRequest()
                 {
@@ -317,8 +298,10 @@ namespace CommunicationService.MessageService
             //Now consider the recipient
             if (!string.IsNullOrEmpty(recipientEmailAddress))
             {
-                Dictionary<string, string> param = new Dictionary<string, string>(additionalParameters);
-                param.Add("RecipientOrRequestor", "Recipient");
+                var param = new Dictionary<string, string>(additionalParameters)
+                {
+                    { "RequestRole", RequestRoles.Recipient.ToString() }
+                };
                 _sendMessageRequests.Add(new SendMessageRequest()
                 {
                     TemplateName = TemplateName.TaskUpdateSimplified,
@@ -333,8 +316,10 @@ namespace CommunicationService.MessageService
             if (!string.IsNullOrEmpty(requestorEmailAddress)
                 && requestorEmailAddress != volunteerEmailAddress && requestorEmailAddress != recipientEmailAddress)
             {
-                Dictionary<string, string> param = new Dictionary<string, string>(additionalParameters);
-                param.Add("RecipientOrRequestor", "Requestor");
+                var param = new Dictionary<string, string>(additionalParameters)
+                {
+                    { "RequestRole", RequestRoles.Requestor.ToString() }
+                };
                 _sendMessageRequests.Add(new SendMessageRequest()
                 {
                     TemplateName = TemplateName.TaskUpdateSimplified,
