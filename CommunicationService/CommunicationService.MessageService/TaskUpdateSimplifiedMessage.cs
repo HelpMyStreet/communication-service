@@ -53,6 +53,14 @@ namespace CommunicationService.MessageService
             _textInfo = cultureInfo.TextInfo;
         }
 
+        private void AddIfNotNullOrEmpty(List<TaskDataItem> list, string name, string value)
+        {
+            if (!string.IsNullOrEmpty(value))
+            {
+                list.Add(new TaskDataItem(name, value));
+            }
+        }
+
         private string GetDueDate(GetJobDetailsResponse job)
         {
             string strDaysFromNow = string.Empty;
@@ -257,42 +265,20 @@ namespace CommunicationService.MessageService
 
             // First table
             List<TaskDataItem> importantDataList = new List<TaskDataItem>();
-            importantDataList.Add(new TaskDataItem() { Name = "Status", Value = job.JobSummary.JobStatus.FriendlyName().ToTitleCase() });
-
-            string reference = GetReference(emailRecipientRequestRole, job);
-            if (!string.IsNullOrEmpty(reference))
-            {
-                importantDataList.Add(new TaskDataItem() { Name = "Request Ref", Value = reference });
-            }
+            AddIfNotNullOrEmpty(importantDataList, "Status", job.JobSummary.JobStatus.FriendlyName().ToTitleCase());
+            AddIfNotNullOrEmpty(importantDataList, "Request Ref", GetReference(emailRecipientRequestRole, job));
 
             // Second table
-            List<TaskDataItem> otherDataList = new List<TaskDataItem>();
-            otherDataList.Add(new TaskDataItem() { Name = "Request Type", Value = job.JobSummary.SupportActivity.FriendlyNameForEmail().ToTitleCase() });
-            otherDataList.Add(new TaskDataItem() { Name = "Help Needed", Value = GetDueDate(job) });
-
             string requestedBy = GetRequestedBy(emailRecipientRequestRole, job);
-            if (!string.IsNullOrEmpty(requestedBy))
-            {
-                otherDataList.Add(new TaskDataItem() { Name = "Requested by", Value = requestedBy });
-            }
-
-            string requestedFrom = await GetHelpRequestedFrom(job);
-            if (!string.IsNullOrEmpty(requestedFrom))
-            {
-                otherDataList.Add(new TaskDataItem() { Name = "Help requested from", Value = requestedFrom });
-            }
-
             string helpRecipient = GetHelpRecipient(emailRecipientRequestRole, job);
-            if (!string.IsNullOrEmpty(helpRecipient) && !helpRecipient.Equals(requestedBy))
-            {
-                otherDataList.Add(new TaskDataItem() { Name = "Help recipient", Value = helpRecipient });
-            }
 
-            string volunteer = await GetVolunteer(emailRecipientRequestRole, job);
-            if (!string.IsNullOrEmpty(volunteer))
-            {
-                otherDataList.Add(new TaskDataItem() { Name = "Volunteer", Value = volunteer });
-            }
+            List<TaskDataItem> otherDataList = new List<TaskDataItem>();
+            AddIfNotNullOrEmpty(otherDataList, "Request Type", job.JobSummary.SupportActivity.FriendlyNameForEmail().ToTitleCase());
+            AddIfNotNullOrEmpty(otherDataList, "Help Needed", GetDueDate(job));
+            AddIfNotNullOrEmpty(otherDataList, "Requested by", requestedBy);
+            AddIfNotNullOrEmpty(otherDataList, "Help requested from", await GetHelpRequestedFrom(job));
+            if (!helpRecipient.Equals(requestedBy)) { AddIfNotNullOrEmpty(otherDataList, "Help recipient", helpRecipient); }
+            AddIfNotNullOrEmpty(otherDataList, "Volunteer", await GetVolunteer(emailRecipientRequestRole, job));
 
             return new EmailBuildData()
             {
