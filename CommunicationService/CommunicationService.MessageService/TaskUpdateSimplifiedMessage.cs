@@ -104,7 +104,7 @@ namespace CommunicationService.MessageService
             }
         }
 
-        private string GetJobUrl(string groupKey, int jobId)
+        private string GetJobUrl(int jobId)
         {
             string baseUrl = _sendGridConfig.Value.BaseUrl;
             string encodedJobId = Base64Utils.Base64Encode(jobId.ToString());
@@ -135,6 +135,8 @@ namespace CommunicationService.MessageService
                 }
             }
 
+            RequestRoles emailRecipientRequestRole = (RequestRoles)Enum.Parse(typeof(RequestRoles), additionalParameters["RequestRole"]);
+
             string emailToAddress = string.Empty;
             string emailToName = string.Empty;
             string recipient = string.Empty;
@@ -143,12 +145,11 @@ namespace CommunicationService.MessageService
             JobStatuses previous = _connectRequestService.PreviousJobStatus(job);
             bool showJobUrl = false;
             string joburl = string.Empty;
-            var groups = await _connectGroupService.GetGroup(job.JobSummary.ReferringGroupID);
 
-            if (job.JobSummary.RequestorDefinedByGroup || recipientUserId != REQUESTOR_DUMMY_USERID)
+            if (emailRecipientRequestRole == RequestRoles.Volunteer || emailRecipientRequestRole == RequestRoles.GroupAdmin)
             {
                 showJobUrl = true;
-                joburl = GetJobUrl(groups.Group.GroupKey, jobId.Value);
+                joburl = GetJobUrl(jobId.Value);
             }
 
             List<TaskDataItem> importantDataList = new List<TaskDataItem>();
@@ -164,8 +165,6 @@ namespace CommunicationService.MessageService
             List<TaskDataItem> otherDataList = new List<TaskDataItem>();
             otherDataList.Add(new TaskDataItem() { Name = "Request Type", Value = job.JobSummary.SupportActivity.FriendlyNameForEmail().ToTitleCase() });
             otherDataList.Add(new TaskDataItem() { Name = "Help Needed", Value = GetDueDate(job) });
-
-            RequestRoles emailRecipientRequestRole = (RequestRoles)Enum.Parse(typeof(RequestRoles), additionalParameters["RequestRole"]);
 
             switch (emailRecipientRequestRole)
             {
@@ -212,9 +211,10 @@ namespace CommunicationService.MessageService
                 otherDataList.Add(new TaskDataItem() { Name = "Requested by", Value = requestedBy.ToTitleCase() });
             }
 
-            if((Groups) job.JobSummary.ReferringGroupID !=  Groups.Generic)
+            if ((Groups)job.JobSummary.ReferringGroupID != Groups.Generic)
             {
-                otherDataList.Add(new TaskDataItem() { Name = "Help requested from", Value = groups.Group.GroupName });
+                var group = await _connectGroupService.GetGroup(job.JobSummary.ReferringGroupID);
+                otherDataList.Add(new TaskDataItem() { Name = "Help requested from", Value = group.Group.GroupName });
             }
 
             string recipientLocality = job.Recipient.Address.Locality == null ? string.Empty : $" ({textInfo.ToTitleCase(job.Recipient.Address.Locality.ToLower())})";
