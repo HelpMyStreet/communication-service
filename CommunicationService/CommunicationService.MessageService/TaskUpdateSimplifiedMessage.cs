@@ -53,6 +53,13 @@ namespace CommunicationService.MessageService
             _textInfo = cultureInfo.TextInfo;
         }
 
+        private RequestRoles GetChangedByRole(GetJobDetailsResponse job)
+        {
+            int lastUpdatedByUserId = _connectRequestService.GetLastUpdatedBy(job);
+            int? currentOrLastVolunteerUserID = _connectRequestService.GetRelevantVolunteerUserID(job);
+            return currentOrLastVolunteerUserID.HasValue && currentOrLastVolunteerUserID.Value == lastUpdatedByUserId ? RequestRoles.Volunteer : RequestRoles.GroupAdmin;
+        }
+
         private void AddIfNotNullOrEmpty(List<TaskDataItem> list, string name, string value)
         {
             if (!string.IsNullOrEmpty(value))
@@ -255,10 +262,9 @@ namespace CommunicationService.MessageService
 
             // Change summary
             additionalParameters.TryGetValue("FieldUpdated", out string fieldUpdated);
-            int lastUpdatedByUserId = _connectRequestService.GetLastUpdatedBy(job);
-            int? currentOrLastVolunteerUserID = _connectRequestService.GetRelevantVolunteerUserID(job);
-            RequestRoles changedByRole = currentOrLastVolunteerUserID.HasValue && currentOrLastVolunteerUserID.Value == lastUpdatedByUserId ? RequestRoles.Volunteer : RequestRoles.GroupAdmin;
             JobStatuses previousStatus = _connectRequestService.PreviousJobStatus(job);
+            RequestRoles changedByRole = GetChangedByRole(job);
+            string supportActivity = job.JobSummary.SupportActivity.FriendlyNameForEmail();
 
             bool showJobUrl = emailRecipientRequestRole == RequestRoles.Volunteer || emailRecipientRequestRole == RequestRoles.GroupAdmin;
             string jobUrl = showJobUrl ? GetJobUrl(jobId.Value) : string.Empty;
@@ -266,26 +272,26 @@ namespace CommunicationService.MessageService
             // First table
             List<TaskDataItem> importantDataList = new List<TaskDataItem>();
             AddIfNotNullOrEmpty(importantDataList, "Status", job.JobSummary.JobStatus.FriendlyName().ToTitleCase());
-            AddIfNotNullOrEmpty(importantDataList, "Request Ref", GetReference(emailRecipientRequestRole, job));
+            AddIfNotNullOrEmpty(importantDataList, "Reference", GetReference(emailRecipientRequestRole, job));
 
             // Second table
             string requestedBy = GetRequestedBy(emailRecipientRequestRole, job);
             string helpRecipient = GetHelpRecipient(emailRecipientRequestRole, job);
 
             List<TaskDataItem> otherDataList = new List<TaskDataItem>();
-            AddIfNotNullOrEmpty(otherDataList, "Request Type", job.JobSummary.SupportActivity.FriendlyNameForEmail().ToTitleCase());
-            AddIfNotNullOrEmpty(otherDataList, "Help Needed", GetDueDate(job));
+            AddIfNotNullOrEmpty(otherDataList, "Request type", supportActivity.ToTitleCase());
+            AddIfNotNullOrEmpty(otherDataList, "Help needed", GetDueDate(job));
             AddIfNotNullOrEmpty(otherDataList, "Requested by", requestedBy);
             AddIfNotNullOrEmpty(otherDataList, "Help requested from", await GetHelpRequestedFrom(job));
-            if (!helpRecipient.Equals(requestedBy)) { AddIfNotNullOrEmpty(otherDataList, "Help recipient", helpRecipient); }
+            if (!helpRecipient.Equals(requestedBy)) { AddIfNotNullOrEmpty(otherDataList, "Recipient", helpRecipient); }
             AddIfNotNullOrEmpty(otherDataList, "Volunteer", await GetVolunteer(emailRecipientRequestRole, job));
 
             return new EmailBuildData()
             {
                 BaseDynamicData = new TaskUpdateSimplifiedData
                 (
-                    $"A {job.JobSummary.SupportActivity.FriendlyNameForEmail()} request has been updated",
-                    $"A {job.JobSummary.SupportActivity.FriendlyNameForEmail()} request has been updated",
+                    $"A {supportActivity} request has been updated",
+                    $"A {supportActivity} request has been updated",
                     emailToFirstName,
                     changedByRole == RequestRoles.GroupAdmin ? "group administrator" : "volunteer",
                     fieldUpdated.ToLower(),
@@ -295,7 +301,7 @@ namespace CommunicationService.MessageService
                     otherDataList,
                     faceCoveringComplete: job.JobSummary.SupportActivity == SupportActivities.FaceMask && job.JobSummary.JobStatus == JobStatuses.Done,
                     previouStatusCompleteAndNowInProgress: previousStatus == JobStatuses.Done && job.JobSummary.JobStatus == JobStatuses.InProgress,
-                    previouStatusInProgressAndNowOpen:  previousStatus == JobStatuses.InProgress && job.JobSummary.JobStatus == JobStatuses.Open,
+                    previouStatusInProgressAndNowOpen: previousStatus == JobStatuses.InProgress && job.JobSummary.JobStatus == JobStatuses.Open,
                     GetFeedback(job, emailRecipientRequestRole)
                 ),
                 EmailToAddress = emailToAddress,
@@ -312,14 +318,13 @@ namespace CommunicationService.MessageService
                 throw new Exception($"Job details cannot be retrieved for jobId {jobId}");
             }
 
-            int lastUpdatedBy = _connectRequestService.GetLastUpdatedBy(job);
-            int? relevantVolunteerUserID = _connectRequestService.GetRelevantVolunteerUserID(job);
-            bool changedByAdmin = relevantVolunteerUserID.HasValue && relevantVolunteerUserID.Value != lastUpdatedBy;
+            int? currentOrLastVolunteerUserID = _connectRequestService.GetRelevantVolunteerUserID(job);
+            RequestRoles changedByRole = GetChangedByRole(job);
 
             string volunteerEmailAddress = string.Empty;
-            if (relevantVolunteerUserID.HasValue)
+            if (currentOrLastVolunteerUserID.HasValue)
             {
-                var user = await _connectUserService.GetUserByIdAsync(relevantVolunteerUserID.Value);
+                var user = await _connectUserService.GetUserByIdAsync(currentOrLastVolunteerUserID.Value);
 
                 if (user != null)
                 {
@@ -327,7 +332,7 @@ namespace CommunicationService.MessageService
                 }
             }
 
-            if (relevantVolunteerUserID.HasValue && changedByAdmin)
+            if (currentOrLastVolunteerUserID.HasValue && changedByRole != RequestRoles.Volunteer)
             {
                 var param = new Dictionary<string, string>(additionalParameters)
                 {
@@ -337,7 +342,7 @@ namespace CommunicationService.MessageService
                 _sendMessageRequests.Add(new SendMessageRequest()
                 {
                     TemplateName = TemplateName.TaskUpdateSimplified,
-                    RecipientUserID = relevantVolunteerUserID.Value,
+                    RecipientUserID = currentOrLastVolunteerUserID.Value,
                     GroupID = groupId,
                     JobID = jobId,
                     AdditionalParameters = param
