@@ -31,7 +31,6 @@ namespace CommunicationService.MessageService.Substitution
         public bool FaceCoveringComplete { get; private set; }
         public bool PreviouStatusCompleteAndNowInProgress { get; private set; }
         public bool PreviouStatusInProgressAndNowOpen { get; private set; }
-        public bool ShowFeedback { get; private set; }
         public string FeedbackForm { get; private set; }
 
 
@@ -48,7 +47,6 @@ namespace CommunicationService.MessageService.Substitution
             bool faceCoveringComplete,
             bool previouStatusCompleteAndNowInProgress,
             bool previouStatusInProgressAndNowOpen,
-            bool showFeedback,
             string feedbackForm
             )
         {
@@ -64,7 +62,6 @@ namespace CommunicationService.MessageService.Substitution
             FaceCoveringComplete = faceCoveringComplete;
             PreviouStatusCompleteAndNowInProgress = previouStatusCompleteAndNowInProgress;
             PreviouStatusInProgressAndNowOpen = previouStatusInProgressAndNowOpen;
-            ShowFeedback = showFeedback;
             FeedbackForm = feedbackForm;
         }
     }
