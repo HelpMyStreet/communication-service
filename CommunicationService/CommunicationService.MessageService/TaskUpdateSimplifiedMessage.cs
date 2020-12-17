@@ -87,7 +87,7 @@ namespace CommunicationService.MessageService
             var happyFaceImage = $"{_sendGridConfig.Value.BaseUrl}/img/email-resources/great.png";
             var sadFaceImage = $"{_sendGridConfig.Value.BaseUrl}/img/email-resources/not-so-great.png";
 
-            if (job.JobSummary.JobStatus == JobStatuses.Done)
+            if (job.JobSummary.JobStatus == JobStatuses.Done && (requestRole == RequestRoles.Recipient || requestRole == RequestRoles.Requestor))
             {
                 return $"<p style='color:#001489;font-weight:bold;font-size:24px'>Tell us how it went</p><p>How was your experience with HelpMyStreet?</p>" +
                             $"<table>" +
