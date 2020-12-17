@@ -14,6 +14,7 @@ namespace CommunicationService.MessageService.Substitution
         public string Postcode { get; private set; }
         public bool DueToday { get; private set; }
         public bool DueTomorrow { get; private set; }
+        public bool CanBeCompletedBeforeDueDate { get; private set; }
         public string DateStatusLastChanged { get; private set; }
         public string DueDateMessage { get; private set; }
 
@@ -25,6 +26,7 @@ namespace CommunicationService.MessageService.Substitution
             string postcode,
             bool duetoday,
             bool duetomorrow,
+            bool canBeCompletedBeforeDueDate,
             string datestatuslastchanged,
             string dueDateMessage
             )
@@ -36,6 +38,7 @@ namespace CommunicationService.MessageService.Substitution
             Postcode = postcode;
             DueToday = duetoday;
             DueTomorrow = duetomorrow;
+            CanBeCompletedBeforeDueDate = canBeCompletedBeforeDueDate;
             DateStatusLastChanged = datestatuslastchanged;
             DueDateMessage = dueDateMessage;
         }

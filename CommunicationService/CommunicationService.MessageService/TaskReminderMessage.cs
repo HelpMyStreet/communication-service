@@ -85,6 +85,7 @@ namespace CommunicationService.MessageService
                     job.JobSummary.PostCode,
                     job.JobSummary.DueDays == 0 ? true : false,
                     job.JobSummary.DueDays == 1 ? true : false,
+                    job.JobSummary.DueDateType == DueDateType.Before,
                     job.JobSummary.DateStatusLastChanged.ToString(DATE_FORMAT),
                     dueDateMessage
                     ),
