@@ -170,12 +170,12 @@ namespace CommunicationService.MessageService
 
         private string GetFeedback(GetJobDetailsResponse job, RequestRoles requestRole)
         {
-            var happyFaceImage = $"{_sendGridConfig.Value.BaseUrl}/img/email-resources/great.png";
-            var sadFaceImage = $"{_sendGridConfig.Value.BaseUrl}/img/email-resources/not-so-great.png";
-
             if (job.JobSummary.JobStatus == JobStatuses.Done && (requestRole == RequestRoles.Recipient || requestRole == RequestRoles.Requestor))
             {
-                return $"<p style='color:#001489;font-weight:bold;font-size:24px'>Tell us how it went</p><p>How was your experience with HelpMyStreet?</p>" +
+                var happyFaceImage = $"{_sendGridConfig.Value.BaseUrl}/img/email-resources/great.png";
+                var sadFaceImage = $"{_sendGridConfig.Value.BaseUrl}/img/email-resources/not-so-great.png";
+
+                return $"<p>&nbsp;</p><p style='color:#001489;font-weight:bold;font-size:24px'>Tell us how it went</p><p>How was your experience with HelpMyStreet?</p>" +
                             $"<table>" +
                             $"<tr style='margin-left:10px'>" +
                             $"<td><a href='{GetProtectedUrl(job.JobSummary.JobID, requestRole, FeedbackRating.HappyFace)}'><img src='{happyFaceImage}' alt='Great' width='200'></a></td>" +
@@ -186,7 +186,7 @@ namespace CommunicationService.MessageService
             }
             else
             {
-                return string.Empty;
+                return "<p>If you have any comments or queries, please get in touch by emailing support@helpmystreet.org.</p>";
             }
         }
 
@@ -310,7 +310,6 @@ namespace CommunicationService.MessageService
                     faceCoveringComplete: job.JobSummary.SupportActivity == SupportActivities.FaceMask && job.JobSummary.JobStatus == JobStatuses.Done,
                     previouStatusCompleteAndNowInProgress: previous == JobStatuses.Done && job.JobSummary.JobStatus == JobStatuses.InProgress,
                     previouStatusInProgressAndNowOpen:  previous == JobStatuses.InProgress && job.JobSummary.JobStatus == JobStatuses.Open,
-                    showFeedback: job.JobSummary.JobStatus == JobStatuses.Done && recipientUserId== REQUESTOR_DUMMY_USERID ? true : false,
                     GetFeedback(job, emailRecipientRequestRole)
                 ),
                 EmailToAddress = emailToAddress,
