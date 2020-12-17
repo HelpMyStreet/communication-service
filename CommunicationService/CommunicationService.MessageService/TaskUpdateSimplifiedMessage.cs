@@ -73,7 +73,7 @@ namespace CommunicationService.MessageService
 
         private string GetRequestedBy(RequestRoles requestRole, GetJobDetailsResponse job)
         {
-            string requestor = string.Empty;
+            string requestor;
 
             if (job.JobSummary.RequestorDefinedByGroup)
             {
@@ -97,7 +97,7 @@ namespace CommunicationService.MessageService
 
         private string GetHelpRecipient(RequestRoles requestRole, GetJobDetailsResponse job)
         {
-            string recipient = string.Empty;
+            string recipient;
 
             if (job.JobSummary.RequestorType == RequestorType.Organisation)
             {
@@ -153,6 +153,20 @@ namespace CommunicationService.MessageService
             return _textInfo.ToTitleCase(volunteer);
         }
 
+        private string GetReference(RequestRoles requestRole, GetJobDetailsResponse job)
+        {
+            string reference = string.Empty;
+
+            if (job.JobSummary.ReferringGroupID == (int)Groups.AgeUKLSL)
+            {
+                var question = job.JobSummary.Questions.FirstOrDefault(x => x.Id == (int)Questions.AgeUKReference);
+
+                reference = question?.Answer;
+            }
+
+            return reference;
+        }
+
 
         private string GetProtectedUrl(int jobId, RequestRoles requestRole, FeedbackRating? feedbackRating)
         {
@@ -197,45 +211,15 @@ namespace CommunicationService.MessageService
 
             string tailUrl = $"/j/{encodedJobId}";
             var token = _linkRepository.CreateLink(tailUrl, _linkConfig.Value.ExpiryDays).Result;
-            return $"<a href='{baseUrl}/link/{token}'>click here</a>";
+            return $"{baseUrl}/link/{token}";
         }
 
         public async Task<EmailBuildData> PrepareTemplateData(Guid batchId, int? recipientUserId, int? jobId, int? groupId, Dictionary<string, string> additionalParameters, string templateName)
         {
             var job = _connectRequestService.GetJobDetailsAsync(jobId.Value).Result;
-            int lastUpdatedByUserId = _connectRequestService.GetLastUpdatedBy(job);
-            int? currentOrLastVolunteerUserID = _connectRequestService.GetRelevantVolunteerUserID(job);
-            bool changedByAdmin = currentOrLastVolunteerUserID.HasValue && currentOrLastVolunteerUserID.Value != lastUpdatedByUserId;
 
-            additionalParameters.TryGetValue("FieldUpdated", out string fieldUpdated);
+            // Recipient
             RequestRoles emailRecipientRequestRole = (RequestRoles)Enum.Parse(typeof(RequestRoles), additionalParameters["RequestRole"]);
-
-            JobStatuses previousStatus = _connectRequestService.PreviousJobStatus(job);
-            bool showJobUrl = false;
-            string joburl = string.Empty;
-
-            if (emailRecipientRequestRole == RequestRoles.Volunteer || emailRecipientRequestRole == RequestRoles.GroupAdmin)
-            {
-                showJobUrl = true;
-                joburl = GetJobUrl(jobId.Value);
-            }
-
-            List<TaskDataItem> importantDataList = new List<TaskDataItem>();
-            importantDataList.Add(new TaskDataItem() { Name = "Status", Value = job.JobSummary.JobStatus.FriendlyName().ToTitleCase() });
-
-            if (job.JobSummary.ReferringGroupID == (int)Groups.AgeUKLSL)
-            {
-                var question = job.JobSummary.Questions.FirstOrDefault(x => x.Id == (int)Questions.AgeUKReference);
-
-                if (!string.IsNullOrEmpty(question?.Answer))
-                {
-                    importantDataList.Add(new TaskDataItem() { Name = "Request Ref", Value = $" ({question.Answer})" });
-                }
-            }
-
-            List<TaskDataItem> otherDataList = new List<TaskDataItem>();
-            otherDataList.Add(new TaskDataItem() { Name = "Request Type", Value = job.JobSummary.SupportActivity.FriendlyNameForEmail().ToTitleCase() });
-            otherDataList.Add(new TaskDataItem() { Name = "Help Needed", Value = GetDueDate(job) });
 
             string emailToAddress = string.Empty;
             string emailToFullName = string.Empty;
@@ -261,7 +245,30 @@ namespace CommunicationService.MessageService
                     break;
             }
 
-            additionalParameters.TryGetValue("Changed", out string changed);
+            // Change summary
+            additionalParameters.TryGetValue("FieldUpdated", out string fieldUpdated);
+            int lastUpdatedByUserId = _connectRequestService.GetLastUpdatedBy(job);
+            int? currentOrLastVolunteerUserID = _connectRequestService.GetRelevantVolunteerUserID(job);
+            RequestRoles changedByRole = currentOrLastVolunteerUserID.HasValue && currentOrLastVolunteerUserID.Value == lastUpdatedByUserId ? RequestRoles.Volunteer : RequestRoles.GroupAdmin;
+            JobStatuses previousStatus = _connectRequestService.PreviousJobStatus(job);
+
+            bool showJobUrl = emailRecipientRequestRole == RequestRoles.Volunteer || emailRecipientRequestRole == RequestRoles.GroupAdmin;
+            string jobUrl = showJobUrl ? GetJobUrl(jobId.Value) : string.Empty;
+
+            // First table
+            List<TaskDataItem> importantDataList = new List<TaskDataItem>();
+            importantDataList.Add(new TaskDataItem() { Name = "Status", Value = job.JobSummary.JobStatus.FriendlyName().ToTitleCase() });
+
+            string reference = GetReference(emailRecipientRequestRole, job);
+            if (!string.IsNullOrEmpty(reference))
+            {
+                importantDataList.Add(new TaskDataItem() { Name = "Request Ref", Value = reference });
+            }
+
+            // Second table
+            List<TaskDataItem> otherDataList = new List<TaskDataItem>();
+            otherDataList.Add(new TaskDataItem() { Name = "Request Type", Value = job.JobSummary.SupportActivity.FriendlyNameForEmail().ToTitleCase() });
+            otherDataList.Add(new TaskDataItem() { Name = "Help Needed", Value = GetDueDate(job) });
 
             string requestedBy = GetRequestedBy(emailRecipientRequestRole, job);
             if (!string.IsNullOrEmpty(requestedBy))
@@ -294,10 +301,10 @@ namespace CommunicationService.MessageService
                     $"A {job.JobSummary.SupportActivity.FriendlyNameForEmail()} request has been updated",
                     $"A {job.JobSummary.SupportActivity.FriendlyNameForEmail()} request has been updated",
                     emailToFirstName,
-                    changedByAdmin ? "group administrator" : "volunteer",
+                    changedByRole == RequestRoles.GroupAdmin ? "group administrator" : "volunteer",
                     fieldUpdated.ToLower(),
                     showJobUrl,
-                    joburl,
+                    jobUrl,
                     importantDataList,
                     otherDataList,
                     faceCoveringComplete: job.JobSummary.SupportActivity == SupportActivities.FaceMask && job.JobSummary.JobStatus == JobStatuses.Done,
