@@ -12,6 +12,8 @@ using System.Linq;
 using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Text;
+using System;
 
 namespace CommunicationService.GroupService
 {
@@ -124,6 +126,25 @@ namespace CommunicationService.GroupService
                 }
                 return null;
             }
+        }
+
+        public async Task<Instructions> GetGroupSupportActivityInstructions(int groupId, SupportActivities supportActivity)
+        {
+            GetGroupSupportActivityInstructionsRequest request = new GetGroupSupportActivityInstructionsRequest()
+            {
+                GroupId = groupId,
+                SupportActivityType = new SupportActivityType() { SupportActivity = supportActivity }
+            };
+            string json = JsonConvert.SerializeObject(request);
+            StringContent data = new StringContent(json, Encoding.UTF8, "application/json");
+            HttpResponseMessage response = await _httpClientWrapper.PostAsync(HttpClientConfigName.GroupService, "/api/GetGroupSupportActivityInstructions", data, CancellationToken.None);
+            string str = await response.Content.ReadAsStringAsync();
+            var deserializedResponse = JsonConvert.DeserializeObject<ResponseWrapper<GetGroupSupportActivityInstructionsResponse, GroupServiceErrorCode>>(str);
+            if (deserializedResponse.HasContent && deserializedResponse.IsSuccessful)
+            {
+                return deserializedResponse.Content.Instructions;
+            }
+            throw new Exception("Bad response from GetGroupSupportActivityInstructions");
         }
 
         public async Task<GetUserGroupsResponse> GetUserGroups(int userId)

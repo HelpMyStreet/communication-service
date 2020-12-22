@@ -22,6 +22,7 @@ namespace CommunicationService.MessageService
         public const string NewCredentials = "NewCredentials";
         public const string TaskUpdateSimplified = "TaskUpdateSimplified";
         public const string NewTaskPendingApprovalNotification = "NewTaskPendingApprovalNotification";
+        public const string TaskDetail = "TaskDetail";
     }
 }
 
