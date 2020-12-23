@@ -80,7 +80,7 @@ namespace CommunicationService.MessageService
                 var instructions = await _connectGroupService.GetGroupSupportActivityInstructions(groupId.Value, job.JobSummary.SupportActivity);
                 
                 volunteerInstructions = $"{Markdown.ParseHtmlString(instructions.Intro)}";
-                if (instructions.Steps.Count > 0) {
+                if (instructions.Steps?.Count > 0) {
                     var steps = string.Join("", instructions.Steps.Select(x => $"<li>{Markdown.ParseHtmlString(x.Heading)}: {Markdown.ParseHtmlString(x.Detail)}</li>"));
                     volunteerInstructions += $"<ol>{steps}</ol>";
                 }
@@ -92,14 +92,13 @@ namespace CommunicationService.MessageService
 
             return new EmailBuildData()
             {
-                BaseDynamicData = new TaskDetailData() {
-                    Organisation = job.JobSummary.RecipientOrganisation,
-                    Activity = job.JobSummary.SupportActivity.FriendlyNameShort(),
-                    FurtherDetails = otherQuestionsList,
-                    VolunteerInstructions = volunteerInstructions,
-                    HasOrganisation = !String.IsNullOrEmpty(job.JobSummary.RecipientOrganisation)
-                },
-
+                BaseDynamicData = new TaskDetailData(                
+                    organisation: job.JobSummary.RecipientOrganisation,
+                    activity: job.JobSummary.SupportActivity.FriendlyNameShort(),
+                    furtherDetails: otherQuestionsList,
+                    volunteerInstructions : volunteerInstructions,
+                    hasOrganisation : !String.IsNullOrEmpty(job.JobSummary.RecipientOrganisation)
+                ),
                 EmailToAddress = user.UserPersonalDetails.EmailAddress,
                 EmailToName = user.UserPersonalDetails.DisplayName
             };

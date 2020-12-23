@@ -1,0 +1,15 @@
+﻿{
+  "Templates": [
+    {
+      "name": "TaskDetail",
+      "subject": "You Asked For Some Details?",
+      "generation": "dynamic",
+      "versions": [
+        {
+          "name": "use correct placeholders",
+          "subject": "You Asked For Some Details?"
+        }
+      ]
+    }
+  ],
+}
