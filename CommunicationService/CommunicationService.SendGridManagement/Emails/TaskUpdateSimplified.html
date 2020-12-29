@@ -42,6 +42,10 @@
 <p>This request has been cancelled. It may be because the help is no longer needed, or because the help cannot be provided.</p>
 {{/if}}
 
+{{#if RequestorDeterminedByGroupConfigAndEmailRecipientIsRequestor}}
+<p>View the full request details {{AdminRequestUrl}}.</p>
+{{/if}}
+
 {{{FeedbackForm}}}
 
 <p>Thanks for using HelpMyStreet!</p>
