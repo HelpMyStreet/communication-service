@@ -229,6 +229,15 @@ namespace CommunicationService.MessageService
             return $"{baseUrl}/link/{token}";
         }
 
+        private string GetRequestUrl(GetJobDetailsResponse job)
+        {
+            string baseUrl = _sendGridConfig.Value.BaseUrl;
+            var group = _connectGroupService.GetGroup(job.JobSummary.ReferringGroupID).Result;
+            string tailUrl = $"/account/g/{group.Group.GroupKey}/requests";
+            var token = _linkRepository.CreateLink(tailUrl, _linkConfig.Value.ExpiryDays).Result;
+            return $"{baseUrl}/link/{token}";
+        }
+
         public async Task<EmailBuildData> PrepareTemplateData(Guid batchId, int? recipientUserId, int? jobId, int? groupId, Dictionary<string, string> additionalParameters, string templateName)
         {
             var job = _connectRequestService.GetJobDetailsAsync(jobId.Value).Result;
@@ -286,6 +295,9 @@ namespace CommunicationService.MessageService
             if (!helpRecipient.Equals(requestedBy)) { AddIfNotNullOrEmpty(otherDataList, "Recipient", helpRecipient); }
             AddIfNotNullOrEmpty(otherDataList, "Volunteer", await GetVolunteer(emailRecipientRequestRole, job));
 
+            bool requestorDeterminedByGroupConfigAndEmailRecipientIsRequestor = emailRecipientRequestRole == RequestRoles.Requestor && job.JobSummary.RequestorDefinedByGroup;
+            string adminRequestUrl = requestorDeterminedByGroupConfigAndEmailRecipientIsRequestor ? GetRequestUrl(job) : string.Empty;
+
             return new EmailBuildData()
             {
                 BaseDynamicData = new TaskUpdateSimplifiedData
@@ -303,7 +315,9 @@ namespace CommunicationService.MessageService
                     previouStatusCompleteAndNowInProgress: previousStatus == JobStatuses.Done && job.JobSummary.JobStatus == JobStatuses.InProgress,
                     previouStatusInProgressAndNowOpen: previousStatus == JobStatuses.InProgress && job.JobSummary.JobStatus == JobStatuses.Open,
                     statusNowCancelled: job.JobSummary.JobStatus == JobStatuses.Cancelled,
-                    GetFeedback(job, emailRecipientRequestRole)
+                    GetFeedback(job, emailRecipientRequestRole),
+                    requestorDeterminedByGroupConfigAndEmailRecipientIsRequestor,
+                    adminRequestUrl
                 ),
                 EmailToAddress = emailToAddress,
                 EmailToName = emailToFullName
