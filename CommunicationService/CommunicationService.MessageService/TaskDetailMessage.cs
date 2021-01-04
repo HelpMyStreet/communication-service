@@ -1,4 +1,4 @@
-using CommunicationService.Core.Domains;
+﻿using CommunicationService.Core.Domains;
 using CommunicationService.Core.Interfaces;
 using CommunicationService.Core.Interfaces.Services;
 using CommunicationService.MessageService.Substitution;
@@ -83,7 +83,7 @@ namespace CommunicationService.MessageService
                 var steps = string.Join("", instructions.Steps.Select(x => $"<li>{Markdown.ParseHtmlString(x.Heading)}: {Markdown.ParseHtmlString(x.Detail)}</li>"));
                 volunteerInstructions += $"<ol>{steps}</ol>";
             }
-            }
+            volunteerInstructions += Markdown.ParseHtmlString(instructions.Close);
 
             var allQuestions = job.JobSummary.Questions.Where(q => q.ShowOnTaskManagement(false) && !string.IsNullOrEmpty(q.Answer));
             var otherQuestionsList = string.Join("", allQuestions.Select(x => $"<p><u>{x.FriendlyName()}</u></p>" +
