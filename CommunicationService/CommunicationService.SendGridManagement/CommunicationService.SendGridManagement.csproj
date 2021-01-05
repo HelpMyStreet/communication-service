@@ -132,6 +132,7 @@
     <None Remove="Migrations\20201217_155700_NewSimplifiedUpdateTaskMessage.json" />
     <None Remove="Migrations\20201223_091500_UpdateTaskDetail.json" />
     <None Remove="Migrations\20201223_093000_UpdateTaskDetail.json" />
+    <None Remove="Migrations\20210105_165000_AddOfflineDetailsUnsubscribeGroup.json" />
   </ItemGroup>
 
   <ItemGroup>
@@ -175,6 +176,7 @@
     <EmbeddedResource Include="Emails\RequestorTaskNotification.html" />
     <EmbeddedResource Include="Migrations\20200709_130700_AddRequestorTaskNotification.json" />
     <EmbeddedResource Include="Migrations\20200717_152400_AddUnsubscribeGroupsDailyDigest.json" />
+    <EmbeddedResource Include="Migrations\20210105_165000_AddOfflineDetailsUnsubscribeGroup.json" />
     <EmbeddedResource Include="Migrations\20201223_093000_UpdateTaskDetail.json" />
     <EmbeddedResource Include="Migrations\20201223_091500_UpdateTaskDetail.json" />
     <EmbeddedResource Include="Migrations\20201217_155700_NewSimplifiedUpdateTaskMessage.json" />
