@@ -224,16 +224,7 @@ namespace CommunicationService.MessageService
             string baseUrl = _sendGridConfig.Value.BaseUrl;
             string encodedJobId = Base64Utils.Base64Encode(jobId.ToString());
 
-            string tailUrl = $"/j/{encodedJobId}";
-            var token = _linkRepository.CreateLink(tailUrl, _linkConfig.Value.ExpiryDays).Result;
-            return $"{baseUrl}/link/{token}";
-        }
-
-        private string GetRequestUrl(GetJobDetailsResponse job)
-        {
-            string baseUrl = _sendGridConfig.Value.BaseUrl;
-            var group = _connectGroupService.GetGroup(job.JobSummary.ReferringGroupID).Result;
-            string tailUrl = $"/account/g/{group.Group.GroupKey}/requests";
+            string tailUrl = $"/link/j/{encodedJobId}";
             var token = _linkRepository.CreateLink(tailUrl, _linkConfig.Value.ExpiryDays).Result;
             return $"{baseUrl}/link/{token}";
         }
@@ -275,7 +266,9 @@ namespace CommunicationService.MessageService
             RequestRoles changedByRole = GetChangedByRole(job);
             string supportActivity = job.JobSummary.SupportActivity.FriendlyNameShort();
 
-            bool showJobUrl = emailRecipientRequestRole == RequestRoles.Volunteer || emailRecipientRequestRole == RequestRoles.GroupAdmin;
+            bool showJobUrl = emailRecipientRequestRole == RequestRoles.Volunteer 
+                || emailRecipientRequestRole == RequestRoles.GroupAdmin
+                || (emailRecipientRequestRole == RequestRoles.Requestor && job.JobSummary.RequestorDefinedByGroup);
             string jobUrl = showJobUrl ? GetJobUrl(jobId.Value) : string.Empty;
 
             // First table
@@ -296,7 +289,7 @@ namespace CommunicationService.MessageService
             AddIfNotNullOrEmpty(otherDataList, "Volunteer", await GetVolunteer(emailRecipientRequestRole, job));
 
             bool requestorDeterminedByGroupConfigAndEmailRecipientIsRequestor = emailRecipientRequestRole == RequestRoles.Requestor && job.JobSummary.RequestorDefinedByGroup;
-            string adminRequestUrl = requestorDeterminedByGroupConfigAndEmailRecipientIsRequestor ? GetRequestUrl(job) : string.Empty;
+            string adminRequestUrl = requestorDeterminedByGroupConfigAndEmailRecipientIsRequestor ? GetJobUrl(jobId.Value) : string.Empty;
 
             return new EmailBuildData()
             {
@@ -315,9 +308,7 @@ namespace CommunicationService.MessageService
                     previouStatusCompleteAndNowInProgress: previousStatus == JobStatuses.Done && job.JobSummary.JobStatus == JobStatuses.InProgress,
                     previouStatusInProgressAndNowOpen: previousStatus == JobStatuses.InProgress && job.JobSummary.JobStatus == JobStatuses.Open,
                     statusNowCancelled: job.JobSummary.JobStatus == JobStatuses.Cancelled,
-                    GetFeedback(job, emailRecipientRequestRole),
-                    requestorDeterminedByGroupConfigAndEmailRecipientIsRequestor,
-                    adminRequestUrl
+                    GetFeedback(job, emailRecipientRequestRole)
                 ),
                 EmailToAddress = emailToAddress,
                 EmailToName = emailToFullName
