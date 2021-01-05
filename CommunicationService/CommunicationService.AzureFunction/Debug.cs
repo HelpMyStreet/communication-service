@@ -77,13 +77,21 @@ namespace CommunicationService.AzureFunction
                 //    _connectRequestService,
                 //    _connectGroupService);
 
-                TaskDetailMessage message = new TaskDetailMessage(
-                    _connectGroupService,
-                    _connectUserService,
+                //TaskDetailMessage message = new TaskDetailMessage(
+                //    _connectGroupService,
+                //    _connectUserService,
+                //    _connectRequestService,
+                //    _emailConfig,
+                //    _cosmosDbService
+                //    );
+
+                TaskUpdateSimplifiedMessage message = new TaskUpdateSimplifiedMessage(
                     _connectRequestService,
-                    _emailConfig,
-                    _cosmosDbService
-                    );
+                    _connectUserService,
+                    _connectGroupService,
+                    _linkRepository,
+                    _linkConfig,
+                    _sendGridConfig);
 
                 //NewCredentialsMessage message = new NewCredentialsMessage(
                 //    _connectUserService,

@@ -132,6 +132,9 @@
     <None Remove="Migrations\20201217_155700_NewSimplifiedUpdateTaskMessage.json" />
     <None Remove="Migrations\20201223_091500_UpdateTaskDetail.json" />
     <None Remove="Migrations\20201223_093000_UpdateTaskDetail.json" />
+    <None Remove="Migrations\20201223_152600_NewSimplifiedUpdateTaskMessage.json" />
+    <None Remove="Migrations\20201229_103000_NewSimplifiedUpdateTaskMessage.json" />
+    <None Remove="Migrations\20210105_154100_NewSimplifiedUpdateTaskMessage.json" />
     <None Remove="Migrations\20210105_165000_AddOfflineDetailsUnsubscribeGroup.json" />
   </ItemGroup>
 
@@ -267,6 +270,9 @@
     <EmbeddedResource Include="Migrations\20200928_161000_AddRequestorUnsubscribe.json" />
     <EmbeddedResource Include="Migrations\20201211_120600_AddTaskDetail.json" />
     <EmbeddedResource Include="Migrations\20201215_120600_UpdateTaskDetail.json" />
+    <EmbeddedResource Include="Migrations\20201223_152600_NewSimplifiedUpdateTaskMessage.json" />
+    <EmbeddedResource Include="Migrations\20201229_103000_NewSimplifiedUpdateTaskMessage.json" />
+    <EmbeddedResource Include="Migrations\20210105_154100_NewSimplifiedUpdateTaskMessage.json" />
   </ItemGroup>
 
   <ItemGroup>
