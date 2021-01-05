@@ -1,0 +1,15 @@
+﻿{
+  "Templates": [
+    {
+      "name": "TaskUpdateSimplified",
+      "subject": "{{{Subject}}}",
+      "generation": "dynamic",
+      "versions": [
+        {
+          "name": "remove admin url",
+          "subject": "{{{Subject}}}"
+        }
+      ]
+    }
+  ]
+}
