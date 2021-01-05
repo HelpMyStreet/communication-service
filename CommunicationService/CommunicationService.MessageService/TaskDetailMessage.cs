@@ -74,17 +74,16 @@ namespace CommunicationService.MessageService
 
             var job = await _connectRequestService.GetJobDetailsAsync(jobId.Value);
             var volunteerInstructions = "";
-            var group = await _connectGroupService.GetGroup(job.JobSummary.ReferringGroupID);
-           
-            if (group != null) {
-                var instructions = await _connectGroupService.GetGroupSupportActivityInstructions(groupId.Value, job.JobSummary.SupportActivity);
+
+            var instructions = await _connectGroupService.GetGroupSupportActivityInstructions(job.JobSummary.ReferringGroupID, job.JobSummary.SupportActivity);
                 
-                volunteerInstructions = $"{Markdown.ParseHtmlString(instructions.Intro)}";
-                if (instructions.Steps?.Count > 0) {
-                    var steps = string.Join("", instructions.Steps.Select(x => $"<li>{Markdown.ParseHtmlString(x.Heading)}: {Markdown.ParseHtmlString(x.Detail)}</li>"));
-                    volunteerInstructions += $"<ol>{steps}</ol>";
-                }
+            volunteerInstructions = $"{Markdown.ParseHtmlString(instructions.Intro)}";
+            if (instructions.Steps?.Count > 0)
+            {
+                var steps = string.Join("", instructions.Steps.Select(x => $"<li>{Markdown.ParseHtmlString(x.Heading)}: {Markdown.ParseHtmlString(x.Detail)}</li>"));
+                volunteerInstructions += $"<ol>{steps}</ol>";
             }
+            volunteerInstructions += Markdown.ParseHtmlString(instructions.Close);
 
             var allQuestions = job.JobSummary.Questions.Where(q => q.ShowOnTaskManagement(false) && !string.IsNullOrEmpty(q.Answer));
             var otherQuestionsList = string.Join("", allQuestions.Select(x => $"<p><u>{x.FriendlyName()}</u></p>" +
