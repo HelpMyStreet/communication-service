@@ -1,4 +1,4 @@
-using CommunicationService.Core.Domains;
+﻿using CommunicationService.Core.Domains;
 using CommunicationService.Core.Interfaces;
 using CommunicationService.Core.Interfaces.Services;
 using CommunicationService.MessageService.Substitution;
