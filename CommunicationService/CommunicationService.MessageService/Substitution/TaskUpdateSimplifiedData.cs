@@ -33,8 +33,6 @@ namespace CommunicationService.MessageService.Substitution
         public bool PreviouStatusInProgressAndNowOpen { get; private set; }
         public bool StatusNowCancelled { get; private set; }
         public string FeedbackForm { get; private set; }
-        public bool RequestorDeterminedByGroupConfigAndEmailRecipientIsRequestor { get; private set; }
-        public string AdminRequestUrl { get; private set; }
 
         public TaskUpdateSimplifiedData(
             string title,
@@ -50,9 +48,7 @@ namespace CommunicationService.MessageService.Substitution
             bool previouStatusCompleteAndNowInProgress,
             bool previouStatusInProgressAndNowOpen,
             bool statusNowCancelled,
-            string feedbackForm,
-            bool requestorDeterminedByGroupConfigAndEmailRecipientIsRequestor,
-            string adminRequestUrl
+            string feedbackForm
             )
         {
             Title = title;
@@ -68,9 +64,7 @@ namespace CommunicationService.MessageService.Substitution
             PreviouStatusCompleteAndNowInProgress = previouStatusCompleteAndNowInProgress;
             PreviouStatusInProgressAndNowOpen = previouStatusInProgressAndNowOpen;
             StatusNowCancelled = statusNowCancelled;
-            FeedbackForm = feedbackForm;
-            RequestorDeterminedByGroupConfigAndEmailRecipientIsRequestor = requestorDeterminedByGroupConfigAndEmailRecipientIsRequestor;
-            AdminRequestUrl = adminRequestUrl;
+            FeedbackForm = feedbackForm; 
         }
     }
 }
