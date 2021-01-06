@@ -224,7 +224,7 @@ namespace CommunicationService.MessageService
             string baseUrl = _sendGridConfig.Value.BaseUrl;
             string encodedJobId = Base64Utils.Base64Encode(jobId.ToString());
 
-            string tailUrl = $"/j/{encodedJobId}";
+            string tailUrl = $"/link/j/{encodedJobId}";
             var token = _linkRepository.CreateLink(tailUrl, _linkConfig.Value.ExpiryDays).Result;
             return $"{baseUrl}/link/{token}";
         }
@@ -266,7 +266,9 @@ namespace CommunicationService.MessageService
             RequestRoles changedByRole = GetChangedByRole(job);
             string supportActivity = job.JobSummary.SupportActivity.FriendlyNameShort();
 
-            bool showJobUrl = emailRecipientRequestRole == RequestRoles.Volunteer || emailRecipientRequestRole == RequestRoles.GroupAdmin;
+            bool showJobUrl = emailRecipientRequestRole == RequestRoles.Volunteer 
+                || emailRecipientRequestRole == RequestRoles.GroupAdmin
+                || (emailRecipientRequestRole == RequestRoles.Requestor && job.JobSummary.RequestorDefinedByGroup);
             string jobUrl = showJobUrl ? GetJobUrl(jobId.Value) : string.Empty;
 
             // First table
