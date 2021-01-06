@@ -34,7 +34,6 @@ namespace CommunicationService.MessageService.Substitution
         public bool StatusNowCancelled { get; private set; }
         public string FeedbackForm { get; private set; }
 
-
         public TaskUpdateSimplifiedData(
             string title,
             string subject,
@@ -65,7 +64,7 @@ namespace CommunicationService.MessageService.Substitution
             PreviouStatusCompleteAndNowInProgress = previouStatusCompleteAndNowInProgress;
             PreviouStatusInProgressAndNowOpen = previouStatusInProgressAndNowOpen;
             StatusNowCancelled = statusNowCancelled;
-            FeedbackForm = feedbackForm;
+            FeedbackForm = feedbackForm; 
         }
     }
 }
