@@ -288,9 +288,6 @@ namespace CommunicationService.MessageService
             if (!helpRecipient.Equals(requestedBy)) { AddIfNotNullOrEmpty(otherDataList, "Recipient", helpRecipient); }
             AddIfNotNullOrEmpty(otherDataList, "Volunteer", await GetVolunteer(emailRecipientRequestRole, job));
 
-            bool requestorDeterminedByGroupConfigAndEmailRecipientIsRequestor = emailRecipientRequestRole == RequestRoles.Requestor && job.JobSummary.RequestorDefinedByGroup;
-            string adminRequestUrl = requestorDeterminedByGroupConfigAndEmailRecipientIsRequestor ? GetJobUrl(jobId.Value) : string.Empty;
-
             return new EmailBuildData()
             {
                 BaseDynamicData = new TaskUpdateSimplifiedData
