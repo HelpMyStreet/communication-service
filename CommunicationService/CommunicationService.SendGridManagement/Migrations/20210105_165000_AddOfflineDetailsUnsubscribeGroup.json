@@ -1,0 +1,8 @@
+﻿{
+  "CreateUpdateUnsubscribeGroups": [
+    {
+      "name": "Offline Details",
+      "description": "Information you have requested to be sent to you via email"
+    }
+  ]
+}

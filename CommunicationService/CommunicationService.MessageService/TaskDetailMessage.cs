@@ -39,7 +39,7 @@ namespace CommunicationService.MessageService
         public string GetUnsubscriptionGroupName(int? recipientId)
         {
 
-            return null;
+            return UnsubscribeGroupName.OfflineDetails;
         }
 
 
