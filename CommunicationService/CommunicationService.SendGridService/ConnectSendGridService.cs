@@ -15,6 +15,7 @@ using System.Net;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+using CommunicationService.
 using HelpMyStreet.Contracts.CommunicationService.Request;
 
 namespace CommunicationService.SendGridService
@@ -168,7 +169,7 @@ namespace CommunicationService.SendGridService
         public async Task<bool> SendDynamicEmail(string messageId, string templateName, string groupName, EmailBuildData emailBuildData)
         {
             var template = await GetTemplate(templateName).ConfigureAwait(false);
-            int groupId = await GetGroupId(groupName).ConfigureAwait(false);
+
             emailBuildData.BaseDynamicData.BaseUrl = _sendGridConfig.Value.BaseUrl;
             Personalization personalization = new Personalization()
             {
@@ -181,10 +182,6 @@ namespace CommunicationService.SendGridService
                 From = new EmailAddress(_sendGridConfig.Value.FromEmail, _sendGridConfig.Value.FromName),
                 ReplyTo = new EmailAddress(_sendGridConfig.Value.ReplyToEmail, _sendGridConfig.Value.ReplyToName),
                 TemplateId = template.id,
-                Asm = new ASM()
-                {
-                    GroupId = groupId
-                },
                 Personalizations = new List<Personalization>()
                 {
                     personalization
@@ -200,6 +197,17 @@ namespace CommunicationService.SendGridService
                     { "GroupId", emailBuildData.GroupID.HasValue ? emailBuildData.GroupID.ToString() : "null" }
                 }
             };
+
+            if (groupName == "NotUnsubscribable")
+            {
+                eml.MailSettings.BypassListManagement.Enable = true;
+            }
+            else
+            {
+                int groupId = await GetGroupId(groupName).ConfigureAwait(false);
+                eml.SetAsm(groupId);
+            }
+
 
             Response response = await _sendGridClient.SendEmailAsync(eml).ConfigureAwait(false);
             if (response.StatusCode == HttpStatusCode.OK || response.StatusCode == HttpStatusCode.Accepted)
