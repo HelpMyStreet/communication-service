@@ -72,14 +72,39 @@ namespace CommunicationService.AzureFunction
                 var request = JsonConvert.SerializeObject(req);
                 log.LogInformation($"RequestCommunicationRequest {request}");
 
-                TaskUpdateNewMessage message = new TaskUpdateNewMessage(
-                        _connectRequestService,
-                        _connectUserService,
-                        _connectGroupService,
-                        _linkRepository,
-                        _linkConfig,
-                        _sendGridConfig
-                    );
+                //TaskNotificationMessage message = new TaskNotificationMessage(
+                //    _connectUserService,
+                //    _connectRequestService,
+                //    _connectGroupService);
+
+                //TaskDetailMessage message = new TaskDetailMessage(
+                //    _connectGroupService,
+                //    _connectUserService,
+                //    _connectRequestService,
+                //    _emailConfig,
+                //    _cosmosDbService
+                //    );
+
+                TaskUpdateSimplifiedMessage message = new TaskUpdateSimplifiedMessage(
+                    _connectRequestService,
+                    _connectUserService,
+                    _connectGroupService,
+                    _linkRepository,
+                    _linkConfig,
+                    _sendGridConfig);
+
+                //NewCredentialsMessage message = new NewCredentialsMessage(
+                //    _connectUserService,
+                //    _connectGroupService);
+
+                //TaskUpdateNewMessage message = new TaskUpdateNewMessage(
+                //        _connectRequestService,
+                //        _connectUserService,
+                //        _connectGroupService,
+                //        _linkRepository,
+                //        _linkConfig,
+                //        _sendGridConfig
+                //    );
 
                 //RegistrationChaserMessage message = new RegistrationChaserMessage(
                 //    _connectUserService, _cosmosDbService, _emailConfig);
@@ -92,7 +117,7 @@ namespace CommunicationService.AzureFunction
                 //    _sendGridConfig
                 //    );
 
-                var recipients = await message.IdentifyRecipients(null, req.JobID, req.GroupID);
+                var recipients = await message.IdentifyRecipients(req.RecipientUserID, req.JobID, req.GroupID, req.AdditionalParameters);
                 //SendMessageRequest smr = recipients.ElementAt(2);
                 foreach (SendMessageRequest smr in recipients)
                 {

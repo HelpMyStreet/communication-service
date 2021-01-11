@@ -79,7 +79,7 @@ namespace CommunicationService.MessageService
             }
         }
 
-        public async Task<List<SendMessageRequest>> IdentifyRecipients(int? recipientUserId, int? jobId, int? groupId)
+        public async Task<List<SendMessageRequest>> IdentifyRecipients(int? recipientUserId, int? jobId, int? groupId, Dictionary<string, string> additionalParameters)
         {
             AddRecipientAndTemplate(TemplateName.Welcome, recipientUserId.Value, jobId, groupId);            
             return _sendMessageRequests;

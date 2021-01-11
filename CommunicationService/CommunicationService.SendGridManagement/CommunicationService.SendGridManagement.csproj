@@ -9,9 +9,13 @@
     <None Remove="Emails\InterUserMessage.html" />
     <None Remove="Emails\Layout.html" />
     <None Remove="Emails\Layout.txt" />
+    <None Remove="Emails\NewCredentials.html" />
+    <None Remove="Emails\NewTaskPendingApprovalNotification.html" />
     <None Remove="Emails\PartialRegistration.html" />
+    <None Remove="Emails\TaskDetail.html" />
     <None Remove="Emails\TaskReminder.html" />
     <None Remove="Emails\TaskUpdateNew.html" />
+    <None Remove="Emails\TaskUpdateSimplified.html" />
     <None Remove="Emails\TestLinkSubstitution.html" />
     <None Remove="Emails\ThanksForVerifying.html" />
     <None Remove="Emails\UnableToVerify.html" />
@@ -101,14 +105,48 @@
     <None Remove="Migrations\20201028_090000_UpdateTaskReminderEmails.json" />
     <None Remove="Migrations\20201006_100000_AddTaskUpdateUnsubscribe.json" />
     <None Remove="Migrations\20201118_121600_UpdateTaskNotificationEmail.json" />
+    <None Remove="Migrations\20201126_141500_NewCredentials.json" />
+    <None Remove="Migrations\20201126_144500_NewCredentials2.json" />
+    <None Remove="Migrations\20201126_160000_InterUserMessageSubject.json" />
+    <None Remove="Migrations\20201130_131500_NewSimplifiedUpdateTaskMessage.json" />
+    <None Remove="Migrations\20201130_132000_NewSimplifiedUpdateTaskMessage.json" />
+    <None Remove="Migrations\20201130_132500_NewSimplifiedUpdateTaskMessage.json" />
+    <None Remove="Migrations\20201130_133500_NewSimplifiedUpdateTaskMessage.json" />
+    <None Remove="Migrations\20201130_144000_NewSimplifiedUpdateTaskMessage.json" />
+    <None Remove="Migrations\20201130_150000_NewSimplifiedUpdateTaskMessage.json" />
+    <None Remove="Migrations\20201130_160000_NewSimplifiedUpdateTaskMessage.json" />
+    <None Remove="Migrations\20201201_084000_NewSimplifiedUpdateTaskMessage.json" />
+    <None Remove="Migrations\20201201_100000_NewSimplifiedUpdateTaskMessage.json" />
+    <None Remove="Migrations\20201201_101500_NewSimplifiedUpdateTaskMessage.json" />
+    <None Remove="Migrations\20201201_110000_NewSimplifiedUpdateTaskMessage.json" />
+    <None Remove="Migrations\20201201_120000_NewSimplifiedUpdateTaskMessage.json" />
+    <None Remove="Migrations\20201201_121000_NewSimplifiedUpdateTaskMessage.json" />
+    <None Remove="Migrations\20201202_132500_NewSimplifiedUpdateTaskMessage.json" />
+    <None Remove="Migrations\20201203_145800_NewTaskPendingApprovalNotification.json" />
+    <None Remove="Migrations\20201203_155400_AddNewTaskPendingApprovalNotificationUnsubscribe.json" />
+    <None Remove="Migrations\20201203_155600_RequestorTaskConfirmationTweaks.json" />
+    <None Remove="Migrations\20201203_155600_RequestorTaskConfirmationTweaks %28copy%29.json" />
+    <None Remove="Migrations\20201215_120600_UpdateTaskDetail.json" />
+    <None Remove="Migrations\20201215_120600_UpdateTaskDetail.json" />
+    <None Remove="Migrations\20201215_163300_UpdateTaskReminderEmails.json" />
+    <None Remove="Migrations\20201217_155700_NewSimplifiedUpdateTaskMessage.json" />
+    <None Remove="Migrations\20201223_091500_UpdateTaskDetail.json" />
+    <None Remove="Migrations\20201223_093000_UpdateTaskDetail.json" />
+    <None Remove="Migrations\20201223_152600_NewSimplifiedUpdateTaskMessage.json" />
+    <None Remove="Migrations\20201229_103000_NewSimplifiedUpdateTaskMessage.json" />
+    <None Remove="Migrations\20210105_154100_NewSimplifiedUpdateTaskMessage.json" />
+    <None Remove="Migrations\20210105_165000_AddOfflineDetailsUnsubscribeGroup.json" />
   </ItemGroup>
 
   <ItemGroup>
     <EmbeddedResource Include="Emails\Layout.txt" />
+    <EmbeddedResource Include="Emails\NewTaskPendingApprovalNotification.html" />
     <EmbeddedResource Include="Emails\TaskReminder.html" />
+    <EmbeddedResource Include="Emails\TaskUpdateSimplified.html" />
     <EmbeddedResource Include="Emails\TaskUpdateNew.html" />
     <EmbeddedResource Include="Emails\InterUserMessage.html" />
     <EmbeddedResource Include="Emails\TestLinkSubstitution.html" />
+    <EmbeddedResource Include="Emails\NewCredentials.html" />
     <EmbeddedResource Include="Emails\YotiReminder.html">
     </EmbeddedResource>
     <EmbeddedResource Include="Emails\UnableToVerify.html">
@@ -141,6 +179,32 @@
     <EmbeddedResource Include="Emails\RequestorTaskNotification.html" />
     <EmbeddedResource Include="Migrations\20200709_130700_AddRequestorTaskNotification.json" />
     <EmbeddedResource Include="Migrations\20200717_152400_AddUnsubscribeGroupsDailyDigest.json" />
+    <EmbeddedResource Include="Migrations\20210105_165000_AddOfflineDetailsUnsubscribeGroup.json" />
+    <EmbeddedResource Include="Migrations\20201223_093000_UpdateTaskDetail.json" />
+    <EmbeddedResource Include="Migrations\20201223_091500_UpdateTaskDetail.json" />
+    <EmbeddedResource Include="Migrations\20201217_155700_NewSimplifiedUpdateTaskMessage.json" />
+    <EmbeddedResource Include="Migrations\20201215_163300_UpdateTaskReminderEmails.json" />
+    <EmbeddedResource Include="Migrations\20201202_132500_NewSimplifiedUpdateTaskMessage.json" />
+    <EmbeddedResource Include="Migrations\20201201_121000_NewSimplifiedUpdateTaskMessage.json" />
+    <EmbeddedResource Include="Migrations\20201201_120000_NewSimplifiedUpdateTaskMessage.json" />
+    <EmbeddedResource Include="Migrations\20201201_110000_NewSimplifiedUpdateTaskMessage.json" />
+    <EmbeddedResource Include="Migrations\20201201_101500_NewSimplifiedUpdateTaskMessage.json" />
+    <EmbeddedResource Include="Migrations\20201201_100000_NewSimplifiedUpdateTaskMessage.json" />
+    <EmbeddedResource Include="Migrations\20201201_084000_NewSimplifiedUpdateTaskMessage.json" />
+    <EmbeddedResource Include="Migrations\20201130_160000_NewSimplifiedUpdateTaskMessage.json" />
+    <EmbeddedResource Include="Migrations\20201130_150000_NewSimplifiedUpdateTaskMessage.json" />
+    <EmbeddedResource Include="Migrations\20201130_144000_NewSimplifiedUpdateTaskMessage.json" />
+    <EmbeddedResource Include="Migrations\20201130_133500_NewSimplifiedUpdateTaskMessage.json" />
+    <EmbeddedResource Include="Migrations\20201130_132500_NewSimplifiedUpdateTaskMessage.json" />
+    <EmbeddedResource Include="Migrations\20201130_132000_NewSimplifiedUpdateTaskMessage.json" />
+    <EmbeddedResource Include="Migrations\20201130_131500_NewSimplifiedUpdateTaskMessage.json" />
+    <EmbeddedResource Include="Migrations\20201127_134500_UpdateInterUserMessage.json" />
+    <EmbeddedResource Include="Migrations\20201126_160000_InterUserMessageSubject.json" />
+    <EmbeddedResource Include="Migrations\20201126_144500_NewCredentials2.json" />
+    <EmbeddedResource Include="Migrations\20201126_141500_NewCredentials.json" />
+    <EmbeddedResource Include="Migrations\20201203_155600_RequestorTaskConfirmationTweaks.json" />
+    <EmbeddedResource Include="Migrations\20201203_155400_AddNewTaskPendingApprovalNotificationUnsubscribe.json" />
+    <EmbeddedResource Include="Migrations\20201203_145800_NewTaskPendingApprovalNotification.json" />
     <EmbeddedResource Include="Migrations\20201118_121600_UpdateTaskNotificationEmail.json" />
     <EmbeddedResource Include="Migrations\20201028_090000_UpdateTaskReminderEmails.json" />
     <EmbeddedResource Include="Migrations\20201026_151500_UpdateRegistrationEmails.json" />
@@ -204,6 +268,11 @@
     <EmbeddedResource Include="Migrations\20200714_135500_AddTaskReminder.json" />
     <EmbeddedResource Include="Migrations\20200710_140200_FixMoreHandlebars.json" />
     <EmbeddedResource Include="Migrations\20200928_161000_AddRequestorUnsubscribe.json" />
+    <EmbeddedResource Include="Migrations\20201211_120600_AddTaskDetail.json" />
+    <EmbeddedResource Include="Migrations\20201215_120600_UpdateTaskDetail.json" />
+    <EmbeddedResource Include="Migrations\20201223_152600_NewSimplifiedUpdateTaskMessage.json" />
+    <EmbeddedResource Include="Migrations\20201229_103000_NewSimplifiedUpdateTaskMessage.json" />
+    <EmbeddedResource Include="Migrations\20210105_154100_NewSimplifiedUpdateTaskMessage.json" />
   </ItemGroup>
 
   <ItemGroup>
@@ -215,6 +284,10 @@
   <ItemGroup>
     <ProjectReference Include="..\CommunicationService.Core\CommunicationService.Core.csproj" />
     <ProjectReference Include="..\CommunicationService.Repo\CommunicationService.Repo.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Include="Emails\TaskDetail.html" />
   </ItemGroup>
 
   <ItemGroup>

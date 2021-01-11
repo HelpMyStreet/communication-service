@@ -2,7 +2,11 @@
 
 <p>You're receiving this email because you requested help at HelpMyStreet.org.</p>
 
-<p>We have notified our volunteers of your request. You’ll be notified when one of them accepts it – after which they may be in touch with you directly to make further arrangements. If you have concerns or think something may have gone wrong, please do feel free to contact us via <a href="mailto:support@helpmystreet.org">support@helpmystreet.org</a>.</p>
+{{#if PendingApproval}}
+    <p>Your request will be reviewed by the admins for {{GroupName}} before being released to volunteers. If you have concerns or think something may have gone wrong, please do feel free to contact us via <a href="mailto:support@helpmystreet.org">support@helpmystreet.org</a>.</p>
+{{else}}
+    <p>We have notified our volunteers of your request. You’ll be notified when one of them accepts it – after which they may be in touch with you directly to make further arrangements. If you have concerns or think something may have gone wrong, please do feel free to contact us via <a href="mailto:support@helpmystreet.org">support@helpmystreet.org</a>.</p>
+{{/if}}
 
 <p>Thanks for using our service!</p>
 

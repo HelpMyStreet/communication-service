@@ -282,7 +282,7 @@ namespace CommunicationService.MessageService
             return statusChange;
         }
 
-        public async Task<List<SendMessageRequest>> IdentifyRecipients(int? recipientUserId, int? jobId, int? groupId)
+        public async Task<List<SendMessageRequest>> IdentifyRecipients(int? recipientUserId, int? jobId, int? groupId, Dictionary<string, string> additionalParameters)
         {
             var job = await _connectRequestService.GetJobDetailsAsync(jobId.Value);
 
@@ -471,7 +471,7 @@ namespace CommunicationService.MessageService
                     string group = string.Empty;
                     if (referringGroupId.HasValue)
                     {
-                        var groupDetails = _connectGroupService.GetGroupResponse(referringGroupId.Value).Result;
+                        var groupDetails = _connectGroupService.GetGroup(referringGroupId.Value).Result;
                         if(groupDetails!=null && groupDetails.Group!=null)
                         {
                             group = $" on behalf of { groupDetails.Group.GroupName}";
@@ -752,11 +752,11 @@ namespace CommunicationService.MessageService
                     case JobStatuses.Cancelled:
                         return inError;
                     case JobStatuses.Done:
-                        return $"<br/><p><strong>Tell us how it went</strong></p><p>How was your experience with HelpMyStreet?</p>" +
+                        return $"<br/><p style='color:#001489;font-weight:bold;font-size:24px'>Tell us how it went</p><p>How was your experience with HelpMyStreet?</p>" +
                         $"<table>" +
                         $"<tr style='margin-left:10px'>" +
-                        $"<td><a href='{GetProtectedUrl(job.JobSummary.JobID, recipientOrRequestor, FeedbackRating.HappyFace)}'><img src='{happyFaceImage}' alt='Great' width='145' height='132'></a></td>" +
-                        $"<td><a href='{GetProtectedUrl(job.JobSummary.JobID, recipientOrRequestor, FeedbackRating.SadFace)}'><img src='{sadFaceImage}' alt='Not So Great' width='145' height='132'></a></td>" +
+                        $"<td><a href='{GetProtectedUrl(job.JobSummary.JobID, recipientOrRequestor, FeedbackRating.HappyFace)}'><img src='{happyFaceImage}' alt='Great' width='200' height='182'></a></td>" +
+                        $"<td><a href='{GetProtectedUrl(job.JobSummary.JobID, recipientOrRequestor, FeedbackRating.SadFace)}'><img src='{sadFaceImage}' alt='Not So Great' width='200' height='182'></a></td>" +
                         $"</tr>" +
                         $"</table><br/>";
                     case JobStatuses.Open:

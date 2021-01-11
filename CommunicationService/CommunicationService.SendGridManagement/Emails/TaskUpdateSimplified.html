@@ -1,0 +1,51 @@
+﻿<p>Hi {{Recipient}},</p>
+
+<p>We just wanted to let you know that your request has been updated by a {{UpdatedBy}}. The <strong>{{FieldUpdated}}</strong> has changed; take a look at the latest details below.</p>
+
+{{#if ShowJobUrl}}
+<p>To view the request on our website, <a href='{{{JobUrl}}}'>click here</a>.</p>
+{{/if}}
+
+<br />
+
+<table class="taskdetails">
+    {{#each ImportantDataList}}
+    <tr>
+        <td><strong>{{Name}}:</strong></td>
+        <td>{{{Value}}}</td>
+    </tr>
+    {{/each}}
+    <tr><td>&nbsp;</td><td>&nbsp;</td></tr>
+    {{#each OtherDataList}}
+    <tr>
+        <td><strong>{{Name}}:</strong></td>
+        <td>{{{Value}}}</td>
+    </tr>
+    {{/each}}
+</table>
+
+<br />
+
+{{#if FaceCoveringComplete}}
+<p>If the face coverings have been posted they may take a few days to arrive.</p>
+{{/if}}
+
+{{#if PreviouStatusCompleteAndNowInProgress}}
+<p>This request was marked as ‘Complete’ but is now ‘In Progress’. It may have been marked as complete by mistake, or something else might be needed before the request can be closed. Please keep an eye out for more updates.</p>
+{{/if}}
+
+{{#if PreviouStatusInProgressAndNowOpen}}
+<p>This request was marked as ‘In Progress’ but is now ‘Open’. It may be because the volunteer is no longer able to help, or there has been a problem with the request. Please look out for further updates.</p>
+{{/if}}
+
+{{#if StatusNowCancelled}}
+<p>This request has been cancelled. It may be because the help is no longer needed, or because the help cannot be provided.</p>
+{{/if}}
+
+{{{FeedbackForm}}}
+
+<p>Thanks for using HelpMyStreet!</p>
+
+<p>Best wishes,</p>
+
+<p>The HelpMyStreet team</p>
