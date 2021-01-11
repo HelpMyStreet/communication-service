@@ -17,6 +17,7 @@ using CommunicationService.Core.Services;
 using CommunicationService.Core.Interfaces.Repositories;
 using CommunicationService.Core.Domains;
 using System.Linq;
+using CommunicationService.Core.Enums;
 
 namespace CommunicationService.AzureFunction
 {

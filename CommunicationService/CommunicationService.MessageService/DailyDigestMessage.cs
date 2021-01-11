@@ -19,6 +19,7 @@ using CommunicationService.Core.Interfaces.Repositories;
 using System.Dynamic;
 using HelpMyStreet.Contracts.RequestService.Response;
 using HelpMyStreet.Utils.Extensions;
+using CommunicationService.Core.Enums;
 
 namespace CommunicationService.MessageService
 {

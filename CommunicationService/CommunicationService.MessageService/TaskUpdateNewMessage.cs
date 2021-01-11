@@ -21,9 +21,11 @@ using System.Security.Principal;
 using RestSharp.Extensions;
 using Microsoft.Extensions.Options;
 using CommunicationService.Core.Configuration;
+using CommunicationService.Core;
 using HelpMyStreet.Utils.Extensions;
 using HelpMyStreet.Utils.Utils;
 using HelpMyStreet.Contracts.FeedbackService.Request;
+using CommunicationService.Core.Enums;
 
 namespace CommunicationService.MessageService
 {

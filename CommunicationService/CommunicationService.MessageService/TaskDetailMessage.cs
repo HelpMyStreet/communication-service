@@ -16,6 +16,7 @@ using System.Runtime.Caching;
 using CommunicationService.Core.Services;
 using HelpMyStreet.Utils.Models;
 using HelpMyStreet.Contracts.AddressService.Response;
+using CommunicationService.Core;
 using CommunicationService.Core.Interfaces.Repositories;
 using System.Dynamic;
 using HelpMyStreet.Contracts.RequestService.Response;
@@ -23,6 +24,7 @@ using HelpMyStreet.Utils.Extensions;
 using System.Text.RegularExpressions;
 using Westwind.AspNetCore.Markdown;
 using System.Web;
+using CommunicationService.Core.Enums;
 
 namespace CommunicationService.MessageService
 {

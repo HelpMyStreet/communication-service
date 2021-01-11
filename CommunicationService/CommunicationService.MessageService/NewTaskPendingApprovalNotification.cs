@@ -4,6 +4,7 @@ using System.Text;
 using System.Threading.Tasks;
 using CommunicationService.Core.Configuration;
 using CommunicationService.Core.Domains;
+using CommunicationService.Core.Enums;
 using CommunicationService.Core.Interfaces;
 using CommunicationService.Core.Interfaces.Repositories;
 using CommunicationService.Core.Interfaces.Services;

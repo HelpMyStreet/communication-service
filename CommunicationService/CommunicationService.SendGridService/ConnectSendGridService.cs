@@ -3,6 +3,7 @@ using CommunicationService.Core.Domains;
 using CommunicationService.Core.Domains.SendGrid;
 using CommunicationService.Core.Exception;
 using CommunicationService.Core.Interfaces.Services;
+using CommunicationService.Core.Enums;
 using HelpMyStreet.Contracts.CommunicationService.Request;
 using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
@@ -16,7 +17,6 @@ using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
-using HelpMyStreet.Contracts.CommunicationService.Request;
 
 namespace CommunicationService.SendGridService
 {
@@ -198,7 +198,7 @@ namespace CommunicationService.SendGridService
                 }
             };
 
-            if (groupName == "NotUnsubscribable")
+            if (groupName == UnsubscribeGroupName.NotUnsubscribable)
             {
                 eml.MailSettings.BypassListManagement.Enable = true;
             }

@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace CommunicationService.MessageService
+namespace CommunicationService.Core.Enums
 {
     public static class UnsubscribeGroupName
     {

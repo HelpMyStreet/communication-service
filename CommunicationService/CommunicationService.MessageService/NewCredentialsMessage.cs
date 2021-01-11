@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using CommunicationService.MessageService.Substitution;
 using HelpMyStreet.Utils.Extensions;
 using System.Linq;
+using CommunicationService.Core.Enums;
 
 namespace CommunicationService.MessageService
 {

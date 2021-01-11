@@ -19,6 +19,7 @@
     <Folder Include="Domains\RequestService\" />
     <Folder Include="Dto\" />
     <Folder Include="Utils\" />
+    <Folder Include="Enums\" />
   </ItemGroup>
 
 </Project>

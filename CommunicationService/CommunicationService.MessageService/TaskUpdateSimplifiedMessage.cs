@@ -15,6 +15,7 @@ using Microsoft.Extensions.Options;
 using CommunicationService.Core.Configuration;
 using HelpMyStreet.Utils.Extensions;
 using HelpMyStreet.Utils.Utils;
+using CommunicationService.Core.Enums;
 
 namespace CommunicationService.MessageService
 {

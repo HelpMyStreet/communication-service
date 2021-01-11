@@ -9,6 +9,7 @@ using HelpMyStreet.Utils.Models;
 using CommunicationService.MessageService.Substitution;
 using HelpMyStreet.Utils.Extensions;
 using HelpMyStreet.Utils.Enums;
+using CommunicationService.Core.Enums;
 
 namespace CommunicationService.MessageService
 {
