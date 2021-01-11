@@ -22,20 +22,10 @@ namespace CommunicationService.MessageService
         private readonly IConnectGroupService _connectGroupService;
         List<SendMessageRequest> _sendMessageRequests;
 
-        public const int REQUESTOR_DUMMY_USERID = -1;
-
         public string GetUnsubscriptionGroupName(int? recipientUserId)
         {
-            if (recipientUserId == REQUESTOR_DUMMY_USERID)
-            {
-                return UnsubscribeGroupName.ReqTaskNotification;
-            }
-            else {
-                return UnsubscribeGroupName.TaskNotification;
-            }
-                    
+            return UnsubscribeGroupName.TaskNotification;
         }
-
 
         public TaskNotificationMessage(IConnectUserService connectUserService, IConnectRequestService connectRequestService, IConnectGroupService connectGroupService)
         {
@@ -51,71 +41,45 @@ namespace CommunicationService.MessageService
             string encodedJobId = HelpMyStreet.Utils.Utils.Base64Utils.Base64Encode(job.JobSummary.JobID.ToString());
             bool isFaceMask = job.JobSummary.SupportActivity == SupportActivities.FaceMask;
 
-            if (recipientUserId == REQUESTOR_DUMMY_USERID)
+            var user = await _connectUserService.GetUserByIdAsync(recipientUserId.Value);
+            var volunteers = _connectUserService.GetVolunteersByPostcodeAndActivity
+                (
+                    job.JobSummary.PostCode,
+                    new List<SupportActivities>() { job.JobSummary.SupportActivity },
+                    CancellationToken.None
+                ).Result;
+
+            if (volunteers != null)
             {
-                return new EmailBuildData()
+
+                var volunteer = volunteers.Volunteers.FirstOrDefault(x => x.UserID == user.ID);
+                if (user != null && job != null)
                 {
-                    BaseDynamicData = new TaskNotificationData
-                    (
-                        job.Requestor.FirstName,
-                        true,
-                        encodedJobId,
-                        job.JobSummary.SupportActivity.FriendlyNameShort(),
-                        job.JobSummary.PostCode,
-                        0,
-                        job.JobSummary.DueDate.ToString("dd/MM/yyyy"),
-                        job.JobSummary.IsHealthCritical,
-                        isFaceMask
-                    ),
-                    EmailToAddress = job.Requestor.EmailAddress,
-                    EmailToName = $"{job.Requestor.FirstName} {job.Requestor.LastName}",
-                    RecipientUserID = REQUESTOR_DUMMY_USERID,
-                };
-            }
-            else
-            {
-                var user = await _connectUserService.GetUserByIdAsync(recipientUserId.Value);
-                var volunteers = _connectUserService.GetVolunteersByPostcodeAndActivity
-                    (
-                        job.JobSummary.PostCode,
-                        new List<SupportActivities>() { job.JobSummary.SupportActivity },
-                        CancellationToken.None
-                    ).Result;
-
-                bool isStreetChampionForGivenPostCode = false;
-
-                if (volunteers != null)
-                {
-
-                    var volunteer = volunteers.Volunteers.FirstOrDefault(x => x.UserID == user.ID);
-                    if (user != null && job != null)
+                    return new EmailBuildData()
                     {
-                        return new EmailBuildData()
-                        {
-                            BaseDynamicData = new TaskNotificationData
-                            (
-                                user.UserPersonalDetails.FirstName,
-                                false,
-                                encodedJobId,
-                                job.JobSummary.SupportActivity.FriendlyNameShort(),
-                                job.JobSummary.PostCode,
-                                Math.Round(volunteer.DistanceInMiles, 1),
-                                job.JobSummary.DueDate.ToString("dd/MM/yyyy"),
-                                job.JobSummary.IsHealthCritical,
-                                isFaceMask
-                            ),
-                            EmailToAddress = user.UserPersonalDetails.EmailAddress,
-                            EmailToName = $"{user.UserPersonalDetails.FirstName} {user.UserPersonalDetails.LastName}"
-                        };
-                    }
-
+                        BaseDynamicData = new TaskNotificationData
+                        (
+                            user.UserPersonalDetails.FirstName,
+                            false,
+                            encodedJobId,
+                            job.JobSummary.SupportActivity.FriendlyNameShort(),
+                            job.JobSummary.PostCode,
+                            Math.Round(volunteer.DistanceInMiles, 1),
+                            job.JobSummary.DueDate.ToString("dd/MM/yyyy"),
+                            job.JobSummary.IsHealthCritical,
+                            isFaceMask
+                        ),
+                        EmailToAddress = user.UserPersonalDetails.EmailAddress,
+                        EmailToName = $"{user.UserPersonalDetails.FirstName} {user.UserPersonalDetails.LastName}"
+                    };
                 }
+
             }
 
             throw new Exception("unable to retrieve user details");
         }
 
-        public async Task<List<SendMessageRequest>> IdentifyRecipients(int? recipientUserId, int? jobId, int? groupId)
+        public async Task<List<SendMessageRequest>> IdentifyRecipients(int? recipientUserId, int? jobId, int? groupId, Dictionary<string, string> additionalParameters)
         {
             List<int> groupUsers = new List<int>();
 
@@ -128,27 +92,34 @@ namespace CommunicationService.MessageService
             groupUsers = groupMembers.Users;
             
             var job = await _connectRequestService.GetJobDetailsAsync(jobId.Value);
+
+            var strategy = await _connectGroupService.GetGroupNewRequestNotificationStrategy(job.JobSummary.ReferringGroupID);
+
+            if(strategy==null)
+            {
+                throw new Exception($"No strategy for {job.JobSummary.ReferringGroupID}");
+            }
+
             List<SupportActivities> supportActivities = new List<SupportActivities>();
             if (job != null)
             {
-                // Add dummy recipient to represent requestor, who will not necessarily exist within our DB and so has no userID to lookup/refer to
-                AddRecipientAndTemplate(TemplateName.RequestorTaskNotification, REQUESTOR_DUMMY_USERID, jobId, groupId);
-                // Continue
                 supportActivities.Add(job.JobSummary.SupportActivity);
                 var volunteers = await _connectUserService.GetVolunteersByPostcodeAndActivity(job.JobSummary.PostCode, supportActivities, CancellationToken.None);
 
                 if (volunteers != null)
                 {
-                    foreach (VolunteerSummary vs in volunteers.Volunteers)
-                    {
-                        if (groupUsers.Contains(vs.UserID))
-                        {
-                            AddRecipientAndTemplate(TemplateName.TaskNotification, vs.UserID, jobId, groupId);
-                        }   
-                    }
+                    volunteers.Volunteers
+                        .Where(v => groupUsers.Contains(v.UserID))
+                        .OrderBy(v => v.DistanceInMiles)
+                        .Take(strategy.MaxVolunteer)
+                        .ToList()
+                        .ForEach(v =>
+                            {
+                                AddRecipientAndTemplate(TemplateName.TaskNotification, v.UserID, jobId, groupId);
+                            });
                 }
             }
-            return _sendMessageRequests;
+            return _sendMessageRequests; 
         }
 
         private void AddRecipientAndTemplate(string templateName, int userId, int? jobId, int? groupId)

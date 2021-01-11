@@ -5,7 +5,7 @@
 	</PropertyGroup>
 	<ItemGroup>
 		<PackageReference Include="AzureExtensions.Swashbuckle" Version="3.2.2" />
-		<PackageReference Include="HelpMyStreet.CoreV3.Contracts" Version="1.1.489" />
+		<PackageReference Include="HelpMyStreet.CoreV3.Contracts" Version="1.1.539" />
 		<PackageReference Include="Microsoft.Azure.Functions.Extensions" Version="1.0.0" />
 		<PackageReference Include="AutoMapper.Extensions.Microsoft.DependencyInjection" Version="8.0.1" />
 		<PackageReference Include="MediatR" Version="8.1.0" />
@@ -26,14 +26,11 @@
 		<ProjectReference Include="..\CommunicationService.EmailService\CommunicationService.EmailService.csproj" />
 		<ProjectReference Include="..\CommunicationService.GroupService\CommunicationService.GroupService.csproj" />
 		<ProjectReference ReplaceParameters="true" Include="..\CommunicationService.Handlers\CommunicationService.Handlers.csproj">
-			<Name>CommunicationService.Handlers</Name>
 		</ProjectReference>
 		<ProjectReference ReplaceParameters="true" Include="..\CommunicationService.Mappers\CommunicationService.Mappers.csproj">
-			<Name>CommunicationService.Mappers</Name>
 		</ProjectReference>
 		<ProjectReference Include="..\CommunicationService.MessageService\CommunicationService.MessageService.csproj" />
 		<ProjectReference ReplaceParameters="true" Include="..\CommunicationService.Repo\CommunicationService.Repo.csproj">
-			<Name>CommunicationService.Repo</Name>
 		</ProjectReference>
 		<ProjectReference Include="..\CommunicationService.RequestService\CommunicationService.RequestService.csproj" />
 		<ProjectReference Include="..\CommunicationService.SendGridManagement\CommunicationService.SendGridManagement.csproj" />
