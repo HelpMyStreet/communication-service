@@ -57,19 +57,20 @@ namespace CommunicationService.MessageService
         public async Task<List<SendMessageRequest>> IdentifyRecipients(int? recipientUserId, int? jobId, int? groupId, Dictionary<string, string> additionalParameters)
         {
             // Add dummy recipient to represent requestor, who will not necessarily exist within our DB and so has no userID to lookup/refer to
-            AddRecipientAndTemplate(TemplateName.RequestorTaskNotification, REQUESTOR_DUMMY_USERID, jobId, groupId);
+            AddRecipientAndTemplate(TemplateName.RequestorTaskNotification, REQUESTOR_DUMMY_USERID, jobId, groupId, additionalParameters);
 
             return _sendMessageRequests;
         }
 
-        private void AddRecipientAndTemplate(string templateName, int userId, int? jobId, int? groupId)
+        private void AddRecipientAndTemplate(string templateName, int userId, int? jobId, int? groupId, Dictionary<string, string> additionalParameters)
         {
             _sendMessageRequests.Add(new SendMessageRequest()
             {
                 TemplateName = templateName,
                 RecipientUserID = userId,
                 GroupID = groupId,
-                JobID = jobId
+                JobID = jobId,
+                AdditionalParameters = additionalParameters
             });  
         }
     }
