@@ -127,8 +127,8 @@ namespace CommunicationService.AzureFunction
                 {
                     var emailBuildData = await message.PrepareTemplateData(Guid.NewGuid(),smr.RecipientUserID, smr.JobID,smr.GroupID, smr.AdditionalParameters, smr.TemplateName);
 
-                    emailBuildData.EmailToAddress = "mike@factor-50.co.uk";
-                    emailBuildData.EmailToName = "Mike Matthews";
+                    emailBuildData.EmailToAddress = "jawwad@factor-50.co.uk";
+                    emailBuildData.EmailToName = "Jawwad";
                     var json2 = JsonConvert.SerializeObject(emailBuildData.BaseDynamicData);
                     _connectSendGridService.SendDynamicEmail(string.Empty, smr.TemplateName, UnsubscribeGroupName.TaskNotification, emailBuildData);
                 }
