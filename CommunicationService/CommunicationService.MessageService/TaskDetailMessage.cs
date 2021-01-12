@@ -111,7 +111,8 @@ namespace CommunicationService.MessageService
                 TemplateName = TemplateName.TaskDetail,
                 RecipientUserID = recipientUserId.Value,
                 GroupID = groupId,
-                JobID = jobId
+                JobID = jobId,
+                AdditionalParameters = additionalParameters
             }) ;
 
             return _sendMessageRequests;
