@@ -80,14 +80,13 @@ namespace CommunicationService.MessageService
             volunteerInstructions = $"{Markdown.ParseHtmlString(instructions.Intro)}";
             if (instructions.Steps?.Count > 0)
             {
-                var steps = string.Join("", instructions.Steps.Select(x => $"<li>{Markdown.ParseHtmlString(x.Heading)}: {Markdown.ParseHtmlString(x.Detail)}</li>"));
+                var steps = string.Join("", instructions.Steps.Select(x => $"<li><u>{Markdown.ParseHtmlString(x.Heading)}</u> {Markdown.ParseHtmlString(x.Detail)}</li>"));
                 volunteerInstructions += $"<ol>{steps}</ol>";
             }
             volunteerInstructions += Markdown.ParseHtmlString(instructions.Close);
 
             var allQuestions = job.JobSummary.Questions.Where(q => q.ShowOnTaskManagement(false) && !string.IsNullOrEmpty(q.Answer));
-            var otherQuestionsList = string.Join("", allQuestions.Select(x => $"<p><u>{x.FriendlyName()}</u></p>" +
-            $"<p>{x.Answer.ToHtmlSafeStringWithLineBreaks()}</p>"));
+            var otherQuestionsList = string.Join("", allQuestions.Select(x => $"<p><strong>{x.FriendlyName()}:</strong><br />{x.Answer.ToHtmlSafeStringWithLineBreaks()}</p>"));
 
             return new EmailBuildData()
             {
@@ -103,7 +102,7 @@ namespace CommunicationService.MessageService
             };
         }
 
-        public async  Task<List<SendMessageRequest>> IdentifyRecipients(int? recipientUserId, int? jobId, int? groupId, Dictionary<string, string> additionalParameters)
+        public async Task<List<SendMessageRequest>> IdentifyRecipients(int? recipientUserId, int? jobId, int? groupId, Dictionary<string, string> additionalParameters)
         {
 
             _sendMessageRequests.Add(new SendMessageRequest()
@@ -111,8 +110,9 @@ namespace CommunicationService.MessageService
                 TemplateName = TemplateName.TaskDetail,
                 RecipientUserID = recipientUserId.Value,
                 GroupID = groupId,
-                JobID = jobId
-            }) ;
+                JobID = jobId,
+                AdditionalParameters = additionalParameters
+            });
 
             return _sendMessageRequests;
         }
