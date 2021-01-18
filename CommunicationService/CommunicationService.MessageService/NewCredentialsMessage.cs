@@ -29,7 +29,7 @@ namespace CommunicationService.MessageService
             _sendMessageRequests = new List<SendMessageRequest>();
         }
 
-        public async Task<EmailBuildData> PrepareTemplateData(Guid batchId, int? recipientUserId, int? jobId, int? groupId, Dictionary<string, string> additionalParameters, string templateName)
+        public async Task<EmailBuildData> PrepareTemplateData(Guid batchId, int? recipientUserId, int? jobId, int? groupId, int? requestId, Dictionary<string, string> additionalParameters, string templateName)
         {
             if (!groupId.HasValue || !recipientUserId.HasValue)
             {
@@ -88,7 +88,7 @@ namespace CommunicationService.MessageService
             };
         }
 
-        public async Task<List<SendMessageRequest>> IdentifyRecipients(int? recipientUserId, int? jobId, int? groupId, Dictionary<string, string> additionalParameters)
+        public async Task<List<SendMessageRequest>> IdentifyRecipients(int? recipientUserId, int? jobId, int? groupId, int? requestId, Dictionary<string, string> additionalParameters)
         {
             _sendMessageRequests.Add(new SendMessageRequest()
             {
@@ -96,6 +96,7 @@ namespace CommunicationService.MessageService
                 RecipientUserID = recipientUserId.Value,
                 GroupID = groupId.Value,
                 JobID = jobId,
+                RequestID = requestId,
                 AdditionalParameters = additionalParameters
             });
 
