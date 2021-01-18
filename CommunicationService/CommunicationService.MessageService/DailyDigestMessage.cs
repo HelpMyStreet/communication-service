@@ -54,7 +54,7 @@ namespace CommunicationService.MessageService
             _sendMessageRequests = new List<SendMessageRequest>();
         }
 
-        public async Task<EmailBuildData> PrepareTemplateData(Guid batchId, int? recipientUserId, int? jobId, int? groupId, Dictionary<string, string> additionalParameters, string templateName)
+        public async Task<EmailBuildData> PrepareTemplateData(Guid batchId, int? recipientUserId, int? jobId, int? groupId, int? requestId, Dictionary<string, string> additionalParameters, string templateName)
         {
             CacheItemPolicy cacheItemPolicy = new CacheItemPolicy();
             cacheItemPolicy.AbsoluteExpiration = DateTime.Now.AddHours(1.0);
@@ -231,7 +231,7 @@ namespace CommunicationService.MessageService
             };
         }
 
-        public async  Task<List<SendMessageRequest>> IdentifyRecipients(int? recipientUserId, int? jobId, int? groupId, Dictionary<string, string> additionalParameters)
+        public async  Task<List<SendMessageRequest>> IdentifyRecipients(int? recipientUserId, int? jobId, int? groupId, int? requestId, Dictionary<string, string> additionalParameters)
         {
             var volunteers = await _connectUserService.GetUsers();
             
@@ -244,7 +244,8 @@ namespace CommunicationService.MessageService
                     TemplateName = TemplateName.DailyDigest,
                     RecipientUserID = volunteer.UserID,
                     GroupID = groupId,
-                    JobID = jobId
+                    JobID = jobId,
+                    RequestID = requestId
                 });
             }
             return _sendMessageRequests;

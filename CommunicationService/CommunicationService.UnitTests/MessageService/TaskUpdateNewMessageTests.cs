@@ -89,6 +89,7 @@ namespace CommunicationService.UnitTests.MessageService
             int? recipientUserId  = null;
             int? jobId = 1;
             int? groupId = null;
+            int? requestId = null;
             string recipientEmailAddress = "recipient@test.com";
             string requestorEmailAddress = "requestor@test.com";
             string volunteerEmailAddress = "volunteer@test.com";
@@ -120,7 +121,7 @@ namespace CommunicationService.UnitTests.MessageService
             };
 
 
-            List<SendMessageRequest> recipients = _classUnderTest.IdentifyRecipients(recipientUserId, jobId, groupId, null).Result;
+            List<SendMessageRequest> recipients = _classUnderTest.IdentifyRecipients(recipientUserId, jobId, groupId,requestId, null).Result;
 
             Assert.AreEqual(recipients.Count, 3);
             Assert.AreEqual(recipients[0].AdditionalParameters, null);
@@ -134,6 +135,7 @@ namespace CommunicationService.UnitTests.MessageService
             int? recipientUserId = null;
             int? jobId = 1;
             int? groupId = null;
+            int? requestId = null;
             string requestorEmailAddress = "requestor@test.com";
 
             _job = new GetJobDetailsResponse()
@@ -147,7 +149,7 @@ namespace CommunicationService.UnitTests.MessageService
             };
 
 
-            List<SendMessageRequest> recipients = _classUnderTest.IdentifyRecipients(recipientUserId, jobId, groupId, null).Result;
+            List<SendMessageRequest> recipients = _classUnderTest.IdentifyRecipients(recipientUserId, jobId, groupId, requestId, null).Result;
 
             Assert.AreEqual(recipients.Count, 1);
             Assert.AreEqual(recipients[0].AdditionalParameters["RecipientOrRequestor"], "Requestor");
@@ -160,6 +162,7 @@ namespace CommunicationService.UnitTests.MessageService
             int? recipientUserId = null;
             int? jobId = 1;
             int? groupId = null;
+            int? requestId = null;
             string recipientEmailAddress = "recipient@test.com";
 
             _job = new GetJobDetailsResponse()
@@ -173,7 +176,7 @@ namespace CommunicationService.UnitTests.MessageService
             };
 
 
-            List<SendMessageRequest> recipients = _classUnderTest.IdentifyRecipients(recipientUserId, jobId, groupId, null).Result;
+            List<SendMessageRequest> recipients = _classUnderTest.IdentifyRecipients(recipientUserId, jobId, groupId, requestId, null).Result;
 
             Assert.AreEqual(recipients.Count, 1);
             Assert.AreEqual(recipients[0].AdditionalParameters["RecipientOrRequestor"], "Recipient");
@@ -185,6 +188,7 @@ namespace CommunicationService.UnitTests.MessageService
             int? recipientUserId = null;
             int? jobId = 1;
             int? groupId = null;
+            int? requestId = null;
             string requestorEmailAddress = "requestor@test.com";
 
             _job = new GetJobDetailsResponse()
@@ -204,7 +208,7 @@ namespace CommunicationService.UnitTests.MessageService
             };
 
 
-            List<SendMessageRequest> recipients = _classUnderTest.IdentifyRecipients(recipientUserId, jobId, groupId, null).Result;
+            List<SendMessageRequest> recipients = _classUnderTest.IdentifyRecipients(recipientUserId, jobId, groupId, requestId, null).Result;
 
             Assert.AreEqual(recipients.Count, 1);
             Assert.AreEqual(recipients[0].AdditionalParameters["RecipientOrRequestor"], "Recipient");

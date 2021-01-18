@@ -38,7 +38,7 @@ namespace CommunicationService.MessageService
             return UnsubscribeGroupName.NewTaskPendingApprovalNotification;
         }
 
-        public async Task<List<SendMessageRequest>> IdentifyRecipients(int? recipientUserId, int? jobId, int? groupId, Dictionary<string, string> additionalParameters)
+        public async Task<List<SendMessageRequest>> IdentifyRecipients(int? recipientUserId, int? jobId, int? groupId, int? requestId, Dictionary<string, string> additionalParameters)
         {
             if (!groupId.HasValue || !jobId.HasValue)
             {
@@ -54,14 +54,15 @@ namespace CommunicationService.MessageService
                     TemplateName = TemplateName.NewTaskPendingApprovalNotification,
                     RecipientUserID = userId,
                     GroupID = groupId,
-                    JobID = jobId
+                    JobID = jobId,
+                    RequestID = requestId,
                 });
             }
 
             return _sendMessageRequests;
         }
 
-        public async Task<EmailBuildData> PrepareTemplateData(Guid batchId, int? recipientUserId, int? jobId, int? groupId, Dictionary<string, string> additionalParameters, string templateName)
+        public async Task<EmailBuildData> PrepareTemplateData(Guid batchId, int? recipientUserId, int? jobId, int? groupId, int? requestId, Dictionary<string, string> additionalParameters, string templateName)
         {
             var job = _connectRequestService.GetJobDetailsAsync(jobId.Value).Result;
             var user = await _connectUserService.GetUserByIdAsync(recipientUserId.Value);

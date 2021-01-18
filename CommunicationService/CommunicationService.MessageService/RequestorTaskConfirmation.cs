@@ -35,7 +35,7 @@ namespace CommunicationService.MessageService
             _sendMessageRequests = new List<SendMessageRequest>();
         }
 
-        public async Task<EmailBuildData> PrepareTemplateData(Guid batchId, int? recipientUserId, int? jobId, int? groupId, Dictionary<string, string> additionalParameters, string templateName)
+        public async Task<EmailBuildData> PrepareTemplateData(Guid batchId, int? recipientUserId, int? jobId, int? groupId, int? requestId, Dictionary<string, string> additionalParameters, string templateName)
         {
             var job = _connectRequestService.GetJobDetailsAsync(jobId.Value).Result;
             var group = await _connectGroupService.GetGroup(job.JobSummary.ReferringGroupID);
@@ -54,15 +54,15 @@ namespace CommunicationService.MessageService
             };
         }
 
-        public async Task<List<SendMessageRequest>> IdentifyRecipients(int? recipientUserId, int? jobId, int? groupId, Dictionary<string, string> additionalParameters)
+        public async Task<List<SendMessageRequest>> IdentifyRecipients(int? recipientUserId, int? jobId, int? groupId, int? requestId, Dictionary<string, string> additionalParameters)
         {
             // Add dummy recipient to represent requestor, who will not necessarily exist within our DB and so has no userID to lookup/refer to
-            AddRecipientAndTemplate(TemplateName.RequestorTaskNotification, REQUESTOR_DUMMY_USERID, jobId, groupId, additionalParameters);
+            AddRecipientAndTemplate(TemplateName.RequestorTaskNotification, REQUESTOR_DUMMY_USERID, jobId, groupId, requestId, additionalParameters);
 
             return _sendMessageRequests;
         }
 
-        private void AddRecipientAndTemplate(string templateName, int userId, int? jobId, int? groupId, Dictionary<string, string> additionalParameters)
+        private void AddRecipientAndTemplate(string templateName, int userId, int? jobId, int? groupId, int? requestId, Dictionary<string, string> additionalParameters)
         {
             _sendMessageRequests.Add(new SendMessageRequest()
             {
@@ -70,6 +70,7 @@ namespace CommunicationService.MessageService
                 RecipientUserID = userId,
                 GroupID = groupId,
                 JobID = jobId,
+                RequestID = requestId,
                 AdditionalParameters = additionalParameters
             });  
         }

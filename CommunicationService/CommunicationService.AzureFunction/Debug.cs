@@ -121,11 +121,11 @@ namespace CommunicationService.AzureFunction
                 //    _connectRequestService,
                 //    _connectGroupService);
 
-                var recipients = await message.IdentifyRecipients(req.RecipientUserID, req.JobID, req.GroupID, req.AdditionalParameters);
+                var recipients = await message.IdentifyRecipients(req.RecipientUserID, req.JobID, req.GroupID, req.RequestID, req.AdditionalParameters);
                 //SendMessageRequest smr = recipients.ElementAt(2);
                 foreach (SendMessageRequest smr in recipients)
                 {
-                    var emailBuildData = await message.PrepareTemplateData(Guid.NewGuid(),smr.RecipientUserID, smr.JobID,smr.GroupID, smr.AdditionalParameters, smr.TemplateName);
+                    var emailBuildData = await message.PrepareTemplateData(Guid.NewGuid(),smr.RecipientUserID, smr.JobID,smr.GroupID, smr.RequestID, smr.AdditionalParameters, smr.TemplateName);
 
                     emailBuildData.EmailToAddress = "jawwad@factor-50.co.uk";
                     emailBuildData.EmailToName = "Jawwad";
