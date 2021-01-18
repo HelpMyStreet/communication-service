@@ -1,0 +1,15 @@
+﻿{
+  "Templates": [
+    {
+      "name": "TaskDetail",
+      "subject": "You Asked For Some Details?",
+      "generation": "dynamic",
+      "versions": [
+        {
+          "name": "formatting tweaks",
+          "subject": "You Asked For Some Details?"
+        }
+      ]
+    }
+  ],
+}
