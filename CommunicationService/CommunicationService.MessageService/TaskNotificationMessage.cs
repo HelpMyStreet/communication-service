@@ -35,7 +35,7 @@ namespace CommunicationService.MessageService
             _sendMessageRequests = new List<SendMessageRequest>();
         }
 
-        public async Task<EmailBuildData> PrepareTemplateData(Guid batchId, int? recipientUserId, int? jobId, int? groupId, Dictionary<string, string> additionalParameters, string templateName)
+        public async Task<EmailBuildData> PrepareTemplateData(Guid batchId, int? recipientUserId, int? jobId, int? groupId, int? requestId, Dictionary<string, string> additionalParameters, string templateName)
         {
             var job = _connectRequestService.GetJobDetailsAsync(jobId.Value).Result;
             string encodedJobId = HelpMyStreet.Utils.Utils.Base64Utils.Base64Encode(job.JobSummary.JobID.ToString());
@@ -79,7 +79,7 @@ namespace CommunicationService.MessageService
             throw new Exception("unable to retrieve user details");
         }
 
-        public async Task<List<SendMessageRequest>> IdentifyRecipients(int? recipientUserId, int? jobId, int? groupId, Dictionary<string, string> additionalParameters)
+        public async Task<List<SendMessageRequest>> IdentifyRecipients(int? recipientUserId, int? jobId, int? groupId, int? requestId, Dictionary<string, string> additionalParameters)
         {
             List<int> groupUsers = new List<int>();
 
@@ -115,21 +115,22 @@ namespace CommunicationService.MessageService
                         .ToList()
                         .ForEach(v =>
                             {
-                                AddRecipientAndTemplate(TemplateName.TaskNotification, v.UserID, jobId, groupId);
+                                AddRecipientAndTemplate(TemplateName.TaskNotification, v.UserID, jobId, groupId, requestId);
                             });
                 }
             }
             return _sendMessageRequests; 
         }
 
-        private void AddRecipientAndTemplate(string templateName, int userId, int? jobId, int? groupId)
+        private void AddRecipientAndTemplate(string templateName, int userId, int? jobId, int? groupId, int? requestId)
         {
             _sendMessageRequests.Add(new SendMessageRequest()
             {
                 TemplateName = templateName,
                 RecipientUserID = userId,
                 GroupID = groupId,
-                JobID = jobId
+                JobID = jobId,
+                RequestID = requestId
             });  
         }
     }
