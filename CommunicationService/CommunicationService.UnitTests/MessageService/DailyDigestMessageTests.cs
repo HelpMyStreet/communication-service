@@ -140,6 +140,7 @@ namespace CommunicationService.UnitTests.SendGridService
             int? recipientUserId = null;
             int? jobId = null;
             int? groupId = null;
+            int? requestId = null;
 
             List<UserDetails> userDetails = new List<UserDetails>();
             userDetails.Add(new UserDetails()
@@ -162,7 +163,7 @@ namespace CommunicationService.UnitTests.SendGridService
             _getUsersResponse = new GetUsersResponse();
             _getUsersResponse.UserDetails = userDetails;
 
-            var result = await _classUnderTest.IdentifyRecipients(recipientUserId, jobId, groupId, null);
+            var result = await _classUnderTest.IdentifyRecipients(recipientUserId, jobId, groupId,requestId, null);
             Assert.AreEqual(userDetails.Count(x => x.SupportRadiusMiles.HasValue), result.Count);
         }
 
@@ -172,6 +173,7 @@ namespace CommunicationService.UnitTests.SendGridService
             int? recipientUserId = 1;
             int? jobId = null;
             int? groupId = null;
+            int? requestId = null;
             string templateName = string.Empty;
 
             _getUserGroupsResponse = new GetUserGroupsResponse()
@@ -179,7 +181,7 @@ namespace CommunicationService.UnitTests.SendGridService
                 Groups = null
             };
 
-            var result = await _classUnderTest.PrepareTemplateData(Guid.NewGuid(),recipientUserId, jobId, groupId, null, templateName);
+            var result = await _classUnderTest.PrepareTemplateData(Guid.NewGuid(),recipientUserId, jobId, groupId, requestId, null, templateName);
             Assert.AreEqual(null,result);
 
         }
@@ -190,11 +192,12 @@ namespace CommunicationService.UnitTests.SendGridService
             int? recipientUserId = 1;
             int? jobId = null;
             int? groupId = null;
+            int? requestId = null;
             string templateName = string.Empty;
 
             _getUserGroupsResponse = null;
 
-            var result = await _classUnderTest.PrepareTemplateData(Guid.NewGuid(),recipientUserId, jobId, groupId, null, templateName);
+            var result = await _classUnderTest.PrepareTemplateData(Guid.NewGuid(),recipientUserId, jobId, groupId, requestId, null, templateName);
             Assert.AreEqual(null, result);
         }
 
@@ -204,6 +207,7 @@ namespace CommunicationService.UnitTests.SendGridService
             int? recipientUserId = 1;
             int? jobId = null;
             int? groupId = null;
+            int? requestId = null;
             string templateName = string.Empty;
 
             _getUserGroupsResponse = new GetUserGroupsResponse()
@@ -219,7 +223,7 @@ namespace CommunicationService.UnitTests.SendGridService
                 
             };
 
-            var result = await _classUnderTest.PrepareTemplateData(Guid.NewGuid(),recipientUserId, jobId, groupId, null, templateName);
+            var result = await _classUnderTest.PrepareTemplateData(Guid.NewGuid(),recipientUserId, jobId, groupId, requestId, null, templateName);
             Assert.AreEqual(null, result);
         }
 
@@ -229,6 +233,7 @@ namespace CommunicationService.UnitTests.SendGridService
             int? recipientUserId = 1;
             int? jobId = null;
             int? groupId = null;
+            int? requestId = null;
             string templateName = string.Empty;
 
             _getUserGroupsResponse = new GetUserGroupsResponse()
@@ -271,7 +276,7 @@ namespace CommunicationService.UnitTests.SendGridService
             });
 
             var chosenJobCount = jobSummaries.Count(x => _user.SupportActivities.Contains(x.SupportActivity) && x.DistanceInMiles < _user.SupportRadiusMiles);
-            var result = await _classUnderTest.PrepareTemplateData(Guid.NewGuid(),recipientUserId, jobId, groupId, null, templateName);
+            var result = await _classUnderTest.PrepareTemplateData(Guid.NewGuid(),recipientUserId, jobId, groupId, requestId, null, templateName);
             DailyDigestData ddd = (DailyDigestData) result.BaseDynamicData;
 
 
@@ -284,6 +289,7 @@ namespace CommunicationService.UnitTests.SendGridService
             int? recipientUserId = 1;
             int? jobId = null;
             int? groupId = null;
+            int? requestId = null;
             string templateName = string.Empty;
 
             _getUserGroupsResponse = new GetUserGroupsResponse()
@@ -329,7 +335,7 @@ namespace CommunicationService.UnitTests.SendGridService
             _filteredJobs = jobSummaries;
 
             var chosenJobCount = jobSummaries.Count(x => _user.SupportActivities.Contains(x.SupportActivity) && x.DistanceInMiles < _user.SupportRadiusMiles);
-            var result = await _classUnderTest.PrepareTemplateData(Guid.NewGuid(),recipientUserId, jobId, groupId, null, templateName);
+            var result = await _classUnderTest.PrepareTemplateData(Guid.NewGuid(),recipientUserId, jobId, groupId, requestId, null, templateName);
             Assert.AreEqual(null, result);
         }
 
@@ -339,6 +345,7 @@ namespace CommunicationService.UnitTests.SendGridService
             int? recipientUserId = null;
             int? jobId = null;
             int? groupId = null;
+            int? requestId = null;
             string templateName = string.Empty;
 
             Exception ex = Assert.ThrowsAsync<BadRequestException>(() => _classUnderTest.PrepareTemplateData
@@ -347,6 +354,7 @@ namespace CommunicationService.UnitTests.SendGridService
                 recipientUserId,
                 jobId,
                 groupId,
+                requestId,
                 null,
                 templateName
             ));
@@ -359,6 +367,7 @@ namespace CommunicationService.UnitTests.SendGridService
             int? recipientUserId = 1;
             int? jobId = null;
             int? groupId = null;
+            int? requestId = null;
             string templateName = string.Empty;
 
             _getUserGroupsResponse = new GetUserGroupsResponse()
@@ -420,7 +429,7 @@ namespace CommunicationService.UnitTests.SendGridService
             var otherJobsStats = otherJobs.GroupBy(x => x.SupportActivity, x => x.DueDate, (activity, dueDate) => new { Key = activity, Count = dueDate.Count(), Min = dueDate.Min() });
             otherJobsStats = otherJobsStats.OrderByDescending(x => x.Count);
 
-            var result = await _classUnderTest.PrepareTemplateData(Guid.NewGuid(),recipientUserId, jobId, groupId, null, templateName);
+            var result = await _classUnderTest.PrepareTemplateData(Guid.NewGuid(),recipientUserId, jobId, groupId, requestId, null, templateName);
             DailyDigestData ddd = (DailyDigestData)result.BaseDynamicData;
 
 

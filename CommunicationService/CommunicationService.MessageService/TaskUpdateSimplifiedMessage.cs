@@ -229,7 +229,7 @@ namespace CommunicationService.MessageService
             return $"{baseUrl}/link/{token}";
         }
 
-        public async Task<EmailBuildData> PrepareTemplateData(Guid batchId, int? recipientUserId, int? jobId, int? groupId, Dictionary<string, string> additionalParameters, string templateName)
+        public async Task<EmailBuildData> PrepareTemplateData(Guid batchId, int? recipientUserId, int? jobId, int? groupId, int? requestId, Dictionary<string, string> additionalParameters, string templateName)
         {
             var job = _connectRequestService.GetJobDetailsAsync(jobId.Value).Result;
 
@@ -312,7 +312,7 @@ namespace CommunicationService.MessageService
             };
         }
 
-        public async Task<List<SendMessageRequest>> IdentifyRecipients(int? recipientUserId, int? jobId, int? groupId, Dictionary<string, string> additionalParameters)
+        public async Task<List<SendMessageRequest>> IdentifyRecipients(int? recipientUserId, int? jobId, int? groupId, int? requestId, Dictionary<string, string> additionalParameters)
         {
             var job = await _connectRequestService.GetJobDetailsAsync(jobId.Value);
 
@@ -348,6 +348,7 @@ namespace CommunicationService.MessageService
                     RecipientUserID = currentOrLastVolunteerUserID.Value,
                     GroupID = groupId,
                     JobID = jobId,
+                    RequestID = requestId,
                     AdditionalParameters = param
                 });
             }
@@ -368,6 +369,7 @@ namespace CommunicationService.MessageService
                     RecipientUserID = REQUESTOR_DUMMY_USERID,
                     GroupID = groupId,
                     JobID = jobId,
+                    RequestID = requestId,
                     AdditionalParameters = param
                 });
             }
@@ -386,6 +388,7 @@ namespace CommunicationService.MessageService
                     RecipientUserID = REQUESTOR_DUMMY_USERID,
                     GroupID = groupId,
                     JobID = jobId,
+                    RequestID = requestId,
                     AdditionalParameters = param
                 });
             }

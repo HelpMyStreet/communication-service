@@ -45,7 +45,7 @@ namespace CommunicationService.MessageService
             
         }
 
-        public async Task<EmailBuildData> PrepareTemplateData(Guid batchId, int? recipientUserId, int? jobId, int? groupId, Dictionary<string, string> additionalParameters, string templateName)
+        public async Task<EmailBuildData> PrepareTemplateData(Guid batchId, int? recipientUserId, int? jobId, int? groupId, int? requestId, Dictionary<string, string> additionalParameters, string templateName)
         {
             var user = await _connectUserService.GetUserByIdAsync(recipientUserId.Value);
 
@@ -64,7 +64,7 @@ namespace CommunicationService.MessageService
             }
         }
 
-        private void AddRecipientAndTemplate(string templateName, int userId, int? jobId, int? groupId)
+        private void AddRecipientAndTemplate(string templateName, int userId, int? jobId, int? groupId, int? requestId)
         {
             List<EmailHistory> history = _cosmosDbService.GetEmailHistory(templateName, userId.ToString()).Result;
             if (history.Count == 0)
@@ -74,14 +74,15 @@ namespace CommunicationService.MessageService
                     TemplateName = templateName,
                     RecipientUserID = userId,
                     GroupID = groupId,
-                    JobID = jobId
+                    JobID = jobId,
+                    RequestID = requestId
                 });
             }
         }
 
-        public async Task<List<SendMessageRequest>> IdentifyRecipients(int? recipientUserId, int? jobId, int? groupId, Dictionary<string, string> additionalParameters)
+        public async Task<List<SendMessageRequest>> IdentifyRecipients(int? recipientUserId, int? jobId, int? groupId, int? requestId, Dictionary<string, string> additionalParameters)
         {
-            AddRecipientAndTemplate(TemplateName.Welcome, recipientUserId.Value, jobId, groupId);            
+            AddRecipientAndTemplate(TemplateName.Welcome, recipientUserId.Value, jobId, groupId, requestId);            
             return _sendMessageRequests;
         }
     }
