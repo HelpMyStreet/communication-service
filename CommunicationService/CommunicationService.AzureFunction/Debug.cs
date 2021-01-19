@@ -77,13 +77,13 @@ namespace CommunicationService.AzureFunction
                 //    _connectRequestService,
                 //    _connectGroupService);
 
-                TaskDetailMessage message = new TaskDetailMessage(
-                    _connectGroupService,
-                    _connectUserService,
-                    _connectRequestService,
-                    _emailConfig,
-                    _cosmosDbService
-                    );
+                //TaskDetailMessage message = new TaskDetailMessage(
+                //    _connectGroupService,
+                //    _connectUserService,
+                //    _connectRequestService,
+                //    _emailConfig,
+                //    _cosmosDbService
+                //    );
 
                 //TaskUpdateSimplifiedMessage message = new TaskUpdateSimplifiedMessage(
                 //    _connectRequestService,
@@ -117,9 +117,9 @@ namespace CommunicationService.AzureFunction
                 //    _sendGridConfig
                 //    );
 
-                //RequestorTaskConfirmation message = new RequestorTaskConfirmation(
-                //    _connectRequestService,
-                //    _connectGroupService);
+                RequestorTaskConfirmation message = new RequestorTaskConfirmation(
+                    _connectRequestService,
+                    _connectGroupService);
 
                 var recipients = await message.IdentifyRecipients(req.RecipientUserID, req.JobID, req.GroupID, req.RequestID, req.AdditionalParameters);
                 //SendMessageRequest smr = recipients.ElementAt(2);
@@ -127,7 +127,7 @@ namespace CommunicationService.AzureFunction
                 {
                     var emailBuildData = await message.PrepareTemplateData(Guid.NewGuid(),smr.RecipientUserID, smr.JobID,smr.GroupID, smr.RequestID, smr.AdditionalParameters, smr.TemplateName);
 
-                    emailBuildData.EmailToAddress = "jawwad@factor-50.co.uk";
+                    emailBuildData.EmailToAddress = "mike@factor-50.co.uk";
                     emailBuildData.EmailToName = "Jawwad";
                     var json2 = JsonConvert.SerializeObject(emailBuildData.BaseDynamicData);
                     _connectSendGridService.SendDynamicEmail(string.Empty, smr.TemplateName, UnsubscribeGroupName.TaskNotification, emailBuildData);

@@ -24,7 +24,6 @@ namespace CommunicationService.RequestService
         {
             _httpClientWrapper = httpClientWrapper;
         }
-
         public async Task<GetJobDetailsResponse> GetJobDetailsAsync(int jobID)
         {
             string path = $"/api/GetJobDetails?userID=-1&jobID=" + jobID;
@@ -67,7 +66,6 @@ namespace CommunicationService.RequestService
             }
             
         }
-
         public async Task<GetJobsByStatusesResponse> GetJobsByStatuses(GetJobsByStatusesRequest getJobsByStatusesRequest)
         {
             using (HttpResponseMessage response = await _httpClientWrapper.GetAsync(HttpClientConfigName.RequestService, "/api/GetJobsByStatuses", getJobsByStatusesRequest, CancellationToken.None ))
@@ -81,7 +79,6 @@ namespace CommunicationService.RequestService
             }
             return null;
         }
-
         public async Task<GetJobsInProgressResponse> GetJobsInProgress()
         {
             string path = $"/api/GetJobsInProgress";
@@ -96,6 +93,22 @@ namespace CommunicationService.RequestService
                 return null;
             }
 
+        }
+        public async Task<GetJobSummaryResponse> GetJobSummaryAsync(int jobID)
+        {
+            string path = $"/api/GetJobSummary?userID=-1&jobID=" + jobID;
+            string absolutePath = $"{path}";
+
+            using (HttpResponseMessage response = await _httpClientWrapper.GetAsync(HttpClientConfigName.RequestService, absolutePath, CancellationToken.None).ConfigureAwait(false))
+            {
+                string jsonResponse = await response.Content.ReadAsStringAsync();
+                var getJobSummaryResponse = JsonConvert.DeserializeObject<ResponseWrapper<GetJobSummaryResponse, CommunicationServiceErrorCode>>(jsonResponse);
+                if (getJobSummaryResponse.HasContent && getJobSummaryResponse.IsSuccessful)
+                {
+                    return getJobSummaryResponse.Content;
+                }
+                return null;
+            }
         }
 
         public int GetLastUpdatedBy(GetJobDetailsResponse getJobDetailsResponse)
@@ -133,6 +146,23 @@ namespace CommunicationService.RequestService
                 }
             }        
             return result;
+        }
+
+        public async Task<GetRequestDetailsResponse> GetRequestDetailsAsync(int requestID)
+        {
+            string path = $"/api/GetRequestDetails?authorisedByUserID=-1&requestID=" + requestID;
+            string absolutePath = $"{path}";
+
+            using (HttpResponseMessage response = await _httpClientWrapper.GetAsync(HttpClientConfigName.RequestService, absolutePath, CancellationToken.None).ConfigureAwait(false))
+            {
+                string jsonResponse = await response.Content.ReadAsStringAsync();
+                var getRequestDetailsResponse = JsonConvert.DeserializeObject<ResponseWrapper<GetRequestDetailsResponse, CommunicationServiceErrorCode>>(jsonResponse);
+                if (getRequestDetailsResponse.HasContent && getRequestDetailsResponse.IsSuccessful)
+                {
+                    return getRequestDetailsResponse.Content;
+                }
+                return null;
+            }
         }
 
         public JobStatuses PreviousJobStatus(GetJobDetailsResponse getJobDetailsResponse)
