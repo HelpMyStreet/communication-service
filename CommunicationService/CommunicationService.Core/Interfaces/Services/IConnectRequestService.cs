@@ -6,8 +6,10 @@ using HelpMyStreet.Utils.Enums;
 namespace CommunicationService.Core.Interfaces.Services
 {
     public interface IConnectRequestService
-    {
+    {        
+        Task<GetRequestDetailsResponse> GetRequestDetailsAsync(int requestID);
         Task<GetJobDetailsResponse> GetJobDetailsAsync(int jobID);
+        Task<GetJobSummaryResponse> GetJobSummaryAsync(int jobID);
         Task<GetJobsByFilterResponse> GetJobsByFilter(GetJobsByFilterRequest request);
         Task<GetJobsInProgressResponse> GetJobsInProgress();
         Task<GetJobsByStatusesResponse> GetJobsByStatuses(GetJobsByStatusesRequest getJobsByStatusesRequest);
