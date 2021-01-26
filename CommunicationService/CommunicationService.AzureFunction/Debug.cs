@@ -119,7 +119,11 @@ namespace CommunicationService.AzureFunction
 
                 RequestorTaskConfirmation message = new RequestorTaskConfirmation(
                     _connectRequestService,
-                    _connectGroupService);
+                    _connectGroupService,
+                    _connectAddressService,
+                    _linkRepository,
+                    _linkConfig,
+                    _sendGridConfig);
 
                 var recipients = await message.IdentifyRecipients(req.RecipientUserID, req.JobID, req.GroupID, req.RequestID, req.AdditionalParameters);
                 //SendMessageRequest smr = recipients.ElementAt(2);
@@ -127,7 +131,7 @@ namespace CommunicationService.AzureFunction
                 {
                     var emailBuildData = await message.PrepareTemplateData(Guid.NewGuid(),smr.RecipientUserID, smr.JobID,smr.GroupID, smr.RequestID, smr.AdditionalParameters, smr.TemplateName);
 
-                    emailBuildData.EmailToAddress = "mike@factor-50.co.uk";
+                    emailBuildData.EmailToAddress = "jawwad@factor-50.co.uk";
                     emailBuildData.EmailToName = "Jawwad";
                     var json2 = JsonConvert.SerializeObject(emailBuildData.BaseDynamicData);
                     _connectSendGridService.SendDynamicEmail(string.Empty, smr.TemplateName, UnsubscribeGroupName.TaskNotification, emailBuildData);

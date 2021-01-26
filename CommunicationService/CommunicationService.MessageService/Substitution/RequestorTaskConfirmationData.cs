@@ -1,5 +1,6 @@
 ﻿
 using CommunicationService.Core.Domains;
+using Microsoft.AspNetCore.Mvc.RazorPages.Infrastructure;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -11,16 +12,22 @@ namespace CommunicationService.MessageService.Substitution
         public RequestJob(
             string activity,            
             string dueDateString,            
-            string countString
+            string countString,
+            bool showJobUrl,
+            string jobUrl
             )
         {
             Activity = activity;
             DueDateString = dueDateString;
             CountString = countString;
+            ShowJobUrl = showJobUrl;
+            JobUrl = jobUrl;
         }
         public string Activity { get; private set; }        
         public string DueDateString { get; private set; }        
         public string CountString { get; private set; }
+        public bool ShowJobUrl { get; set; }
+        public string JobUrl { get; set; }
     }
 
     public class RequestorTaskConfirmationData : BaseDynamicData
