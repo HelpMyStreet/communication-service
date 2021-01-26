@@ -112,26 +112,35 @@ namespace CommunicationService.MessageService
 
         private string GetHelpRecipient(RequestRoles requestRole, GetJobDetailsResponse job)
         {
-            string recipient;
+            string recipient = string.Empty;
 
-            if (job.JobSummary.RequestorType == RequestorType.Organisation)
+            if (job.Recipient != null)
             {
-                recipient = job.JobSummary.RecipientOrganisation;
-            }
-            else if (requestRole == RequestRoles.Recipient || (requestRole == RequestRoles.Requestor && job.JobSummary.RequestorType == RequestorType.Myself))
-            {
-                recipient = $"You ({job.Recipient.FirstName})";
-            }
-            else if (!string.IsNullOrEmpty(job.Recipient.Address.Locality))
-            {
-                recipient = $"{job.Recipient.FirstName} ({job.Recipient.Address.Locality.ToLower()})";
+
+                if (job.JobSummary.RequestorType == RequestorType.Organisation && !string.IsNullOrEmpty(job.JobSummary.RecipientOrganisation))
+                {
+                    recipient = job.JobSummary.RecipientOrganisation;
+                }
+                else if (requestRole == RequestRoles.Recipient || (requestRole == RequestRoles.Requestor && job.JobSummary.RequestorType == RequestorType.Myself))
+                {
+                    recipient = $"You ({job.Recipient.FirstName})";
+                }
+                else if (!string.IsNullOrEmpty(job.Recipient.Address.Locality))
+                {
+                    recipient = $"{job.Recipient.FirstName} ({job.Recipient.Address.Locality.ToLower()})";
+                }
+                else
+                {
+                    recipient = job.Recipient.FirstName;
+                }
+
+                return _textInfo.ToTitleCase(recipient);
             }
             else
             {
-                recipient = job.Recipient.FirstName;
+                return string.Empty;
             }
-
-            return _textInfo.ToTitleCase(recipient);
+            
         }
 
         public async Task<string> GetHelpRequestedFrom(GetJobDetailsResponse job)

@@ -85,13 +85,13 @@ namespace CommunicationService.AzureFunction
                 //    _cosmosDbService
                 //    );
 
-                //TaskUpdateSimplifiedMessage message = new TaskUpdateSimplifiedMessage(
-                //    _connectRequestService,
-                //    _connectUserService,
-                //    _connectGroupService,
-                //    _linkRepository,
-                //    _linkConfig,
-                //    _sendGridConfig);
+                TaskUpdateSimplifiedMessage message = new TaskUpdateSimplifiedMessage(
+                    _connectRequestService,
+                    _connectUserService,
+                    _connectGroupService,
+                    _linkRepository,
+                    _linkConfig,
+                    _sendGridConfig);
 
                 //NewCredentialsMessage message = new NewCredentialsMessage(
                 //    _connectUserService,
