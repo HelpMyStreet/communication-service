@@ -137,7 +137,11 @@
     <None Remove="Migrations\20210105_154100_NewSimplifiedUpdateTaskMessage.json" />
     <None Remove="Migrations\20210105_165000_AddOfflineDetailsUnsubscribeGroup.json" />
     <None Remove="Migrations\20210112_102900_UpdateTaskDetail.json" />
+    <None Remove="Migrations\20210121_150000_UpdateTaskReminderEmails.json" />
     <None Remove="Migrations\20210119_110000_RequestorTaskConfirmationHandleShifts.json" />
+    <None Remove="Migrations\20210126_083000_UpdateTaskReminderEmails.json" />
+    <None Remove="Migrations\20210126_084500_RequestorTaskConfirmationHandleShifts.json" />
+    <None Remove="Migrations\20210126_091500_RequestorTaskConfirmationHandleShifts.json" />
   </ItemGroup>
 
   <ItemGroup>
@@ -181,6 +185,10 @@
     <EmbeddedResource Include="Emails\RequestorTaskNotification.html" />
     <EmbeddedResource Include="Migrations\20200709_130700_AddRequestorTaskNotification.json" />
     <EmbeddedResource Include="Migrations\20200717_152400_AddUnsubscribeGroupsDailyDigest.json" />
+    <EmbeddedResource Include="Migrations\20210126_091500_RequestorTaskConfirmationHandleShifts.json" />
+    <EmbeddedResource Include="Migrations\20210126_084500_RequestorTaskConfirmationHandleShifts.json" />
+    <EmbeddedResource Include="Migrations\20210126_083000_UpdateTaskReminderEmails.json" />
+    <EmbeddedResource Include="Migrations\20210121_150000_UpdateTaskReminderEmails.json" />
     <EmbeddedResource Include="Migrations\20210119_110000_RequestorTaskConfirmationHandleShifts.json" />
     <EmbeddedResource Include="Migrations\20210105_165000_AddOfflineDetailsUnsubscribeGroup.json" />
     <EmbeddedResource Include="Migrations\20201223_093000_UpdateTaskDetail.json" />
