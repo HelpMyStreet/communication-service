@@ -1,4 +1,5 @@
-﻿using CommunicationService.Core.Domains;
+﻿using CommunicationService.Core.Configuration;
+using CommunicationService.Core.Domains;
 using CommunicationService.Core.Interfaces;
 using CommunicationService.Core.Interfaces.Repositories;
 using CommunicationService.Core.Interfaces.Services;
@@ -9,7 +10,9 @@ using HelpMyStreet.Contracts.UserService.Response;
 using HelpMyStreet.Utils.Enums;
 using HelpMyStreet.Utils.Extensions;
 using HelpMyStreet.Utils.Models;
+using HelpMyStreet.Utils.Utils;
 using Microsoft.AspNetCore.Razor.TagHelpers;
+using Microsoft.Extensions.Options;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -36,6 +39,10 @@ namespace CommunicationService.MessageService
     {
         private readonly IConnectRequestService _connectRequestService;
         private readonly IConnectGroupService _connectGroupService;
+        private readonly IConnectAddressService _connectAddressService;
+        private readonly ILinkRepository _linkRepository;
+        private readonly IOptions<LinkConfig> _linkConfig;
+        private readonly IOptions<SendGridConfig> _sendGridConfig;
         List<SendMessageRequest> _sendMessageRequests;
 
         public const int REQUESTOR_DUMMY_USERID = -1;
@@ -45,11 +52,37 @@ namespace CommunicationService.MessageService
             return UnsubscribeGroupName.ReqTaskNotification;
         }
 
-        public RequestorTaskConfirmation(IConnectRequestService connectRequestService, IConnectGroupService connectGroupService)
+        public RequestorTaskConfirmation(IConnectRequestService connectRequestService, 
+            IConnectGroupService connectGroupService, 
+            IConnectAddressService connectAddressService,
+            ILinkRepository linkRepository, 
+            IOptions<LinkConfig> linkConfig, 
+            IOptions<SendGridConfig> sendGridConfig)
         {
             _connectRequestService = connectRequestService;
             _connectGroupService = connectGroupService;
+            _connectAddressService = connectAddressService;
+            _linkRepository = linkRepository;
+            _linkConfig = linkConfig;
+            _sendGridConfig = sendGridConfig;
             _sendMessageRequests = new List<SendMessageRequest>();
+        }
+
+        private string GetJobUrl(int jobId)
+        {
+            string baseUrl = _sendGridConfig.Value.BaseUrl;
+            string encodedJobId = Base64Utils.Base64Encode(jobId.ToString());
+
+            string tailUrl = $"/link/j/{encodedJobId}";
+            var token = _linkRepository.CreateLink(tailUrl, _linkConfig.Value.ExpiryDays).Result;
+            return $"{baseUrl}/link/{token}";
+        }
+
+        private RequestRoles GetChangedByRole(GetJobDetailsResponse job)
+        {
+            int lastUpdatedByUserId = _connectRequestService.GetLastUpdatedBy(job);
+            int? currentOrLastVolunteerUserID = _connectRequestService.GetRelevantVolunteerUserID(job);
+            return currentOrLastVolunteerUserID.HasValue && currentOrLastVolunteerUserID.Value == lastUpdatedByUserId ? RequestRoles.Volunteer : RequestRoles.GroupAdmin;
         }
 
         private List<RequestJob> GetJobsForStandardRequest(GetRequestDetailsResponse response, List<GroupJob> groupJobs)
@@ -57,19 +90,28 @@ namespace CommunicationService.MessageService
             List<RequestJob> requestJobs = new List<RequestJob>();
 
             string dueDateString = string.Empty;
-
+            bool showJobUrl = false;
+            string jobUrl = string.Empty;
+            
             //TODO - This can be written to handle multiple jobs for a standard request
             if (groupJobs.Count==1 && groupJobs[0].Count==1)
             {
-                GetJobSummaryResponse jobResponse = _connectRequestService.GetJobSummaryAsync(response.RequestSummary.JobSummaries[0].JobID).Result;
+                int jobid = response.RequestSummary.JobSummaries[0].JobID;
+                GetJobDetailsResponse jobResponse = _connectRequestService.GetJobDetailsAsync(jobid).Result;
 
                 if (jobResponse != null)
                 {
-                    dueDateString = $" - DueDate: {jobResponse.JobSummary.DueDate} ";
+                    RequestRoles getChangedBy = GetChangedByRole(jobResponse);
+                    showJobUrl = getChangedBy == RequestRoles.Volunteer
+               || getChangedBy == RequestRoles.GroupAdmin
+               || (getChangedBy == RequestRoles.Requestor && jobResponse.JobSummary.RequestorDefinedByGroup);
+                    jobUrl = showJobUrl ? GetJobUrl(jobid) : string.Empty;
+
+                    dueDateString = $" - Due Date: <strong>{jobResponse.JobSummary.DueDate.ToString("ddd dd MMMM yyyy")}.</strong>";
                 }
                 else
                 {
-                    throw new Exception($"Unable to retrieve job summary for jobid { response.RequestSummary.JobSummaries[0].JobID}");
+                    throw new Exception($"Unable to retrieve job details for jobid { jobid }");
                 }                
             }
                         
@@ -77,8 +119,10 @@ namespace CommunicationService.MessageService
             {
                 requestJobs.Add(new RequestJob(
                     activity: gj.SupportActivity.FriendlyNameShort(),
-                    countString: gj.Count == 1 ? string.Empty : $" - count ({gj.Count})",
-                    dueDateString: dueDateString
+                    countString: string.Empty,
+                    dueDateString: dueDateString,
+                    showJobUrl: showJobUrl,
+                    jobUrl: jobUrl
                     ));
             }
             return requestJobs;
@@ -88,15 +132,31 @@ namespace CommunicationService.MessageService
         {
             List<RequestJob> requestJobs = new List<RequestJob>();
 
-            string dueDateString = $" - Start: {response.RequestSummary.Shift.StartDate } - {response.RequestSummary.Shift.EndDate}";
+            var locationDetails = _connectAddressService.GetLocationDetails(response.RequestSummary.Shift.Location).Result;
+
+            if(locationDetails ==null)
+            {
+                throw new Exception($"Unable to retrieve location details for request {response.RequestSummary.RequestID}");
+            }
+
+            string locationName = locationDetails.LocationDetails.ShortName;
+
+            var time = TimeSpan.FromMinutes(response.RequestSummary.Shift.ShiftLength);
+
+            string dueDateString = $"Shift: <strong>{response.RequestSummary.Shift.StartDate.ToString("ddd dd MMMM yyyy h:mm tt - ")}{response.RequestSummary.Shift.EndDate.ToString("h:mm tt")}</strong> " +
+                $"(Duration: {time.TotalHours} hrs {time.Minutes} mins). " +
+                $"Location: <strong>{locationName}</strong>";
 
             foreach (GroupJob gj in groupJobs)
             {
                 requestJobs.Add(new RequestJob(
-                    activity: gj.SupportActivity.FriendlyNameShort(), 
-                    countString: gj.Count == 1 ? string.Empty : $" - count ({gj.Count})",
-                    dueDateString: dueDateString
+                    activity: gj.SupportActivity.FriendlyNameShort(),
+                    countString: gj.Count == 1 ? $" - 1 volunteer required. " : $" - {gj.Count} volunteers required. ",
+                    dueDateString: dueDateString,
+                    showJobUrl: false,
+                    jobUrl:string.Empty
                     ));
+                ;
             }
             return requestJobs;
         }
