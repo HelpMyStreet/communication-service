@@ -1,0 +1,26 @@
+﻿<p>Hi {{FirstName}},</p>
+
+<p>You’re receiving this email because you signed up as a Volunteer at <a href='http://www.helpmystreet.org/'>HelpMyStreet.org</a>.</p>
+
+{{#if Shift}}
+<p>New shift(s) have just been added that meet the criteria you said you could help with:</p>
+
+<ul>
+    {{#each RequestList}}
+    <li>
+        {{{RequestDetails}}}
+    </li>
+    {{/each}}
+</ul>
+
+{{else}}
+<p></p>
+{{/if}}
+
+<p>Please visit your <a href='{{BaseUrl}}/account/open-requests'>Open Requests</a> page to find out more and accept them if you’re able to help.</p>
+
+<p>Thanks so much!</p>
+
+<p>The HelpMyStreet Team</p>
+
+<p>P.S. If you visit the site and these requests are no longer visible, it’s likely that they have been accepted by another user. Take a look around to see if there is anything else you can help with or keep an eye open for future notifications.</p>

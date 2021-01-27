@@ -88,6 +88,8 @@ namespace CommunicationService.MessageService
                     return new NewCredentialsMessage(_connectUserService, _connectGroupService);
                 case CommunicationJobTypes.TaskDetail:
                     return new TaskDetailMessage(_connectGroupService, _connectUserService, _connectRequestService, _emailConfig, _cosmosDbService);
+                case CommunicationJobTypes.SendNewRequestNotification:
+                    return new NewRequestNotificationMessage();
                 default:                   
                     throw new Exception("Unknown Email Type");
             }

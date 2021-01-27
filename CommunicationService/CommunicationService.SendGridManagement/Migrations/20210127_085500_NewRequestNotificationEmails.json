@@ -1,0 +1,26 @@
+﻿{
+  "Templates": [
+    {
+      "name": "RequestNotification",
+      "subject": "{{{Subject}}}",
+      "generation": "dynamic",
+      "versions": [
+        {
+          "name": "First Draft",
+          "subject": "{{{Subject}}}"
+        }
+      ]
+    },
+    {
+      "name": "RequestorTaskNotification",
+      "subject": "Your New Help Request",
+      "generation": "dynamic",
+      "versions": [
+        {
+          "name": "Add job url",
+          "subject": "Your New Help Request"
+        }
+      ]
+    }
+  ]
+}
