@@ -1,0 +1,15 @@
+﻿{
+  "Templates": [
+    {
+      "name": "RequestNotification",
+      "subject": "{{{Subject}}}",
+      "generation": "dynamic",
+      "versions": [
+        {
+          "name": "Second Draft",
+          "subject": "{{{Subject}}}"
+        }
+      ]
+    }
+  ]
+}

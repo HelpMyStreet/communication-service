@@ -117,13 +117,15 @@ namespace CommunicationService.AzureFunction
                 //    _sendGridConfig
                 //    );
 
-                RequestorTaskConfirmation message = new RequestorTaskConfirmation(
-                    _connectRequestService,
-                    _connectGroupService,
-                    _connectAddressService,
-                    _linkRepository,
-                    _linkConfig,
-                    _sendGridConfig);
+                //RequestorTaskConfirmation message = new RequestorTaskConfirmation(
+                //    _connectRequestService,
+                //    _connectGroupService,
+                //    _connectAddressService,
+                //    _linkRepository,
+                //    _linkConfig,
+                //    _sendGridConfig);
+
+                NewRequestNotificationMessage message = new NewRequestNotificationMessage();
 
                 var recipients = await message.IdentifyRecipients(req.RecipientUserID, req.JobID, req.GroupID, req.RequestID, req.AdditionalParameters);
                 //SendMessageRequest smr = recipients.ElementAt(2);
