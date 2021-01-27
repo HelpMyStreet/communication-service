@@ -4,6 +4,7 @@ using CommunicationService.Core.Interfaces.Services;
 using CommunicationService.MessageService.Substitution;
 using HelpMyStreet.Contracts.RequestService.Request;
 using HelpMyStreet.Utils.Enums;
+using HelpMyStreet.Utils.Extensions;
 using HelpMyStreet.Utils.Models;
 using System;
 using System.Collections.Generic;
@@ -40,9 +41,9 @@ namespace CommunicationService.MessageService
             GetOpenShiftJobsByFilterRequest request = new GetOpenShiftJobsByFilterRequest();
             var shifts = await _connectRequestService.GetOpenShiftJobsByFilter(request);
 
-            List<int> usersToBeNotified = new List<int>();
+            List<Tuple<int, Location>> usersToBeNotified = new List<Tuple<int, Location>>();
 
-            if(shifts.ShiftJobs.Count>0)
+            if (shifts.ShiftJobs.Count>0)
             {         
                 var locationsSupportActivities = shifts.ShiftJobs.GroupBy(d => new { d.Location, d.SupportActivity })
                     .Select(m => new { m.Key.Location, m.Key.SupportActivity });
@@ -62,22 +63,24 @@ namespace CommunicationService.MessageService
 
                             if(users!=null && users.Volunteers.Count()>0)
                             {
-                                usersToBeNotified.AddRange(users.Volunteers.Select(x => x.UserID).ToList());
+                                usersToBeNotified.AddRange(users.Volunteers.Select(i => new Tuple<int,Location>(i.UserID,x.Location)).ToList());
                             }
                         }
                     }                    
                 }
 
-                if(usersToBeNotified.Count>0)
+                if (usersToBeNotified.Count > 0)
                 {
-                    usersToBeNotified
-                        .Distinct()
-                        .ToList()
-                        .ForEach(userId =>
-                        {
-                            AddRecipientAndTemplate(TemplateName.RequestNotification, userId, null, null, null, additionalParameters);
-                        });
+                    foreach (var userId in usersToBeNotified.GroupBy(g => g.Item1).Select(m=> m.Key).ToList())
+                    {
+                        List<Location> locations = usersToBeNotified.Where(x => x.Item1 == userId).Select(m => m.Item2).ToList();
+                        string parameter = string.Join(",", locations.Cast<int>().ToArray());
+                        Dictionary<string, string> locationParameters = new Dictionary<string, string>();
+                        locationParameters.Add("locations", parameter);
+                        AddRecipientAndTemplate(TemplateName.RequestNotification, userId, null, null, null, locationParameters);
+                    }
                 }
+
             }
             
             return _sendMessageRequests;
@@ -85,6 +88,36 @@ namespace CommunicationService.MessageService
 
         public async Task<EmailBuildData> PrepareTemplateData(Guid batchId, int? recipientUserId, int? jobId, int? groupId, int? requestId, Dictionary<string, string> additionalParameters, string templateName)
         {
+            var user = await _connectUserService.GetUserByIdAsync(recipientUserId.Value);
+
+            if(user==null)
+            {
+                throw new Exception($"Unable to retrieve user details for userid{ recipientUserId.Value }");
+            }
+
+            if (!additionalParameters.TryGetValue("locations", out string locations))
+            {
+                throw new Exception($"Location parameter expected for {recipientUserId.Value}");
+            }
+
+            
+
+            LocationsRequest lr = new LocationsRequest() { Locations = new List<Location>() };
+
+            locations.Split(",").ToList()
+                .ForEach(x =>
+                {
+                    lr.Locations.Add((Location) Enum.Parse(typeof(Location),x));
+                });
+
+            GetOpenShiftJobsByFilterRequest request = new GetOpenShiftJobsByFilterRequest();
+            var shifts = await _connectRequestService.GetOpenShiftJobsByFilter(request);
+
+            if (shifts ==null || shifts.ShiftJobs.Count==0)
+            {
+                throw new Exception($"No shifts returned from user id {recipientUserId.Value}");
+            }
+
             return new EmailBuildData()
             {
                 BaseDynamicData = new NewRequestNotificationMessageData
@@ -93,20 +126,41 @@ namespace CommunicationService.MessageService
                             subject: "New vacinnation programme support shifts have been added to HelpMyStreet",
                             firstName:"Jawwad",
                             shift:true,
-                            requestList: GetRequestList()
+                            requestList: GetRequestList(shifts.ShiftJobs, user.PostalCode)
                          ),
                 EmailToAddress = "jawwad@factor-50.co.uk",
                 EmailToName = $"Jawwad Mukhtar"
             };
         }
 
-        private List<JobDetails> GetRequestList()
+        private List<JobDetails> GetRequestList(List<ShiftJob> jobs, string postCode)
         {
-            return new List<JobDetails>()
+            var locationDistances = _connectAddressService.GetLocationsByDistance(postCode, 100).Result;
+
+            var summary = jobs.GroupBy(x => new { x.SupportActivity, x.StartDate, x.EndDate, x.ShiftLength, x.Location })
+                .OrderBy(o => o.Key.StartDate)
+                .Select(m => new {
+                    SupportActivity = m.Key.SupportActivity,
+                    Location = m.Key.Location,
+                    ShiftDetails = $"{m.Key.StartDate.ToString("ddd, dd MMMM yyy h:mm tt")} - {m.Key.EndDate.ToString("h:mm tt")}",
+                    Duration = $"{ Math.Floor(TimeSpan.FromMinutes(m.Key.ShiftLength).TotalHours)} hrs { TimeSpan.FromMinutes(m.Key.ShiftLength).Minutes } mins",
+                    Count = m.Count()
+                }).ToList();
+
+            List<JobDetails> result  = new List<JobDetails>();
+            foreach (var item in summary)
             {
-                new JobDetails("<strong>Vaccination Programme Support</strong> at <strong>Lincoln Hospital</strong>(20.00 miles away). 5 volunteers required. Shift: Tue, 22 December 2020 11:04 AM - 11:14 AM](Duration: [duration 1 hour 30 mins])"),
-                new JobDetails("<strong>Vaccination Programme Support</strong> at <strong>Lincoln Hospital</strong>(20.00 miles away). 5 volunteers required. Shift: Tue, 20 January 2020 11:04 AM - 11:14 AM](Duration: [duration 1 hour 30 mins])")
-            };
+                var locationDetails = _connectAddressService.GetLocationDetails(item.Location).Result;
+                var distanceFromUser = locationDistances.LocationDistances.Where(x => x.Location == item.Location).Select(x => x.DistanceFromPostCode).FirstOrDefault();
+
+                result.Add(new JobDetails($"<strong>{item.SupportActivity.FriendlyNameShort()}</strong> at <strong>{locationDetails.LocationDetails.Name}</strong>" +
+                    $" ({Math.Round(distanceFromUser, 2)} miles away). " +
+                    $"{item.Count} volunteers required. " +
+                    $"Shift: <strong>{ item.ShiftDetails }</strong>" +
+                    $" (Duration: {item.Duration })"));
+            }
+
+            return result;
         }
 
         private void AddRecipientAndTemplate(string templateName, int userId, int? jobId, int? groupId, int? requestId, Dictionary<string, string> additionalParameters)
