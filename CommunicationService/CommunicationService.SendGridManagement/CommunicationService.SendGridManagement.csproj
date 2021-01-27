@@ -146,6 +146,7 @@
     <None Remove="Migrations\20210127_084500_NewRequestNotificationEmails.json" />
     <None Remove="Migrations\20210127_085500_NewRequestNotificationEmails.json" />
     <None Remove="Migrations\20210127_095000_NewRequestNotificationEmails.json" />
+    <None Remove="Migrations\20210127_1445000_NewRequestNotificationEmails.json" />
   </ItemGroup>
 
   <ItemGroup>
@@ -190,6 +191,7 @@
     <EmbeddedResource Include="Emails\RequestorTaskNotification.html" />
     <EmbeddedResource Include="Migrations\20200709_130700_AddRequestorTaskNotification.json" />
     <EmbeddedResource Include="Migrations\20200717_152400_AddUnsubscribeGroupsDailyDigest.json" />
+    <EmbeddedResource Include="Migrations\20210127_1445000_NewRequestNotificationEmails.json" />
     <EmbeddedResource Include="Migrations\20210127_095000_NewRequestNotificationEmails.json" />
     <EmbeddedResource Include="Migrations\20210127_085500_NewRequestNotificationEmails.json" />
     <EmbeddedResource Include="Migrations\20210127_084500_NewRequestNotificationEmails.json" />

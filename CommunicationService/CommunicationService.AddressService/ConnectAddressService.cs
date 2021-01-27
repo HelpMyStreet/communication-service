@@ -56,5 +56,23 @@ namespace CommunicationService.AddressService
             }
             return null;
         }
+
+        public async Task<GetLocationsByDistanceResponse> GetLocationsByDistance(string postCode, int maxDistance)
+        {
+            GetLocationsByDistanceRequest request = new GetLocationsByDistanceRequest() { Postcode = postCode, MaxDistance = maxDistance};
+            string json = JsonConvert.SerializeObject(request);
+            StringContent data = new StringContent(json, Encoding.UTF8, "application/json");
+
+            using (HttpResponseMessage response = await _httpClientWrapper.PostAsync(HttpClientConfigName.AddressService, "/api/GetLocationsByDistance", data, CancellationToken.None))
+            {
+                string jsonResponse = await response.Content.ReadAsStringAsync();
+                var sendEmailResponse = JsonConvert.DeserializeObject<ResponseWrapper<GetLocationsByDistanceResponse, AddressServiceErrorCode>>(jsonResponse);
+                if (sendEmailResponse.HasContent && sendEmailResponse.IsSuccessful)
+                {
+                    return sendEmailResponse.Content;
+                }
+            }
+            return null;
+        }
     }
 }
