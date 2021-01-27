@@ -125,7 +125,7 @@ namespace CommunicationService.AzureFunction
                 //    _linkConfig,
                 //    _sendGridConfig);
 
-                NewRequestNotificationMessage message = new NewRequestNotificationMessage();
+                NewRequestNotificationMessage message = new NewRequestNotificationMessage(_connectRequestService,_connectAddressService, _connectUserService);
 
                 var recipients = await message.IdentifyRecipients(req.RecipientUserID, req.JobID, req.GroupID, req.RequestID, req.AdditionalParameters);
                 //SendMessageRequest smr = recipients.ElementAt(2);
