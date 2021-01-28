@@ -7,6 +7,5 @@ namespace CommunicationService.Core.Domains
     public class RequestHistory
     {
         public int RequestID { get; set; }
-        public int RecipientUserId { get; set; }
     }
 }
