@@ -125,12 +125,18 @@ namespace CommunicationService.AzureFunction
                 //    _linkConfig,
                 //    _sendGridConfig);
 
-                NewRequestNotificationMessage message = new NewRequestNotificationMessage(_connectRequestService,_connectAddressService, _connectUserService, _cosmosDbService);
+                NewRequestNotificationMessage message = new NewRequestNotificationMessage(
+                    _connectRequestService,
+                    _connectAddressService, 
+                    _connectUserService, 
+                    _cosmosDbService,
+                    _emailConfig
+                    );
 
                 var recipients = await message.IdentifyRecipients(req.RecipientUserID, req.JobID, req.GroupID, req.RequestID, req.AdditionalParameters);
-                //SendMessageRequest smr = recipients.ElementAt(2);
-                foreach (SendMessageRequest smr in recipients)
-                {
+                SendMessageRequest smr = recipients.ElementAt(0);
+                //foreach (SendMessageRequest smr in recipients)
+                //{
                     var emailBuildData = await message.PrepareTemplateData(Guid.NewGuid(), smr.RecipientUserID, smr.JobID, smr.GroupID, smr.RequestID, smr.AdditionalParameters, smr.TemplateName);
 
                     if (emailBuildData != null)
@@ -141,7 +147,7 @@ namespace CommunicationService.AzureFunction
                         var json2 = JsonConvert.SerializeObject(emailBuildData.BaseDynamicData);
                         _connectSendGridService.SendDynamicEmail(string.Empty, smr.TemplateName, UnsubscribeGroupName.TaskNotification, emailBuildData);
                     }
-                }
+                //}
 
                 int i = 1;
 

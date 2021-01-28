@@ -62,7 +62,7 @@ namespace CommunicationService.UserService
             }
         }
 
-        public async Task<GetVolunteersByPostcodeAndActivityResponse> GetVolunteersByPostcodeAndActivity(string postcode, List<SupportActivities> activities, CancellationToken cancellationToken)
+        public async Task<GetVolunteersByPostcodeAndActivityResponse> GetVolunteersByPostcodeAndActivity(string postcode, List<SupportActivities> activities, double? shiftRadius, CancellationToken cancellationToken)
         {
             string path = $"api/GetVolunteersByPostcodeAndActivity";
             GetVolunteersByPostcodeAndActivityRequest request = new GetVolunteersByPostcodeAndActivityRequest
@@ -70,7 +70,8 @@ namespace CommunicationService.UserService
                 VolunteerFilter = new VolunteerFilter
                 {
                     Postcode = postcode,
-                    Activities = activities
+                    Activities = activities,
+                    OverrideVolunteerRadius = shiftRadius
                 }
             };
 

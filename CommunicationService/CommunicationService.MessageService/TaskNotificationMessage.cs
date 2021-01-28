@@ -46,6 +46,7 @@ namespace CommunicationService.MessageService
                 (
                     job.JobSummary.PostCode,
                     new List<SupportActivities>() { job.JobSummary.SupportActivity },
+                    null,
                     CancellationToken.None
                 ).Result;
 
@@ -104,7 +105,7 @@ namespace CommunicationService.MessageService
             if (job != null)
             {
                 supportActivities.Add(job.JobSummary.SupportActivity);
-                var volunteers = await _connectUserService.GetVolunteersByPostcodeAndActivity(job.JobSummary.PostCode, supportActivities, CancellationToken.None);
+                var volunteers = await _connectUserService.GetVolunteersByPostcodeAndActivity(job.JobSummary.PostCode, supportActivities, null, CancellationToken.None);
 
                 if (volunteers != null)
                 {

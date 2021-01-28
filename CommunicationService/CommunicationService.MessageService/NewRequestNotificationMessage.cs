@@ -1,4 +1,5 @@
-﻿using CommunicationService.Core.Domains;
+﻿using CommunicationService.Core.Configuration;
+using CommunicationService.Core.Domains;
 using CommunicationService.Core.Interfaces;
 using CommunicationService.Core.Interfaces.Repositories;
 using CommunicationService.Core.Interfaces.Services;
@@ -7,6 +8,7 @@ using HelpMyStreet.Contracts.RequestService.Request;
 using HelpMyStreet.Utils.Enums;
 using HelpMyStreet.Utils.Extensions;
 using HelpMyStreet.Utils.Models;
+using Microsoft.Extensions.Options;
 using System;
 using System.Collections.Generic;
 using System.Dynamic;
@@ -24,6 +26,7 @@ namespace CommunicationService.MessageService
         private readonly IConnectAddressService _connectAddressService;
         private readonly IConnectUserService _connectUserService;
         private readonly ICosmosDbService _cosmosDbService;
+        private readonly IOptions<EmailConfig> _emailConfig;
 
         List<SendMessageRequest> _sendMessageRequests;
 
@@ -32,12 +35,17 @@ namespace CommunicationService.MessageService
             return UnsubscribeGroupName.TaskNotification;
         }
 
-        public NewRequestNotificationMessage(IConnectRequestService connectRequestService, IConnectAddressService connectAddressService, IConnectUserService connectUserService, ICosmosDbService cosmosDbService)
+        public NewRequestNotificationMessage(IConnectRequestService connectRequestService, 
+            IConnectAddressService connectAddressService, 
+            IConnectUserService connectUserService, 
+            ICosmosDbService cosmosDbService,
+            IOptions<EmailConfig> emailConfig)
         {
             _connectRequestService = connectRequestService;
             _connectAddressService = connectAddressService;
             _connectUserService = connectUserService;
             _cosmosDbService = cosmosDbService;
+            _emailConfig = emailConfig;
             _sendMessageRequests = new List<SendMessageRequest>();
         }
 
@@ -64,6 +72,7 @@ namespace CommunicationService.MessageService
                             var users = await _connectUserService.GetVolunteersByPostcodeAndActivity(
                                 locations.LocationDetails.Address.Postcode,
                                 new List<SupportActivities>() { x.SupportActivity },
+                                _emailConfig.Value.ShiftRadius,
                                 CancellationToken.None);
 
                             if(users!=null && users.Volunteers.Count()>0)
@@ -126,7 +135,7 @@ namespace CommunicationService.MessageService
             List<int> requestsAlreadyNotified = await _cosmosDbService.GetShiftRequestDetailsSent(user.ID);
 
             shifts.ShiftJobs = shifts.ShiftJobs.
-                Where(x => !requestsAlreadyNotified.Contains(x.RequestID)).ToList();
+               Where(x => !requestsAlreadyNotified.Contains(x.RequestID)).ToList();
 
             if (shifts.ShiftJobs.Count > 0)
             {
@@ -181,7 +190,7 @@ namespace CommunicationService.MessageService
 
         private List<JobDetails> GetRequestList(List<ShiftJob> jobs, string postCode)
         {
-            var locationDistances = _connectAddressService.GetLocationsByDistance(postCode, 100).Result;
+            var locationDistances = _connectAddressService.GetLocationsByDistance(postCode, Convert.ToInt32(_emailConfig.Value.ShiftRadius.Value)).Result;
 
             var summary = jobs.GroupBy(x => new { x.SupportActivity, x.StartDate, x.EndDate, x.ShiftLength, x.Location })
                 .OrderBy(o => o.Key.StartDate)
