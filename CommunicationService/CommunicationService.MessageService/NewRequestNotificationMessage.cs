@@ -1,5 +1,6 @@
 ﻿using CommunicationService.Core.Domains;
 using CommunicationService.Core.Interfaces;
+using CommunicationService.Core.Interfaces.Repositories;
 using CommunicationService.Core.Interfaces.Services;
 using CommunicationService.MessageService.Substitution;
 using HelpMyStreet.Contracts.RequestService.Request;
@@ -8,6 +9,7 @@ using HelpMyStreet.Utils.Extensions;
 using HelpMyStreet.Utils.Models;
 using System;
 using System.Collections.Generic;
+using System.Dynamic;
 using System.Linq;
 using System.Security.Cryptography.X509Certificates;
 using System.Text;
@@ -21,6 +23,8 @@ namespace CommunicationService.MessageService
         private readonly IConnectRequestService _connectRequestService;
         private readonly IConnectAddressService _connectAddressService;
         private readonly IConnectUserService _connectUserService;
+        private readonly ICosmosDbService _cosmosDbService;
+
         List<SendMessageRequest> _sendMessageRequests;
 
         public string GetUnsubscriptionGroupName(int? recipientUserId)
@@ -28,16 +32,17 @@ namespace CommunicationService.MessageService
             return UnsubscribeGroupName.TaskNotification;
         }
 
-        public NewRequestNotificationMessage(IConnectRequestService connectRequestService, IConnectAddressService connectAddressService, IConnectUserService connectUserService)
+        public NewRequestNotificationMessage(IConnectRequestService connectRequestService, IConnectAddressService connectAddressService, IConnectUserService connectUserService, ICosmosDbService cosmosDbService)
         {
             _connectRequestService = connectRequestService;
             _connectAddressService = connectAddressService;
             _connectUserService = connectUserService;
+            _cosmosDbService = cosmosDbService;
             _sendMessageRequests = new List<SendMessageRequest>();
         }
 
         public async Task<List<SendMessageRequest>> IdentifyRecipients(int? recipientUserId, int? jobId, int? groupId, int? requestId, Dictionary<string, string> additionalParameters)
-        {
+        {            
             GetOpenShiftJobsByFilterRequest request = new GetOpenShiftJobsByFilterRequest();
             var shifts = await _connectRequestService.GetOpenShiftJobsByFilter(request);
 
@@ -90,7 +95,7 @@ namespace CommunicationService.MessageService
         {
             var user = await _connectUserService.GetUserByIdAsync(recipientUserId.Value);
 
-            if(user==null)
+            if (user == null)
             {
                 throw new Exception($"Unable to retrieve user details for userid{ recipientUserId.Value }");
             }
@@ -100,37 +105,78 @@ namespace CommunicationService.MessageService
                 throw new Exception($"Location parameter expected for {recipientUserId.Value}");
             }
 
-            
+
 
             LocationsRequest lr = new LocationsRequest() { Locations = new List<Location>() };
 
             locations.Split(",").ToList()
                 .ForEach(x =>
                 {
-                    lr.Locations.Add((Location) Enum.Parse(typeof(Location),x));
+                    lr.Locations.Add((Location)Enum.Parse(typeof(Location), x));
                 });
 
             GetOpenShiftJobsByFilterRequest request = new GetOpenShiftJobsByFilterRequest();
             var shifts = await _connectRequestService.GetOpenShiftJobsByFilter(request);
 
-            if (shifts ==null || shifts.ShiftJobs.Count==0)
+            if (shifts == null || shifts.ShiftJobs.Count == 0)
             {
                 throw new Exception($"No shifts returned from user id {recipientUserId.Value}");
             }
 
-            return new EmailBuildData()
+            List<int> requestsAlreadyNotified = await _cosmosDbService.GetShiftRequestDetailsSent(user.ID);
+
+            shifts.ShiftJobs = shifts.ShiftJobs.
+                Where(x => !requestsAlreadyNotified.Contains(x.RequestID)).ToList();
+
+            if (shifts.ShiftJobs.Count > 0)
             {
-                BaseDynamicData = new NewRequestNotificationMessageData
-                         (
-                            title: "New vaccination programmme support shifts",
-                            subject: "New vacinnation programme support shifts have been added to HelpMyStreet",
-                            firstName:"Jawwad",
-                            shift:true,
-                            requestList: GetRequestList(shifts.ShiftJobs, user.PostalCode)
-                         ),
-                EmailToAddress = "jawwad@factor-50.co.uk",
-                EmailToName = $"Jawwad Mukhtar"
-            };
+
+                shifts.ShiftJobs.GroupBy(x => x.RequestID)
+                    .ToList()
+                    .ForEach(async job =>
+                    {
+                        ExpandoObject o = new ExpandoObject();
+                        o.TryAdd("id", Guid.NewGuid());
+                        o.TryAdd("RequestId", job.Key);
+                        o.TryAdd("RecipientUserId", recipientUserId.Value);
+                        o.TryAdd("TemplateName", templateName);
+
+                        await _cosmosDbService.AddItemAsync(o);
+                    });
+
+                SupportActivities? mostCommonActivity = GetMostCommonSupportActivityFromShifts(shifts.ShiftJobs);
+
+                return new EmailBuildData()
+                {
+                    BaseDynamicData = new NewRequestNotificationMessageData
+                             (
+                                title: mostCommonActivity.HasValue ? $"New { mostCommonActivity.Value.FriendlyNameShort() } shifts" : string.Empty,
+                                subject: mostCommonActivity.HasValue ? $"New { mostCommonActivity.Value.FriendlyNameShort() } shifts have been added to HelpMyStreet" : "New activities have been added to HelpMyStreet",
+                                firstName: user.UserPersonalDetails.FirstName,
+                                shift: true,
+                                requestList: GetRequestList(shifts.ShiftJobs, user.PostalCode)
+                             ),
+                    EmailToAddress = user.UserPersonalDetails.EmailAddress,
+                    EmailToName = $"{user.UserPersonalDetails.FirstName} {user.UserPersonalDetails.LastName}"
+                };
+            }
+            else
+            {
+                return null;
+            }
+        }
+
+        private SupportActivities? GetMostCommonSupportActivityFromShifts(List<ShiftJob> jobs)
+        {
+            if (jobs.Count == 0)
+                return null;
+            
+            var a = jobs.GroupBy(g => g.SupportActivity)
+                .Select(x => new { Activity = x.Key, Count = x.Count() })
+                .OrderByDescending(o => o.Count)
+                .First();
+
+            return a.Activity;
         }
 
         private List<JobDetails> GetRequestList(List<ShiftJob> jobs, string postCode)

@@ -9,7 +9,7 @@ using System.Linq;
 using System.Threading.Tasks;
 
 namespace CommunicationService.Repo
-{
+{ 
     public class CosmosDbService : ICosmosDbService
     {
         private Container _container;
@@ -118,6 +118,22 @@ namespace CommunicationService.Repo
             }
 
             return false;
+        }
+
+        
+
+        public async Task<List<int>> GetShiftRequestDetailsSent(int userID)
+        { 
+            string queryString = $"SELECT c.RequestId FROM c where c.TemplateName='RequestNotification' and c.RecipientUserId={userID} and c.RequestId<>null group by c.RequestId,c.RecipientUserId";
+            var query = this._container.GetItemQueryIterator<RequestHistory>(new QueryDefinition(queryString));
+            List<RequestHistory> results = new List<RequestHistory>();
+            while (query.HasMoreResults)
+            {
+                var response = await query.ReadNextAsync();
+                results.AddRange(response.ToList());
+            }
+
+            return results.Select(s=> s.RequestID).ToList();
         }
     }
 }
