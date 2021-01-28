@@ -38,6 +38,10 @@ namespace CommunicationService.MessageService
             {
                 return $"A request for help you accepted is due today";
             }
+            else if (days == 1)
+            {                    
+                return $"A request for help you accepted is due tomorrow";
+            }
             else
             {
                 switch (dueDateType)
