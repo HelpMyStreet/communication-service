@@ -190,29 +190,23 @@ namespace CommunicationService.MessageService
 
         private List<JobDetails> GetRequestList(List<ShiftJob> jobs, string postCode)
         {
-            var locationDistances = _connectAddressService.GetLocationsByDistance(postCode, Convert.ToInt32(_emailConfig.Value.ShiftRadius.Value)).Result;
-
             var summary = jobs.GroupBy(x => new { x.SupportActivity, x.StartDate, x.EndDate, x.ShiftLength, x.Location })
                 .OrderBy(o => o.Key.StartDate)
                 .Select(m => new {
                     SupportActivity = m.Key.SupportActivity,
                     Location = m.Key.Location,
                     ShiftDetails = $"{m.Key.StartDate.ToString("ddd, dd MMMM yyy h:mm tt")} - {m.Key.EndDate.ToString("h:mm tt")}",
-                    Duration = $"{ Math.Floor(TimeSpan.FromMinutes(m.Key.ShiftLength).TotalHours)} hrs { TimeSpan.FromMinutes(m.Key.ShiftLength).Minutes } mins",
-                    Count = m.Count()
                 }).ToList();
 
             List<JobDetails> result  = new List<JobDetails>();
             foreach (var item in summary)
             {
                 var locationDetails = _connectAddressService.GetLocationDetails(item.Location).Result;
-                var distanceFromUser = locationDistances.LocationDistances.Where(x => x.Location == item.Location).Select(x => x.DistanceFromPostCode).FirstOrDefault();
-
-                result.Add(new JobDetails($"<strong>{item.SupportActivity.FriendlyNameShort()}</strong> at <strong>{locationDetails.LocationDetails.Name}</strong>" +
-                    $" ({Math.Round(distanceFromUser, 2)} miles away). " +
-                    $"{item.Count} volunteers required. " +
-                    $"Shift: <strong>{ item.ShiftDetails }</strong>" +
-                    $" (Duration: {item.Duration })"));
+                
+                result.Add(new JobDetails(
+                    $"<strong>{item.SupportActivity.FriendlyNameShort()}</strong> " +
+                    $"at <strong>{locationDetails.LocationDetails.Name}</strong>." +
+                    $"Shift: { item.ShiftDetails }"));
             }
 
             return result;
