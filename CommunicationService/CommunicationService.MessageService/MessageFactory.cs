@@ -82,6 +82,8 @@ namespace CommunicationService.MessageService
                     return new DailyDigestMessage(_connectGroupService, _connectUserService, _connectRequestService, _emailConfig, _jobFilteringService,_connectAddressService, _cosmosDbService);
                 case CommunicationJobTypes.SendTaskReminder:
                     return new TaskReminderMessage(_connectRequestService, _connectUserService);
+                case CommunicationJobTypes.SendShiftReminder:
+                    return new ShiftReminderMessage(_connectRequestService, _connectUserService, _connectAddressService, _linkRepository, _linkConfig);
                 case CommunicationJobTypes.InterUserMessage:
                     return new InterUserMessage(_connectRequestService, _connectUserService);
                 case CommunicationJobTypes.NewCredentials:

@@ -17,6 +17,7 @@ namespace CommunicationService.MessageService
         public const string TaskUpdate = "TaskUpdate";
         public const string DailyDigest = "DailyDigest";
         public const string TaskReminder = "TaskReminder";
+        public const string ShiftReminder = "ShiftReminder";
         public const string TaskUpdateNew = "TaskUpdateNew";
         public const string InterUserMessage = "InterUserMessage";
         public const string TestLinkSubstitution = "TestLinkSubstitution";

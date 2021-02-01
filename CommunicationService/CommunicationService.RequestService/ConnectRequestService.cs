@@ -190,6 +190,31 @@ namespace CommunicationService.RequestService
             }
         }
 
+        public async Task<GetShiftRequestsByFilterResponse> GetShiftRequestsByFilter(GetShiftRequestsByFilterRequest request)
+        {
+            string path = $"/api/GetShiftRequestsByFilter";
+            using (HttpResponseMessage response = await _httpClientWrapper.GetAsync(HttpClientConfigName.RequestService, path, request, CancellationToken.None).ConfigureAwait(false))
+            {
+                string jsonResponse = await response.Content.ReadAsStringAsync();
+                var getJobsResponse = JsonConvert.DeserializeObject<ResponseWrapper<GetShiftRequestsByFilterResponse, RequestServiceErrorCode>>(jsonResponse);
+                if (getJobsResponse.HasContent && getJobsResponse.IsSuccessful)
+                {
+                    return getJobsResponse.Content;
+                }
+                else
+                {
+                    if (response.StatusCode == System.Net.HttpStatusCode.BadRequest)
+                    {
+                        throw new BadRequestException($"GetShiftRequestsByFilterResponse Returned a bad request");
+                    }
+                    else
+                    {
+                        throw new InternalServerException($"GetShiftRequestsByFilterResponse Returned {jsonResponse}");
+                    }
+                }
+            }
+        }
+
         public JobStatuses PreviousJobStatus(GetJobDetailsResponse getJobDetailsResponse)
         {
             var history = getJobDetailsResponse.History.OrderByDescending(x => x.StatusDate).ToList();

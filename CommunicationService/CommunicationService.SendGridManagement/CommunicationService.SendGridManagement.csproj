@@ -13,6 +13,7 @@
     <None Remove="Emails\NewTaskPendingApprovalNotification.html" />
     <None Remove="Emails\PartialRegistration.html" />
     <None Remove="Emails\RequestNotification.html" />
+    <None Remove="Emails\ShiftReminder.html" />
     <None Remove="Emails\TaskDetail.html" />
     <None Remove="Emails\TaskReminder.html" />
     <None Remove="Emails\TaskUpdateNew.html" />
@@ -147,12 +148,15 @@
     <None Remove="Migrations\20210127_085500_NewRequestNotificationEmails.json" />
     <None Remove="Migrations\20210127_095000_NewRequestNotificationEmails.json" />
     <None Remove="Migrations\20210127_1445000_NewRequestNotificationEmails.json" />
+    <None Remove="Migrations\20210201_143000_ShiftReminderEmails.json" />
+    <None Remove="Migrations\20210201_1433700_ShiftReminderEmails.json" />
   </ItemGroup>
 
   <ItemGroup>
     <EmbeddedResource Include="Emails\Layout.txt" />
     <EmbeddedResource Include="Emails\NewTaskPendingApprovalNotification.html" />
     <EmbeddedResource Include="Emails\RequestNotification.html" />
+    <EmbeddedResource Include="Emails\ShiftReminder.html" />
     <EmbeddedResource Include="Emails\TaskReminder.html" />
     <EmbeddedResource Include="Emails\TaskUpdateSimplified.html" />
     <EmbeddedResource Include="Emails\TaskUpdateNew.html" />
@@ -191,6 +195,8 @@
     <EmbeddedResource Include="Emails\RequestorTaskNotification.html" />
     <EmbeddedResource Include="Migrations\20200709_130700_AddRequestorTaskNotification.json" />
     <EmbeddedResource Include="Migrations\20200717_152400_AddUnsubscribeGroupsDailyDigest.json" />
+    <EmbeddedResource Include="Migrations\20210201_1433700_ShiftReminderEmails.json" />
+    <EmbeddedResource Include="Migrations\20210201_143000_ShiftReminderEmails.json" />
     <EmbeddedResource Include="Migrations\20210127_1445000_NewRequestNotificationEmails.json" />
     <EmbeddedResource Include="Migrations\20210127_095000_NewRequestNotificationEmails.json" />
     <EmbeddedResource Include="Migrations\20210127_085500_NewRequestNotificationEmails.json" />
