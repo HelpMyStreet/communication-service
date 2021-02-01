@@ -10,5 +10,7 @@ namespace CommunicationService.Core.Interfaces.Services
         Task<GetPostcodeCoordinatesResponse> GetPostcodeCoordinates(GetPostcodeCoordinatesRequest getPostcodeCoordinatesRequest);
 
         Task<GetLocationResponse> GetLocationDetails(Location location);
+
+        Task<GetLocationsByDistanceResponse> GetLocationsByDistance(string postCode, int maxDistance); 
     }
 }

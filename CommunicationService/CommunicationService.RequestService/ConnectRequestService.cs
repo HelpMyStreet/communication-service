@@ -125,6 +125,31 @@ namespace CommunicationService.RequestService
             }
         }
 
+        public async Task<GetOpenShiftJobsByFilterResponse> GetOpenShiftJobsByFilter(GetOpenShiftJobsByFilterRequest request)
+        {
+            string path = $"/api/GetOpenShiftJobsByFilter";
+            using (HttpResponseMessage response = await _httpClientWrapper.GetAsync(HttpClientConfigName.RequestService, path, request, CancellationToken.None).ConfigureAwait(false))
+            {
+                string jsonResponse = await response.Content.ReadAsStringAsync();
+                var getJobsResponse = JsonConvert.DeserializeObject<ResponseWrapper<GetOpenShiftJobsByFilterResponse, RequestServiceErrorCode>>(jsonResponse);
+                if (getJobsResponse.HasContent && getJobsResponse.IsSuccessful)
+                {
+                    return getJobsResponse.Content;
+                }
+                else
+                {
+                    if (response.StatusCode == System.Net.HttpStatusCode.BadRequest)
+                    {
+                        throw new BadRequestException($"GetOpenShiftJobsByFilter Returned a bad request");
+                    }
+                    else
+                    {
+                        throw new InternalServerException($"GetOpenShiftJobsByFilter Returned {jsonResponse}");
+                    }
+                }
+            }
+        }
+
         public int? GetRelevantVolunteerUserID(GetJobDetailsResponse getJobDetailsResponse)
         {
             int? result = null;
@@ -139,7 +164,7 @@ namespace CommunicationService.RequestService
                 if (history.Count >= 2)
                 {
                     var previousState = history.ElementAt(1);
-                    if (previousState.JobStatus == JobStatuses.InProgress && previousState.VolunteerUserID.HasValue)
+                    if ((previousState.JobStatus == JobStatuses.InProgress || previousState.JobStatus == JobStatuses.Accepted) && previousState.VolunteerUserID.HasValue)
                     {
                         result = previousState.VolunteerUserID.Value;
                     }

@@ -15,7 +15,7 @@ namespace CommunicationService.Core.Interfaces.Services
 
         Task<User> GetUserByIdAsync(int userID);
 
-        Task<GetVolunteersByPostcodeAndActivityResponse> GetVolunteersByPostcodeAndActivity(string postcode, List<SupportActivities> activities, CancellationToken cancellationToken);
+        Task<GetVolunteersByPostcodeAndActivityResponse> GetVolunteersByPostcodeAndActivity(string postcode, List<SupportActivities> activities, double? shiftRadius, CancellationToken cancellationToken);
 
         Task<GetIncompleteRegistrationStatusResponse> GetIncompleteRegistrationStatusAsync();
 
