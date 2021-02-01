@@ -85,14 +85,14 @@ namespace CommunicationService.AzureFunction
                 //    _cosmosDbService
                 //    );
 
-                TaskUpdateSimplifiedMessage message = new TaskUpdateSimplifiedMessage(
-                    _connectRequestService,
-                    _connectUserService,
-                    _connectGroupService,
-                    _linkRepository,
-                    _linkConfig,
-                    _sendGridConfig,
-                    _connectAddressService);
+                //TaskUpdateSimplifiedMessage message = new TaskUpdateSimplifiedMessage(
+                //    _connectRequestService,
+                //    _connectUserService,
+                //    _connectGroupService,
+                //    _linkRepository,
+                //    _linkConfig,
+                //    _sendGridConfig,
+                //    _connectAddressService);
 
                 //NewCredentialsMessage message = new NewCredentialsMessage(
                 //    _connectUserService,
@@ -133,6 +133,8 @@ namespace CommunicationService.AzureFunction
                 //    _cosmosDbService,
                 //    _emailConfig
                 //    );
+
+                ShiftReminderMessage message = new ShiftReminderMessage(_connectRequestService, _connectUserService, _connectAddressService, _linkRepository, _linkConfig);
 
                 var recipients = await message.IdentifyRecipients(req.RecipientUserID, req.JobID, req.GroupID, req.RequestID, req.AdditionalParameters);
                // SendMessageRequest smr = recipients.ElementAt(0);
