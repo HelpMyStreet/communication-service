@@ -77,7 +77,7 @@ namespace CommunicationService.MessageService
                 case CommunicationJobTypes.RequestorTaskConfirmation:
                     return new RequestorTaskConfirmation(_connectRequestService, _connectGroupService, _connectAddressService, _linkRepository, _linkConfig, _sendGridConfig);
                 case CommunicationJobTypes.SendTaskStateChangeUpdate:
-                    return new TaskUpdateSimplifiedMessage(_connectRequestService, _connectUserService, _connectGroupService, _linkRepository, _linkConfig, _sendGridConfig);
+                    return new TaskUpdateSimplifiedMessage(_connectRequestService, _connectUserService, _connectGroupService, _linkRepository, _linkConfig, _sendGridConfig, _connectAddressService);
                 case CommunicationJobTypes.SendOpenTaskDigest:
                     return new DailyDigestMessage(_connectGroupService, _connectUserService, _connectRequestService, _emailConfig, _jobFilteringService,_connectAddressService, _cosmosDbService);
                 case CommunicationJobTypes.SendTaskReminder:
