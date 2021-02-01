@@ -78,6 +78,7 @@ namespace CommunicationService.UnitTests.SendGridService
             _userService.Setup(x => x.GetVolunteersByPostcodeAndActivity(
                 It.IsAny<string>(),
                 It.IsAny<List<SupportActivities>>(),
+                It.IsAny<double?>(),
                 It.IsAny<CancellationToken>()))
                 .ReturnsAsync(() => _getVolunteersByPostcodeAndActivityResponse);
         }

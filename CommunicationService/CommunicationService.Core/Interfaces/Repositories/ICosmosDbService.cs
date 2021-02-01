@@ -14,5 +14,7 @@ namespace CommunicationService.Core.Interfaces.Repositories
         Task<List<MigrationHistory>> GetMigrationHistory();
         Task<bool> EmailSent(string messageId);
         Task<bool> SendGridEventExists(string event_id);
+        Task<List<int>> GetShiftRequestDetailsSent(int userID);
+
     }
 }

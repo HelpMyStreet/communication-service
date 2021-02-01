@@ -85,13 +85,14 @@ namespace CommunicationService.AzureFunction
                 //    _cosmosDbService
                 //    );
 
-                //TaskUpdateSimplifiedMessage message = new TaskUpdateSimplifiedMessage(
-                //    _connectRequestService,
-                //    _connectUserService,
-                //    _connectGroupService,
-                //    _linkRepository,
-                //    _linkConfig,
-                //    _sendGridConfig);
+                TaskUpdateSimplifiedMessage message = new TaskUpdateSimplifiedMessage(
+                    _connectRequestService,
+                    _connectUserService,
+                    _connectGroupService,
+                    _linkRepository,
+                    _linkConfig,
+                    _sendGridConfig,
+                    _connectAddressService);
 
                 //NewCredentialsMessage message = new NewCredentialsMessage(
                 //    _connectUserService,
@@ -117,24 +118,36 @@ namespace CommunicationService.AzureFunction
                 //    _sendGridConfig
                 //    );
 
-                RequestorTaskConfirmation message = new RequestorTaskConfirmation(
-                    _connectRequestService,
-                    _connectGroupService,
-                    _connectAddressService,
-                    _linkRepository,
-                    _linkConfig,
-                    _sendGridConfig);
+                //RequestorTaskConfirmation message = new RequestorTaskConfirmation(
+                //    _connectRequestService,
+                //    _connectGroupService,
+                //    _connectAddressService,
+                //    _linkRepository,
+                //    _linkConfig,
+                //    _sendGridConfig);
+
+                //NewRequestNotificationMessage message = new NewRequestNotificationMessage(
+                //    _connectRequestService,
+                //    _connectAddressService, 
+                //    _connectUserService, 
+                //    _cosmosDbService,
+                //    _emailConfig
+                //    );
 
                 var recipients = await message.IdentifyRecipients(req.RecipientUserID, req.JobID, req.GroupID, req.RequestID, req.AdditionalParameters);
-                //SendMessageRequest smr = recipients.ElementAt(2);
+               // SendMessageRequest smr = recipients.ElementAt(0);
                 foreach (SendMessageRequest smr in recipients)
                 {
-                    var emailBuildData = await message.PrepareTemplateData(Guid.NewGuid(),smr.RecipientUserID, smr.JobID,smr.GroupID, smr.RequestID, smr.AdditionalParameters, smr.TemplateName);
+                    var emailBuildData = await message.PrepareTemplateData(Guid.NewGuid(), smr.RecipientUserID, smr.JobID, smr.GroupID, smr.RequestID, smr.AdditionalParameters, smr.TemplateName);
 
-                    emailBuildData.EmailToAddress = "jawwad@factor-50.co.uk";
-                    emailBuildData.EmailToName = "Jawwad";
-                    var json2 = JsonConvert.SerializeObject(emailBuildData.BaseDynamicData);
-                    _connectSendGridService.SendDynamicEmail(string.Empty, smr.TemplateName, UnsubscribeGroupName.TaskNotification, emailBuildData);
+                    if (emailBuildData != null)
+                    {
+
+                        emailBuildData.EmailToAddress = "jawwad@factor-50.co.uk";
+                        emailBuildData.EmailToName = "Jawwad";
+                        var json2 = JsonConvert.SerializeObject(emailBuildData.BaseDynamicData);
+                        _connectSendGridService.SendDynamicEmail(string.Empty, smr.TemplateName, UnsubscribeGroupName.TaskNotification, emailBuildData);
+                    }
                 }
 
                 int i = 1;

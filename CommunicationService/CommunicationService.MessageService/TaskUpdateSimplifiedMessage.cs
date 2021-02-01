@@ -23,6 +23,7 @@ namespace CommunicationService.MessageService
         private readonly IConnectRequestService _connectRequestService;
         private readonly IConnectUserService _connectUserService;
         private readonly IConnectGroupService _connectGroupService;
+        private readonly IConnectAddressService _connectAddressService;
         private readonly ILinkRepository _linkRepository;
         private readonly IOptions<LinkConfig> _linkConfig;
         private readonly IOptions<SendGridConfig> _sendGridConfig;
@@ -38,7 +39,13 @@ namespace CommunicationService.MessageService
             return UnsubscribeGroupName.TaskUpdate;
         }
 
-        public TaskUpdateSimplifiedMessage(IConnectRequestService connectRequestService, IConnectUserService connectUserService, IConnectGroupService connectGroupService, ILinkRepository linkRepository, IOptions<LinkConfig> linkConfig, IOptions<SendGridConfig> sendGridConfig)
+        public TaskUpdateSimplifiedMessage(IConnectRequestService connectRequestService, 
+            IConnectUserService connectUserService, 
+            IConnectGroupService connectGroupService, 
+            ILinkRepository linkRepository, 
+            IOptions<LinkConfig> linkConfig, 
+            IOptions<SendGridConfig> sendGridConfig,
+            IConnectAddressService connectAddressService)
         {
             _connectRequestService = connectRequestService;
             _connectUserService = connectUserService;
@@ -46,7 +53,7 @@ namespace CommunicationService.MessageService
             _linkRepository = linkRepository;
             _linkConfig = linkConfig;
             _sendGridConfig = sendGridConfig;
-
+            _connectAddressService = connectAddressService;
             _sendMessageRequests = new List<SendMessageRequest>();
 
             CultureInfo cultureInfo = Thread.CurrentThread.CurrentCulture;
@@ -84,6 +91,38 @@ namespace CommunicationService.MessageService
                     break;
             }
             return strDaysFromNow;
+        }
+
+        private string GetShiftDetails(GetJobDetailsResponse job)
+        {
+            if(job.RequestSummary.Shift==null)
+            {
+                return string.Empty;
+            }
+            else
+            {
+                return $"{job.RequestSummary.Shift.StartDate.ToString("ddd, dd MMMM yyy h:mm tt")} - {job.RequestSummary.Shift.EndDate.ToString("h:mm tt")}";
+            }            
+        }
+
+        private string GetLocationDetails(GetJobDetailsResponse job)
+        {
+            if (job.RequestSummary.Shift == null)
+            {
+                return string.Empty;
+            }
+            else
+            {
+                var locationDetails = _connectAddressService.GetLocationDetails(job.RequestSummary.Shift.Location).Result;
+                if (locationDetails != null)
+                {
+                    return $"{locationDetails.LocationDetails.Name}";
+                }
+                else
+                {
+                    throw new Exception("Unable to find location details");
+                }
+            }
         }
 
         private string GetRequestedBy(RequestRoles requestRole, GetJobDetailsResponse job)
@@ -292,6 +331,8 @@ namespace CommunicationService.MessageService
             List<TaskDataItem> otherDataList = new List<TaskDataItem>();
             AddIfNotNullOrEmpty(otherDataList, "Request type", supportActivity.ToTitleCase());
             AddIfNotNullOrEmpty(otherDataList, "Help needed", GetDueDate(job));
+            AddIfNotNullOrEmpty(otherDataList, "Help needed", GetShiftDetails(job));
+            AddIfNotNullOrEmpty(otherDataList, "Location", GetLocationDetails(job));
             AddIfNotNullOrEmpty(otherDataList, "Requested by", requestedBy);
             AddIfNotNullOrEmpty(otherDataList, "Help requested from", await GetHelpRequestedFrom(job));
             if (!helpRecipient.Equals(requestedBy)) { AddIfNotNullOrEmpty(otherDataList, "Recipient", helpRecipient); }
@@ -319,6 +360,20 @@ namespace CommunicationService.MessageService
                 EmailToAddress = emailToAddress,
                 EmailToName = emailToFullName
             };
+        }
+
+        private int? GetCreatedByUserID(GetJobDetailsResponse job)
+        {
+            var createdBy = job.History.OrderByDescending(x => x.StatusDate).Take(1).FirstOrDefault();
+
+            if(createdBy !=null)
+            {
+                return createdBy.CreatedByUserID;
+            }
+            else
+            {
+                return null;
+            }
         }
 
         public async Task<List<SendMessageRequest>> IdentifyRecipients(int? recipientUserId, int? jobId, int? groupId, int? requestId, Dictionary<string, string> additionalParameters)
@@ -365,41 +420,49 @@ namespace CommunicationService.MessageService
             string recipientEmailAddress = job.Recipient?.EmailAddress;
             string requestorEmailAddress = job.Requestor?.EmailAddress;
 
+            var createdByUserID = GetCreatedByUserID(job);
+
             //Now consider the recipient
             if (!string.IsNullOrEmpty(recipientEmailAddress))
             {
-                var param = new Dictionary<string, string>(additionalParameters)
+                if (createdByUserID.HasValue && createdByUserID.Value != -1)
                 {
-                    { "RequestRole", RequestRoles.Recipient.ToString() }
-                };
-                _sendMessageRequests.Add(new SendMessageRequest()
-                {
-                    TemplateName = TemplateName.TaskUpdateSimplified,
-                    RecipientUserID = REQUESTOR_DUMMY_USERID,
-                    GroupID = groupId,
-                    JobID = jobId,
-                    RequestID = requestId,
-                    AdditionalParameters = param
-                });
+                    var param = new Dictionary<string, string>(additionalParameters)
+                    {
+                        { "RequestRole", RequestRoles.Recipient.ToString() }
+                    };
+                    _sendMessageRequests.Add(new SendMessageRequest()
+                    {
+                        TemplateName = TemplateName.TaskUpdateSimplified,
+                        RecipientUserID = REQUESTOR_DUMMY_USERID,
+                        GroupID = groupId,
+                        JobID = jobId,
+                        RequestID = requestId,
+                        AdditionalParameters = param
+                    });
+                }
             }
 
             //Now consider the requestor
             if (!string.IsNullOrEmpty(requestorEmailAddress)
                 && requestorEmailAddress != volunteerEmailAddress && requestorEmailAddress != recipientEmailAddress)
             {
-                var param = new Dictionary<string, string>(additionalParameters)
+                if (createdByUserID.HasValue && createdByUserID.Value != -1)
                 {
-                    { "RequestRole", RequestRoles.Requestor.ToString() }
-                };
-                _sendMessageRequests.Add(new SendMessageRequest()
-                {
-                    TemplateName = TemplateName.TaskUpdateSimplified,
-                    RecipientUserID = REQUESTOR_DUMMY_USERID,
-                    GroupID = groupId,
-                    JobID = jobId,
-                    RequestID = requestId,
-                    AdditionalParameters = param
-                });
+                    var param = new Dictionary<string, string>(additionalParameters)
+                    {
+                        { "RequestRole", RequestRoles.Requestor.ToString() }
+                    };
+                    _sendMessageRequests.Add(new SendMessageRequest()
+                    {
+                        TemplateName = TemplateName.TaskUpdateSimplified,
+                        RecipientUserID = REQUESTOR_DUMMY_USERID,
+                        GroupID = groupId,
+                        JobID = jobId,
+                        RequestID = requestId,
+                        AdditionalParameters = param
+                    });
+                }
             }
 
             return _sendMessageRequests;
