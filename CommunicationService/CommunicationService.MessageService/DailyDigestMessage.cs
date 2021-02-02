@@ -19,6 +19,8 @@ using CommunicationService.Core.Interfaces.Repositories;
 using System.Dynamic;
 using HelpMyStreet.Contracts.RequestService.Response;
 using HelpMyStreet.Utils.Extensions;
+using System.IO;
+using UserService.Core.Utils;
 
 namespace CommunicationService.MessageService
 {
@@ -109,7 +111,10 @@ namespace CommunicationService.MessageService
                 }
             }
 
-            List<PostcodeCoordinate> postcodeCoordinates = new List<PostcodeCoordinate>();
+            var openTasks = openjobs.JobSummaries.Where(x => x.RequestType == RequestType.Task).ToList();
+            var openShifts = openjobs.JobSummaries.Where(x => x.RequestType == RequestType.Shift && user.SupportActivities.Contains(x.SupportActivity)).ToList();
+            
+            List <PostcodeCoordinate> postcodeCoordinates = new List<PostcodeCoordinate>();
 
             if(cache.Contains(CACHEKEY_OPEN_ADDRESS))
             {
@@ -152,7 +157,7 @@ namespace CommunicationService.MessageService
 
             List<JobSummary> jobs = null;
             jobs = await _jobFilteringService.FilterJobSummaries(
-                openjobs.JobSummaries,
+                openTasks,
                 null,
                 user.PostalCode,
                 _emailConfig.Value.DigestOtherJobsDistance,
@@ -169,10 +174,6 @@ namespace CommunicationService.MessageService
             }
 
             var criteriaJobs = jobs.Where(x => user.SupportActivities.Contains(x.SupportActivity) && x.DistanceInMiles <= user.SupportRadiusMiles);
-            if (criteriaJobs.Count() == 0)
-            {
-                return null;
-            }
 
             criteriaJobs = criteriaJobs.OrderBy(x => x.DueDate);
 
@@ -216,15 +217,50 @@ namespace CommunicationService.MessageService
                     ));
             }
 
+            var shiftItemList = new List<ShiftItem>();
+            
+            if (openShifts.Count>0)
+            {
+                var requests = openShifts
+                    .GroupBy(g => new { g.SupportActivity, g.RequestID } )
+                    .Select(m => new { m.Key.RequestID, m.Key.SupportActivity })
+                    .ToList();
+
+                DistanceCalculator calculator = new DistanceCalculator();
+
+                foreach (var item in requests)
+                {
+                    var request = await _connectRequestService.GetRequestDetailsAsync(item.RequestID);
+                    var location = await _connectAddressService.GetLocationDetails(request.RequestSummary.Shift.Location);
+                    var distance = calculator.GetDistanceInMiles(userPostalCode.Latitude, 
+                        userPostalCode.Longitude,
+                        (double) location.LocationDetails.Latitude,
+                        (double) location.LocationDetails.Longitude);
+
+                    if(distance<= _emailConfig.Value.ShiftRadius)
+                    {
+                        string shiftDate = request.RequestSummary.Shift.StartDate.ToString("ddd, dd MMMM yyy h:mm tt") + " - " + request.RequestSummary.Shift.EndDate.ToString("h:mm tt");
+                        shiftItemList.Add(new ShiftItem($"<strong>{ item.SupportActivity.FriendlyNameShort() }</strong> " +
+                            $"at {location.LocationDetails.Name} " +
+                            $"( {Math.Round(distance, 2)} miles away) " +
+                            $"- {shiftDate}"));                 
+                    }
+                }
+            }
+
+                      
+
             return new EmailBuildData()
             {
                 BaseDynamicData = new DailyDigestData(string.Empty,
-                    user.UserPersonalDetails.FirstName,
-                    criteriaJobs.Count() > 1 ? false : true,
+                    user.UserPersonalDetails.FirstName,                    
                     criteriaJobs.Count(),
                     otherJobs.Count() > 0,
+                    true,
+                    shiftItemList.Count,
                     chosenJobsList,
-                    otherJobsList
+                    otherJobsList,
+                    shiftItemList
                     ),
                 EmailToAddress = user.UserPersonalDetails.EmailAddress,
                 EmailToName = user.UserPersonalDetails.DisplayName
