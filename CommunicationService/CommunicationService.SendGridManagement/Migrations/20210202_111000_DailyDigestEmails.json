@@ -1,0 +1,15 @@
+﻿{
+  "Templates": [
+    {
+      "name": "DailyDigest",
+      "subject": "Help Needed Near You",
+      "generation": "dynamic",
+      "versions": [
+        {
+          "name": "Try conditional statements",
+          "subject": "Help Needed Near You"
+        }
+      ]
+    }
+  ]
+}
