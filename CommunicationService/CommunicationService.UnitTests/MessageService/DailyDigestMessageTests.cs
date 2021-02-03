@@ -316,7 +316,8 @@ namespace CommunicationService.UnitTests.SendGridService
             jobSummaries.Add(new JobSummary()
             {
                 DistanceInMiles = 2,
-                SupportActivity = SupportActivities.CheckingIn
+                SupportActivity = SupportActivities.CheckingIn,
+                RequestType = RequestType.Task
             });
 
             _getJobsByStatusesResponse = new GetJobsByStatusesResponse()
@@ -394,19 +395,22 @@ namespace CommunicationService.UnitTests.SendGridService
             jobSummaries.Add(new JobSummary()
             {
                 DistanceInMiles = 1,
-                SupportActivity = SupportActivities.Shopping
+                SupportActivity = SupportActivities.Shopping,
+                RequestType = RequestType.Task
             });
 
             jobSummaries.Add(new JobSummary()
             {
                 DistanceInMiles = 2,
-                SupportActivity = SupportActivities.Shopping
+                SupportActivity = SupportActivities.Shopping,
+                RequestType = RequestType.Task
             });
 
             jobSummaries.Add(new JobSummary()
             {
                 DistanceInMiles = 2,
-                SupportActivity = SupportActivities.CheckingIn
+                SupportActivity = SupportActivities.CheckingIn,
+                RequestType = RequestType.Task
             });
 
             _getJobsByStatusesResponse = new GetJobsByStatusesResponse()
