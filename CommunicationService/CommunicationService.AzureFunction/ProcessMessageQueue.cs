@@ -156,6 +156,7 @@ public class ProcessMessageQueue
                 message.CommunicationJob = sendMessageRequest.CommunicationJobType;
                 message.GroupId = sendMessageRequest.GroupID;
                 message.BatchId = sendMessageRequest.BatchID.ToString();
+                message.RequestId = sendMessageRequest.RequestID;
             }
 
             if(!string.IsNullOrEmpty(emailAddress))

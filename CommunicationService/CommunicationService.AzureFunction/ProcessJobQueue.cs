@@ -91,6 +91,7 @@ namespace CommunicationService.AzureFunction
                     message.JobId = requestCommunicationRequest.JobID;
                     message.CommunicationJob = requestCommunicationRequest.CommunicationJob.CommunicationJobType;
                     message.GroupId = requestCommunicationRequest.GroupID;
+                    message.RequestId = requestCommunicationRequest.RequestID;
                 }
 
                 _cosmosDbService.AddItemAsync(message);
