@@ -160,7 +160,7 @@ namespace CommunicationService.MessageService
             return subject;
         }
 
-        public async Task<EmailBuildData> PrepareTemplateData(Guid batchId, int? recipientUserId, int? jobId, int? groupId, Dictionary<string, string> additionalParameters, string templateName)
+        public async Task<EmailBuildData> PrepareTemplateData(Guid batchId, int? recipientUserId, int? jobId, int? groupId, int? requestId, Dictionary<string, string> additionalParameters, string templateName)
         {
             var britishZone = TimeZoneInfo.FindSystemTimeZoneById("GMT Standard Time");
             var job = _connectRequestService.GetJobDetailsAsync(jobId.Value).Result;
@@ -282,7 +282,7 @@ namespace CommunicationService.MessageService
             return statusChange;
         }
 
-        public async Task<List<SendMessageRequest>> IdentifyRecipients(int? recipientUserId, int? jobId, int? groupId, Dictionary<string, string> additionalParameters)
+        public async Task<List<SendMessageRequest>> IdentifyRecipients(int? recipientUserId, int? jobId, int? groupId, int? requestId, Dictionary<string, string> additionalParameters)
         {
             var job = await _connectRequestService.GetJobDetailsAsync(jobId.Value);
 
@@ -324,7 +324,8 @@ namespace CommunicationService.MessageService
                     TemplateName = TemplateName.TaskUpdateNew,
                     RecipientUserID = relevantVolunteerUserID.Value,
                     GroupID = groupId,
-                    JobID = jobId
+                    JobID = jobId,
+                    RequestID = requestId
                 });
             }
 
@@ -339,6 +340,7 @@ namespace CommunicationService.MessageService
                     RecipientUserID = REQUESTOR_DUMMY_USERID,
                     GroupID = groupId,
                     JobID = jobId,
+                    RequestID = requestId,
                     AdditionalParameters = new Dictionary<string, string>()
                      {
                         {"RecipientOrRequestor", "Recipient"}
@@ -368,6 +370,7 @@ namespace CommunicationService.MessageService
                     RecipientUserID = REQUESTOR_DUMMY_USERID,
                     GroupID = groupId,
                     JobID = jobId,
+                    RequestID = requestId,
                     AdditionalParameters = new Dictionary<string, string>()
                      {
                         {"RecipientOrRequestor", "Requestor"}

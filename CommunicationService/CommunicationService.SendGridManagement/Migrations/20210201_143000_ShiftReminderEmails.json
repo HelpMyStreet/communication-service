@@ -1,0 +1,15 @@
+﻿{
+  "Templates": [
+    {
+      "name": "ShiftReminder",
+      "subject": "{{{Subject}}}",
+      "generation": "dynamic",
+      "versions": [
+        {
+          "name": "First Draft",
+          "subject": "{{{Subject}}}"
+        }
+      ]
+    }
+  ]
+}

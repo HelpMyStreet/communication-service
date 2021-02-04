@@ -77,13 +77,13 @@ namespace CommunicationService.AzureFunction
                 //    _connectRequestService,
                 //    _connectGroupService);
 
-                TaskDetailMessage message = new TaskDetailMessage(
-                    _connectGroupService,
-                    _connectUserService,
-                    _connectRequestService,
-                    _emailConfig,
-                    _cosmosDbService
-                    );
+                //TaskDetailMessage message = new TaskDetailMessage(
+                //    _connectGroupService,
+                //    _connectUserService,
+                //    _connectRequestService,
+                //    _emailConfig,
+                //    _cosmosDbService
+                //    );
 
                 //TaskUpdateSimplifiedMessage message = new TaskUpdateSimplifiedMessage(
                 //    _connectRequestService,
@@ -91,7 +91,8 @@ namespace CommunicationService.AzureFunction
                 //    _connectGroupService,
                 //    _linkRepository,
                 //    _linkConfig,
-                //    _sendGridConfig);
+                //    _sendGridConfig,
+                //    _connectAddressService);
 
                 //NewCredentialsMessage message = new NewCredentialsMessage(
                 //    _connectUserService,
@@ -119,18 +120,50 @@ namespace CommunicationService.AzureFunction
 
                 //RequestorTaskConfirmation message = new RequestorTaskConfirmation(
                 //    _connectRequestService,
-                //    _connectGroupService);
+                //    _connectGroupService,
+                //    _connectAddressService,
+                //    _linkRepository,
+                //    _linkConfig,
+                //    _sendGridConfig);
 
-                var recipients = await message.IdentifyRecipients(req.RecipientUserID, req.JobID, req.GroupID, req.AdditionalParameters);
-                //SendMessageRequest smr = recipients.ElementAt(2);
+                //NewRequestNotificationMessage message = new NewRequestNotificationMessage(
+                //    _connectRequestService,
+                //    _connectAddressService, 
+                //    _connectUserService, 
+                //    _cosmosDbService,
+                //    _emailConfig
+                //    );
+
+                //ShiftReminderMessage message = new ShiftReminderMessage(_connectRequestService, _connectUserService, _connectAddressService, _linkRepository, _linkConfig);
+
+                DailyDigestMessage message = new DailyDigestMessage(
+                    _connectGroupService,
+                    _connectUserService,
+                    _connectRequestService,
+                    _emailConfig,
+                    _jobFilteringService,
+                    _connectAddressService,
+                    _cosmosDbService
+                    );
+
+                var recipients = await message.IdentifyRecipients(req.RecipientUserID, req.JobID, req.GroupID, req.RequestID, req.AdditionalParameters);
+
+                recipients = recipients.Where(x => x.RecipientUserID == 20256).ToList();
+
+
+               // SendMessageRequest smr = recipients.ElementAt(0);
                 foreach (SendMessageRequest smr in recipients)
                 {
-                    var emailBuildData = await message.PrepareTemplateData(Guid.NewGuid(),smr.RecipientUserID, smr.JobID,smr.GroupID, smr.AdditionalParameters, smr.TemplateName);
+                    var emailBuildData = await message.PrepareTemplateData(Guid.NewGuid(), smr.RecipientUserID, smr.JobID, smr.GroupID, smr.RequestID, smr.AdditionalParameters, smr.TemplateName);
 
-                    emailBuildData.EmailToAddress = "jawwad@factor-50.co.uk";
-                    emailBuildData.EmailToName = "Jawwad";
-                    var json2 = JsonConvert.SerializeObject(emailBuildData.BaseDynamicData);
-                    _connectSendGridService.SendDynamicEmail(string.Empty, smr.TemplateName, UnsubscribeGroupName.TaskNotification, emailBuildData);
+                    if (emailBuildData != null)
+                    {
+
+                        emailBuildData.EmailToAddress = "jawwad@factor-50.co.uk";
+                        emailBuildData.EmailToName = "Jawwad";
+                        var json2 = JsonConvert.SerializeObject(emailBuildData.BaseDynamicData);
+                        _connectSendGridService.SendDynamicEmail(string.Empty, smr.TemplateName, UnsubscribeGroupName.TaskNotification, emailBuildData);
+                    }
                 }
 
                 int i = 1;
