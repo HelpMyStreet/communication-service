@@ -36,7 +36,7 @@ namespace CommunicationService.AzureFunction
             RequestCommunicationRequest requestCommunicationRequest  = JsonConvert.DeserializeObject<RequestCommunicationRequest>(converted);
             AddCommunicationRequestToCosmos(mySbMsg, "start", requestCommunicationRequest);
             IMessage message = _messageFactory.Create(requestCommunicationRequest);
-            List<SendMessageRequest> messageDetails = await message.IdentifyRecipients(requestCommunicationRequest.RecipientUserID, requestCommunicationRequest.JobID, requestCommunicationRequest.GroupID, requestCommunicationRequest.AdditionalParameters);
+            List<SendMessageRequest> messageDetails = await message.IdentifyRecipients(requestCommunicationRequest.RecipientUserID, requestCommunicationRequest.JobID, requestCommunicationRequest.GroupID, requestCommunicationRequest.RequestID, requestCommunicationRequest.AdditionalParameters);
 
             if (messageDetails.Count == 0)
             {
@@ -63,6 +63,7 @@ namespace CommunicationService.AzureFunction
                     JobID = m.JobID,
                     GroupID = m.GroupID,
                     MessageType = MessageTypes.Email,
+                    RequestID = m.RequestID,
                     AdditionalParameters =  m.AdditionalParameters
                 });
             }
@@ -90,6 +91,7 @@ namespace CommunicationService.AzureFunction
                     message.JobId = requestCommunicationRequest.JobID;
                     message.CommunicationJob = requestCommunicationRequest.CommunicationJob.CommunicationJobType;
                     message.GroupId = requestCommunicationRequest.GroupID;
+                    message.RequestId = requestCommunicationRequest.RequestID;
                 }
 
                 _cosmosDbService.AddItemAsync(message);

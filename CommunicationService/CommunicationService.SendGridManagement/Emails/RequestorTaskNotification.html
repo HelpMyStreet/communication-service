@@ -8,6 +8,15 @@
     <p>We have notified our volunteers of your request. You’ll be notified when one of them accepts it – after which they may be in touch with you directly to make further arrangements. If you have concerns or think something may have gone wrong, please do feel free to contact us via <a href="mailto:support@helpmystreet.org">support@helpmystreet.org</a>.</p>
 {{/if}}
 
+<p>Here is a summary of your request:</p>
+<ul>
+    {{#each RequestJobList}}
+    <li>
+        <strong>{{Activity}}</strong>{{{CountString}}}{{{DueDateString}}}{{#if ShowJobUrl}} Click <a href='{{{JobUrl}}}'>here</a> to view the request.{{/if}}
+    </li>
+    {{/each}}
+</ul>
+
 <p>Thanks for using our service!</p>
 
 <p>Best wishes,</p>

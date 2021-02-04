@@ -51,7 +51,7 @@ public class ProcessMessageQueue
 
                 IMessage message = _messageFactory.Create(sendMessageRequest);
 
-                EmailBuildData emailBuildData = await message.PrepareTemplateData(sendMessageRequest.BatchID, sendMessageRequest.RecipientUserID, sendMessageRequest.JobID, sendMessageRequest.GroupID, sendMessageRequest.AdditionalParameters, sendMessageRequest.TemplateName);
+                EmailBuildData emailBuildData = await message.PrepareTemplateData(sendMessageRequest.BatchID, sendMessageRequest.RecipientUserID, sendMessageRequest.JobID, sendMessageRequest.GroupID, sendMessageRequest.RequestID, sendMessageRequest.AdditionalParameters, sendMessageRequest.TemplateName);
                 
                 if (emailBuildData != null)
                 {
@@ -156,6 +156,7 @@ public class ProcessMessageQueue
                 message.CommunicationJob = sendMessageRequest.CommunicationJobType;
                 message.GroupId = sendMessageRequest.GroupID;
                 message.BatchId = sendMessageRequest.BatchID.ToString();
+                message.RequestId = sendMessageRequest.RequestID;
             }
 
             if(!string.IsNullOrEmpty(emailAddress))

@@ -7,8 +7,12 @@ namespace CommunicationService.Core.Interfaces.Services
 {
     public interface IConnectRequestService
     {
+        Task<GetShiftRequestsByFilterResponse> GetShiftRequestsByFilter(GetShiftRequestsByFilterRequest request);
+        Task<GetRequestDetailsResponse> GetRequestDetailsAsync(int requestID);
         Task<GetJobDetailsResponse> GetJobDetailsAsync(int jobID);
+        Task<GetJobSummaryResponse> GetJobSummaryAsync(int jobID);
         Task<GetJobsByFilterResponse> GetJobsByFilter(GetJobsByFilterRequest request);
+        Task<GetOpenShiftJobsByFilterResponse> GetOpenShiftJobsByFilter(GetOpenShiftJobsByFilterRequest request);
         Task<GetJobsInProgressResponse> GetJobsInProgress();
         Task<GetJobsByStatusesResponse> GetJobsByStatuses(GetJobsByStatusesRequest getJobsByStatusesRequest);
         int GetLastUpdatedBy(GetJobDetailsResponse getJobDetailsResponse);

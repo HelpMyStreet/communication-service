@@ -15,6 +15,8 @@ namespace CommunicationService.Core.Domains
         public int RecipientUserID { get; set; }
         public int? JobID { get; set; }
         public int? GroupID { get; set; }
+        public int? RequestID { get; set; }
+
         public Dictionary<string, string> AdditionalParameters { get; set; }
     }
 }

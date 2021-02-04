@@ -19,6 +19,8 @@ using CommunicationService.Core.Interfaces.Repositories;
 using System.Dynamic;
 using HelpMyStreet.Contracts.RequestService.Response;
 using HelpMyStreet.Utils.Extensions;
+using System.IO;
+using UserService.Core.Utils;
 
 namespace CommunicationService.MessageService
 {
@@ -54,7 +56,7 @@ namespace CommunicationService.MessageService
             _sendMessageRequests = new List<SendMessageRequest>();
         }
 
-        public async Task<EmailBuildData> PrepareTemplateData(Guid batchId, int? recipientUserId, int? jobId, int? groupId, Dictionary<string, string> additionalParameters, string templateName)
+        public async Task<EmailBuildData> PrepareTemplateData(Guid batchId, int? recipientUserId, int? jobId, int? groupId, int? requestId, Dictionary<string, string> additionalParameters, string templateName)
         {
             CacheItemPolicy cacheItemPolicy = new CacheItemPolicy();
             cacheItemPolicy.AbsoluteExpiration = DateTime.Now.AddHours(1.0);
@@ -103,13 +105,17 @@ namespace CommunicationService.MessageService
                 {
                     cache.Add(CACHEKEY_OPEN_REQUESTS, openjobs, cacheItemPolicy);
                 }
-                else
-                {
-                    return null;
-                }
             }
 
-            List<PostcodeCoordinate> postcodeCoordinates = new List<PostcodeCoordinate>();
+            var openTasks = openjobs?.JobSummaries.Where(x => x.RequestType == RequestType.Task).ToList();
+            var openShifts = openjobs?.JobSummaries.Where(x => x.RequestType == RequestType.Shift && user.SupportActivities.Contains(x.SupportActivity)).ToList();
+            
+            if((openTasks == null || openTasks.Count==0) && (openShifts ==null || openShifts.Count==0 ) )
+            {
+                return null;
+            }
+
+            List <PostcodeCoordinate> postcodeCoordinates = new List<PostcodeCoordinate>();
 
             if(cache.Contains(CACHEKEY_OPEN_ADDRESS))
             {
@@ -152,7 +158,7 @@ namespace CommunicationService.MessageService
 
             List<JobSummary> jobs = null;
             jobs = await _jobFilteringService.FilterJobSummaries(
-                openjobs.JobSummaries,
+                openTasks,
                 null,
                 user.PostalCode,
                 _emailConfig.Value.DigestOtherJobsDistance,
@@ -163,75 +169,110 @@ namespace CommunicationService.MessageService
                 postcodeCoordinates
                 );
 
-            if (jobs.Count() == 0)
-            {
-                return null;
-            }
-
-            var criteriaJobs = jobs.Where(x => user.SupportActivities.Contains(x.SupportActivity) && x.DistanceInMiles <= user.SupportRadiusMiles);
-            if (criteriaJobs.Count() == 0)
-            {
-                return null;
-            }
-
-            criteriaJobs = criteriaJobs.OrderBy(x => x.DueDate);
-
-            var otherJobs = jobs.Where(x => !criteriaJobs.Contains(x));
-            var otherJobsStats = otherJobs.GroupBy(x => x.SupportActivity, x => x.DueDate, (activity, dueDate) => new { Key = activity, Count = dueDate.Count(), Min = dueDate.Min() });
-            otherJobsStats = otherJobsStats.OrderByDescending(x => x.Count);
-
             var chosenJobsList = new List<DailyDigestDataJob>();
-
-            foreach (var job in criteriaJobs)
-            {
-                string encodedJobId = HelpMyStreet.Utils.Utils.Base64Utils.Base64Encode(job.JobID.ToString());
-
-                chosenJobsList.Add(new DailyDigestDataJob(
-                    job.SupportActivity.FriendlyNameShort(),
-                    job.PostCode,
-                    job.DueDate.ToString("dd/MM/yyyy"),
-                    job.DueDate < DateTime.Now.AddDays(1),
-                    job.IsHealthCritical,
-                    true,
-                    1,
-                    encodedJobId,
-                    Math.Round(job.DistanceInMiles, 1).ToString()
-                    ));
-            }
-
-
             var otherJobsList = new List<DailyDigestDataJob>();
-            foreach (var job in otherJobsStats)
+            var shiftItemList = new List<ShiftItem>();
+            List<JobSummary> criteriaJobs = new List<JobSummary>();
+            List<JobSummary> otherJobs = new List<JobSummary>();
+
+
+            if (jobs.Count() > 0)
             {
-                otherJobsList.Add(new DailyDigestDataJob(
-                    job.Key.FriendlyNameShort(),
-                    string.Empty,
-                    job.Min.ToString("dd/MM/yyyy"),
-                    false,
-                    false,
-                    job.Count == 1 ? true : false,
-                    job.Count,
-                    "",
-                    ""
-                    ));
+                criteriaJobs = jobs.Where(x => user.SupportActivities.Contains(x.SupportActivity) && x.DistanceInMiles <= user.SupportRadiusMiles).ToList();
+
+                criteriaJobs = criteriaJobs.OrderBy(x => x.DueDate).ToList();
+
+                otherJobs = jobs.Where(x => !criteriaJobs.Contains(x)).ToList();
+                var otherJobsStats = otherJobs.GroupBy(x => x.SupportActivity, x => x.DueDate, (activity, dueDate) => new { Key = activity, Count = dueDate.Count(), Min = dueDate.Min() });
+                otherJobsStats = otherJobsStats.OrderByDescending(x => x.Count);
+
+                foreach (var job in criteriaJobs)
+                {
+                    string encodedJobId = HelpMyStreet.Utils.Utils.Base64Utils.Base64Encode(job.JobID.ToString());
+
+                    chosenJobsList.Add(new DailyDigestDataJob(
+                        job.SupportActivity.FriendlyNameShort(),
+                        job.PostCode,
+                        job.DueDate.ToString("dd/MM/yyyy"),
+                        job.DueDate < DateTime.Now.AddDays(1),
+                        job.IsHealthCritical,
+                        true,
+                        1,
+                        encodedJobId,
+                        Math.Round(job.DistanceInMiles, 1).ToString()
+                        ));
+                }
+
+                foreach (var job in otherJobsStats)
+                {
+                    otherJobsList.Add(new DailyDigestDataJob(
+                        job.Key.FriendlyNameShort(),
+                        string.Empty,
+                        job.Min.ToString("dd/MM/yyyy"),
+                        false,
+                        false,
+                        job.Count == 1 ? true : false,
+                        job.Count,
+                        "",
+                        ""
+                        ));
+                }
             }
 
-            return new EmailBuildData()
+            if (openShifts?.Count>0)
             {
-                BaseDynamicData = new DailyDigestData(string.Empty,
-                    user.UserPersonalDetails.FirstName,
-                    criteriaJobs.Count() > 1 ? false : true,
-                    criteriaJobs.Count(),
-                    otherJobs.Count() > 0,
-                    chosenJobsList,
-                    otherJobsList
-                    ),
-                EmailToAddress = user.UserPersonalDetails.EmailAddress,
-                EmailToName = user.UserPersonalDetails.DisplayName
-            };
+                var requests = openShifts
+                    .GroupBy(g => new { g.SupportActivity, g.RequestID } )
+                    .Select(m => new { m.Key.RequestID, m.Key.SupportActivity })
+                    .ToList();
+
+                DistanceCalculator calculator = new DistanceCalculator();
+
+                foreach (var item in requests)
+                {
+                    var request = await _connectRequestService.GetRequestDetailsAsync(item.RequestID);
+                    var location = await _connectAddressService.GetLocationDetails(request.RequestSummary.Shift.Location);
+                    var distance = calculator.GetDistanceInMiles(userPostalCode.Latitude, 
+                        userPostalCode.Longitude,
+                        (double) location.LocationDetails.Latitude,
+                        (double) location.LocationDetails.Longitude);
+
+                    if(distance<= _emailConfig.Value.ShiftRadius)
+                    {
+                        string shiftDate = request.RequestSummary.Shift.StartDate.ToString("ddd, dd MMMM yyy h:mm tt") + " - " + request.RequestSummary.Shift.EndDate.ToString("h:mm tt");
+                        shiftItemList.Add(new ShiftItem($"<strong>{ item.SupportActivity.FriendlyNameShort() }</strong> " +
+                            $"at {location.LocationDetails.Name} " +
+                            $"( {Math.Round(distance, 2)} miles away) " +
+                            $"- {shiftDate}"));                 
+                    }
+                }
+            }
+
+            if (chosenJobsList.Count > 0 || shiftItemList.Count > 0)
+            {
+                return new EmailBuildData()
+                {
+                    BaseDynamicData = new DailyDigestData(string.Empty,
+                        user.UserPersonalDetails.FirstName,
+                        criteriaJobs.Count(),
+                        otherJobs.Count() > 0,
+                        true,
+                        shiftItemList.Count,
+                        chosenJobsList,
+                        otherJobsList,
+                        shiftItemList
+                        ),
+                    EmailToAddress = user.UserPersonalDetails.EmailAddress,
+                    EmailToName = user.UserPersonalDetails.DisplayName
+                };
+            }
+            else
+            {
+                return null;
+            }
         }
 
-        public async  Task<List<SendMessageRequest>> IdentifyRecipients(int? recipientUserId, int? jobId, int? groupId, Dictionary<string, string> additionalParameters)
+        public async  Task<List<SendMessageRequest>> IdentifyRecipients(int? recipientUserId, int? jobId, int? groupId, int? requestId, Dictionary<string, string> additionalParameters)
         {
             var volunteers = await _connectUserService.GetUsers();
             
@@ -244,7 +285,8 @@ namespace CommunicationService.MessageService
                     TemplateName = TemplateName.DailyDigest,
                     RecipientUserID = volunteer.UserID,
                     GroupID = groupId,
-                    JobID = jobId
+                    JobID = jobId,
+                    RequestID = requestId
                 });
             }
             return _sendMessageRequests;
