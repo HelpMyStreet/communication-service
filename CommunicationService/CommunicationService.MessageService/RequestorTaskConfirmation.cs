@@ -144,7 +144,7 @@ namespace CommunicationService.MessageService
             var time = TimeSpan.FromMinutes(response.RequestSummary.Shift.ShiftLength);
 
             string dueDateString = $"Shift: <strong>{response.RequestSummary.Shift.StartDate.ToString("ddd dd MMMM yyyy h:mm tt - ")}{response.RequestSummary.Shift.EndDate.ToString("h:mm tt")}</strong> " +
-                $"(Duration: {time.TotalHours} hrs {time.Minutes} mins). " +
+                $"(Duration: {Math.Floor(time.TotalHours)} hrs {time.Minutes} mins). " +
                 $"Location: <strong>{locationName}</strong>";
 
             foreach (GroupJob gj in groupJobs)
