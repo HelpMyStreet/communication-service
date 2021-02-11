@@ -1,0 +1,17 @@
+﻿{
+  "Templates": [
+    {
+      "name": "TaskReminder",
+      "subject": "Request reminder",
+      "generation": "dynamic",
+      "versions": [
+        {
+          "name": "Add DueDate",
+          "subject": "Request reminder"
+        }
+      ]
+    }
+  ]
+}
+
+

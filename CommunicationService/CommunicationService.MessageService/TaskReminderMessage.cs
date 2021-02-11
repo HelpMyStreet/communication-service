@@ -32,15 +32,15 @@ namespace CommunicationService.MessageService
             _sendMessageRequests = new List<SendMessageRequest>();
         }
 
-        private string GetTitleFromDays(int days, DueDateType dueDateType)
+        private string GetTitleFromDays(int days, DueDateType dueDateType, DateTime dueDate)
         {
             if (days == 0)
             {
-                return $"A request for help you accepted is due today";
+                return $"A request for help you accepted is due today ({dueDate.ToString("ddd, dd MMMM")})";
             }
             else if (days == 1)
             {                    
-                return $"A request for help you accepted is due tomorrow";
+                return $"A request for help you accepted is due tomorrow ({dueDate.ToString("ddd, dd MMMM")})";
             }
             else
             {
@@ -83,7 +83,7 @@ namespace CommunicationService.MessageService
             {
                 BaseDynamicData = new TaskReminderData(
                     encodedJobId,
-                    GetTitleFromDays(job.JobSummary.DueDays, job.JobSummary.DueDateType),
+                    GetTitleFromDays(job.JobSummary.DueDays, job.JobSummary.DueDateType, job.JobSummary.DueDate),
                     user.UserPersonalDetails.FirstName,
                     job.JobSummary.SupportActivity.FriendlyNameShort(),
                     job.JobSummary.PostCode,
@@ -91,7 +91,8 @@ namespace CommunicationService.MessageService
                     job.JobSummary.DueDays == 1 ? true : false,
                     job.JobSummary.DueDateType == DueDateType.Before,
                     job.JobSummary.DateStatusLastChanged.ToString(DATE_FORMAT),
-                    dueDateMessage
+                    dueDateMessage,
+                    dueDateString: $"({job.JobSummary.DueDate.ToString("ddd, dd MMMM")})" 
                     ),
                 EmailToAddress = user.UserPersonalDetails.EmailAddress,
                 EmailToName = $"{user.UserPersonalDetails.FirstName} {user.UserPersonalDetails.LastName}"
