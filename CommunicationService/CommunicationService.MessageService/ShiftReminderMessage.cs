@@ -48,6 +48,16 @@ namespace CommunicationService.MessageService
             _sendMessageRequests = new List<SendMessageRequest>();
         }
 
+        private string FormatDate(DateTime dateTime)
+        {
+            string s = dateTime.FriendlyFutureDate();
+            if(s == "tomorrow")
+            {
+                s = $"Tommorow ({ dateTime.FormatDate(DateTimeFormat.LongDateFormat)})";
+            }
+            return $"{s} at {dateTime.FormatDate(DateTimeFormat.TimeFormat)}";
+        }
+
         public async Task<EmailBuildData> PrepareTemplateData(Guid batchId, int? recipientUserId, int? jobId, int? groupId, int? requestId, Dictionary<string, string> additionalParameters, string templateName)
         {
             var request = await _connectRequestService.GetRequestDetailsAsync(requestId.Value);
@@ -66,8 +76,8 @@ namespace CommunicationService.MessageService
                     firstname: user.UserPersonalDetails.FirstName,
                     activity: job.SupportActivity.FriendlyNameShort(),
                     location: location.LocationDetails.Name,
-                    shiftStartDateString: $"{request.RequestSummary.Shift.StartDate.FriendlyFutureDate()} at {request.RequestSummary.Shift.StartDate.FormatDate(DateTimeFormat.TimeFormat)}",
-                    shiftEndDateString: $"{request.RequestSummary.Shift.StartDate.FriendlyFutureDate()} at {request.RequestSummary.Shift.EndDate.FormatDate(DateTimeFormat.TimeFormat)}",
+                    shiftStartDateString: FormatDate(request.RequestSummary.Shift.StartDate),
+                    shiftEndDateString: FormatDate(request.RequestSummary.Shift.EndDate),
                     locationAddress: string.Empty,
                     joburlToken: joburlToken
                     ),
