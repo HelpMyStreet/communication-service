@@ -27,7 +27,6 @@ namespace CommunicationService.MessageService
         private readonly ILinkRepository _linkRepository;
         private readonly IOptions<LinkConfig> _linkConfig;
         private readonly IOptions<SendGridConfig> _sendGridConfig;
-        private readonly IOptions<EmailConfig> _emailConfig;
         private const string DATE_FORMAT = "dddd, dd MMMM";
         private readonly TextInfo _textInfo;
 
@@ -46,8 +45,7 @@ namespace CommunicationService.MessageService
             ILinkRepository linkRepository, 
             IOptions<LinkConfig> linkConfig, 
             IOptions<SendGridConfig> sendGridConfig,
-            IConnectAddressService connectAddressService,
-            IOptions<EmailConfig> emailConfig)
+            IConnectAddressService connectAddressService)
         {
             _connectRequestService = connectRequestService;
             _connectUserService = connectUserService;
@@ -56,7 +54,6 @@ namespace CommunicationService.MessageService
             _linkConfig = linkConfig;
             _sendGridConfig = sendGridConfig;
             _connectAddressService = connectAddressService;
-            _emailConfig = emailConfig;
             _sendMessageRequests = new List<SendMessageRequest>();
 
             CultureInfo cultureInfo = Thread.CurrentThread.CurrentCulture;
@@ -104,7 +101,7 @@ namespace CommunicationService.MessageService
             }
             else
             {
-                return $"{job.RequestSummary.Shift.StartDate.ToString(_emailConfig.Value.LongDateTimeFormat)} - {job.RequestSummary.Shift.EndDate.ToString(_emailConfig.Value.TimeFormat)}";
+                return $"{job.RequestSummary.Shift.StartDate.FormatDate(DateTimeFormat.LongDateTimeFormat)} - {job.RequestSummary.Shift.EndDate.FormatDate(DateTimeFormat.TimeFormat)}";
             }            
         }
 
