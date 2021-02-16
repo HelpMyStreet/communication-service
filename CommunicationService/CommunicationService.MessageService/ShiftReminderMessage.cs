@@ -24,7 +24,7 @@ namespace CommunicationService.MessageService
         private readonly IConnectUserService _connectUserService;
         private readonly IConnectAddressService _connectAddressService;
         private readonly ILinkRepository _linkRepository;
-        private readonly IOptions<LinkConfig> _linkConfig;
+        private readonly IOptions<LinkConfig> _linkConfig;        
 
         List<SendMessageRequest> _sendMessageRequests;
 
@@ -67,9 +67,6 @@ namespace CommunicationService.MessageService
 
             string encodedJobId = Base64Utils.Base64Encode(jobId.Value.ToString());
             var joburlToken = await _linkRepository.CreateLink($"/link/j/{encodedJobId}", _linkConfig.Value.ExpiryDays);
-
-            string startDate = request.RequestSummary.Shift.StartDate.FriendlyFutureDate();
-
 
             return new EmailBuildData()
             {
