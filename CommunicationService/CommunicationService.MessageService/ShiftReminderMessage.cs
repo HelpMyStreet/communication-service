@@ -25,6 +25,7 @@ namespace CommunicationService.MessageService
         private readonly IConnectAddressService _connectAddressService;
         private readonly ILinkRepository _linkRepository;
         private readonly IOptions<LinkConfig> _linkConfig;
+        private readonly IOptions<EmailConfig> _emailConfig;
 
         List<SendMessageRequest> _sendMessageRequests;
 
@@ -37,7 +38,8 @@ namespace CommunicationService.MessageService
             IConnectUserService connectUserService, 
             IConnectAddressService connectAddressService,
             ILinkRepository linkRepository,
-            IOptions<LinkConfig> linkConfig
+            IOptions<LinkConfig> linkConfig,
+            IOptions<EmailConfig> emailConfig
             )
         {
             _connectRequestService = connectRequestService;
@@ -45,6 +47,7 @@ namespace CommunicationService.MessageService
             _connectAddressService = connectAddressService;
             _linkRepository = linkRepository;
             _linkConfig = linkConfig;
+            _emailConfig = emailConfig;
             _sendMessageRequests = new List<SendMessageRequest>();
         }
 
@@ -66,8 +69,8 @@ namespace CommunicationService.MessageService
                     firstname: user.UserPersonalDetails.FirstName,
                     activity: job.SupportActivity.FriendlyNameShort(),
                     location: location.LocationDetails.Name,
-                    shiftStartDateString: $"{request.RequestSummary.Shift.StartDate.FriendlyFutureDate()} at {request.RequestSummary.Shift.StartDate.ToString("h:mm tt")}",
-                    shiftEndDateString: $"{request.RequestSummary.Shift.StartDate.FriendlyFutureDate()} at {request.RequestSummary.Shift.EndDate.ToString("h:mm tt")}",
+                    shiftStartDateString: $"{request.RequestSummary.Shift.StartDate.FriendlyFutureDate()} at {request.RequestSummary.Shift.StartDate.ToString(_emailConfig.Value.TimeFormat)}",
+                    shiftEndDateString: $"{request.RequestSummary.Shift.StartDate.FriendlyFutureDate()} at {request.RequestSummary.Shift.EndDate.ToString(_emailConfig.Value.TimeFormat)}",
                     locationAddress: string.Empty,
                     joburlToken: joburlToken
                     ),

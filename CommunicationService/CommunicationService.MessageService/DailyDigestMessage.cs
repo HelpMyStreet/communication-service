@@ -193,7 +193,7 @@ namespace CommunicationService.MessageService
                     chosenJobsList.Add(new DailyDigestDataJob(
                         job.SupportActivity.FriendlyNameShort(),
                         job.PostCode,
-                        job.DueDate.ToString("dd/MM/yyyy"),
+                        job.DueDate.ToString(_emailConfig.Value.ShortDateFormat),
                         job.DueDate < DateTime.Now.AddDays(1),
                         job.IsHealthCritical,
                         true,
@@ -208,7 +208,7 @@ namespace CommunicationService.MessageService
                     otherJobsList.Add(new DailyDigestDataJob(
                         job.Key.FriendlyNameShort(),
                         string.Empty,
-                        job.Min.ToString("dd/MM/yyyy"),
+                        job.Min.ToString(_emailConfig.Value.ShortDateFormat),
                         false,
                         false,
                         job.Count == 1 ? true : false,
@@ -239,7 +239,7 @@ namespace CommunicationService.MessageService
 
                     if(distance<= _emailConfig.Value.ShiftRadius)
                     {
-                        string shiftDate = request.RequestSummary.Shift.StartDate.ToString("ddd, dd MMMM yyy h:mm tt") + " - " + request.RequestSummary.Shift.EndDate.ToString("h:mm tt");
+                        string shiftDate = request.RequestSummary.Shift.StartDate.ToString(_emailConfig.Value.LongDateTimeFormat) + " - " + request.RequestSummary.Shift.EndDate.ToString(_emailConfig.Value.TimeFormat);
                         shiftItemList.Add(new ShiftItem($"<strong>{ item.SupportActivity.FriendlyNameShort() }</strong> " +
                             $"at {location.LocationDetails.Name} " +
                             $"( {Math.Round(distance, 2)} miles away) " +

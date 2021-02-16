@@ -1,4 +1,5 @@
-﻿using CommunicationService.Core.Domains;
+﻿using CommunicationService.Core.Configuration;
+using CommunicationService.Core.Domains;
 using CommunicationService.Core.Interfaces;
 using CommunicationService.Core.Interfaces.Repositories;
 using CommunicationService.Core.Interfaces.Services;
@@ -7,6 +8,7 @@ using HelpMyStreet.Contracts.GroupService.Response;
 using HelpMyStreet.Contracts.UserService.Response;
 using HelpMyStreet.Utils.Enums;
 using HelpMyStreet.Utils.Extensions;
+using Microsoft.Extensions.Options;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -20,6 +22,7 @@ namespace CommunicationService.MessageService
         private readonly IConnectUserService _connectUserService;
         private readonly IConnectRequestService _connectRequestService;
         private readonly IConnectGroupService _connectGroupService;
+        private readonly IOptions<EmailConfig> _emailConfig;
         List<SendMessageRequest> _sendMessageRequests;
 
         public string GetUnsubscriptionGroupName(int? recipientUserId)
@@ -27,11 +30,12 @@ namespace CommunicationService.MessageService
             return UnsubscribeGroupName.TaskNotification;
         }
 
-        public TaskNotificationMessage(IConnectUserService connectUserService, IConnectRequestService connectRequestService, IConnectGroupService connectGroupService)
+        public TaskNotificationMessage(IConnectUserService connectUserService, IConnectRequestService connectRequestService, IConnectGroupService connectGroupService, IOptions<EmailConfig> emailConfig)
         {
             _connectUserService = connectUserService;
             _connectRequestService = connectRequestService;
             _connectGroupService = connectGroupService;
+            _emailConfig = emailConfig;
             _sendMessageRequests = new List<SendMessageRequest>();
         }
 
@@ -66,7 +70,7 @@ namespace CommunicationService.MessageService
                             job.JobSummary.SupportActivity.FriendlyNameShort(),
                             job.JobSummary.PostCode,
                             Math.Round(volunteer.DistanceInMiles, 1),
-                            job.JobSummary.DueDate.ToString("dd/MM/yyyy"),
+                            job.JobSummary.DueDate.ToString(_emailConfig.Value.ShortDateFormat),
                             job.JobSummary.IsHealthCritical,
                             isFaceMask
                         ),

@@ -73,17 +73,17 @@ namespace CommunicationService.MessageService
                 case CommunicationJobTypes.SendRegistrationChasers:
                     return new RegistrationChaserMessage(_connectUserService, _cosmosDbService,_emailConfig);
                 case CommunicationJobTypes.SendNewTaskNotification:
-                    return new TaskNotificationMessage(_connectUserService, _connectRequestService, _connectGroupService);
+                    return new TaskNotificationMessage(_connectUserService, _connectRequestService, _connectGroupService,_emailConfig);
                 case CommunicationJobTypes.RequestorTaskConfirmation:
-                    return new RequestorTaskConfirmation(_connectRequestService, _connectGroupService, _connectAddressService, _linkRepository, _linkConfig, _sendGridConfig);
+                    return new RequestorTaskConfirmation(_connectRequestService, _connectGroupService, _connectAddressService, _linkRepository, _linkConfig, _sendGridConfig, _emailConfig);
                 case CommunicationJobTypes.SendTaskStateChangeUpdate:
-                    return new TaskUpdateSimplifiedMessage(_connectRequestService, _connectUserService, _connectGroupService, _linkRepository, _linkConfig, _sendGridConfig, _connectAddressService);
+                    return new TaskUpdateSimplifiedMessage(_connectRequestService, _connectUserService, _connectGroupService, _linkRepository, _linkConfig, _sendGridConfig, _connectAddressService, _emailConfig);
                 case CommunicationJobTypes.SendOpenTaskDigest:
                     return new DailyDigestMessage(_connectGroupService, _connectUserService, _connectRequestService, _emailConfig, _jobFilteringService,_connectAddressService, _cosmosDbService);
                 case CommunicationJobTypes.SendTaskReminder:
                     return new TaskReminderMessage(_connectRequestService, _connectUserService);
                 case CommunicationJobTypes.SendShiftReminder:
-                    return new ShiftReminderMessage(_connectRequestService, _connectUserService, _connectAddressService, _linkRepository, _linkConfig);
+                    return new ShiftReminderMessage(_connectRequestService, _connectUserService, _connectAddressService, _linkRepository, _linkConfig, _emailConfig);
                 case CommunicationJobTypes.InterUserMessage:
                     return new InterUserMessage(_connectRequestService, _connectUserService);
                 case CommunicationJobTypes.NewCredentials:

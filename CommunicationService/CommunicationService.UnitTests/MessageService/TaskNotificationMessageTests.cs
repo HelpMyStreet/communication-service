@@ -1,10 +1,12 @@
-﻿using CommunicationService.Core.Interfaces.Services;
+﻿using CommunicationService.Core.Configuration;
+using CommunicationService.Core.Interfaces.Services;
 using CommunicationService.MessageService;
 using HelpMyStreet.Contracts.GroupService.Response;
 using HelpMyStreet.Contracts.RequestService.Response;
 using HelpMyStreet.Contracts.UserService.Response;
 using HelpMyStreet.Utils.Enums;
 using HelpMyStreet.Utils.Models;
+using Microsoft.Extensions.Options;
 using Moq;
 using NUnit.Framework;
 using System;
@@ -21,6 +23,7 @@ namespace CommunicationService.UnitTests.SendGridService
         private Mock<IConnectGroupService> _groupService;
         private Mock<IConnectUserService> _userService;
         private Mock<IConnectRequestService> _requestService;
+        private Mock<IOptions<EmailConfig>> _emailConfig;
         private GetGroupMembersResponse _getGroupMembersResponse;
         private GetGroupNewRequestNotificationStrategyResponse _getGroupNewRequestNotificationStrategyResponse;
         private GetVolunteersByPostcodeAndActivityResponse _getVolunteersByPostcodeAndActivityResponse;
@@ -35,6 +38,7 @@ namespace CommunicationService.UnitTests.SendGridService
             SetupGroupService();
             SetupUserService();
             SetupRequestService();
+            SetupEmailConfig();
 
             _getGroupMembersResponse = new GetGroupMembersResponse()
             {
@@ -57,7 +61,9 @@ namespace CommunicationService.UnitTests.SendGridService
             _classUnderTest = new TaskNotificationMessage(
                 _userService.Object,
                 _requestService.Object,
-                _groupService.Object);
+                _groupService.Object,
+                _emailConfig.Object
+                ); ;
         }
 
         private void SetupGroupService()
@@ -89,6 +95,11 @@ namespace CommunicationService.UnitTests.SendGridService
 
             _requestService.Setup(x => x.GetJobDetailsAsync(It.IsAny<int>()))
                 .ReturnsAsync(() => _getJobDetailsResponse);
+        }
+
+        private void SetupEmailConfig()
+        {
+            _emailConfig = new Mock<IOptions<EmailConfig>>();
         }
 
         [Test]

@@ -12,5 +12,14 @@ namespace CommunicationService.Core.Configuration
         public bool ShowUserIDInEmailTitle { get; set; }
         public int? ServiceBusSleepInMilliseconds { get; set; }        
         public double? ShiftRadius { get; set; }
+        public string ShortDateFormat { get; set; }
+        public string LongDateFormat { get; set; }
+        public string TimeFormat { get; set; }
+        public string LongDateTimeFormat { 
+            get
+            {
+                return $"{LongDateFormat} {TimeFormat}";
+            }
+        }
     }
 }
