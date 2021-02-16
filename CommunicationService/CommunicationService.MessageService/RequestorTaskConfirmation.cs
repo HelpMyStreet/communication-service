@@ -43,7 +43,6 @@ namespace CommunicationService.MessageService
         private readonly ILinkRepository _linkRepository;
         private readonly IOptions<LinkConfig> _linkConfig;
         private readonly IOptions<SendGridConfig> _sendGridConfig;
-        private readonly IOptions<EmailConfig> _emailConfig;
         List<SendMessageRequest> _sendMessageRequests;
 
         public const int REQUESTOR_DUMMY_USERID = -1;
@@ -58,8 +57,7 @@ namespace CommunicationService.MessageService
             IConnectAddressService connectAddressService,
             ILinkRepository linkRepository, 
             IOptions<LinkConfig> linkConfig, 
-            IOptions<SendGridConfig> sendGridConfig,
-            IOptions<EmailConfig> emailConfig)
+            IOptions<SendGridConfig> sendGridConfig)
         {
             _connectRequestService = connectRequestService;
             _connectGroupService = connectGroupService;
@@ -67,7 +65,6 @@ namespace CommunicationService.MessageService
             _linkRepository = linkRepository;
             _linkConfig = linkConfig;
             _sendGridConfig = sendGridConfig;
-            _emailConfig = emailConfig;
             _sendMessageRequests = new List<SendMessageRequest>();
         }
 
@@ -110,7 +107,7 @@ namespace CommunicationService.MessageService
                || (getChangedBy == RequestRoles.Requestor && jobResponse.JobSummary.RequestorDefinedByGroup);
                     jobUrl = showJobUrl ? GetJobUrl(jobid) : string.Empty;
 
-                    dueDateString = $" - Due Date: <strong>{jobResponse.JobSummary.DueDate.ToString(_emailConfig.Value.LongDateFormat)}.</strong>";
+                    dueDateString = $" - Due Date: <strong>{jobResponse.JobSummary.DueDate.FormatDate(DateTimeFormat.LongDateFormat)}.</strong>";
                 }
                 else
                 {
@@ -146,7 +143,7 @@ namespace CommunicationService.MessageService
 
             var time = TimeSpan.FromMinutes(response.RequestSummary.Shift.ShiftLength);
 
-            string dueDateString = $"Shift: <strong>{response.RequestSummary.Shift.StartDate.ToString(_emailConfig.Value.LongDateTimeFormat)} - {response.RequestSummary.Shift.EndDate.ToString(_emailConfig.Value.TimeFormat)}</strong> " +
+            string dueDateString = $"Shift: <strong>{response.RequestSummary.Shift.StartDate.FormatDate(DateTimeFormat.LongDateTimeFormat)} - {response.RequestSummary.Shift.EndDate.FormatDate(DateTimeFormat.TimeFormat)}</strong> " +
                 $"(Duration: {Math.Floor(time.TotalHours)} hrs {time.Minutes} mins). " +
                 $"Location: <strong>{locationName}</strong>";
 

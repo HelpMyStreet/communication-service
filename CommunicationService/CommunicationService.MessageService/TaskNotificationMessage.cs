@@ -22,7 +22,6 @@ namespace CommunicationService.MessageService
         private readonly IConnectUserService _connectUserService;
         private readonly IConnectRequestService _connectRequestService;
         private readonly IConnectGroupService _connectGroupService;
-        private readonly IOptions<EmailConfig> _emailConfig;
         List<SendMessageRequest> _sendMessageRequests;
 
         public string GetUnsubscriptionGroupName(int? recipientUserId)
@@ -30,12 +29,11 @@ namespace CommunicationService.MessageService
             return UnsubscribeGroupName.TaskNotification;
         }
 
-        public TaskNotificationMessage(IConnectUserService connectUserService, IConnectRequestService connectRequestService, IConnectGroupService connectGroupService, IOptions<EmailConfig> emailConfig)
+        public TaskNotificationMessage(IConnectUserService connectUserService, IConnectRequestService connectRequestService, IConnectGroupService connectGroupService)
         {
             _connectUserService = connectUserService;
             _connectRequestService = connectRequestService;
             _connectGroupService = connectGroupService;
-            _emailConfig = emailConfig;
             _sendMessageRequests = new List<SendMessageRequest>();
         }
 
@@ -70,7 +68,7 @@ namespace CommunicationService.MessageService
                             job.JobSummary.SupportActivity.FriendlyNameShort(),
                             job.JobSummary.PostCode,
                             Math.Round(volunteer.DistanceInMiles, 1),
-                            job.JobSummary.DueDate.ToString(_emailConfig.Value.ShortDateFormat),
+                            job.JobSummary.DueDate.FormatDate(DateTimeFormat.ShortDateFormat),
                             job.JobSummary.IsHealthCritical,
                             isFaceMask
                         ),

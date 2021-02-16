@@ -134,8 +134,8 @@ namespace CommunicationService.MessageService
 
             List<int> requestsAlreadyNotified = await _cosmosDbService.GetShiftRequestDetailsSent(user.ID);
 
-            //shifts.ShiftJobs = shifts.ShiftJobs.
-            //   Where(x => !requestsAlreadyNotified.Contains(x.RequestID)).ToList();
+            shifts.ShiftJobs = shifts.ShiftJobs.
+               Where(x => !requestsAlreadyNotified.Contains(x.RequestID)).ToList();
 
             if (shifts.ShiftJobs.Count > 0)
             {
@@ -195,7 +195,7 @@ namespace CommunicationService.MessageService
                 .Select(m => new {
                     SupportActivity = m.Key.SupportActivity,
                     Location = m.Key.Location,
-                    ShiftDetails = $"{m.Key.StartDate.ToString(_emailConfig.Value.LongDateTimeFormat)} - {m.Key.EndDate.ToString(_emailConfig.Value.TimeFormat)}",
+                    ShiftDetails = $"{m.Key.StartDate.FormatDate(DateTimeFormat.LongDateTimeFormat)} - {m.Key.EndDate.FormatDate(DateTimeFormat.TimeFormat)}",
                 }).ToList();
 
             List<JobDetails> result  = new List<JobDetails>();

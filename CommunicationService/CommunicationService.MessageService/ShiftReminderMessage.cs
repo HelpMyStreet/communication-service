@@ -24,8 +24,7 @@ namespace CommunicationService.MessageService
         private readonly IConnectUserService _connectUserService;
         private readonly IConnectAddressService _connectAddressService;
         private readonly ILinkRepository _linkRepository;
-        private readonly IOptions<LinkConfig> _linkConfig;
-        private readonly IOptions<EmailConfig> _emailConfig;
+        private readonly IOptions<LinkConfig> _linkConfig;        
 
         List<SendMessageRequest> _sendMessageRequests;
 
@@ -38,8 +37,7 @@ namespace CommunicationService.MessageService
             IConnectUserService connectUserService, 
             IConnectAddressService connectAddressService,
             ILinkRepository linkRepository,
-            IOptions<LinkConfig> linkConfig,
-            IOptions<EmailConfig> emailConfig
+            IOptions<LinkConfig> linkConfig
             )
         {
             _connectRequestService = connectRequestService;
@@ -47,7 +45,6 @@ namespace CommunicationService.MessageService
             _connectAddressService = connectAddressService;
             _linkRepository = linkRepository;
             _linkConfig = linkConfig;
-            _emailConfig = emailConfig;
             _sendMessageRequests = new List<SendMessageRequest>();
         }
 
@@ -69,8 +66,8 @@ namespace CommunicationService.MessageService
                     firstname: user.UserPersonalDetails.FirstName,
                     activity: job.SupportActivity.FriendlyNameShort(),
                     location: location.LocationDetails.Name,
-                    shiftStartDateString: $"{request.RequestSummary.Shift.StartDate.FriendlyFutureDate()} at {request.RequestSummary.Shift.StartDate.ToString(_emailConfig.Value.TimeFormat)}",
-                    shiftEndDateString: $"{request.RequestSummary.Shift.StartDate.FriendlyFutureDate()} at {request.RequestSummary.Shift.EndDate.ToString(_emailConfig.Value.TimeFormat)}",
+                    shiftStartDateString: $"{request.RequestSummary.Shift.StartDate.FriendlyFutureDate()} at {request.RequestSummary.Shift.StartDate.FormatDate(DateTimeFormat.TimeFormat)}",
+                    shiftEndDateString: $"{request.RequestSummary.Shift.StartDate.FriendlyFutureDate()} at {request.RequestSummary.Shift.EndDate.FormatDate(DateTimeFormat.TimeFormat)}",
                     locationAddress: string.Empty,
                     joburlToken: joburlToken
                     ),
