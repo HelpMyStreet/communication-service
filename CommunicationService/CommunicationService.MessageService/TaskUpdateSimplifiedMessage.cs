@@ -101,7 +101,7 @@ namespace CommunicationService.MessageService
             }
             else
             {
-                return $"{job.RequestSummary.Shift.StartDate.ToString("ddd, dd MMMM yyy h:mm tt")} - {job.RequestSummary.Shift.EndDate.ToString("h:mm tt")}";
+                return $"{job.RequestSummary.Shift.StartDate.FormatDate(DateTimeFormat.LongDateTimeFormat)} - {job.RequestSummary.Shift.EndDate.FormatDate(DateTimeFormat.TimeFormat)}";
             }            
         }
 
