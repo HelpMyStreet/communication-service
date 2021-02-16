@@ -53,9 +53,9 @@ namespace CommunicationService.MessageService
             string s = dateTime.FriendlyFutureDate();
             if(s == "tomorrow")
             {
-                s = $"Tommorow ({ dateTime.ToString("ddd, dd MMM") })";
+                s = $"Tommorow ({ dateTime.FormatDate(DateTimeFormat.LongDateFormat)})";
             }
-            return $"{s} at {dateTime.ToString("h:mm tt")}";
+            return $"{s} at {dateTime.FormatDate(DateTimeFormat.TimeFormat)}";
         }
 
         public async Task<EmailBuildData> PrepareTemplateData(Guid batchId, int? recipientUserId, int? jobId, int? groupId, int? requestId, Dictionary<string, string> additionalParameters, string templateName)
