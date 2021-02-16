@@ -24,7 +24,7 @@ namespace CommunicationService.MessageService
         private readonly IConnectUserService _connectUserService;
         private readonly IConnectAddressService _connectAddressService;
         private readonly ILinkRepository _linkRepository;
-        private readonly IOptions<LinkConfig> _linkConfig;
+        private readonly IOptions<LinkConfig> _linkConfig;        
 
         List<SendMessageRequest> _sendMessageRequests;
 
@@ -66,8 +66,8 @@ namespace CommunicationService.MessageService
                     firstname: user.UserPersonalDetails.FirstName,
                     activity: job.SupportActivity.FriendlyNameShort(),
                     location: location.LocationDetails.Name,
-                    shiftStartDateString: $"{request.RequestSummary.Shift.StartDate.FriendlyFutureDate()} at {request.RequestSummary.Shift.StartDate.ToString("h:mm tt")}",
-                    shiftEndDateString: $"{request.RequestSummary.Shift.StartDate.FriendlyFutureDate()} at {request.RequestSummary.Shift.EndDate.ToString("h:mm tt")}",
+                    shiftStartDateString: $"{request.RequestSummary.Shift.StartDate.FriendlyFutureDate()} at {request.RequestSummary.Shift.StartDate.FormatDate(DateTimeFormat.TimeFormat)}",
+                    shiftEndDateString: $"{request.RequestSummary.Shift.StartDate.FriendlyFutureDate()} at {request.RequestSummary.Shift.EndDate.FormatDate(DateTimeFormat.TimeFormat)}",
                     locationAddress: string.Empty,
                     joburlToken: joburlToken
                     ),

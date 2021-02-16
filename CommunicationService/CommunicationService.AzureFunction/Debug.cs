@@ -126,13 +126,13 @@ namespace CommunicationService.AzureFunction
                 //    _linkConfig,
                 //    _sendGridConfig);
 
-                //NewRequestNotificationMessage message = new NewRequestNotificationMessage(
-                //    _connectRequestService,
-                //    _connectAddressService, 
-                //    _connectUserService, 
-                //    _cosmosDbService,
-                //    _emailConfig
-                //    );
+                NewRequestNotificationMessage message = new NewRequestNotificationMessage(
+                    _connectRequestService,
+                    _connectAddressService,
+                    _connectUserService,
+                    _cosmosDbService,
+                    _emailConfig
+                    );
 
                 //ShiftReminderMessage message = new ShiftReminderMessage(_connectRequestService, _connectUserService, _connectAddressService, _linkRepository, _linkConfig);
 
@@ -146,20 +146,20 @@ namespace CommunicationService.AzureFunction
                 //    _cosmosDbService
                 //    );
 
-                NewTaskPendingApprovalNotification message = new NewTaskPendingApprovalNotification(
-                    _connectRequestService,
-                    _connectGroupService,
-                    _connectUserService,
-                    _linkRepository,
-                    _linkConfig);
+                //NewTaskPendingApprovalNotification message = new NewTaskPendingApprovalNotification(
+                //    _connectRequestService,
+                //    _connectGroupService,
+                //    _connectUserService,
+                //    _linkRepository,
+                //    _linkConfig);
 
                 var recipients = await message.IdentifyRecipients(req.RecipientUserID, req.JobID, req.GroupID, req.RequestID, req.AdditionalParameters);
                 //recipients = recipients.Take(1).ToList();
 
-                //recipients = recipients.Where(x => x.RecipientUserID == 20256).ToList();
+                recipients = recipients.Where(x => x.RecipientUserID == 3).ToList();
 
 
-               // SendMessageRequest smr = recipients.ElementAt(0);
+                //SendMessageRequest smr = recipients.ElementAt(0);
                 foreach (SendMessageRequest smr in recipients)
                 {
                     var emailBuildData = await message.PrepareTemplateData(Guid.NewGuid(), smr.RecipientUserID, smr.JobID, smr.GroupID, smr.RequestID, smr.AdditionalParameters, smr.TemplateName);
