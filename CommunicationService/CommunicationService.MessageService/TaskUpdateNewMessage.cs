@@ -573,12 +573,12 @@ namespace CommunicationService.MessageService
             DateTime dueDate = job.JobSummary.DueDate;
             double daysFromNow = (dueDate.Date - DateTime.Now.Date).TotalDays;
             string strDaysFromNow = "Just to remind you, your help is needed ";
-            string encodedJobId = HelpMyStreet.Utils.Utils.Base64Utils.Base64Encode(job.JobSummary.JobID.ToString()) ;
-            string joburl = "<a href=\"" + baseUrl + "/account/accepted-requests?j=" + encodedJobId + "\">here</a>";
-            string acceptedurl = "<a href=\"" + baseUrl + "/account/accepted-requests?j=" + encodedJobId + "\">My Accepted Requests</a>";
-            string openRequestsUrl = "<a href=\"" + baseUrl + "/account/open-requests?j="+ encodedJobId + "\">Open Requests</a>";
+            string encodedJobId = Base64Utils.Base64Encode(job.JobSummary.JobID.ToString());
+            string jobUrl = baseUrl + "/link/j/" + encodedJobId;
+            string acceptedurl = "<a href=\"" + jobUrl + "\">My Requests</a>";
+            string openRequestsUrl = "<a href=\"" + jobUrl + "\">Open Requests</a>";
             string supporturl = "<a href=\"mailto:support@helpmystreet.org\">support@helpmystreet.org</a>";
-            string completedRequestsUrl = "<a href=\"" + baseUrl + "/account/completed-requests?j=" + encodedJobId + "\">My Completed Requests</a>";
+            string completedRequestsUrl = "<a href=\"" + jobUrl + "\">My Requests</a>";
 
             if (job.JobSummary.DueDays < 0)
             {
