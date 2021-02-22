@@ -101,7 +101,7 @@ namespace CommunicationService.MessageService
             }
             else
             {
-                return $"{job.RequestSummary.Shift.StartDate.ToString("ddd, dd MMMM yyy h:mm tt")} - {job.RequestSummary.Shift.EndDate.ToString("h:mm tt")}";
+                return $"{job.RequestSummary.Shift.StartDate.FormatDate(DateTimeFormat.LongDateTimeFormat)} - {job.RequestSummary.Shift.EndDate.FormatDate(DateTimeFormat.TimeFormat)}";
             }            
         }
 
@@ -257,6 +257,9 @@ namespace CommunicationService.MessageService
                             $"<tr style='margin-left:10px'>" +
                             $"<td><a href='{GetProtectedUrl(job.JobSummary.JobID, requestRole, FeedbackRating.HappyFace)}'><img src='{happyFaceImage}' alt='Great' width='200'></a></td>" +
                             $"<td><a href='{GetProtectedUrl(job.JobSummary.JobID, requestRole, FeedbackRating.SadFace)}'><img src='{sadFaceImage}' alt='Not So Great' width='200'></a></td>" +
+                            $"</tr>" +
+                            $"<tr>" +
+                            $"<td colspan=2><a href='{GetProtectedUrl(job.JobSummary.JobID, requestRole,null)}'>Click here to leave your feedback</a></td>" +
                             $"</tr>" +
                             $"</table>" +
                             $"<p>If you have any comments or queries, please click <a href='{GetProtectedUrl(job.JobSummary.JobID, requestRole, null)}'>here</a>, or get in touch by emailing support@helpmystreet.org.</p>";

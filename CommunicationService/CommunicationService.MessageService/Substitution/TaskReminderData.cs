@@ -17,6 +17,7 @@ namespace CommunicationService.MessageService.Substitution
         public bool CanBeCompletedBeforeDueDate { get; private set; }
         public string DateStatusLastChanged { get; private set; }
         public string DueDateMessage { get; private set; }
+        public string DueDateString { get; private set; }
 
         public TaskReminderData(
             string encodedJobId,
@@ -28,7 +29,8 @@ namespace CommunicationService.MessageService.Substitution
             bool duetomorrow,
             bool canBeCompletedBeforeDueDate,
             string datestatuslastchanged,
-            string dueDateMessage
+            string dueDateMessage,
+            string dueDateString
             )
         {
             EncodedJobID = encodedJobId;
@@ -41,6 +43,7 @@ namespace CommunicationService.MessageService.Substitution
             CanBeCompletedBeforeDueDate = canBeCompletedBeforeDueDate;
             DateStatusLastChanged = datestatuslastchanged;
             DueDateMessage = dueDateMessage;
+            DueDateString = dueDateString;
         }
     }
 }

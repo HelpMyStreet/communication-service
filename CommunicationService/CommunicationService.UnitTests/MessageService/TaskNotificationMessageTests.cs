@@ -1,10 +1,12 @@
-﻿using CommunicationService.Core.Interfaces.Services;
+﻿using CommunicationService.Core.Configuration;
+using CommunicationService.Core.Interfaces.Services;
 using CommunicationService.MessageService;
 using HelpMyStreet.Contracts.GroupService.Response;
 using HelpMyStreet.Contracts.RequestService.Response;
 using HelpMyStreet.Contracts.UserService.Response;
 using HelpMyStreet.Utils.Enums;
 using HelpMyStreet.Utils.Models;
+using Microsoft.Extensions.Options;
 using Moq;
 using NUnit.Framework;
 using System;
@@ -57,7 +59,8 @@ namespace CommunicationService.UnitTests.SendGridService
             _classUnderTest = new TaskNotificationMessage(
                 _userService.Object,
                 _requestService.Object,
-                _groupService.Object);
+                _groupService.Object
+                );
         }
 
         private void SetupGroupService()

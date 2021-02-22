@@ -24,7 +24,7 @@ namespace CommunicationService.MessageService
         private readonly IConnectUserService _connectUserService;
         private readonly IConnectAddressService _connectAddressService;
         private readonly ILinkRepository _linkRepository;
-        private readonly IOptions<LinkConfig> _linkConfig;
+        private readonly IOptions<LinkConfig> _linkConfig;        
 
         List<SendMessageRequest> _sendMessageRequests;
 
@@ -48,6 +48,16 @@ namespace CommunicationService.MessageService
             _sendMessageRequests = new List<SendMessageRequest>();
         }
 
+        private string FormatDate(DateTime dateTime)
+        {
+            string s = dateTime.FriendlyFutureDate();
+            if(s == "tomorrow")
+            {
+                s = $"Tommorow ({ dateTime.FormatDate(DateTimeFormat.LongDateFormat)})";
+            }
+            return $"{s} at {dateTime.FormatDate(DateTimeFormat.TimeFormat)}";
+        }
+
         public async Task<EmailBuildData> PrepareTemplateData(Guid batchId, int? recipientUserId, int? jobId, int? groupId, int? requestId, Dictionary<string, string> additionalParameters, string templateName)
         {
             var request = await _connectRequestService.GetRequestDetailsAsync(requestId.Value);
@@ -66,8 +76,8 @@ namespace CommunicationService.MessageService
                     firstname: user.UserPersonalDetails.FirstName,
                     activity: job.SupportActivity.FriendlyNameShort(),
                     location: location.LocationDetails.Name,
-                    shiftStartDateString: $"{request.RequestSummary.Shift.StartDate.FriendlyFutureDate()} at {request.RequestSummary.Shift.StartDate.ToString("h:mm tt")}",
-                    shiftEndDateString: $"{request.RequestSummary.Shift.StartDate.FriendlyFutureDate()} at {request.RequestSummary.Shift.EndDate.ToString("h:mm tt")}",
+                    shiftStartDateString: FormatDate(request.RequestSummary.Shift.StartDate),
+                    shiftEndDateString: FormatDate(request.RequestSummary.Shift.EndDate),
                     locationAddress: string.Empty,
                     joburlToken: joburlToken
                     ),

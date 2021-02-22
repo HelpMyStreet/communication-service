@@ -16,7 +16,6 @@ namespace CommunicationService.MessageService
     {
         private readonly IConnectRequestService _connectRequestService;
         private readonly IConnectUserService _connectUserService;
-        private const string DATE_FORMAT = "dddd, dd MMMM";
 
         List<SendMessageRequest> _sendMessageRequests;
 
@@ -32,15 +31,15 @@ namespace CommunicationService.MessageService
             _sendMessageRequests = new List<SendMessageRequest>();
         }
 
-        private string GetTitleFromDays(int days, DueDateType dueDateType)
+        private string GetTitleFromDays(int days, DueDateType dueDateType, DateTime dueDate)
         {
             if (days == 0)
             {
-                return $"A request for help you accepted is due today";
+                return $"A request for help you accepted is due today ({dueDate.FormatDate(DateTimeFormat.ShortDateFormat)})";
             }
             else if (days == 1)
             {                    
-                return $"A request for help you accepted is due tomorrow";
+                return $"A request for help you accepted is due tomorrow ({dueDate.FormatDate(DateTimeFormat.ShortDateFormat)})";
             }
             else
             {
@@ -72,10 +71,10 @@ namespace CommunicationService.MessageService
             switch (job.JobSummary.DueDateType)
             {
                 case DueDateType.Before:
-                    dueDateMessage = $"The help is needed on or before {job.JobSummary.DueDate.ToString(DATE_FORMAT)} – {job.JobSummary.DueDays} days from now.";
+                    dueDateMessage = $"The help is needed on or before {job.JobSummary.DueDate.FormatDate(DateTimeFormat.ShortDateFormat)} – {job.JobSummary.DueDays} days from now.";
                     break;
                 case DueDateType.On:
-                    dueDateMessage = $"The help is needed on {job.JobSummary.DueDate.ToString(DATE_FORMAT)} – {job.JobSummary.DueDays} days from now.";
+                    dueDateMessage = $"The help is needed on {job.JobSummary.DueDate.FormatDate(DateTimeFormat.ShortDateFormat)} – {job.JobSummary.DueDays} days from now.";
                     break;
             }
 
@@ -83,15 +82,16 @@ namespace CommunicationService.MessageService
             {
                 BaseDynamicData = new TaskReminderData(
                     encodedJobId,
-                    GetTitleFromDays(job.JobSummary.DueDays, job.JobSummary.DueDateType),
+                    GetTitleFromDays(job.JobSummary.DueDays, job.JobSummary.DueDateType, job.JobSummary.DueDate),
                     user.UserPersonalDetails.FirstName,
                     job.JobSummary.SupportActivity.FriendlyNameShort(),
                     job.JobSummary.PostCode,
                     job.JobSummary.DueDays == 0 ? true : false,
                     job.JobSummary.DueDays == 1 ? true : false,
                     job.JobSummary.DueDateType == DueDateType.Before,
-                    job.JobSummary.DateStatusLastChanged.ToString(DATE_FORMAT),
-                    dueDateMessage
+                    job.JobSummary.DateStatusLastChanged.FormatDate(DateTimeFormat.ShortDateFormat),
+                    dueDateMessage,
+                    dueDateString: $"({job.JobSummary.DueDate.FormatDate(DateTimeFormat.ShortDateFormat)})" 
                     ),
                 EmailToAddress = user.UserPersonalDetails.EmailAddress,
                 EmailToName = $"{user.UserPersonalDetails.FirstName} {user.UserPersonalDetails.LastName}"
