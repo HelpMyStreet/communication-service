@@ -62,11 +62,6 @@ namespace CommunicationService.MessageService
                 if (user != null && requestDetails != null)
                 {
                     var job = requestDetails.RequestSummary.JobSummaries.First();
-                    string numberofVolunteers = string.Empty;
-                    if (requestDetails.RequestSummary.JobSummaries.Count > 0)
-                    {
-                        numberofVolunteers = $"{ requestDetails.RequestSummary.JobSummaries.Count } x ";
-                    };
                     
                     return new EmailBuildData()
                     {
@@ -80,8 +75,7 @@ namespace CommunicationService.MessageService
                             distanceFromPostcode: Math.Round(volunteer.DistanceInMiles, 1),
                             dueDate: job.DueDate.FormatDate(DateTimeFormat.ShortDateFormat),
                             isHealthCritical: job.IsHealthCritical,
-                            isFaceMask: supportActivity == SupportActivities.FaceMask,
-                            numberofVolunteers: numberofVolunteers
+                            isFaceMask: supportActivity == SupportActivities.FaceMask
                         ),
                         EmailToAddress = user.UserPersonalDetails.EmailAddress,
                         EmailToName = $"{user.UserPersonalDetails.FirstName} {user.UserPersonalDetails.LastName}"

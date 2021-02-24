@@ -72,10 +72,10 @@ namespace CommunicationService.AzureFunction
                 var request = JsonConvert.SerializeObject(req);
                 log.LogInformation($"RequestCommunicationRequest {request}");
 
-                TaskNotificationMessage message = new TaskNotificationMessage(
-                    _connectUserService,
-                    _connectRequestService,
-                    _connectGroupService);
+                //TaskNotificationMessage message = new TaskNotificationMessage(
+                //    _connectUserService,
+                //    _connectRequestService,
+                //    _connectGroupService);
 
                 //TaskDetailMessage message = new TaskDetailMessage(
                 //    _connectGroupService,
@@ -118,13 +118,13 @@ namespace CommunicationService.AzureFunction
                 //    _sendGridConfig
                 //    );
 
-                //RequestorTaskConfirmation message = new RequestorTaskConfirmation(
-                //    _connectRequestService,
-                //    _connectGroupService,
-                //    _connectAddressService,
-                //    _linkRepository,
-                //    _linkConfig,
-                //    _sendGridConfig);
+                RequestorTaskConfirmation message = new RequestorTaskConfirmation(
+                    _connectRequestService,
+                    _connectGroupService,
+                    _connectAddressService,
+                    _linkRepository,
+                    _linkConfig,
+                    _sendGridConfig);
 
                 //NewRequestNotificationMessage message = new NewRequestNotificationMessage(
                 //    _connectRequestService,
