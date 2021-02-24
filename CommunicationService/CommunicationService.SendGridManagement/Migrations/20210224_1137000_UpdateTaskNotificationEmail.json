@@ -1,0 +1,17 @@
+﻿{
+  "Templates": [
+    {
+      "name": "TaskNotification",
+      "subject": "A New HelpMyStreet Request Has Been Raised",
+      "generation": "dynamic",
+      "versions": [
+        {
+          "name": "Add mulitple volunteers",
+          "subject": "A New HelpMyStreet Request Has Been Raised"
+        }
+      ]
+    }
+  ]
+}
+
+
