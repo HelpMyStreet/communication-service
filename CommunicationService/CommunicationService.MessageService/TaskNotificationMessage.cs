@@ -65,15 +65,9 @@ namespace CommunicationService.MessageService
                     string numberofVolunteers = string.Empty;
                     if (requestDetails.RequestSummary.JobSummaries.Count > 0)
                     {
-                        numberofVolunteers = $"(Number of volunteers { requestDetails.RequestSummary.JobSummaries.Count })";
+                        numberofVolunteers = $"{ requestDetails.RequestSummary.JobSummaries.Count } x ";
                     };
-                    JobSummary summary = null;
-
-                    if(job.GetType() == typeof(JobSummary))
-                    {
-                        summary = (JobSummary)job;
-                    }
-
+                    
                     return new EmailBuildData()
                     {
                         BaseDynamicData = new TaskNotificationData
@@ -84,8 +78,8 @@ namespace CommunicationService.MessageService
                             activity: supportActivity.FriendlyNameShort(),
                             postcode: requestDetails.RequestSummary.PostCode,
                             distanceFromPostcode: Math.Round(volunteer.DistanceInMiles, 1),
-                            dueDate: summary.DueDate.FormatDate(DateTimeFormat.ShortDateFormat),
-                            isHealthCritical: summary.IsHealthCritical,
+                            dueDate: job.DueDate.FormatDate(DateTimeFormat.ShortDateFormat),
+                            isHealthCritical: job.IsHealthCritical,
                             isFaceMask: supportActivity == SupportActivities.FaceMask,
                             numberofVolunteers: numberofVolunteers
                         ),

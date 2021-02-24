@@ -72,10 +72,10 @@ namespace CommunicationService.AzureFunction
                 var request = JsonConvert.SerializeObject(req);
                 log.LogInformation($"RequestCommunicationRequest {request}");
 
-                //TaskNotificationMessage message = new TaskNotificationMessage(
-                //    _connectUserService,
-                //    _connectRequestService,
-                //    _connectGroupService);
+                TaskNotificationMessage message = new TaskNotificationMessage(
+                    _connectUserService,
+                    _connectRequestService,
+                    _connectGroupService);
 
                 //TaskDetailMessage message = new TaskDetailMessage(
                 //    _connectGroupService,
@@ -85,14 +85,14 @@ namespace CommunicationService.AzureFunction
                 //    _cosmosDbService
                 //    );
 
-                TaskUpdateSimplifiedMessage message = new TaskUpdateSimplifiedMessage(
-                    _connectRequestService,
-                    _connectUserService,
-                    _connectGroupService,
-                    _linkRepository,
-                    _linkConfig,
-                    _sendGridConfig,
-                    _connectAddressService);
+                //TaskUpdateSimplifiedMessage message = new TaskUpdateSimplifiedMessage(
+                //    _connectRequestService,
+                //    _connectUserService,
+                //    _connectGroupService,
+                //    _linkRepository,
+                //    _linkConfig,
+                //    _sendGridConfig,
+                //    _connectAddressService);
 
                 //NewCredentialsMessage message = new NewCredentialsMessage(
                 //    _connectUserService,
@@ -154,7 +154,7 @@ namespace CommunicationService.AzureFunction
                 //    _linkConfig);
 
                 var recipients = await message.IdentifyRecipients(req.RecipientUserID, req.JobID, req.GroupID, req.RequestID, req.AdditionalParameters);
-                //recipients = recipients.Take(1).ToList();
+                recipients = recipients.Take(1).ToList();
 
                 //recipients = recipients.Where(x => x.RecipientUserID == 3).ToList();
 
