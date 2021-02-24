@@ -15,8 +15,7 @@ namespace CommunicationService.MessageService.Substitution
         public double DistanceFromPostCode { get; private set; }
         public string DueDate { get; private set; }
         public bool IsHealthCritical { get; private set; }
-        public bool IsFaceMask { get; private set; }
-        public string NumberOfVolunteers { get; set; }
+        public bool IsFaceMask { get; private set; }        
 
         public TaskNotificationData(
             string firstname,
@@ -27,8 +26,7 @@ namespace CommunicationService.MessageService.Substitution
             double distanceFromPostcode,
             string dueDate,
             bool isHealthCritical,
-            bool isFaceMask,
-            string numberofVolunteers
+            bool isFaceMask
             )
         {
             FirstName = firstname;
@@ -40,7 +38,6 @@ namespace CommunicationService.MessageService.Substitution
             DueDate = dueDate;
             IsHealthCritical = isHealthCritical;
             IsFaceMask = isFaceMask;
-            NumberOfVolunteers = numberofVolunteers;
         }
     }
 }
