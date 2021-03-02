@@ -118,13 +118,13 @@ namespace CommunicationService.AzureFunction
                 //    _sendGridConfig
                 //    );
 
-                RequestorTaskConfirmation message = new RequestorTaskConfirmation(
-                    _connectRequestService,
-                    _connectGroupService,
-                    _connectAddressService,
-                    _linkRepository,
-                    _linkConfig,
-                    _sendGridConfig);
+                //RequestorTaskConfirmation message = new RequestorTaskConfirmation(
+                //    _connectRequestService,
+                //    _connectGroupService,
+                //    _connectAddressService,
+                //    _linkRepository,
+                //    _linkConfig,
+                //    _sendGridConfig);
 
                 //NewRequestNotificationMessage message = new NewRequestNotificationMessage(
                 //    _connectRequestService,
@@ -136,15 +136,14 @@ namespace CommunicationService.AzureFunction
 
                 //ShiftReminderMessage message = new ShiftReminderMessage(_connectRequestService, _connectUserService, _connectAddressService, _linkRepository, _linkConfig);
 
-                //DailyDigestMessage message = new DailyDigestMessage(
-                //    _connectGroupService,
-                //    _connectUserService,
-                //    _connectRequestService,
-                //    _emailConfig,
-                //    _jobFilteringService,
-                //    _connectAddressService,
-                //    _cosmosDbService
-                //    );
+                DailyDigestMessage message = new DailyDigestMessage(
+                    _connectGroupService,
+                    _connectUserService,
+                    _connectRequestService,
+                    _emailConfig,
+                    _connectAddressService,
+                    _cosmosDbService
+                    );
 
                 //NewTaskPendingApprovalNotification message = new NewTaskPendingApprovalNotification(
                 //    _connectRequestService,
@@ -154,9 +153,9 @@ namespace CommunicationService.AzureFunction
                 //    _linkConfig);
 
                 var recipients = await message.IdentifyRecipients(req.RecipientUserID, req.JobID, req.GroupID, req.RequestID, req.AdditionalParameters);
-                recipients = recipients.Take(1).ToList();
+                //recipients = recipients.Take(1).ToList();
 
-                //recipients = recipients.Where(x => x.RecipientUserID == 3).ToList();
+                recipients = recipients.Where(x => x.RecipientUserID == 20232).ToList();
 
 
                 //SendMessageRequest smr = recipients.ElementAt(0);

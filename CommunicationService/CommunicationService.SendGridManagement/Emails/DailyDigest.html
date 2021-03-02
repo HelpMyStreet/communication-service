@@ -1,20 +1,20 @@
 ﻿<p>Hi {{FirstName}},</p>
 <p>You're receiving this e-mail because you signed up as a volunteer at HelpMyStreet.org.</p>
 
-{{#equals ChosenJobs 1 }}
+{{#equals ChosenRequestTasks 1 }}
 <p>Open Requests:</p>
 <p><i>There is currently 1 open request in your area that meets the criteria you signed up for:</i></p>
 {{/equals}}
 
-{{#greaterThan ChosenJobs 1}}
+{{#greaterThan ChosenRequestTasks 1}}
 <p>Open Requests:</p>
 <p><i>There are currently {{ChosenJobs}} open requests in your area that meet the criteria you signed up for:</i></p>
 {{/greaterThan}}
 
 <ul>
-    {{#each ChosenJobList}}
+    {{#each ChosenRequestTaskList}}
     <li>
-        <a href="{{BaseUrl}}/account/open-requests?j={{EncodedJobID}}"><strong>{{Activity}}</strong> in {{PostCode}} ({{DistanceInMiles}} miles away) - {{#if Soon}}<span style="color: #ff4e00">{{else}}<span>{{/if}}Due {{DueDate}}</span></a>
+        <a href="{{BaseUrl}}/link/r/{{EncodedRequestID}}"><strong>{{Activity}}</strong> in {{PostCode}} ({{DistanceInMiles}} miles away) - {{#if Soon}}<span style="color: #ff4e00">{{else}}<span>{{/if}}Due {{DueDate}}</span></a>
         {{#if Urgent}}<strong> - CRITICAL</strong>{{/if}}
     </li>
     {{/each}}
@@ -32,11 +32,11 @@
     {{/each}}
 </ul>
 
-{{#if OtherJobs}}
+{{#if OtherRequestTasks}}
 <p>Other Requests:</p>
 <p><i>There are other open requests, which may interest you:</i></p>
 <ul>
-    {{#each OtherJobsList}}
+    {{#each OtherRequestTaskList}}
     {{#if IsSingleItem}}
     <li>{{Count}} request for <strong>{{Activity}}</strong> - due {{DueDate}}</li>
     {{else}}
