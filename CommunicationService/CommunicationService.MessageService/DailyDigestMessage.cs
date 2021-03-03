@@ -140,8 +140,8 @@ namespace CommunicationService.MessageService
                        dueDate: request.DueDate.FormatDate(DateTimeFormat.ShortDateFormat),
                        soon: request.DueDate < DateTime.Now.AddDays(1),
                        urgent: request.IsHealthCritical,
-                       isSingleItem: true,
-                       count: 1,
+                       isSingleItem: true, //not used in the chosen task component of the email
+                       count: 1, //not used in the chosen task component of the email
                        encodedRequestId: encodedRequestId,
                        distanceInMiles: Math.Round(request.DistanceInMiles, 1).ToString()
                     ));
@@ -150,15 +150,15 @@ namespace CommunicationService.MessageService
                 foreach (var request in otherRequestTasksStats)
                 {
                     otherRequestTaskList.Add(new DailyDigestDataJob(
-                        request.Key.FriendlyNameShort(),
-                        string.Empty,
-                        request.Min.FormatDate(DateTimeFormat.ShortDateFormat),
-                        false,
-                        false,
-                        request.Count == 1 ? true : false,
-                        request.Count,
-                        "",
-                        ""
+                        activity: request.Key.FriendlyNameShort(),
+                        postCode: string.Empty, //not used in the other task component of the email
+                        dueDate: request.Min.FormatDate(DateTimeFormat.ShortDateFormat),
+                        soon: false, //not used in the other task component of the email
+                        urgent: false, //not used in the other task component of the email
+                        isSingleItem: request.Count == 1 ? true : false,
+                        count: request.Count,
+                        encodedRequestId: "", //not used in the other task component of the email
+                        distanceInMiles: "" //not used in the other task component of the email
                         ));
                 }
             }
