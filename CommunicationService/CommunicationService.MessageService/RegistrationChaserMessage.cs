@@ -41,8 +41,6 @@ namespace CommunicationService.MessageService
             {
                 case TemplateName.PartialRegistration:
                     return "Almost there, complete your registration to start helping";
-                case TemplateName.YotiReminder:
-                    return "Welcome to HelpMyStreet!";
                 default:
                     throw new Exception($"{templateName} is unknown");
             }
