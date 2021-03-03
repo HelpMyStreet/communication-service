@@ -197,7 +197,8 @@ namespace CommunicationService.SendGridService
                     { "GroupName", groupName},
                     { "MessageId", messageId },
                     { "JobId", emailBuildData.JobID.HasValue ? emailBuildData.JobID.ToString() : "null" },
-                    { "GroupId", emailBuildData.GroupID.HasValue ? emailBuildData.GroupID.ToString() : "null" }
+                    { "GroupId", emailBuildData.GroupID.HasValue ? emailBuildData.GroupID.ToString() : "null" },
+                    { "RequestId", emailBuildData.RequestID.HasValue ? emailBuildData.RequestID.ToString() : "null" }
                 }
             };
 

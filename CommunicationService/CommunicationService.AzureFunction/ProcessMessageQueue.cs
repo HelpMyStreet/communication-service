@@ -58,6 +58,7 @@ public class ProcessMessageQueue
                     emailBuildData.JobID = sendMessageRequest.JobID;
                     emailBuildData.GroupID = sendMessageRequest.GroupID;
                     emailBuildData.RecipientUserID = sendMessageRequest.RecipientUserID;
+                    emailBuildData.RequestID = sendMessageRequest.RequestID;
                     var result = await _connectSendGridService.SendDynamicEmail(mySbMsg.MessageId, sendMessageRequest.TemplateName, message.GetUnsubscriptionGroupName(sendMessageRequest.RecipientUserID), emailBuildData);
                     log.LogInformation($"SendDynamicEmail({sendMessageRequest.TemplateName}) returned {result}");
                     if (result)
