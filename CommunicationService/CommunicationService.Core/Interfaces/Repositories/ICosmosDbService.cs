@@ -15,7 +15,7 @@ namespace CommunicationService.Core.Interfaces.Repositories
         Task<bool> EmailSent(string messageId);
         Task<bool> SendGridEventExists(string event_id);
         Task<List<int>> GetShiftRequestDetailsSent(int userID);
-        Task<bool> EmailSent(string templateName, int jobId);
+        Task<bool> EmailSent(string templateName, int jobId, int recipientUserId);
 
     }
 }

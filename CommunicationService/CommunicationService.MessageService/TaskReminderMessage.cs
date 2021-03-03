@@ -130,7 +130,7 @@ namespace CommunicationService.MessageService
                             AddRecipientAndTemplate(TemplateName.TaskReminder, summary.VolunteerUserID.Value, summary.JobID, groupId, requestId);
                             break;
                         case (0, DueDateType.On):
-                            if (!_cosmosDbService.EmailSent(TemplateName.TaskReminder, summary.JobID).Result)
+                            if (!_cosmosDbService.EmailSent(TemplateName.TaskReminder, summary.JobID, summary.VolunteerUserID.Value).Result)
                             {
                                 AddRecipientAndTemplate(TemplateName.TaskReminder, summary.VolunteerUserID.Value, summary.JobID, groupId, requestId);
                             }
