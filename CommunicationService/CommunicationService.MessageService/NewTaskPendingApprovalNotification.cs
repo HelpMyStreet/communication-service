@@ -40,9 +40,9 @@ namespace CommunicationService.MessageService
 
         public async Task<List<SendMessageRequest>> IdentifyRecipients(int? recipientUserId, int? jobId, int? groupId, int? requestId, Dictionary<string, string> additionalParameters)
         {
-            if (!groupId.HasValue || !jobId.HasValue)
+            if (!groupId.HasValue || !requestId.HasValue)
             {
-                throw new Exception($"GroupID or JobID is missing");
+                throw new Exception($"GroupID or RequestID are missing");
             }
 
             List<int> groupTaskAdmins = await _connectGroupService.GetGroupMembersForGivenRole(groupId.Value, GroupRoles.TaskAdmin);
@@ -54,7 +54,7 @@ namespace CommunicationService.MessageService
                     TemplateName = TemplateName.NewTaskPendingApprovalNotification,
                     RecipientUserID = userId,
                     GroupID = groupId,
-                    JobID = jobId,
+                    JobID = null,
                     RequestID = requestId,
                 });
             }
@@ -64,15 +64,21 @@ namespace CommunicationService.MessageService
 
         public async Task<EmailBuildData> PrepareTemplateData(Guid batchId, int? recipientUserId, int? jobId, int? groupId, int? requestId, Dictionary<string, string> additionalParameters, string templateName)
         {
-            var job = _connectRequestService.GetJobDetailsAsync(jobId.Value).Result;
-            var user = await _connectUserService.GetUserByIdAsync(recipientUserId.Value);
-            var group = await _connectGroupService.GetGroup(job.JobSummary.ReferringGroupID);
+            var requestDetails = await _connectRequestService.GetRequestDetailsAsync(requestId.Value);
 
-            string encodedJobId = Base64Utils.Base64Encode(job.JobSummary.JobID.ToString());
-
-            if (job != null && user?.UserPersonalDetails != null && group?.Group != null)
+            if (requestDetails == null)
             {
-                var token = await _linkRepository.CreateLink($"/link/j/{encodedJobId}", _linkConfig.Value.ExpiryDays);
+                throw new Exception($"Unable to return request details for requestId {requestId.Value}");
+            }
+
+            var user = await _connectUserService.GetUserByIdAsync(recipientUserId.Value);
+            var group = await _connectGroupService.GetGroup(requestDetails.RequestSummary.ReferringGroupID);
+
+            string encodedRequestId = Base64Utils.Base64Encode(requestDetails.RequestSummary.RequestID.ToString());
+
+            if (requestDetails != null && user?.UserPersonalDetails != null && group?.Group != null)
+            {
+                var token = await _linkRepository.CreateLink($"/link/r/{encodedRequestId}", _linkConfig.Value.ExpiryDays);
 
                 return new EmailBuildData()
                 {

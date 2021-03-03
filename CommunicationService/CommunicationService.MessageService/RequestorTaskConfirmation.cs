@@ -107,7 +107,7 @@ namespace CommunicationService.MessageService
                || (getChangedBy == RequestRoles.Requestor && jobResponse.JobSummary.RequestorDefinedByGroup);
                     jobUrl = showJobUrl ? GetJobUrl(jobid) : string.Empty;
 
-                    dueDateString = $" - Due Date: <strong>{jobResponse.JobSummary.DueDate.ToString("ddd dd MMMM yyyy")}.</strong>";
+                    dueDateString = $" - Due Date: <strong>{jobResponse.JobSummary.DueDate.FormatDate(DateTimeFormat.LongDateFormat)}.</strong>";
                 }
                 else
                 {
@@ -143,8 +143,8 @@ namespace CommunicationService.MessageService
 
             var time = TimeSpan.FromMinutes(response.RequestSummary.Shift.ShiftLength);
 
-            string dueDateString = $"Shift: <strong>{response.RequestSummary.Shift.StartDate.ToString("ddd dd MMMM yyyy h:mm tt - ")}{response.RequestSummary.Shift.EndDate.ToString("h:mm tt")}</strong> " +
-                $"(Duration: {time.TotalHours} hrs {time.Minutes} mins). " +
+            string dueDateString = $"Shift: <strong>{response.RequestSummary.Shift.StartDate.FormatDate(DateTimeFormat.LongDateTimeFormat)} - {response.RequestSummary.Shift.EndDate.FormatDate(DateTimeFormat.TimeFormat)}</strong> " +
+                $"(Duration: {Math.Floor(time.TotalHours)} hrs {time.Minutes} mins). " +
                 $"Location: <strong>{locationName}</strong>";
 
             foreach (GroupJob gj in groupJobs)
