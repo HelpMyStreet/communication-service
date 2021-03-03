@@ -72,7 +72,7 @@ namespace CommunicationService.MessageService
                             var users = await _connectUserService.GetVolunteersByPostcodeAndActivity(
                                 locations.LocationDetails.Address.Postcode,
                                 new List<SupportActivities>() { x.SupportActivity },
-                                _emailConfig.Value.ShiftRadius,
+                                _emailConfig.Value.OpenRequestRadius,
                                 CancellationToken.None);
 
                             if(users!=null && users.Volunteers.Count()>0)
@@ -195,7 +195,7 @@ namespace CommunicationService.MessageService
                 .Select(m => new {
                     SupportActivity = m.Key.SupportActivity,
                     Location = m.Key.Location,
-                    ShiftDetails = $"{m.Key.StartDate.ToString("ddd, dd MMMM yyy h:mm tt")} - {m.Key.EndDate.ToString("h:mm tt")}",
+                    ShiftDetails = $"{m.Key.StartDate.FormatDate(DateTimeFormat.LongDateTimeFormat)} - {m.Key.EndDate.FormatDate(DateTimeFormat.TimeFormat)}",
                 }).ToList();
 
             List<JobDetails> result  = new List<JobDetails>();

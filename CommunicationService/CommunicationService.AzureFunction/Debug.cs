@@ -128,8 +128,8 @@ namespace CommunicationService.AzureFunction
 
                 //NewRequestNotificationMessage message = new NewRequestNotificationMessage(
                 //    _connectRequestService,
-                //    _connectAddressService, 
-                //    _connectUserService, 
+                //    _connectAddressService,
+                //    _connectUserService,
                 //    _cosmosDbService,
                 //    _emailConfig
                 //    );
@@ -141,17 +141,24 @@ namespace CommunicationService.AzureFunction
                     _connectUserService,
                     _connectRequestService,
                     _emailConfig,
-                    _jobFilteringService,
                     _connectAddressService,
                     _cosmosDbService
                     );
 
+                //NewTaskPendingApprovalNotification message = new NewTaskPendingApprovalNotification(
+                //    _connectRequestService,
+                //    _connectGroupService,
+                //    _connectUserService,
+                //    _linkRepository,
+                //    _linkConfig);
+
                 var recipients = await message.IdentifyRecipients(req.RecipientUserID, req.JobID, req.GroupID, req.RequestID, req.AdditionalParameters);
+                //recipients = recipients.Take(1).ToList();
 
-                recipients = recipients.Where(x => x.RecipientUserID == 20256).ToList();
+                recipients = recipients.Where(x => x.RecipientUserID == 20232).ToList();
 
 
-               // SendMessageRequest smr = recipients.ElementAt(0);
+                //SendMessageRequest smr = recipients.ElementAt(0);
                 foreach (SendMessageRequest smr in recipients)
                 {
                     var emailBuildData = await message.PrepareTemplateData(Guid.NewGuid(), smr.RecipientUserID, smr.JobID, smr.GroupID, smr.RequestID, smr.AdditionalParameters, smr.TemplateName);

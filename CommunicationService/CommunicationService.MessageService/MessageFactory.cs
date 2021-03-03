@@ -79,7 +79,7 @@ namespace CommunicationService.MessageService
                 case CommunicationJobTypes.SendTaskStateChangeUpdate:
                     return new TaskUpdateSimplifiedMessage(_connectRequestService, _connectUserService, _connectGroupService, _linkRepository, _linkConfig, _sendGridConfig, _connectAddressService);
                 case CommunicationJobTypes.SendOpenTaskDigest:
-                    return new DailyDigestMessage(_connectGroupService, _connectUserService, _connectRequestService, _emailConfig, _jobFilteringService,_connectAddressService, _cosmosDbService);
+                    return new DailyDigestMessage(_connectGroupService, _connectUserService, _connectRequestService, _emailConfig,_connectAddressService, _cosmosDbService);
                 case CommunicationJobTypes.SendTaskReminder:
                     return new TaskReminderMessage(_connectRequestService, _connectUserService);
                 case CommunicationJobTypes.SendShiftReminder:
@@ -92,6 +92,8 @@ namespace CommunicationService.MessageService
                     return new TaskDetailMessage(_connectGroupService, _connectUserService, _connectRequestService, _emailConfig, _cosmosDbService);
                 case CommunicationJobTypes.SendNewRequestNotification:
                     return new NewRequestNotificationMessage(_connectRequestService, _connectAddressService, _connectUserService, _cosmosDbService, _emailConfig);
+                case CommunicationJobTypes.NewTaskPendingApprovalNotification:
+                    return new NewTaskPendingApprovalNotification(_connectRequestService, _connectGroupService, _connectUserService, _linkRepository, _linkConfig);
                 default:                   
                     throw new Exception("Unknown Email Type");
             }
