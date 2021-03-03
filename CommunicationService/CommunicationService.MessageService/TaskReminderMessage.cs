@@ -16,6 +16,7 @@ namespace CommunicationService.MessageService
     {
         private readonly IConnectRequestService _connectRequestService;
         private readonly IConnectUserService _connectUserService;
+        private readonly ICosmosDbService _cosmosDbService;
 
         List<SendMessageRequest> _sendMessageRequests;
 
@@ -24,10 +25,12 @@ namespace CommunicationService.MessageService
                 return UnsubscribeGroupName.TaskReminder;
         }
 
-        public TaskReminderMessage(IConnectRequestService connectRequestService, IConnectUserService connectUserService)
+        public TaskReminderMessage(IConnectRequestService connectRequestService, IConnectUserService connectUserService, ICosmosDbService cosmosDbService)
         {
             _connectRequestService = connectRequestService;
             _connectUserService = connectUserService;
+            _cosmosDbService = cosmosDbService;
+
             _sendMessageRequests = new List<SendMessageRequest>();
         }
 
@@ -93,6 +96,9 @@ namespace CommunicationService.MessageService
                     dueDateMessage,
                     dueDateString: $"({job.JobSummary.DueDate.FormatDate(DateTimeFormat.ShortDateFormat)})" 
                     ),
+                JobID = jobId,
+                GroupID = groupId,
+                RecipientUserID = recipientUserId.Value,
                 EmailToAddress = user.UserPersonalDetails.EmailAddress,
                 EmailToName = $"{user.UserPersonalDetails.FirstName} {user.UserPersonalDetails.LastName}"
             };
@@ -122,6 +128,12 @@ namespace CommunicationService.MessageService
                     {
                         case (0, DueDateType.Before):
                             AddRecipientAndTemplate(TemplateName.TaskReminder, summary.VolunteerUserID.Value, summary.JobID, groupId, requestId);
+                            break;
+                        case (0, DueDateType.On):
+                            if (!_cosmosDbService.EmailSent(TemplateName.TaskReminder, summary.JobID).Result)
+                            {
+                                AddRecipientAndTemplate(TemplateName.TaskReminder, summary.VolunteerUserID.Value, summary.JobID, groupId, requestId);
+                            }
                             break;
                         case (1, DueDateType.On):
                             AddRecipientAndTemplate(TemplateName.TaskReminder, summary.VolunteerUserID.Value, summary.JobID, groupId, requestId);

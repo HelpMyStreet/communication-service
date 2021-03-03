@@ -136,14 +136,14 @@ namespace CommunicationService.AzureFunction
 
                 //ShiftReminderMessage message = new ShiftReminderMessage(_connectRequestService, _connectUserService, _connectAddressService, _linkRepository, _linkConfig);
 
-                DailyDigestMessage message = new DailyDigestMessage(
-                    _connectGroupService,
-                    _connectUserService,
-                    _connectRequestService,
-                    _emailConfig,
-                    _connectAddressService,
-                    _cosmosDbService
-                    );
+                //DailyDigestMessage message = new DailyDigestMessage(
+                //    _connectGroupService,
+                //    _connectUserService,
+                //    _connectRequestService,
+                //    _emailConfig,
+                //    _connectAddressService,
+                //    _cosmosDbService
+                //    );
 
                 //NewTaskPendingApprovalNotification message = new NewTaskPendingApprovalNotification(
                 //    _connectRequestService,
@@ -152,10 +152,16 @@ namespace CommunicationService.AzureFunction
                 //    _linkRepository,
                 //    _linkConfig);
 
+                TaskReminderMessage message = new TaskReminderMessage(
+                    _connectRequestService,
+                    _connectUserService,
+                    _cosmosDbService
+                    );
+
                 var recipients = await message.IdentifyRecipients(req.RecipientUserID, req.JobID, req.GroupID, req.RequestID, req.AdditionalParameters);
                 //recipients = recipients.Take(1).ToList();
 
-                recipients = recipients.Where(x => x.RecipientUserID == 20232).ToList();
+                //recipients = recipients.Where(x => x.RecipientUserID == 20232).ToList();
 
 
                 //SendMessageRequest smr = recipients.ElementAt(0);
