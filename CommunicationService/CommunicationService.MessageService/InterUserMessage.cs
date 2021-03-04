@@ -106,17 +106,15 @@ namespace CommunicationService.MessageService
             return $"<strong>{senderName}</strong> at <strong>{groupName}</strong>.";
         }
 
-        private async Task<string> SenderAndContext(string senderName, string senderRequestorRole, string toRequestorRole, string senderGroupName, int? jobId)
+        private async Task<string> SenderAndContext(string senderName, string senderRequestorRole, string toRequestorRole, string senderGroupName, GetJobDetailsResponse job)
         {
             string result = string.Empty ;
             RequestRoles senderRole = (RequestRoles)Enum.Parse(typeof(RequestRoles), senderRequestorRole);
             RequestRoles toRole = (RequestRoles)Enum.Parse(typeof(RequestRoles), toRequestorRole);
             string helpRecipient = string.Empty;
 
-            GetJobDetailsResponse job = null;
-            if (jobId.HasValue)
+            if (job != null)
             {
-                job = await _connectRequestService.GetJobDetailsAsync(jobId.Value);
                 helpRecipient = job.Recipient?.FirstName;
             }
 
@@ -206,7 +204,14 @@ namespace CommunicationService.MessageService
                 additionalParameters.TryGetValue("SenderMessage", out senderMessage);
                 additionalParameters.TryGetValue("SenderName", out senderName);               
             }
-            string senderAndContext = await SenderAndContext( senderName, senderRequestorRole, toRequestorRole, senderGroupName, jobId);
+
+            GetJobDetailsResponse job = null;
+            if (jobId.HasValue)
+            {
+                job = await _connectRequestService.GetJobDetailsAsync(jobId.Value);
+            }
+
+            string senderAndContext = await SenderAndContext( senderName, senderRequestorRole, toRequestorRole, senderGroupName, job);
 
             return new EmailBuildData()
             {
@@ -219,7 +224,19 @@ namespace CommunicationService.MessageService
                     senderMessage
                     ),
                 EmailToAddress = emailToAddress,
-                EmailToName = emailToName
+                EmailToName = emailToName,
+                JobID = job.JobSummary.JobID,
+                RequestID = job.JobSummary.RequestID,
+                GroupID = job.JobSummary.ReferringGroupID,
+                ReferencedJobs = new List<ReferencedJob>()
+                {
+                    new ReferencedJob()
+                    {
+                        G = job.JobSummary.ReferringGroupID,
+                        R = job.JobSummary.RequestID,
+                        J = job.JobSummary.JobID
+                    }
+                }
             };
         }
 

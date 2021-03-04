@@ -203,6 +203,15 @@ namespace CommunicationService.MessageService
                 EmailToAddress = requestDetails.Requestor.EmailAddress,
                 EmailToName = $"{requestDetails.Requestor.FirstName} {requestDetails.Requestor.LastName}",
                 RecipientUserID = REQUESTOR_DUMMY_USERID,
+                RequestID = requestId,
+                ReferencedJobs = new List<ReferencedJob>()
+                {
+                    new ReferencedJob()
+                    {
+                        G = requestDetails.RequestSummary.ReferringGroupID,
+                        R = requestId.Value
+                    }
+                }
             };
         }
 
