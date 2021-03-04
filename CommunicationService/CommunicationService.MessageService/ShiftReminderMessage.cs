@@ -82,7 +82,18 @@ namespace CommunicationService.MessageService
                     joburlToken: joburlToken
                     ),
                 EmailToAddress = user.UserPersonalDetails.EmailAddress,
-                EmailToName = $"{user.UserPersonalDetails.FirstName} {user.UserPersonalDetails.LastName}"
+                EmailToName = $"{user.UserPersonalDetails.FirstName} {user.UserPersonalDetails.LastName}",
+                RequestID = requestId,
+                JobID = jobId,
+                ReferencedJobs = new List<ReferencedJob>()
+                {
+                    new ReferencedJob()
+                    {
+                        G = request.RequestSummary.ReferringGroupID,
+                        R = requestId,
+                        J = jobId
+                    }
+                }
             };
         }
 
