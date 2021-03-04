@@ -361,7 +361,19 @@ namespace CommunicationService.MessageService
                     GetFeedback(job, emailRecipientRequestRole)
                 ),
                 EmailToAddress = emailToAddress,
-                EmailToName = emailToFullName
+                EmailToName = emailToFullName,
+                JobID = job.JobSummary.JobID,
+                RequestID = job.JobSummary.RequestID,
+                GroupID = job.JobSummary.ReferringGroupID,
+                ReferencedJobs = new List<ReferencedJob>()
+                {
+                    new ReferencedJob()
+                    {
+                        G = job.JobSummary.ReferringGroupID,
+                        R = job.JobSummary.RequestID,
+                        J = job.JobSummary.JobID
+                    }
+                }
             };
         }
 

@@ -180,7 +180,7 @@ namespace CommunicationService.MessageService
             var openShifts = await GetOpenShiftsForUser(user.ID, locations);
 
             List<int> requestsAlreadyNotified = await _cosmosDbService.GetShiftRequestDetailsSent(user.ID);
-
+                        
             openShifts = openShifts.Where(x => !requestsAlreadyNotified.Contains(x.RequestID)).ToList();
 
             if (openShifts.Count() > 0)
@@ -195,7 +195,7 @@ namespace CommunicationService.MessageService
                         o.TryAdd("RequestId", job.Key);
                         o.TryAdd("RecipientUserId", recipientUserId.Value);
                         o.TryAdd("TemplateName", templateName);
-
+                        o.TryAdd("event", "PrepareTemplateData");
                         await _cosmosDbService.AddItemAsync(o);
                     });
 
@@ -212,13 +212,33 @@ namespace CommunicationService.MessageService
                                 requestList: GetRequestList(openShifts, user.PostalCode)
                              ),
                     EmailToAddress = user.UserPersonalDetails.EmailAddress,
-                    EmailToName = $"{user.UserPersonalDetails.FirstName} {user.UserPersonalDetails.LastName}"
+                    EmailToName = $"{user.UserPersonalDetails.FirstName} {user.UserPersonalDetails.LastName}",
+                    ReferencedJobs = GetReferencedJobs(openShifts)
                 };
             }
             else
             {
                 return null;
             }
+        }
+
+        private List<ReferencedJob> GetReferencedJobs(List<ShiftJob> shiftJobs)
+        {
+            if (shiftJobs.Count == 0)
+            {
+                return new List<ReferencedJob>();
+            }
+
+            List<ReferencedJob> jobs = new List<ReferencedJob>();
+            shiftJobs.GroupBy(x => x.RequestID)
+                    .ToList()
+                    .ForEach(request =>
+                    jobs.Add(new ReferencedJob()
+                    {
+                        R = request.Key
+                    }
+                    ));
+            return jobs;
         }
 
         private SupportActivities? GetMostCommonSupportActivityFromShifts(List<ShiftJob> jobs)

@@ -98,7 +98,19 @@ namespace CommunicationService.MessageService
                     hasOrganisation : !String.IsNullOrEmpty(job.JobSummary.RecipientOrganisation)
                 ),
                 EmailToAddress = user.UserPersonalDetails.EmailAddress,
-                EmailToName = user.UserPersonalDetails.DisplayName
+                EmailToName = user.UserPersonalDetails.DisplayName,
+                JobID = job.JobSummary.JobID,
+                RequestID = job.JobSummary.RequestID,
+                GroupID = job.JobSummary.ReferringGroupID,
+                ReferencedJobs = new List<ReferencedJob>()
+                {
+                    new ReferencedJob()
+                    {
+                        G = job.JobSummary.ReferringGroupID,
+                        R = job.JobSummary.RequestID,
+                        J = job.JobSummary.JobID
+                    }
+                }
             };
         }
 

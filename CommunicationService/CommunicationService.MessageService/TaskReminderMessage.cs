@@ -94,7 +94,17 @@ namespace CommunicationService.MessageService
                     dueDateString: $"({job.JobSummary.DueDate.FormatDate(DateTimeFormat.ShortDateFormat)})" 
                     ),
                 EmailToAddress = user.UserPersonalDetails.EmailAddress,
-                EmailToName = $"{user.UserPersonalDetails.FirstName} {user.UserPersonalDetails.LastName}"
+                EmailToName = $"{user.UserPersonalDetails.FirstName} {user.UserPersonalDetails.LastName}",
+                RequestID = job.JobSummary.RequestID,
+                ReferencedJobs = new List<ReferencedJob>()
+                {
+                    new ReferencedJob()
+                    {
+                        G = job.JobSummary.ReferringGroupID,
+                        R = job.JobSummary.RequestID,
+                        J = job.JobSummary.JobID
+                    }
+                }
             };
         }
 

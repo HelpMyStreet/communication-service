@@ -11,6 +11,7 @@ using System.IO;
 using System.Dynamic;
 using System.Collections.Generic;
 using System.Linq;
+using CommunicationService.Core.Domains;
 
 namespace CommunicationService.AzureFunction
 {
@@ -40,12 +41,14 @@ namespace CommunicationService.AzureFunction
 
                     foreach(ExpandoObject o in data)
                     {
+                        var referencedJobs = GetReferencedJob(o);
                         string eventId = GetSGEventID(o);
                         if(!await _cosmosDbService.SendGridEventExists(eventId))
                         {
                             o.TryAdd("id", Guid.NewGuid());
+                            o.TryAdd("ReferencedJobs", referencedJobs);
                             await _cosmosDbService.AddItemAsync(o);
-                        }
+                        }                        
                     }
                 }
                 return new OkObjectResult(true);
@@ -69,6 +72,23 @@ namespace CommunicationService.AzureFunction
             {
                 return string.Empty;
             }
+        }
+
+        private List<ReferencedJob> GetReferencedJob(ExpandoObject o)
+        {
+            var kvp = o.FirstOrDefault(x => x.Key == "ReferencedJobs");
+
+            if (kvp.Key != null)
+            {
+                var dict = (IDictionary<string, object>)o;
+                dict.Remove(kvp.Key);
+                return JsonConvert.DeserializeObject<List<ReferencedJob>>(kvp.Value.ToString());
+            }
+            else
+            {
+                return new List<ReferencedJob>();
+            }
+            
         }
     }
 }

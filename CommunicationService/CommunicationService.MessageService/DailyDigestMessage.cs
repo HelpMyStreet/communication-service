@@ -21,6 +21,7 @@ using HelpMyStreet.Contracts.RequestService.Response;
 using HelpMyStreet.Utils.Extensions;
 using System.IO;
 using UserService.Core.Utils;
+using System.Reflection.Metadata.Ecma335;
 
 namespace CommunicationService.MessageService
 {
@@ -149,6 +150,7 @@ namespace CommunicationService.MessageService
                 if (userAddress != null && userAddress.PostcodeCoordinates.Count()>0)
                 {
                     postcodeCoordinates.Add(userAddress.PostcodeCoordinates.First());
+                    userPostalCode = postcodeCoordinates.FirstOrDefault(x => x.Postcode == user.PostalCode);
                 }
             }
 
@@ -263,7 +265,8 @@ namespace CommunicationService.MessageService
                         shiftItemList
                         ),
                     EmailToAddress = user.UserPersonalDetails.EmailAddress,
-                    EmailToName = user.UserPersonalDetails.DisplayName
+                    EmailToName = user.UserPersonalDetails.DisplayName,
+                    ReferencedJobs = GetReferencedJobs(criteriaJobs, otherJobs, openShifts),
                 };
             }
             else
@@ -272,6 +275,22 @@ namespace CommunicationService.MessageService
             }
         }
 
+        private List<ReferencedJob> GetReferencedJobs(List<JobSummary> criteriaJobs, List<JobSummary> otherJobs, List<JobSummary> shiftJobs)
+        {
+            List<JobSummary> concatedList = criteriaJobs.Concat(otherJobs).Concat(shiftJobs).ToList();
+  
+            List<ReferencedJob> jobs = new List<ReferencedJob>();
+            concatedList.GroupBy(x => x.RequestID)
+                    .ToList()
+                    .ForEach(request =>
+                    jobs.Add(new ReferencedJob()
+                    {
+                        R = request.Key
+                    }
+                    ));
+
+            return jobs;
+        }
         public async  Task<List<SendMessageRequest>> IdentifyRecipients(int? recipientUserId, int? jobId, int? groupId, int? requestId, Dictionary<string, string> additionalParameters)
         {
             var volunteers = await _connectUserService.GetUsers();

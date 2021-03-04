@@ -89,7 +89,17 @@ namespace CommunicationService.MessageService
                         token
                     ),
                     EmailToAddress = user.UserPersonalDetails.EmailAddress,
-                    EmailToName = $"{user.UserPersonalDetails.FirstName} {user.UserPersonalDetails.LastName}"
+                    EmailToName = $"{user.UserPersonalDetails.FirstName} {user.UserPersonalDetails.LastName}",
+                    RequestID = requestDetails.RequestSummary.RequestID,
+                    GroupID = requestDetails.RequestSummary.ReferringGroupID,
+                    ReferencedJobs = new List<ReferencedJob>()
+                {
+                    new ReferencedJob()
+                    {
+                        G = requestDetails.RequestSummary.ReferringGroupID,
+                        R = requestDetails.RequestSummary.RequestID,
+                    }
+                }
                 };
             }
             throw new Exception("Unable to retrieve necessary details to build email");
