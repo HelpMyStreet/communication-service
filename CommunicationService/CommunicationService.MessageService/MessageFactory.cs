@@ -91,7 +91,7 @@ namespace CommunicationService.MessageService
                 case CommunicationJobTypes.TaskDetail:
                     return new TaskDetailMessage(_connectGroupService, _connectUserService, _connectRequestService, _emailConfig, _cosmosDbService);
                 case CommunicationJobTypes.SendNewRequestNotification:
-                    return new NewRequestNotificationMessage(_connectRequestService, _connectAddressService, _connectUserService, _cosmosDbService, _emailConfig);
+                    return new NewRequestNotificationMessage(_connectRequestService, _connectAddressService, _connectUserService, _cosmosDbService, _emailConfig, _connectGroupService);
                 case CommunicationJobTypes.NewTaskPendingApprovalNotification:
                     return new NewTaskPendingApprovalNotification(_connectRequestService, _connectGroupService, _connectUserService, _linkRepository, _linkConfig);
                 default:                   

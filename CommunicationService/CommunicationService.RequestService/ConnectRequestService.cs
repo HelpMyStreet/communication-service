@@ -13,6 +13,8 @@ using HelpMyStreet.Utils.Enums;
 using System.Linq;
 using System.Linq.Expressions;
 using System;
+using HelpMyStreet.Utils.Models;
+using System.Collections.Generic;
 
 namespace CommunicationService.RequestService
 {
@@ -125,7 +127,7 @@ namespace CommunicationService.RequestService
             }
         }
 
-        public async Task<GetOpenShiftJobsByFilterResponse> GetOpenShiftJobsByFilter(GetOpenShiftJobsByFilterRequest request)
+        public async Task<List<ShiftJob>> GetOpenShiftJobsByFilter(GetOpenShiftJobsByFilterRequest request)
         {
             string path = $"/api/GetOpenShiftJobsByFilter";
             using (HttpResponseMessage response = await _httpClientWrapper.GetAsync(HttpClientConfigName.RequestService, path, request, CancellationToken.None).ConfigureAwait(false))
@@ -134,7 +136,7 @@ namespace CommunicationService.RequestService
                 var getJobsResponse = JsonConvert.DeserializeObject<ResponseWrapper<GetOpenShiftJobsByFilterResponse, RequestServiceErrorCode>>(jsonResponse);
                 if (getJobsResponse.HasContent && getJobsResponse.IsSuccessful)
                 {
-                    return getJobsResponse.Content;
+                    return getJobsResponse.Content.ShiftJobs;
                 }
                 else
                 {
@@ -210,6 +212,31 @@ namespace CommunicationService.RequestService
                     else
                     {
                         throw new InternalServerException($"GetShiftRequestsByFilterResponse Returned {jsonResponse}");
+                    }
+                }
+            }
+        }
+
+        public async Task<List<ShiftJob>> GetUserShiftJobsByFilter(GetUserShiftJobsByFilterRequest request)
+        {
+            string path = $"/api/GetUserShiftJobsByFilter";
+            using (HttpResponseMessage response = await _httpClientWrapper.GetAsync(HttpClientConfigName.RequestService, path, request, CancellationToken.None).ConfigureAwait(false))
+            {
+                string jsonResponse = await response.Content.ReadAsStringAsync();
+                var getJobsResponse = JsonConvert.DeserializeObject<ResponseWrapper<GetUserShiftJobsByFilterResponse, RequestServiceErrorCode>>(jsonResponse);
+                if (getJobsResponse.HasContent && getJobsResponse.IsSuccessful)
+                {
+                    return getJobsResponse.Content.ShiftJobs;
+                }
+                else
+                {
+                    if (response.StatusCode == System.Net.HttpStatusCode.BadRequest)
+                    {
+                        throw new BadRequestException($"GetUserShiftJobsByFilterResponse Returned a bad request");
+                    }
+                    else
+                    {
+                        throw new InternalServerException($"GetUserShiftJobsByFilterResponse Returned {jsonResponse}");
                     }
                 }
             }

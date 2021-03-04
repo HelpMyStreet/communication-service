@@ -85,14 +85,14 @@ namespace CommunicationService.AzureFunction
                 //    _cosmosDbService
                 //    );
 
-                TaskUpdateSimplifiedMessage message = new TaskUpdateSimplifiedMessage(
-                    _connectRequestService,
-                    _connectUserService,
-                    _connectGroupService,
-                    _linkRepository,
-                    _linkConfig,
-                    _sendGridConfig,
-                    _connectAddressService);
+                //TaskUpdateSimplifiedMessage message = new TaskUpdateSimplifiedMessage(
+                //    _connectRequestService,
+                //    _connectUserService,
+                //    _connectGroupService,
+                //    _linkRepository,
+                //    _linkConfig,
+                //    _sendGridConfig,
+                //    _connectAddressService);
 
                 //NewCredentialsMessage message = new NewCredentialsMessage(
                 //    _connectUserService,
@@ -126,13 +126,14 @@ namespace CommunicationService.AzureFunction
                 //    _linkConfig,
                 //    _sendGridConfig);
 
-                //NewRequestNotificationMessage message = new NewRequestNotificationMessage(
-                //    _connectRequestService,
-                //    _connectAddressService,
-                //    _connectUserService,
-                //    _cosmosDbService,
-                //    _emailConfig
-                //    );
+                NewRequestNotificationMessage message = new NewRequestNotificationMessage(
+                    _connectRequestService,
+                    _connectAddressService,
+                    _connectUserService,
+                    _cosmosDbService,
+                    _emailConfig,
+                    _connectGroupService
+                    );
 
                 //ShiftReminderMessage message = new ShiftReminderMessage(_connectRequestService, _connectUserService, _connectAddressService, _linkRepository, _linkConfig);
 
@@ -154,7 +155,7 @@ namespace CommunicationService.AzureFunction
                 //    _linkConfig);
 
                 var recipients = await message.IdentifyRecipients(req.RecipientUserID, req.JobID, req.GroupID, req.RequestID, req.AdditionalParameters);
-                //recipients = recipients.Take(1).ToList();
+                recipients = recipients.Take(1).ToList();
 
                 //recipients = recipients.Where(x => x.RecipientUserID == 3).ToList();
 
