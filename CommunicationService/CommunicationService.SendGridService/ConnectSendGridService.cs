@@ -165,6 +165,18 @@ namespace CommunicationService.SendGridService
             }
         }
 
+        private string GetReferencedJobs(List<ReferencedJob> referencedJobs)
+        {
+            if (referencedJobs.Count == 0)
+            {
+                return string.Empty;
+            }
+            else
+            {
+                return JsonConvert.SerializeObject(referencedJobs);
+            }
+        }
+
         public async Task<bool> SendDynamicEmail(string messageId, string templateName, string groupName, EmailBuildData emailBuildData)
         {
             var template = await GetTemplate(templateName).ConfigureAwait(false);
@@ -188,7 +200,7 @@ namespace CommunicationService.SendGridService
                 Personalizations = new List<Personalization>()
                 {
                     personalization
-                },
+                },                
                 CustomArgs = new Dictionary<string, string>
                 {
                     { "TemplateId", template.id },
@@ -198,7 +210,8 @@ namespace CommunicationService.SendGridService
                     { "MessageId", messageId },
                     { "JobId", emailBuildData.JobID.HasValue ? emailBuildData.JobID.ToString() : "null" },
                     { "GroupId", emailBuildData.GroupID.HasValue ? emailBuildData.GroupID.ToString() : "null" },
-                    { "RequestId", emailBuildData.RequestID.HasValue ? emailBuildData.RequestID.ToString() : "null" }
+                    { "RequestId", emailBuildData.RequestID.HasValue ? emailBuildData.RequestID.ToString() : "null" },
+                    { "ReferencedJobs", GetReferencedJobs(emailBuildData.ReferencedJobs)}
                 }
             };
 
