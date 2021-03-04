@@ -167,7 +167,7 @@ namespace CommunicationService.SendGridService
 
         private string GetReferencedJobs(List<ReferencedJob> referencedJobs)
         {
-            if (referencedJobs.Count == 0)
+            if (referencedJobs!=null && referencedJobs?.Count == 0)
             {
                 return string.Empty;
             }
