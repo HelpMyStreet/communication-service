@@ -196,7 +196,7 @@ namespace CommunicationService.MessageService
                 BaseDynamicData = new RequestorTaskConfirmationData
                 (
                     firstname: requestDetails.Requestor.FirstName,
-                    statusIsOpen: additionalParameters["PendingApproval"] == true.ToString(),
+                    pendingApproval: additionalParameters["PendingApproval"] == true.ToString(),
                     groupName: group.Group.GroupName,
                     requestJobList: GetJobs(requestDetails)
                 ),
