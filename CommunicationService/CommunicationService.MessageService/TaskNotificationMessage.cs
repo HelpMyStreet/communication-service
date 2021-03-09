@@ -79,14 +79,14 @@ namespace CommunicationService.MessageService
                         ),
                         EmailToAddress = user.UserPersonalDetails.EmailAddress,
                         EmailToName = $"{user.UserPersonalDetails.FirstName} {user.UserPersonalDetails.LastName}",
-                        RequestID = job.JobSummary.RequestID,
+                        RequestID = job.RequestID,
                         ReferencedJobs = new List<ReferencedJob>()
                         {
                             new ReferencedJob()
                             {
-                                G = job.JobSummary.ReferringGroupID,
-                                R = job.JobSummary.RequestID,
-                                J = job.JobSummary.JobID
+                                G = job.ReferringGroupID,
+                                R = job.RequestID,
+                                J = job.JobID
                             }
                         }
                     };
