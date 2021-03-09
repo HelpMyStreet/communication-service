@@ -197,7 +197,7 @@ namespace CommunicationService.MessageService
                         ),
                     EmailToAddress = user.UserPersonalDetails.EmailAddress,
                     EmailToName = user.UserPersonalDetails.DisplayName,
-                    ReferencedJobs = GetReferencedJobs(criteriaJobs, otherJobs, openShifts),
+                    ReferencedJobs = GetReferencedJobs(criteriaRequestTasks, otherRequestTasks, openShifts),
                 };
             }
             else
@@ -206,17 +206,19 @@ namespace CommunicationService.MessageService
             }
         }
 
-        private List<ReferencedJob> GetReferencedJobs(List<JobSummary> criteriaJobs, List<JobSummary> otherJobs, List<JobSummary> shiftJobs)
+        private List<ReferencedJob> GetReferencedJobs(List<JobSummary> criteriaJobs, List<JobSummary> otherJobs, List<ShiftJob> shiftJobs)
         {
-            List<JobSummary> concatedList = criteriaJobs.Concat(otherJobs).Concat(shiftJobs).ToList();
-  
+            var concatedList = criteriaJobs.Select(x => x.RequestID)
+                .Concat(otherJobs.Select(x => x.RequestID))
+                .Concat(shiftJobs.Select(x => x.RequestID));
+
             List<ReferencedJob> jobs = new List<ReferencedJob>();
-            concatedList.GroupBy(x => x.RequestID)
+            concatedList.Select(x => x).Distinct()
                     .ToList()
                     .ForEach(request =>
                     jobs.Add(new ReferencedJob()
                     {
-                        R = request.Key
+                        R = request
                     }
                     ));
 
