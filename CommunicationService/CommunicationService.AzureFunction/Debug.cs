@@ -142,7 +142,6 @@ namespace CommunicationService.AzureFunction
                 //    _connectUserService,
                 //    _connectRequestService,
                 //    _emailConfig,
-                //    _jobFilteringService,
                 //    _connectAddressService,
                 //    _cosmosDbService
                 //    );
@@ -154,10 +153,16 @@ namespace CommunicationService.AzureFunction
                 //    _linkRepository,
                 //    _linkConfig);
 
+                TaskReminderMessage message = new TaskReminderMessage(
+                    _connectRequestService,
+                    _connectUserService,
+                    _cosmosDbService
+                    );
+
                 var recipients = await message.IdentifyRecipients(req.RecipientUserID, req.JobID, req.GroupID, req.RequestID, req.AdditionalParameters);
                 recipients = recipients.Take(1).ToList();
 
-                //recipients = recipients.Where(x => x.RecipientUserID == 3).ToList();
+                //recipients = recipients.Where(x => x.RecipientUserID == 20232).ToList();
 
 
                 //SendMessageRequest smr = recipients.ElementAt(0);

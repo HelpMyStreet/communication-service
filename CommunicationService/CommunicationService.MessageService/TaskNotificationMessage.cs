@@ -5,13 +5,16 @@ using CommunicationService.Core.Interfaces.Repositories;
 using CommunicationService.Core.Interfaces.Services;
 using CommunicationService.MessageService.Substitution;
 using HelpMyStreet.Contracts.GroupService.Response;
+using HelpMyStreet.Contracts.RequestService.Response;
 using HelpMyStreet.Contracts.UserService.Response;
 using HelpMyStreet.Utils.Enums;
 using HelpMyStreet.Utils.Extensions;
+using HelpMyStreet.Utils.Models;
 using Microsoft.Extensions.Options;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Permissions;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -39,15 +42,15 @@ namespace CommunicationService.MessageService
 
         public async Task<EmailBuildData> PrepareTemplateData(Guid batchId, int? recipientUserId, int? jobId, int? groupId, int? requestId, Dictionary<string, string> additionalParameters, string templateName)
         {
-            var job = _connectRequestService.GetJobDetailsAsync(jobId.Value).Result;
-            string encodedJobId = HelpMyStreet.Utils.Utils.Base64Utils.Base64Encode(job.JobSummary.JobID.ToString());
-            bool isFaceMask = job.JobSummary.SupportActivity == SupportActivities.FaceMask;
+            var requestDetails = await _connectRequestService.GetRequestDetailsAsync(requestId.Value);
+            string encodedRequestId = HelpMyStreet.Utils.Utils.Base64Utils.Base64Encode(requestDetails.RequestSummary.RequestID.ToString());
+            SupportActivities supportActivity = GetSupportActivityFromRequest(requestDetails);            
 
             var user = await _connectUserService.GetUserByIdAsync(recipientUserId.Value);
             var volunteers = _connectUserService.GetVolunteersByPostcodeAndActivity
                 (
-                    job.JobSummary.PostCode,
-                    new List<SupportActivities>() { job.JobSummary.SupportActivity },
+                    requestDetails.RequestSummary.PostCode,
+                    new List<SupportActivities>() { supportActivity },
                     null,
                     CancellationToken.None
                 ).Result;
@@ -56,21 +59,23 @@ namespace CommunicationService.MessageService
             {
 
                 var volunteer = volunteers.Volunteers.FirstOrDefault(x => x.UserID == user.ID);
-                if (user != null && job != null)
+                if (user != null && requestDetails != null)
                 {
+                    var job = requestDetails.RequestSummary.JobSummaries.First();
+                    
                     return new EmailBuildData()
                     {
                         BaseDynamicData = new TaskNotificationData
                         (
-                            user.UserPersonalDetails.FirstName,
-                            false,
-                            encodedJobId,
-                            job.JobSummary.SupportActivity.FriendlyNameShort(),
-                            job.JobSummary.PostCode,
-                            Math.Round(volunteer.DistanceInMiles, 1),
-                            job.JobSummary.DueDate.FormatDate(DateTimeFormat.ShortDateFormat),
-                            job.JobSummary.IsHealthCritical,
-                            isFaceMask
+                            firstname: user.UserPersonalDetails.FirstName,
+                            isRequestor: false,
+                            encodedRequestID: encodedRequestId,
+                            activity: supportActivity.FriendlyNameShort(),
+                            postcode: requestDetails.RequestSummary.PostCode,
+                            distanceFromPostcode: Math.Round(volunteer.DistanceInMiles, 1),
+                            dueDate: job.DueDate.FormatDate(DateTimeFormat.ShortDateFormat),
+                            isHealthCritical: job.IsHealthCritical,
+                            isFaceMask: supportActivity == SupportActivities.FaceMask
                         ),
                         EmailToAddress = user.UserPersonalDetails.EmailAddress,
                         EmailToName = $"{user.UserPersonalDetails.FirstName} {user.UserPersonalDetails.LastName}",
@@ -92,32 +97,51 @@ namespace CommunicationService.MessageService
             throw new Exception("unable to retrieve user details");
         }
 
+        private SupportActivities GetSupportActivityFromRequest(GetRequestDetailsResponse request)
+        {
+            var activities = request.RequestSummary.JobSummaries.Select(x => x.SupportActivity).Distinct();
+
+            if(activities.Count()==1)
+            {
+                return activities.First();
+            }
+            else
+            {
+                throw new Exception("Unable to retrive distinct support activity from request");
+            }
+        }
+
         public async Task<List<SendMessageRequest>> IdentifyRecipients(int? recipientUserId, int? jobId, int? groupId, int? requestId, Dictionary<string, string> additionalParameters)
         {
             List<int> groupUsers = new List<int>();
 
-            if(!groupId.HasValue || !jobId.HasValue)
+            if(!groupId.HasValue || !requestId.HasValue)
             {
-                throw new Exception($"GroupID or JobID is missing");
+                throw new Exception($"GroupID or RequestID is missing");
+            }
+
+            var requestDetails = await _connectRequestService.GetRequestDetailsAsync(requestId.Value);
+
+            if (requestDetails == null)
+            {
+                throw new Exception($"Unable to return request details for requestId {requestId.Value}");
             }
 
             var groupMembers = await _connectGroupService.GetGroupMembers(groupId.Value);
             groupUsers = groupMembers.Users;
-            
-            var job = await _connectRequestService.GetJobDetailsAsync(jobId.Value);
 
-            var strategy = await _connectGroupService.GetGroupNewRequestNotificationStrategy(job.JobSummary.ReferringGroupID);
+            var strategy = await _connectGroupService.GetGroupNewRequestNotificationStrategy(requestDetails.RequestSummary.ReferringGroupID);
 
             if(strategy==null)
             {
-                throw new Exception($"No strategy for {job.JobSummary.ReferringGroupID}");
+                throw new Exception($"No strategy for {requestDetails.RequestSummary.ReferringGroupID}");
             }
 
             List<SupportActivities> supportActivities = new List<SupportActivities>();
-            if (job != null)
+            if (requestDetails != null)
             {
-                supportActivities.Add(job.JobSummary.SupportActivity);
-                var volunteers = await _connectUserService.GetVolunteersByPostcodeAndActivity(job.JobSummary.PostCode, supportActivities, null, CancellationToken.None);
+                supportActivities.Add(GetSupportActivityFromRequest(requestDetails));
+                var volunteers = await _connectUserService.GetVolunteersByPostcodeAndActivity(requestDetails.RequestSummary.PostCode, supportActivities, null, CancellationToken.None);
 
                 if (volunteers != null)
                 {
@@ -128,14 +152,14 @@ namespace CommunicationService.MessageService
                         .ToList()
                         .ForEach(v =>
                             {
-                                AddRecipientAndTemplate(TemplateName.TaskNotification, v.UserID, jobId, groupId, requestId);
+                                AddRecipientAndTemplate(TemplateName.TaskNotification, v.UserID, null, groupId, requestId, additionalParameters);
                             });
                 }
             }
             return _sendMessageRequests; 
         }
 
-        private void AddRecipientAndTemplate(string templateName, int userId, int? jobId, int? groupId, int? requestId)
+        private void AddRecipientAndTemplate(string templateName, int userId, int? jobId, int? groupId, int? requestId, Dictionary<string, string> additionalParameters)
         {
             _sendMessageRequests.Add(new SendMessageRequest()
             {
@@ -143,7 +167,8 @@ namespace CommunicationService.MessageService
                 RecipientUserID = userId,
                 GroupID = groupId,
                 JobID = jobId,
-                RequestID = requestId
+                RequestID = requestId,
+                AdditionalParameters = additionalParameters
             });  
         }
     }
