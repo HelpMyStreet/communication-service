@@ -42,7 +42,6 @@ namespace CommunicationService.RequestService
                 return null;
             }
         }
-
         public async Task<GetJobsByFilterResponse> GetJobsByFilter(GetJobsByFilterRequest request)
         {
             string path = $"/api/GetJobsByFilter";
@@ -66,8 +65,32 @@ namespace CommunicationService.RequestService
                     }
                 }
             }
-            
         }
+        public async Task<GetAllJobsByFilterResponse> GetAllJobsByFilter(GetAllJobsByFilterRequest request)
+        {
+            string path = $"/api/GetAllJobsByFilter";
+            using (HttpResponseMessage response = await _httpClientWrapper.GetAsync(HttpClientConfigName.RequestService, path, request, CancellationToken.None).ConfigureAwait(false))
+            {
+                string jsonResponse = await response.Content.ReadAsStringAsync();
+                var getJobsResponse = JsonConvert.DeserializeObject<ResponseWrapper<GetAllJobsByFilterResponse, RequestServiceErrorCode>>(jsonResponse);
+                if (getJobsResponse.HasContent && getJobsResponse.IsSuccessful)
+                {
+                    return getJobsResponse.Content;
+                }
+                else
+                {
+                    if (response.StatusCode == System.Net.HttpStatusCode.BadRequest)
+                    {
+                        throw new BadRequestException($"GetAllJobsByFilter Returned a bad request");
+                    }
+                    else
+                    {
+                        throw new InternalServerException($"GetAllJobsByFilter Returned {jsonResponse}");
+                    }
+                }
+            }
+        }
+
         public async Task<GetJobsByStatusesResponse> GetJobsByStatuses(GetJobsByStatusesRequest getJobsByStatusesRequest)
         {
             using (HttpResponseMessage response = await _httpClientWrapper.GetAsync(HttpClientConfigName.RequestService, "/api/GetJobsByStatuses", getJobsByStatusesRequest, CancellationToken.None ))
@@ -112,7 +135,6 @@ namespace CommunicationService.RequestService
                 return null;
             }
         }
-
         public int GetLastUpdatedBy(GetJobDetailsResponse getJobDetailsResponse)
         {
             var lastHistory = getJobDetailsResponse.History.OrderByDescending(x => x.StatusDate).First();
@@ -151,7 +173,6 @@ namespace CommunicationService.RequestService
                 }
             }
         }
-
         public int? GetRelevantVolunteerUserID(GetJobDetailsResponse getJobDetailsResponse)
         {
             int? result = null;
@@ -174,7 +195,6 @@ namespace CommunicationService.RequestService
             }        
             return result;
         }
-
         public async Task<GetRequestDetailsResponse> GetRequestDetailsAsync(int requestID)
         {
             string path = $"/api/GetRequestDetails?authorisedByUserID=-1&requestID=" + requestID;
@@ -191,7 +211,6 @@ namespace CommunicationService.RequestService
                 return null;
             }
         }
-
         public async Task<GetShiftRequestsByFilterResponse> GetShiftRequestsByFilter(GetShiftRequestsByFilterRequest request)
         {
             string path = $"/api/GetShiftRequestsByFilter";

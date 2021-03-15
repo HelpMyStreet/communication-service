@@ -7,9 +7,6 @@ namespace CommunicationService.MessageService
     public static class TemplateName
     {
         public const string Welcome = "Welcome";
-        public const string ThanksForVerifying = "ThanksForVerifying";
-        public const string UnableToVerify = "UnableToVerify";
-        public const string YotiReminder = "YotiReminder";
         public const string PartialRegistration = "PartialRegistration";
         public const string TaskNotification = "TaskNotification";
         public const string RequestNotification = "RequestNotification";
@@ -18,9 +15,7 @@ namespace CommunicationService.MessageService
         public const string DailyDigest = "DailyDigest";
         public const string TaskReminder = "TaskReminder";
         public const string ShiftReminder = "ShiftReminder";
-        public const string TaskUpdateNew = "TaskUpdateNew";
         public const string InterUserMessage = "InterUserMessage";
-        public const string TestLinkSubstitution = "TestLinkSubstitution";
         public const string NewCredentials = "NewCredentials";
         public const string TaskUpdateSimplified = "TaskUpdateSimplified";
         public const string NewTaskPendingApprovalNotification = "NewTaskPendingApprovalNotification";
