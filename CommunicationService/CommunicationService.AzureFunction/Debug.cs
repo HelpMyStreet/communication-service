@@ -156,7 +156,7 @@ namespace CommunicationService.AzureFunction
                 //    _linkConfig);
 
                 var recipients = await message.IdentifyRecipients(req.RecipientUserID, req.JobID, req.GroupID, req.RequestID, req.AdditionalParameters);
-                //recipients = recipients.Take(1).ToList();
+                recipients = recipients.Take(1).ToList();
 
                 //recipients = recipients.Where(x => x.RecipientUserID == 3).ToList();
 
