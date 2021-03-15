@@ -3,9 +3,11 @@ using HelpMyStreet.Contracts.AddressService.Request;
 using HelpMyStreet.Contracts.AddressService.Response;
 using HelpMyStreet.Contracts.Shared;
 using HelpMyStreet.Utils.Enums;
+using HelpMyStreet.Utils.Models;
 using HelpMyStreet.Utils.Utils;
 using Newtonsoft.Json;
 using System;
+using System.Collections.Generic;
 using System.Net.Http;
 using System.Text;
 using System.Threading;
@@ -70,6 +72,23 @@ namespace CommunicationService.AddressService
                 if (sendEmailResponse.HasContent && sendEmailResponse.IsSuccessful)
                 {
                     return sendEmailResponse.Content;
+                }
+            }
+            return null;
+        }
+
+        public async Task<List<LocationDetails>> GetLocations(GetLocationsRequest request)
+        {
+            string json = JsonConvert.SerializeObject(request);
+            StringContent data = new StringContent(json, Encoding.UTF8, "application/json");
+
+            using (HttpResponseMessage response = await _httpClientWrapper.PostAsync(HttpClientConfigName.AddressService, "/api/GetLocations", data, CancellationToken.None))
+            {
+                string jsonResponse = await response.Content.ReadAsStringAsync();
+                var sendEmailResponse = JsonConvert.DeserializeObject<ResponseWrapper<GetLocationsResponse, AddressServiceErrorCode>>(jsonResponse);
+                if (sendEmailResponse.HasContent && sendEmailResponse.IsSuccessful)
+                {
+                    return sendEmailResponse.Content.LocationDetails;
                 }
             }
             return null;

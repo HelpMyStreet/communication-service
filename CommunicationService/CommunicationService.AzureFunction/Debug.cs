@@ -17,6 +17,7 @@ using CommunicationService.Core.Services;
 using CommunicationService.Core.Interfaces.Repositories;
 using CommunicationService.Core.Domains;
 using System.Linq;
+using HelpMyStreet.Utils.Enums;
 
 namespace CommunicationService.AzureFunction
 {
@@ -69,6 +70,13 @@ namespace CommunicationService.AzureFunction
         {
             try
             {
+                //var comms =  Enum.GetValues(typeof(Location))
+                //    .Cast<Location>()
+                //    //.Select(v => v)
+                //.ToList();
+
+                //var strComms = JsonConvert.SerializeObject(comms);
+
                 var request = JsonConvert.SerializeObject(req);
                 log.LogInformation($"RequestCommunicationRequest {request}");
 
@@ -155,7 +163,7 @@ namespace CommunicationService.AzureFunction
                 //    _linkConfig);
 
                 var recipients = await message.IdentifyRecipients(req.RecipientUserID, req.JobID, req.GroupID, req.RequestID, req.AdditionalParameters);
-                recipients = recipients.Take(1).ToList();
+                //recipients = recipients.Take(1).ToList();
 
                 //recipients = recipients.Where(x => x.RecipientUserID == 3).ToList();
 
