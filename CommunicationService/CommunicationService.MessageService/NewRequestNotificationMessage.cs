@@ -187,9 +187,9 @@ namespace CommunicationService.MessageService
 
             var openShifts = await GetOpenShiftsForUser(user.ID, locations);
 
-            //List<int> requestsAlreadyNotified = await _cosmosDbService.GetShiftRequestDetailsSent(user.ID);
+            List<int> requestsAlreadyNotified = await _cosmosDbService.GetShiftRequestDetailsSent(user.ID);
                         
-            //openShifts = openShifts.Where(x => !requestsAlreadyNotified.Contains(x.RequestID)).ToList();
+            openShifts = openShifts.Where(x => !requestsAlreadyNotified.Contains(x.RequestID)).ToList();
 
             if (openShifts.Count() > 0)
             {
