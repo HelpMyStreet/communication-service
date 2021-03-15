@@ -135,5 +135,22 @@ namespace CommunicationService.Repo
 
             return results.Select(s=> s.RequestID).ToList();
         }
+
+        public async Task<bool> EmailSent(string templateName, int jobId, int recipientUserId)
+        {
+            string queryString = $"SELECT c.id, c.TemplateName FROM c where c.TemplateName='{templateName}' and c.JobId='{jobId}' and c.RecipientUserID='{recipientUserId}'";
+            var query = this._container.GetItemQueryIterator<MigrationHistory>(new QueryDefinition(queryString));
+
+            if (query.HasMoreResults)
+            {
+                var response = await query.ReadNextAsync();
+                if (response.Count > 0)
+                {
+                    return true;
+                }
+            }
+
+            return false;
+        }
     }
 }
