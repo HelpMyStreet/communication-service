@@ -28,10 +28,6 @@ namespace CommunicationService.MessageService
             {
                 case TemplateName.Welcome:
                     return "Welcome to HelpMyStreet!";
-                case TemplateName.ThanksForVerifying:
-                    return "Thanks for verifying your ID";
-                case TemplateName.UnableToVerify:
-                    return "Hmm, something’s not quite right – can we help?";
                 default:
                     throw new Exception($"{templateName} is unknown");
             }

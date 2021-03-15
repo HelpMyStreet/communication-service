@@ -86,7 +86,7 @@ namespace CommunicationService.MessageService
                             var users = await _connectUserService.GetVolunteersByPostcodeAndActivity(
                                 locations.Address.Postcode,
                                 new List<SupportActivities>() { x.SupportActivity },
-                                _emailConfig.Value.ShiftRadius,
+                                _emailConfig.Value.OpenRequestRadius,
                                 CancellationToken.None);
 
                             if (users != null && users.Volunteers.Count() > 0)
