@@ -4,6 +4,7 @@ using CommunicationService.Core.Interfaces;
 using CommunicationService.Core.Interfaces.Repositories;
 using CommunicationService.Core.Interfaces.Services;
 using CommunicationService.MessageService.Substitution;
+using HelpMyStreet.Contracts.AddressService.Request;
 using HelpMyStreet.Contracts.RequestService.Request;
 using HelpMyStreet.Utils.Enums;
 using HelpMyStreet.Utils.EqualityComparers;
@@ -14,6 +15,7 @@ using System;
 using System.Collections.Generic;
 using System.Dynamic;
 using System.Linq;
+using System.Runtime.Caching;
 using System.Security.Cryptography.X509Certificates;
 using System.Text;
 using System.Threading;
@@ -30,6 +32,9 @@ namespace CommunicationService.MessageService
         private readonly IOptions<EmailConfig> _emailConfig;
         private readonly IConnectGroupService _connectGroupService;
         private IEqualityComparer<ShiftJob> _shiftJobDedupe_EqualityComparer;
+        private CacheItemPolicy _cacheItemPolicy;
+        private ObjectCache _cache;
+        private const string CACHEKEY_GETLOCATIONS = "getLocations";
 
         List<SendMessageRequest> _sendMessageRequests;
 
@@ -53,6 +58,9 @@ namespace CommunicationService.MessageService
             _connectGroupService = connectGroupService;
             _shiftJobDedupe_EqualityComparer = new JobBasicDedupe_EqualityComparer();
             _sendMessageRequests = new List<SendMessageRequest>();
+            _cacheItemPolicy = new CacheItemPolicy();
+            _cacheItemPolicy.AbsoluteExpiration = DateTime.Now.AddHours(1.0);
+            _cache = MemoryCache.Default;
         }
 
         public async Task<List<SendMessageRequest>> IdentifyRecipients(int? recipientUserId, int? jobId, int? groupId, int? requestId, Dictionary<string, string> additionalParameters)
@@ -127,7 +135,7 @@ namespace CommunicationService.MessageService
 
         private async Task<List<ShiftJob>> GetOpenShiftsForUser(int userId, string locations)
         {
-            LocationsRequest lr = new LocationsRequest() { Locations = new List<Location>() };
+            HelpMyStreet.Contracts.RequestService.Request.LocationsRequest lr = new HelpMyStreet.Contracts.RequestService.Request.LocationsRequest() { Locations = new List<Location>() };
 
             locations.Split(",").ToList()
                 .ForEach(x =>
@@ -179,9 +187,9 @@ namespace CommunicationService.MessageService
 
             var openShifts = await GetOpenShiftsForUser(user.ID, locations);
 
-            List<int> requestsAlreadyNotified = await _cosmosDbService.GetShiftRequestDetailsSent(user.ID);
+            //List<int> requestsAlreadyNotified = await _cosmosDbService.GetShiftRequestDetailsSent(user.ID);
                         
-            openShifts = openShifts.Where(x => !requestsAlreadyNotified.Contains(x.RequestID)).ToList();
+            //openShifts = openShifts.Where(x => !requestsAlreadyNotified.Contains(x.RequestID)).ToList();
 
             if (openShifts.Count() > 0)
             {
@@ -209,7 +217,7 @@ namespace CommunicationService.MessageService
                                 subject: mostCommonActivity.HasValue ? $"New { mostCommonActivity.Value.FriendlyNameShort() } shifts have been added to HelpMyStreet" : "New activities have been added to HelpMyStreet",
                                 firstName: user.UserPersonalDetails.FirstName,
                                 shift: true,
-                                requestList: GetRequestList(openShifts, user.PostalCode)
+                                requestList: await GetRequestList(openShifts, user.PostalCode)
                              ),
                     EmailToAddress = user.UserPersonalDetails.EmailAddress,
                     EmailToName = $"{user.UserPersonalDetails.FirstName} {user.UserPersonalDetails.LastName}",
@@ -254,8 +262,13 @@ namespace CommunicationService.MessageService
             return a.Activity;
         }
 
-        private List<JobDetails> GetRequestList(List<ShiftJob> jobs, string postCode)
+        private async Task<List<JobDetails>> GetRequestList(List<ShiftJob> jobs, string postCode)
         {
+            CacheItemPolicy cacheItemPolicy = new CacheItemPolicy();
+            cacheItemPolicy.AbsoluteExpiration = DateTime.Now.AddHours(1.0);
+
+            ObjectCache cache = MemoryCache.Default;
+
             var summary = jobs.GroupBy(x => new { x.SupportActivity, x.StartDate, x.EndDate, x.ShiftLength, x.Location })
                 .OrderBy(o => o.Key.StartDate)
                 .Select(m => new {
@@ -265,13 +278,39 @@ namespace CommunicationService.MessageService
                 }).ToList();
 
             List<JobDetails> result  = new List<JobDetails>();
+            List<LocationDetails> locationDetails = new List<LocationDetails>();
+
+            if (_cache.Contains(CACHEKEY_GETLOCATIONS))
+            {
+                locationDetails = (List<LocationDetails>)cache.Get(CACHEKEY_GETLOCATIONS);
+            }
+            else
+            {
+                var locations = Enum.GetValues(typeof(Location)).Cast<Location>().ToList();
+
+                locationDetails = await _connectAddressService.GetLocations(new GetLocationsRequest()
+                {
+                    LocationsRequests = new HelpMyStreet.Contracts.AddressService.Request.LocationsRequest()
+                    {
+                        Locations = locations
+                    }
+                });
+
+                if (locationDetails != null)
+                {
+                    cache.Add(CACHEKEY_GETLOCATIONS, locationDetails, cacheItemPolicy);
+                }
+            }
+
             foreach (var item in summary)
             {
-                var locationDetails = _connectAddressService.GetLocationDetails(item.Location).Result;
-                
+                var location = locationDetails.FirstOrDefault(x => x.Location == item.Location);
+
+                //var locationDetails = _connectAddressService.GetLocationDetails(item.Location).Result;
+
                 result.Add(new JobDetails(
                     $"<strong>{item.SupportActivity.FriendlyNameShort()}</strong> " +
-                    $"at <strong>{locationDetails.LocationDetails.Name}</strong>." +
+                    $"at <strong>{location.Name}</strong>." +
                     $"Shift: { item.ShiftDetails }"));
             }
 
