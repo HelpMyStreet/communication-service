@@ -22,6 +22,7 @@ using HelpMyStreet.Utils.Extensions;
 using System.IO;
 using UserService.Core.Utils;
 using System.Reflection.Metadata.Ecma335;
+using System.Threading;
 
 namespace CommunicationService.MessageService
 {
@@ -233,17 +234,17 @@ namespace CommunicationService.MessageService
                 foreach (var item in requests)
                 {
                     var request = await _connectRequestService.GetRequestDetailsAsync(item.RequestID);
-                    var location = await _connectAddressService.GetLocationDetails(request.RequestSummary.Shift.Location);
+                    var location = await _connectAddressService.GetLocationDetails(request.RequestSummary.Shift.Location, CancellationToken.None);
                     var distance = calculator.GetDistanceInMiles(userPostalCode.Latitude, 
                         userPostalCode.Longitude,
-                        (double) location.LocationDetails.Latitude,
-                        (double) location.LocationDetails.Longitude);
+                        (double) location.Latitude,
+                        (double) location.Longitude);
 
                     if(distance<= _emailConfig.Value.ShiftRadius)
                     {
                         string shiftDate = request.RequestSummary.Shift.StartDate.FormatDate(DateTimeFormat.LongDateTimeFormat) + " - " + request.RequestSummary.Shift.EndDate.FormatDate(DateTimeFormat.TimeFormat);
                         shiftItemList.Add(new ShiftItem($"<strong>{ item.SupportActivity.FriendlyNameShort() }</strong> " +
-                            $"at {location.LocationDetails.Name} " +
+                            $"at {location.Name} " +
                             $"( {Math.Round(distance, 2)} miles away) " +
                             $"- {shiftDate}"));                 
                     }

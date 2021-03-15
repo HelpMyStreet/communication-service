@@ -113,10 +113,10 @@ namespace CommunicationService.MessageService
             }
             else
             {
-                var locationDetails = _connectAddressService.GetLocationDetails(job.RequestSummary.Shift.Location).Result;
+                var locationDetails = _connectAddressService.GetLocationDetails(job.RequestSummary.Shift.Location, CancellationToken.None).Result;
                 if (locationDetails != null)
                 {
-                    return $"{locationDetails.LocationDetails.Name}";
+                    return $"{locationDetails.Name}";
                 }
                 else
                 {

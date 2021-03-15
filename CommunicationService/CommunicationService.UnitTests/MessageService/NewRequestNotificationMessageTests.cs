@@ -33,7 +33,7 @@ namespace CommunicationService.UnitTests.SendGridService
 
         private GetVolunteersByPostcodeAndActivityResponse _getVolunteersByPostcodeAndActivityResponse;
         private List<ShiftJob> _openShiftJobs;
-        private Dictionary<Location, GetLocationResponse> _dictLocationResponse;
+        private Dictionary<Location, LocationDetails> _dictLocationResponse;
         private User _user;
         private GetUserGroupsResponse _getUserGroupsResponse;
         private List<ShiftJob> _shiftJobs;
@@ -142,12 +142,12 @@ namespace CommunicationService.UnitTests.SendGridService
 
         private void SetupAddressService()
         {
-            _dictLocationResponse = new Dictionary<Location, GetLocationResponse>();
-            _dictLocationResponse.Add(Location.FranklinHallSpilsby, new GetLocationResponse() { LocationDetails = new LocationDetails() { Location = Location.FranklinHallSpilsby, Name= "Franklin Hall Spilsby", Address = new Address() { Postcode = "PostCode1" } } });
-            _dictLocationResponse.Add(Location.LincolnCountyHospital, new GetLocationResponse() { LocationDetails = new LocationDetails() { Location = Location.LincolnCountyHospital, Name = "Lincoln County Hospital",  Address = new Address() { Postcode = "PostCode2" } } });
+            _dictLocationResponse = new Dictionary<Location, LocationDetails>();
+            _dictLocationResponse.Add(Location.FranklinHallSpilsby, new LocationDetails() { Location = Location.FranklinHallSpilsby, Name= "Franklin Hall Spilsby", Address = new Address() { Postcode = "PostCode1" } });
+            _dictLocationResponse.Add(Location.LincolnCountyHospital, new LocationDetails() { Location = Location.LincolnCountyHospital, Name = "Lincoln County Hospital",  Address = new Address() { Postcode = "PostCode2" } });
             _addressService = new Mock<IConnectAddressService>();
-            _addressService.Setup(x => x.GetLocationDetails(It.IsAny<Location>()))
-                .ReturnsAsync((Location l) => _dictLocationResponse[l]);
+            _addressService.Setup(x => x.GetLocationDetails(It.IsAny<Location>(),It.IsAny<CancellationToken>()))
+                .ReturnsAsync((Location l, CancellationToken ct) => _dictLocationResponse[l]);
 
         }
 
@@ -205,7 +205,7 @@ namespace CommunicationService.UnitTests.SendGridService
         }
 
         [Test]
-        public async Task Test()
+        public async Task CheckTemplateData()
         {
             int? recipientUserId = 1;
             int? jobId = null;

@@ -70,13 +70,6 @@ namespace CommunicationService.AzureFunction
         {
             try
             {
-                //var comms =  Enum.GetValues(typeof(Location))
-                //    .Cast<Location>()
-                //    //.Select(v => v)
-                //.ToList();
-
-                //var strComms = JsonConvert.SerializeObject(comms);
-
                 var request = JsonConvert.SerializeObject(req);
                 log.LogInformation($"RequestCommunicationRequest {request}");
 
