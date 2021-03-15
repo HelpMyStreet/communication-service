@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Threading;
 using System.Threading.Tasks;
 using HelpMyStreet.Contracts.AddressService.Request;
 using HelpMyStreet.Contracts.AddressService.Response;
@@ -11,10 +12,8 @@ namespace CommunicationService.Core.Interfaces.Services
     {
         Task<GetPostcodeCoordinatesResponse> GetPostcodeCoordinates(GetPostcodeCoordinatesRequest getPostcodeCoordinatesRequest);
 
-        Task<GetLocationResponse> GetLocationDetails(Location location);
+        Task<LocationDetails> GetLocationDetails(Location location, CancellationToken cancellationToken);
 
-        Task<GetLocationsByDistanceResponse> GetLocationsByDistance(string postCode, int maxDistance);
-
-        Task<List<LocationDetails>> GetLocations(GetLocationsRequest request);
+        Task<GetLocationsByDistanceResponse> GetLocationsByDistance(string postCode, int maxDistance);        
     }
 }

@@ -79,12 +79,12 @@ namespace CommunicationService.MessageService
                 {
                     foreach (var x in locationsSupportActivities)
                     {
-                        var locations = await _connectAddressService.GetLocationDetails(x.Location);
+                        var locations = await _connectAddressService.GetLocationDetails(x.Location, CancellationToken.None);
 
                         if (locations != null)
                         {
                             var users = await _connectUserService.GetVolunteersByPostcodeAndActivity(
-                                locations.LocationDetails.Address.Postcode,
+                                locations.Address.Postcode,
                                 new List<SupportActivities>() { x.SupportActivity },
                                 _emailConfig.Value.ShiftRadius,
                                 CancellationToken.None);
@@ -217,7 +217,7 @@ namespace CommunicationService.MessageService
                                 subject: mostCommonActivity.HasValue ? $"New { mostCommonActivity.Value.FriendlyNameShort() } shifts have been added to HelpMyStreet" : "New activities have been added to HelpMyStreet",
                                 firstName: user.UserPersonalDetails.FirstName,
                                 shift: true,
-                                requestList: await GetRequestList(openShifts, user.PostalCode)
+                                requestList: GetRequestList(openShifts)
                              ),
                     EmailToAddress = user.UserPersonalDetails.EmailAddress,
                     EmailToName = $"{user.UserPersonalDetails.FirstName} {user.UserPersonalDetails.LastName}",
@@ -262,13 +262,8 @@ namespace CommunicationService.MessageService
             return a.Activity;
         }
 
-        private async Task<List<JobDetails>> GetRequestList(List<ShiftJob> jobs, string postCode)
+        private List<JobDetails> GetRequestList(List<ShiftJob> jobs)
         {
-            CacheItemPolicy cacheItemPolicy = new CacheItemPolicy();
-            cacheItemPolicy.AbsoluteExpiration = DateTime.Now.AddHours(1.0);
-
-            ObjectCache cache = MemoryCache.Default;
-
             var summary = jobs.GroupBy(x => new { x.SupportActivity, x.StartDate, x.EndDate, x.ShiftLength, x.Location })
                 .OrderBy(o => o.Key.StartDate)
                 .Select(m => new {
@@ -277,40 +272,14 @@ namespace CommunicationService.MessageService
                     ShiftDetails = $"{m.Key.StartDate.FormatDate(DateTimeFormat.LongDateTimeFormat)} - {m.Key.EndDate.FormatDate(DateTimeFormat.TimeFormat)}",
                 }).ToList();
 
-            List<JobDetails> result  = new List<JobDetails>();
-            List<LocationDetails> locationDetails = new List<LocationDetails>();
-
-            if (_cache.Contains(CACHEKEY_GETLOCATIONS))
-            {
-                locationDetails = (List<LocationDetails>)cache.Get(CACHEKEY_GETLOCATIONS);
-            }
-            else
-            {
-                var locations = Enum.GetValues(typeof(Location)).Cast<Location>().ToList();
-
-                locationDetails = await _connectAddressService.GetLocations(new GetLocationsRequest()
-                {
-                    LocationsRequests = new HelpMyStreet.Contracts.AddressService.Request.LocationsRequest()
-                    {
-                        Locations = locations
-                    }
-                });
-
-                if (locationDetails != null)
-                {
-                    cache.Add(CACHEKEY_GETLOCATIONS, locationDetails, cacheItemPolicy);
-                }
-            }
-
+            List<JobDetails> result = new List<JobDetails>();
             foreach (var item in summary)
             {
-                var location = locationDetails.FirstOrDefault(x => x.Location == item.Location);
-
-                //var locationDetails = _connectAddressService.GetLocationDetails(item.Location).Result;
+                var locationDetails = _connectAddressService.GetLocationDetails(item.Location, CancellationToken.None).Result;
 
                 result.Add(new JobDetails(
                     $"<strong>{item.SupportActivity.FriendlyNameShort()}</strong> " +
-                    $"at <strong>{location.Name}</strong>." +
+                    $"at <strong>{locationDetails.Name}</strong>." +
                     $"Shift: { item.ShiftDetails }"));
             }
 
