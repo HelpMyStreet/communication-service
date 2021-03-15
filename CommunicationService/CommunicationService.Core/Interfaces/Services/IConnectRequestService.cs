@@ -14,6 +14,7 @@ namespace CommunicationService.Core.Interfaces.Services
         Task<GetJobDetailsResponse> GetJobDetailsAsync(int jobID);
         Task<GetJobSummaryResponse> GetJobSummaryAsync(int jobID);
         Task<GetJobsByFilterResponse> GetJobsByFilter(GetJobsByFilterRequest request);
+        Task<GetAllJobsByFilterResponse> GetAllJobsByFilter(GetAllJobsByFilterRequest request);        
         Task<List<ShiftJob>> GetOpenShiftJobsByFilter(GetOpenShiftJobsByFilterRequest request);
         Task<GetJobsInProgressResponse> GetJobsInProgress();
         Task<GetJobsByStatusesResponse> GetJobsByStatuses(GetJobsByStatusesRequest getJobsByStatusesRequest);

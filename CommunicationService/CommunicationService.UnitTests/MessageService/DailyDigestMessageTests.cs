@@ -29,16 +29,14 @@ namespace CommunicationService.UnitTests.SendGridService
         private Mock<IConnectUserService> _userService;
         private Mock<IConnectRequestService> _requestService;
         private Mock<IOptions<EmailConfig>> _emailConfig;
-        private Mock<IJobFilteringService> _jobFilteringService;
         private Mock<IConnectAddressService> _addressService;
         private Mock<ICosmosDbService> _cosmosDbService;
         private EmailConfig _emailConfigSettings;
         private GetUsersResponse _getUsersResponse;
         private GetUserGroupsResponse _getUserGroupsResponse;
         private User _user;
-        private GetJobsByStatusesResponse _getJobsByStatusesResponse;
         private GetPostcodeCoordinatesResponse _getPostcodeCoordinatesResponse;
-        private List<JobSummary> _filteredJobs;
+        private GetAllJobsByFilterResponse _getAllJobsByFilterResponse;
 
 
         private DailyDigestMessage _classUnderTest;
@@ -50,7 +48,6 @@ namespace CommunicationService.UnitTests.SendGridService
             SetupUserService();
             SetupRequestService();
             SetupEmailConfig();
-            SetupJobFilterService();
             SetupAddressService();
             SetupCosmosDBService();
 
@@ -59,7 +56,6 @@ namespace CommunicationService.UnitTests.SendGridService
                 _userService.Object,
                 _requestService.Object,
                 _emailConfig.Object,
-                _jobFilteringService.Object,
                 _addressService.Object,
                 _cosmosDbService.Object) ;
         }
@@ -87,8 +83,8 @@ namespace CommunicationService.UnitTests.SendGridService
         {
             _requestService = new Mock<IConnectRequestService>();
 
-            _requestService.Setup(x => x.GetJobsByStatuses(It.IsAny<GetJobsByStatusesRequest>()))
-                .ReturnsAsync(() => _getJobsByStatusesResponse);
+            _requestService.Setup(x => x.GetAllJobsByFilter(It.IsAny<GetAllJobsByFilterRequest>()))
+                .ReturnsAsync(() => _getAllJobsByFilterResponse);
         }
 
         private void SetupEmailConfig()
@@ -96,7 +92,7 @@ namespace CommunicationService.UnitTests.SendGridService
             _emailConfigSettings = new EmailConfig()
             {
                 ShowUserIDInEmailTitle = true,
-                DigestOtherJobsDistance = 20,
+                OpenRequestRadius = 20,
                 RegistrationChaserMaxTimeInHours = 2,
                 RegistrationChaserMinTimeInMinutes = 30,
                 ServiceBusSleepInMilliseconds = 1000
@@ -111,22 +107,6 @@ namespace CommunicationService.UnitTests.SendGridService
             _addressService = new Mock<IConnectAddressService>();
             _addressService.Setup(x => x.GetPostcodeCoordinates(It.IsAny<GetPostcodeCoordinatesRequest>()))
                 .ReturnsAsync(() => _getPostcodeCoordinatesResponse);
-        }
-
-        private void SetupJobFilterService()
-        {
-            _jobFilteringService = new Mock<IJobFilteringService>();
-            _jobFilteringService.Setup(x => x.FilterJobSummaries(
-                It.IsAny<List<JobSummary>>(),
-                It.IsAny<List<SupportActivities>>(),
-                It.IsAny<string>(),
-                It.IsAny<double?>(),
-                It.IsAny<Dictionary<SupportActivities, double?>>(),
-                It.IsAny<int?>(),
-                It.IsAny<List<int>>(),
-                It.IsAny<List<JobStatuses>>(),
-                It.IsAny<List<PostcodeCoordinate>>()
-                )).ReturnsAsync(() => _filteredJobs);
         }
 
         private void SetupCosmosDBService()
@@ -202,7 +182,7 @@ namespace CommunicationService.UnitTests.SendGridService
         }
 
         [Test]
-        public async Task PrepareTemplateData_ReturnsMullAsNoJobsReturned()
+        public async Task PrepareTemplateData_ReturnsNullAsNoJobsReturned()
         {
             int? recipientUserId = 1;
             int? jobId = null;
@@ -221,6 +201,12 @@ namespace CommunicationService.UnitTests.SendGridService
                 SupportActivities = new List<SupportActivities>() { SupportActivities.Shopping},
                 PostalCode = "NG1 6DQ"
                 
+            };
+
+            _getAllJobsByFilterResponse = new GetAllJobsByFilterResponse()
+            {
+                JobSummaries = new List<JobSummary>(),
+                ShiftJobs = new List<ShiftJob>()
             };
 
             var result = await _classUnderTest.PrepareTemplateData(Guid.NewGuid(),recipientUserId, jobId, groupId, requestId, null, templateName);
@@ -259,28 +245,37 @@ namespace CommunicationService.UnitTests.SendGridService
             List<JobSummary> jobSummaries = new List<JobSummary>();
             jobSummaries.Add(new JobSummary()
             {
+                RequestID = 1,
                 DistanceInMiles = 1,
                 SupportActivity = SupportActivities.Shopping
             });
 
             jobSummaries.Add(new JobSummary()
             {
+                RequestID = 2,
                 DistanceInMiles = 2,
                 SupportActivity = SupportActivities.Shopping
             });
 
             jobSummaries.Add(new JobSummary()
             {
+                RequestID = 3,
                 DistanceInMiles = 2,
                 SupportActivity = SupportActivities.CheckingIn
             });
+
+            _getAllJobsByFilterResponse = new GetAllJobsByFilterResponse()
+            {
+                JobSummaries = jobSummaries,
+                ShiftJobs = new List<ShiftJob>()
+            };
 
             var chosenJobCount = jobSummaries.Count(x => _user.SupportActivities.Contains(x.SupportActivity) && x.DistanceInMiles < _user.SupportRadiusMiles);
             var result = await _classUnderTest.PrepareTemplateData(Guid.NewGuid(),recipientUserId, jobId, groupId, requestId, null, templateName);
             DailyDigestData ddd = (DailyDigestData) result.BaseDynamicData;
 
 
-            Assert.AreEqual(chosenJobCount, ddd.ChosenJobs);
+            Assert.AreEqual(chosenJobCount, ddd.ChosenRequestTasks);
         }
 
         [Test]
@@ -320,9 +315,10 @@ namespace CommunicationService.UnitTests.SendGridService
                 RequestType = RequestType.Task
             });
 
-            _getJobsByStatusesResponse = new GetJobsByStatusesResponse()
+            _getAllJobsByFilterResponse = new GetAllJobsByFilterResponse()
             {
-                JobSummaries = jobSummaries
+                JobSummaries = jobSummaries,
+                ShiftJobs = new List<ShiftJob>()
             };
 
             _getPostcodeCoordinatesResponse = new GetPostcodeCoordinatesResponse()
@@ -332,9 +328,6 @@ namespace CommunicationService.UnitTests.SendGridService
                     new PostcodeCoordinate(){Postcode="DE23 6NY",Latitude=1d,Longitude=1d}
                 }
             };
-
-            _filteredJobs = jobSummaries;
-
             var chosenJobCount = jobSummaries.Count(x => _user.SupportActivities.Contains(x.SupportActivity) && x.DistanceInMiles < _user.SupportRadiusMiles);
             var result = await _classUnderTest.PrepareTemplateData(Guid.NewGuid(),recipientUserId, jobId, groupId, requestId, null, templateName);
             Assert.AreEqual(null, result);
@@ -394,6 +387,7 @@ namespace CommunicationService.UnitTests.SendGridService
             List<JobSummary> jobSummaries = new List<JobSummary>();
             jobSummaries.Add(new JobSummary()
             {
+                RequestID = 1,
                 DistanceInMiles = 1,
                 SupportActivity = SupportActivities.Shopping,
                 RequestType = RequestType.Task
@@ -401,6 +395,7 @@ namespace CommunicationService.UnitTests.SendGridService
 
             jobSummaries.Add(new JobSummary()
             {
+                RequestID = 2,
                 DistanceInMiles = 2,
                 SupportActivity = SupportActivities.Shopping,
                 RequestType = RequestType.Task
@@ -408,15 +403,11 @@ namespace CommunicationService.UnitTests.SendGridService
 
             jobSummaries.Add(new JobSummary()
             {
+                RequestID = 3,
                 DistanceInMiles = 2,
                 SupportActivity = SupportActivities.CheckingIn,
                 RequestType = RequestType.Task
             });
-
-            _getJobsByStatusesResponse = new GetJobsByStatusesResponse()
-            {
-                JobSummaries = jobSummaries
-            };
 
             _getPostcodeCoordinatesResponse = new GetPostcodeCoordinatesResponse()
             {
@@ -426,7 +417,13 @@ namespace CommunicationService.UnitTests.SendGridService
                 }
             };
 
-            _filteredJobs = jobSummaries;
+            _getAllJobsByFilterResponse = new GetAllJobsByFilterResponse()
+            {
+                JobSummaries = jobSummaries,
+                ShiftJobs = new List<ShiftJob>()
+            };
+
+            //_filteredJobs = jobSummaries;
 
             var criteriaJobs = jobSummaries.Where(x => _user.SupportActivities.Contains(x.SupportActivity) && x.DistanceInMiles < _user.SupportRadiusMiles);
             var otherJobs = jobSummaries.Where(x => !criteriaJobs.Contains(x));
@@ -437,8 +434,8 @@ namespace CommunicationService.UnitTests.SendGridService
             DailyDigestData ddd = (DailyDigestData)result.BaseDynamicData;
 
 
-            Assert.AreEqual(criteriaJobs.Count(), ddd.ChosenJobs);
-            Assert.AreEqual(otherJobs.Count()>0, ddd.OtherJobs);
+            Assert.AreEqual(criteriaJobs.Count(), ddd.ChosenRequestTasks);
+            Assert.AreEqual(otherJobs.Count()>0, ddd.OtherRequestTasks);
 
         }
     }
