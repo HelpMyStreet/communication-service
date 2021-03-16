@@ -26,7 +26,7 @@ namespace CommunicationService.UnitTests.SendGridService
         private GetGroupMembersResponse _getGroupMembersResponse;
         private GetGroupNewRequestNotificationStrategyResponse _getGroupNewRequestNotificationStrategyResponse;
         private GetVolunteersByPostcodeAndActivityResponse _getVolunteersByPostcodeAndActivityResponse;
-        private GetJobDetailsResponse _getJobDetailsResponse;
+        private GetRequestDetailsResponse _getRequestDetailsResponse;
         private const int GROUPID = -1;
 
         private TaskNotificationMessage _classUnderTest;
@@ -46,13 +46,19 @@ namespace CommunicationService.UnitTests.SendGridService
                 }
             };
 
-            _getJobDetailsResponse = new GetJobDetailsResponse()
+            _getRequestDetailsResponse = new GetRequestDetailsResponse()
             {
-                JobSummary = new JobSummary()
+                RequestSummary = new RequestSummary()
                 {
-                    ReferringGroupID = GROUPID,
-                    PostCode = "PostCode",
-                    SupportActivity = SupportActivities.Shopping
+                    JobSummaries = new List<JobSummary>()
+                    {
+                        new JobSummary()
+                        {
+                            ReferringGroupID = GROUPID,
+                            PostCode = "PostCode",
+                           SupportActivity = SupportActivities.Shopping
+                        }
+                    }
                 }
             };
 
@@ -90,17 +96,25 @@ namespace CommunicationService.UnitTests.SendGridService
         {
             _requestService = new Mock<IConnectRequestService>();
 
-            _requestService.Setup(x => x.GetJobDetailsAsync(It.IsAny<int>()))
-                .ReturnsAsync(() => _getJobDetailsResponse);
+            _requestService.Setup(x => x.GetRequestDetailsAsync(It.IsAny<int>()))
+                .ReturnsAsync(() => _getRequestDetailsResponse);
         }
 
         [Test]
         public void MissingStrategy_ThrowsException()
         {
-            int? jobId = 1;
+            int? jobId =null;
             int? groupId = GROUPID;
             int? recipientUserId = null;
-            int? requestId = null;
+            int? requestId = 1;
+
+            _getRequestDetailsResponse = new GetRequestDetailsResponse()
+            {
+                RequestSummary = new RequestSummary()
+                {
+                    ReferringGroupID = GROUPID
+                }
+            };
 
             _getGroupNewRequestNotificationStrategyResponse = null;
             Exception ex = Assert.ThrowsAsync<Exception>(() => _classUnderTest.IdentifyRecipients
@@ -115,9 +129,9 @@ namespace CommunicationService.UnitTests.SendGridService
         public async Task IdentifyRecipientsReturnsCorrectUsers()
         {
             int? recipientUserId = null;
-            int? jobId = 1;
+            int? jobId = null;
             int? groupId = GROUPID;
-            int? requestId = null;
+            int? requestId = 1;
             int maxVolunteer = 10;
 
             _getGroupNewRequestNotificationStrategyResponse = new GetGroupNewRequestNotificationStrategyResponse()
@@ -156,17 +170,17 @@ namespace CommunicationService.UnitTests.SendGridService
         [Test]
         public async Task MissingGroupID_ThrowsException()
         {
-            int? jobId = 1;
+            int? jobId = null;
             int? groupId = null;
             int? recipientUserId = null;
-            int? requestId = null;
+            int? requestId = 1;
 
             Exception ex = Assert.ThrowsAsync<Exception>(() => _classUnderTest.IdentifyRecipients
             (
              recipientUserId, jobId, groupId, requestId, null  
             ));
 
-            Assert.AreEqual($"GroupID or JobID is missing", ex.Message);
+            Assert.AreEqual($"GroupID or RequestID is missing", ex.Message);
         }
 
         
