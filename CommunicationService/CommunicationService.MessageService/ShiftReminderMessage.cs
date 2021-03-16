@@ -63,7 +63,7 @@ namespace CommunicationService.MessageService
         {
             var request = await _connectRequestService.GetRequestDetailsAsync(requestId.Value);
             var user = await _connectUserService.GetUserByIdAsync(recipientUserId.Value);
-            var job = request.RequestSummary.JobSummaries.Where(x => x.JobID == jobId.Value).FirstOrDefault();
+            var job = request.RequestSummary.JobBasics.Where(x => x.JobID == jobId.Value).FirstOrDefault();
             var location = await _connectAddressService.GetLocationDetails(request.RequestSummary.Shift.Location, CancellationToken.None);
 
             string encodedJobId = Base64Utils.Base64Encode(jobId.Value.ToString());
@@ -124,7 +124,7 @@ namespace CommunicationService.MessageService
             if (shifts != null && shifts?.RequestSummaries.Count > 0)
             {
                 shifts.RequestSummaries
-                    .SelectMany(shiftjobs => shiftjobs.JobSummaries)?
+                    .SelectMany(shiftjobs => shiftjobs.JobBasics)?
                     .Where(w => w.JobStatus == JobStatuses.Accepted)
                     .ToList()
                     .ForEach(job => AddRecipientAndTemplate(TemplateName.ShiftReminder, job.VolunteerUserID.Value, job.JobID, job.ReferringGroupID, job.RequestID));

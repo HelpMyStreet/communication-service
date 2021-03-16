@@ -99,7 +99,7 @@ namespace CommunicationService.MessageService
 
         private SupportActivities GetSupportActivityFromRequest(GetRequestDetailsResponse request)
         {
-            var activities = request.RequestSummary.JobSummaries.Select(x => x.SupportActivity).Distinct();
+            var activities = request.RequestSummary.JobBasics.Select(x => x.SupportActivity).Distinct();
 
             if(activities.Count()==1)
             {
