@@ -32,9 +32,6 @@ namespace CommunicationService.MessageService
         private readonly IOptions<EmailConfig> _emailConfig;
         private readonly IConnectGroupService _connectGroupService;
         private IEqualityComparer<ShiftJob> _shiftJobDedupe_EqualityComparer;
-        private CacheItemPolicy _cacheItemPolicy;
-        private ObjectCache _cache;
-        private const string CACHEKEY_GETLOCATIONS = "getLocations";
 
         List<SendMessageRequest> _sendMessageRequests;
 
@@ -58,9 +55,6 @@ namespace CommunicationService.MessageService
             _connectGroupService = connectGroupService;
             _shiftJobDedupe_EqualityComparer = new JobBasicDedupe_EqualityComparer();
             _sendMessageRequests = new List<SendMessageRequest>();
-            _cacheItemPolicy = new CacheItemPolicy();
-            _cacheItemPolicy.AbsoluteExpiration = DateTime.Now.AddHours(1.0);
-            _cache = MemoryCache.Default;
         }
 
         public async Task<List<SendMessageRequest>> IdentifyRecipients(int? recipientUserId, int? jobId, int? groupId, int? requestId, Dictionary<string, string> additionalParameters)
