@@ -156,11 +156,10 @@ namespace CommunicationService.UnitTests.SendGridService
             _emailConfigSettings = new EmailConfig
             {
                 ShowUserIDInEmailTitle = true,
-                DigestOtherJobsDistance = 20,
                 RegistrationChaserMaxTimeInHours = 2,
                 RegistrationChaserMinTimeInMinutes = 30,
                 ServiceBusSleepInMilliseconds = 1000,
-                ShiftRadius = 20
+                OpenRequestRadius = 20
             };
 
             _emailConfig = new Mock<IOptions<EmailConfig>>();

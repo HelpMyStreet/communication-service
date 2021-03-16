@@ -165,7 +165,7 @@ namespace CommunicationService.MessageService
                 }
             }
 
-            if (openShifts?.Count>0)
+            if (openShifts?.Count > 0)
             {
                 var requests = openShifts
                     .Distinct(_shiftJobDedupe_EqualityComparer)
@@ -173,21 +173,12 @@ namespace CommunicationService.MessageService
 
                 foreach (var shift in requests)
                 {
-                    var request = await _connectRequestService.GetRequestDetailsAsync(item.RequestID);
-                    var location = await _connectAddressService.GetLocationDetails(request.RequestSummary.Shift.Location, CancellationToken.None);
-                    var distance = calculator.GetDistanceInMiles(userPostalCode.Latitude, 
-                        userPostalCode.Longitude,
-                        (double) location.Latitude,
-                        (double) location.Longitude);
-
-                    if(distance<= _emailConfig.Value.ShiftRadius)
-                    {
-                        string shiftDate = request.RequestSummary.Shift.StartDate.FormatDate(DateTimeFormat.LongDateTimeFormat) + " - " + request.RequestSummary.Shift.EndDate.FormatDate(DateTimeFormat.TimeFormat);
-                        shiftItemList.Add(new ShiftItem($"<strong>{ item.SupportActivity.FriendlyNameShort() }</strong> " +
-                            $"at {location.Name} " +
-                            $"( {Math.Round(distance, 2)} miles away) " +
-                            $"- {shiftDate}"));                 
-                    }
+                    var location = await _connectAddressService.GetLocationDetails(shift.Location, CancellationToken.None);
+                    string shiftDate = shift.StartDate.FormatDate(DateTimeFormat.LongDateTimeFormat) + " - " + shift.EndDate.FormatDate(DateTimeFormat.TimeFormat);
+                    shiftItemList.Add(new ShiftItem($"<strong>{ shift.SupportActivity.FriendlyNameShort() }</strong> " +
+                        $"at {location.Name} " +
+                        $"( {Math.Round(shift.DistanceInMiles, 2)} miles away) " +
+                        $"- {shiftDate}"));
                 }
             }
 
