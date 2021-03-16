@@ -58,7 +58,8 @@ namespace CommunicationService.UnitTests.SendGridService
                             PostCode = "PostCode",
                            SupportActivity = SupportActivities.Shopping
                         }
-                    }
+                    },
+                    ShiftJobs = new List<ShiftJob>()
                 }
             };
 
