@@ -16,7 +16,7 @@ namespace CommunicationService.MessageService.Substitution
             bool urgent,
             bool isSingleItem,
             int count,
-            string encodedJobId,
+            string encodedRequestId,
             string distanceInMiles
             )
         {
@@ -27,7 +27,7 @@ namespace CommunicationService.MessageService.Substitution
             Urgent = urgent;
             IsSingleItem = isSingleItem;
             Count = count;
-            EncodedJobID = encodedJobId;
+            EncodedRequestID = encodedRequestId;
             DistanceInMiles = distanceInMiles;
         }
 
@@ -38,7 +38,7 @@ namespace CommunicationService.MessageService.Substitution
         public bool Urgent { get; private set; }
         public bool IsSingleItem { get; private set; }
         public int Count { get; private set; }
-        public string EncodedJobID { get; private set; }
+        public string EncodedRequestID { get; private set; }
         public string DistanceInMiles { get; private set; }
     }
 
@@ -58,35 +58,35 @@ namespace CommunicationService.MessageService.Substitution
     {
         public string Title { get; private set; }
         public string FirstName { get; private set; }        
-        public int ChosenJobs { get; private set; }
-        public bool OtherJobs { get; private set; }
+        public int ChosenRequestTasks { get; private set; }
+        public bool OtherRequestTasks { get; private set; }
         public bool ShiftsAvailable { get; private set; }
         public int ShiftCount { get; set; }
-        public List<DailyDigestDataJob> ChosenJobList { get; private set; }
-        public List<DailyDigestDataJob> OtherJobsList { get; private set; }
+        public List<DailyDigestDataJob> ChosenRequestTaskList { get; private set; }
+        public List<DailyDigestDataJob> OtherRequestTaskList { get; private set; }
         public List<ShiftItem> ShiftItemList { get; private set; }
 
         public DailyDigestData(
             string title,
             string firstName,            
-            int chosenJobs,
-            bool otherJobs,
+            int chosenRequestTasks,
+            bool otherRequestTasks,
             bool shiftsAvailable,
             int shiftCount,
-            List<DailyDigestDataJob> chosenJobsList,
-            List<DailyDigestDataJob> otherJobsList,
+            List<DailyDigestDataJob> chosenRequestTaskList,
+            List<DailyDigestDataJob> otherRequestTaskList,
             List<ShiftItem> shiftItemList
             )
 
         {
             Title = title;
             FirstName = firstName;
-            ChosenJobs = chosenJobs;
-            OtherJobs = otherJobs;
+            ChosenRequestTasks = chosenRequestTasks;
+            OtherRequestTasks = otherRequestTasks;
             ShiftsAvailable = shiftsAvailable;
             ShiftCount = shiftCount;
-            ChosenJobList = chosenJobsList;
-            OtherJobsList = otherJobsList;
+            ChosenRequestTaskList = chosenRequestTaskList;
+            OtherRequestTaskList = otherRequestTaskList;
             ShiftItemList = shiftItemList;
         }
     }
