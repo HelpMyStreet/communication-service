@@ -4,6 +4,7 @@ using CommunicationService.Core.Interfaces;
 using CommunicationService.Core.Interfaces.Repositories;
 using CommunicationService.Core.Interfaces.Services;
 using CommunicationService.MessageService.Substitution;
+using HelpMyStreet.Contracts.AddressService.Request;
 using HelpMyStreet.Contracts.RequestService.Request;
 using HelpMyStreet.Utils.Enums;
 using HelpMyStreet.Utils.EqualityComparers;
@@ -14,6 +15,7 @@ using System;
 using System.Collections.Generic;
 using System.Dynamic;
 using System.Linq;
+using System.Runtime.Caching;
 using System.Security.Cryptography.X509Certificates;
 using System.Text;
 using System.Threading;
@@ -71,12 +73,12 @@ namespace CommunicationService.MessageService
                 {
                     foreach (var x in locationsSupportActivities)
                     {
-                        var locations = await _connectAddressService.GetLocationDetails(x.Location);
+                        var locations = await _connectAddressService.GetLocationDetails(x.Location, CancellationToken.None);
 
                         if (locations != null)
                         {
                             var users = await _connectUserService.GetVolunteersByPostcodeAndActivity(
-                                locations.LocationDetails.Address.Postcode,
+                                locations.Address.Postcode,
                                 new List<SupportActivities>() { x.SupportActivity },
                                 _emailConfig.Value.OpenRequestRadius,
                                 CancellationToken.None);
@@ -127,7 +129,7 @@ namespace CommunicationService.MessageService
 
         private async Task<List<ShiftJob>> GetOpenShiftsForUser(int userId, string locations)
         {
-            LocationsRequest lr = new LocationsRequest() { Locations = new List<Location>() };
+            HelpMyStreet.Contracts.RequestService.Request.LocationsRequest lr = new HelpMyStreet.Contracts.RequestService.Request.LocationsRequest() { Locations = new List<Location>() };
 
             locations.Split(",").ToList()
                 .ForEach(x =>
@@ -209,7 +211,7 @@ namespace CommunicationService.MessageService
                                 subject: mostCommonActivity.HasValue ? $"New { mostCommonActivity.Value.FriendlyNameShort() } shifts have been added to HelpMyStreet" : "New activities have been added to HelpMyStreet",
                                 firstName: user.UserPersonalDetails.FirstName,
                                 shift: true,
-                                requestList: GetRequestList(openShifts, user.PostalCode)
+                                requestList: GetRequestList(openShifts)
                              ),
                     EmailToAddress = user.UserPersonalDetails.EmailAddress,
                     EmailToName = $"{user.UserPersonalDetails.FirstName} {user.UserPersonalDetails.LastName}",
@@ -254,7 +256,7 @@ namespace CommunicationService.MessageService
             return a.Activity;
         }
 
-        private List<JobDetails> GetRequestList(List<ShiftJob> jobs, string postCode)
+        private List<JobDetails> GetRequestList(List<ShiftJob> jobs)
         {
             var summary = jobs.GroupBy(x => new { x.SupportActivity, x.StartDate, x.EndDate, x.ShiftLength, x.Location })
                 .OrderBy(o => o.Key.StartDate)
@@ -264,14 +266,14 @@ namespace CommunicationService.MessageService
                     ShiftDetails = $"{m.Key.StartDate.FormatDate(DateTimeFormat.LongDateTimeFormat)} - {m.Key.EndDate.FormatDate(DateTimeFormat.TimeFormat)}",
                 }).ToList();
 
-            List<JobDetails> result  = new List<JobDetails>();
+            List<JobDetails> result = new List<JobDetails>();
             foreach (var item in summary)
             {
-                var locationDetails = _connectAddressService.GetLocationDetails(item.Location).Result;
-                
+                var locationDetails = _connectAddressService.GetLocationDetails(item.Location, CancellationToken.None).Result;
+
                 result.Add(new JobDetails(
                     $"<strong>{item.SupportActivity.FriendlyNameShort()}</strong> " +
-                    $"at <strong>{locationDetails.LocationDetails.Name}</strong>." +
+                    $"at <strong>{locationDetails.Name}</strong>." +
                     $"Shift: { item.ShiftDetails }"));
             }
 
