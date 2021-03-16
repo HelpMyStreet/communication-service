@@ -21,6 +21,8 @@ using HelpMyStreet.Contracts.RequestService.Response;
 using HelpMyStreet.Utils.Extensions;
 using System.IO;
 using UserService.Core.Utils;
+using System.Reflection.Metadata.Ecma335;
+using System.Threading;
 using HelpMyStreet.Utils.EqualityComparers;
 
 namespace CommunicationService.MessageService
@@ -163,7 +165,7 @@ namespace CommunicationService.MessageService
                 }
             }
 
-            if (openShifts?.Count>0)
+            if (openShifts?.Count > 0)
             {
                 var requests = openShifts
                     .Distinct(_shiftJobDedupe_EqualityComparer)
@@ -171,12 +173,12 @@ namespace CommunicationService.MessageService
 
                 foreach (var shift in requests)
                 {
-                    var location = await _connectAddressService.GetLocationDetails(shift.Location);                    
-                        string shiftDate = shift.StartDate.FormatDate(DateTimeFormat.LongDateTimeFormat) + " - " + shift.EndDate.FormatDate(DateTimeFormat.TimeFormat);
-                        shiftItemList.Add(new ShiftItem($"<strong>{ shift.SupportActivity.FriendlyNameShort() }</strong> " +
-                            $"at {location.LocationDetails.Name} " +
-                            $"( {Math.Round(shift.DistanceInMiles, 2)} miles away) " +
-                            $"- {shiftDate}"));
+                    var location = await _connectAddressService.GetLocationDetails(shift.Location, CancellationToken.None);
+                    string shiftDate = shift.StartDate.FormatDate(DateTimeFormat.LongDateTimeFormat) + " - " + shift.EndDate.FormatDate(DateTimeFormat.TimeFormat);
+                    shiftItemList.Add(new ShiftItem($"<strong>{ shift.SupportActivity.FriendlyNameShort() }</strong> " +
+                        $"at {location.Name} " +
+                        $"( {Math.Round(shift.DistanceInMiles, 2)} miles away) " +
+                        $"- {shiftDate}"));
                 }
             }
 

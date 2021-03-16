@@ -17,6 +17,7 @@ using CommunicationService.Core.Services;
 using CommunicationService.Core.Interfaces.Repositories;
 using CommunicationService.Core.Domains;
 using System.Linq;
+using HelpMyStreet.Utils.Enums;
 
 namespace CommunicationService.AzureFunction
 {

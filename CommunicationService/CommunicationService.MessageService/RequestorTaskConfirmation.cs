@@ -132,14 +132,14 @@ namespace CommunicationService.MessageService
         {
             List<RequestJob> requestJobs = new List<RequestJob>();
 
-            var locationDetails = _connectAddressService.GetLocationDetails(response.RequestSummary.Shift.Location).Result;
+            var locationDetails = _connectAddressService.GetLocationDetails(response.RequestSummary.Shift.Location, CancellationToken.None).Result;
 
             if(locationDetails ==null)
             {
                 throw new Exception($"Unable to retrieve location details for request {response.RequestSummary.RequestID}");
             }
 
-            string locationName = locationDetails.LocationDetails.ShortName;
+            string locationName = locationDetails.ShortName;
 
             var time = TimeSpan.FromMinutes(response.RequestSummary.Shift.ShiftLength);
 

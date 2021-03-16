@@ -15,6 +15,7 @@ using CommunicationService.Core.Domains.SendGrid;
 using HelpMyStreet.Utils.Utils;
 using Microsoft.Extensions.Options;
 using CommunicationService.Core.Configuration;
+using System.Threading;
 
 namespace CommunicationService.MessageService
 {
@@ -63,7 +64,7 @@ namespace CommunicationService.MessageService
             var request = await _connectRequestService.GetRequestDetailsAsync(requestId.Value);
             var user = await _connectUserService.GetUserByIdAsync(recipientUserId.Value);
             var job = request.RequestSummary.JobSummaries.Where(x => x.JobID == jobId.Value).FirstOrDefault();
-            var location = await _connectAddressService.GetLocationDetails(request.RequestSummary.Shift.Location);
+            var location = await _connectAddressService.GetLocationDetails(request.RequestSummary.Shift.Location, CancellationToken.None);
 
             string encodedJobId = Base64Utils.Base64Encode(jobId.Value.ToString());
             var joburlToken = await _linkRepository.CreateLink($"/link/j/{encodedJobId}", _linkConfig.Value.ExpiryDays);
@@ -75,7 +76,7 @@ namespace CommunicationService.MessageService
                     subject: "Volunteer shift reminder",
                     firstname: user.UserPersonalDetails.FirstName,
                     activity: job.SupportActivity.FriendlyNameShort(),
-                    location: location.LocationDetails.Name,
+                    location: location.Name,
                     shiftStartDateString: FormatDate(request.RequestSummary.Shift.StartDate),
                     shiftEndDateString: FormatDate(request.RequestSummary.Shift.EndDate),
                     locationAddress: string.Empty,

@@ -32,6 +32,10 @@ using HelpMyStreet.Utils.Utils;
 using CommunicationService.AddressService;
 using CommunicationService.Core.Services;
 using UserService.Core.Utils;
+using HelpMyStreet.Utils.CoordinatedResetCache;
+using HelpMyStreet.Cache.Extensions;
+using HelpMyStreet.Cache;
+using HelpMyStreet.Utils.Models;
 
 [assembly: FunctionsStartup(typeof(CommunicationService.AzureFunction.Startup))]
 namespace CommunicationService.AzureFunction
@@ -128,6 +132,10 @@ namespace CommunicationService.AzureFunction
 
             SendGridManagement.EmailTemplateUploader emailTemplateUploader =
                 new SendGridManagement.EmailTemplateUploader(new SendGridClient(sendGridConfig.ApiKey), InitializeCosmosClientInstance(cosmosConfig));
+
+            builder.Services.AddSingleton<IPollyMemoryCacheProvider, PollyMemoryCacheProvider>();
+            builder.Services.AddMemCache();
+            builder.Services.AddSingleton(x => x.GetService<IMemDistCacheFactory<LocationDetails>>().GetCache(new TimeSpan(30, 0, 0, 0), ResetTimeFactory.OnMidday));
 
             emailTemplateUploader.Migrate().ConfigureAwait(false);
         }
