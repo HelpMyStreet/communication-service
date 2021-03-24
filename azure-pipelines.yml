@@ -6,7 +6,7 @@
 trigger:
 - master
 - next-major-release
-- JM/RevertDIY
+- dev
 
 pool:
   vmImage: 'windows-latest'
