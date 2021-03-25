@@ -73,7 +73,7 @@ namespace CommunicationService.MessageService
 
                     if(groupJobs.Count>1)
                     {
-                        repeatMessage = $" required {groupJobs.Count} times - ";
+                        repeatMessage = $" required {groupJobs.Count} times";
                         dueDate = $"First Due - {job.DueDate.FormatDate(DateTimeFormat.ShortDateFormat)}";
                     }
 
