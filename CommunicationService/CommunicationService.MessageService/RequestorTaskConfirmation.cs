@@ -16,6 +16,7 @@ using Microsoft.Extensions.Options;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Cryptography.X509Certificates;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -25,13 +26,16 @@ namespace CommunicationService.MessageService
     {
         public GroupJob(
             SupportActivities supportActivity,
+            DateTime dueDate,
             int count
             )
         {
             SupportActivity = supportActivity;
+            DueDate = dueDate;
             Count = count;
         }
         public SupportActivities SupportActivity { get; private set; }
+        public DateTime DueDate { get; private set; }
         public int Count { get; private set; }        
     }
 
@@ -92,38 +96,52 @@ namespace CommunicationService.MessageService
             string dueDateString = string.Empty;
             bool showJobUrl = false;
             string jobUrl = string.Empty;
-            
-            //TODO - This can be written to handle multiple jobs for a standard request. Need to tweak when repeat enquiries functionality added
-            if (groupJobs.Count==1)
+
+            int jobid = response.RequestSummary.JobBasics.OrderBy(x=> x.DueDate).First().JobID;
+            GetJobDetailsResponse jobResponse = _connectRequestService.GetJobDetailsAsync(jobid).Result;
+
+            if (jobResponse != null)
             {
-                int jobid = response.RequestSummary.JobBasics[0].JobID;
-                GetJobDetailsResponse jobResponse = _connectRequestService.GetJobDetailsAsync(jobid).Result;
-
-                if (jobResponse != null)
-                {
-                    RequestRoles getChangedBy = GetChangedByRole(jobResponse);
-                    showJobUrl = getChangedBy == RequestRoles.Volunteer
-               || getChangedBy == RequestRoles.GroupAdmin
-               || (getChangedBy == RequestRoles.Requestor && jobResponse.JobSummary.RequestorDefinedByGroup);
-                    jobUrl = showJobUrl ? GetJobUrl(jobid, response.RequestSummary.RequestID, groupJobs[0].Count) : string.Empty;
-
-                    dueDateString = $" - Due Date: <strong>{jobResponse.JobSummary.DueDate.FormatDate(DateTimeFormat.LongDateFormat)}.</strong>";
-                }
-                else
-                {
-                    throw new Exception($"Unable to retrieve job details for jobid { jobid }");
-                }                
+                RequestRoles getChangedBy = GetChangedByRole(jobResponse);
+                showJobUrl = getChangedBy == RequestRoles.Volunteer || getChangedBy == RequestRoles.GroupAdmin || (getChangedBy == RequestRoles.Requestor && jobResponse.JobSummary.RequestorDefinedByGroup);
+                jobUrl = showJobUrl ? GetJobUrl(jobid, response.RequestSummary.RequestID, groupJobs[0].Count) : string.Empty;               
             }
-                        
-            foreach (GroupJob gj in groupJobs)
+            else
             {
+                throw new Exception($"Unable to retrieve job details for jobid { jobid }");
+            }
+            
+            if (groupJobs.Count == 1)
+            {
+                dueDateString = $" - Due Date: <strong>{jobResponse.JobSummary.DueDate.FormatDate(DateTimeFormat.LongDateFormat)}.</strong>";
+                
+                foreach (GroupJob gj in groupJobs)
+                {
+                    requestJobs.Add(new RequestJob(
+                        activity: gj.SupportActivity.FriendlyNameShort(),
+                        countString: gj.Count == 1 ? string.Empty : $" - {gj.Count} volunteers required. ",
+                        dueDateString: dueDateString,
+                        showJobUrl: showJobUrl,
+                        jobUrl: jobUrl
+                        ));
+                }
+
+            }
+            else
+            {
+                //must be a repeat
+                dueDateString = $" - First Due Date: <strong>{jobResponse.JobSummary.DueDate.FormatDate(DateTimeFormat.LongDateFormat)}.</strong>";
+
+                string repeatString = groupJobs.Count == 1 ? string.Empty : $" {groupJobs.Count} times";
+                string countString = groupJobs[0].Count == 1 ? string.Empty : $" - {groupJobs[0].Count} volunteers required";
+
                 requestJobs.Add(new RequestJob(
-                    activity: gj.SupportActivity.FriendlyNameShort(),
-                    countString: gj.Count == 1 ? string.Empty: $" - {gj.Count} volunteers required. ",
-                    dueDateString: dueDateString,
-                    showJobUrl: showJobUrl,
-                    jobUrl: jobUrl
-                    ));
+                        activity: jobResponse.JobSummary.SupportActivity.FriendlyNameShort(),
+                        countString: $"{countString}{repeatString}",
+                        dueDateString: dueDateString,
+                        showJobUrl: showJobUrl,
+                        jobUrl: jobUrl
+                        ));                
             }
             return requestJobs;
         }
@@ -165,8 +183,8 @@ namespace CommunicationService.MessageService
         {
             List<RequestJob> requestJobs = new List<RequestJob>();
             var groupJobs = response.RequestSummary.JobBasics
-                .GroupBy(x => x.SupportActivity)
-                .Select(g => new GroupJob(g.Key, g.Count()))
+                .GroupBy(x => new { x.SupportActivity, x.DueDate })
+                .Select(g => new GroupJob(g.Key.SupportActivity, g.Key.DueDate, g.Count()))
                 .ToList();
 
             switch (response.RequestSummary.RequestType)

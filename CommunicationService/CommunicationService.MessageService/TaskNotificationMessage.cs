@@ -61,8 +61,23 @@ namespace CommunicationService.MessageService
                 var volunteer = volunteers.Volunteers.FirstOrDefault(x => x.UserID == user.ID);
                 if (user != null && requestDetails != null)
                 {
-                    var job = requestDetails.RequestSummary.JobSummaries.First();
-                    
+                    var job = requestDetails.RequestSummary.JobSummaries.OrderBy(x=> x.DueDate).First();
+
+                    string repeatMessage = string.Empty;
+                    string dueDate = $"Due - {job.DueDate.FormatDate(DateTimeFormat.ShortDateFormat)}";
+
+                    var groupJobs = requestDetails.RequestSummary.JobBasics
+                        .GroupBy(x => new { x.SupportActivity, x.DueDate })
+                        .Select(g => new GroupJob(g.Key.SupportActivity, g.Key.DueDate, g.Count()))
+                        .ToList();
+
+                    if(groupJobs.Count>1)
+                    {
+                        repeatMessage = $" required {groupJobs.Count} times";
+                        dueDate = $"First Due - {job.DueDate.FormatDate(DateTimeFormat.ShortDateFormat)}";
+                    }
+
+
                     return new EmailBuildData()
                     {
                         BaseDynamicData = new TaskNotificationData
@@ -73,9 +88,10 @@ namespace CommunicationService.MessageService
                             activity: supportActivity.FriendlyNameShort(),
                             postcode: requestDetails.RequestSummary.PostCode,
                             distanceFromPostcode: Math.Round(volunteer.DistanceInMiles, 1),
-                            dueDate: job.DueDate.FormatDate(DateTimeFormat.ShortDateFormat),
+                            dueDate: dueDate,
                             isHealthCritical: job.IsHealthCritical,
-                            isFaceMask: supportActivity == SupportActivities.FaceMask
+                            isFaceMask: supportActivity == SupportActivities.FaceMask,
+                            repeatMessage: repeatMessage
                         ),
                         EmailToAddress = user.UserPersonalDetails.EmailAddress,
                         EmailToName = $"{user.UserPersonalDetails.FirstName} {user.UserPersonalDetails.LastName}",
