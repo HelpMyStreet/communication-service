@@ -48,6 +48,8 @@ namespace CommunicationService.MessageService
             {
                 switch (dueDateType)
                 {
+                    case DueDateType.ASAP:
+                        return $"A request for help you accepted is due as soon as possible";
                     case DueDateType.Before:
                         return $"A request for help you accepted is due within {days} days";
                     case DueDateType.On:
@@ -73,6 +75,9 @@ namespace CommunicationService.MessageService
 
             switch (job.JobSummary.DueDateType)
             {
+                case DueDateType.ASAP:
+                    dueDateMessage = $"The help is needed as soon as possible.";
+                    break;
                 case DueDateType.Before:
                     dueDateMessage = $"The help is needed on or before {job.JobSummary.DueDate.FormatDate(DateTimeFormat.ShortDateFormat)} – {job.JobSummary.DueDays} days from now.";
                     break;
@@ -91,7 +96,7 @@ namespace CommunicationService.MessageService
                     job.JobSummary.PostCode,
                     job.JobSummary.DueDays == 0 ? true : false,
                     job.JobSummary.DueDays == 1 ? true : false,
-                    job.JobSummary.DueDateType == DueDateType.Before,
+                    job.JobSummary.DueDateType == DueDateType.Before || job.JobSummary.DueDateType == DueDateType.ASAP,
                     job.JobSummary.DateStatusLastChanged.FormatDate(DateTimeFormat.ShortDateFormat),
                     dueDateMessage,
                     dueDateString: $"({job.JobSummary.DueDate.FormatDate(DateTimeFormat.ShortDateFormat)})" 
@@ -136,6 +141,7 @@ namespace CommunicationService.MessageService
                 {
                     switch(summary.DueDays, summary.DueDateType)
                     {
+                        case (0, DueDateType.ASAP):
                         case (0, DueDateType.Before):
                             AddRecipientAndTemplate(TemplateName.TaskReminder, summary.VolunteerUserID.Value, summary.JobID, groupId, requestId);
                             break;
@@ -148,6 +154,8 @@ namespace CommunicationService.MessageService
                         case (1, DueDateType.On):
                             AddRecipientAndTemplate(TemplateName.TaskReminder, summary.VolunteerUserID.Value, summary.JobID, groupId, requestId);
                             break;
+                        case (3, DueDateType.ASAP):
+                        case (7, DueDateType.ASAP):
                         case (3, DueDateType.Before):
                         case (7, DueDateType.Before):
                             if ((DateTime.Now - summary.DateStatusLastChanged).TotalHours > 24)
