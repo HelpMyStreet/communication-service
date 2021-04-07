@@ -83,6 +83,9 @@ namespace CommunicationService.MessageService
 
             switch (job.JobSummary.DueDateType)
             {
+                case DueDateType.ASAP:
+                    strDaysFromNow += $"As soon as possible";
+                    break;
                 case DueDateType.Before:
                     strDaysFromNow += daysFromNow == 0 ? "Today" : $"On or before {dueDate.ToString(DATE_FORMAT)}";
                     break;
