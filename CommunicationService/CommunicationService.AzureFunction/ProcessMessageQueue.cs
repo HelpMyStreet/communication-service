@@ -55,9 +55,10 @@ public class ProcessMessageQueue
                 
                 if (emailBuildData != null)
                 {
-                    emailBuildData.JobID = sendMessageRequest.JobID;
-                    emailBuildData.GroupID = sendMessageRequest.GroupID;
+                    emailBuildData.JobID = emailBuildData.JobID.HasValue ? emailBuildData.JobID : sendMessageRequest.JobID;
+                    emailBuildData.GroupID = emailBuildData.GroupID.HasValue ? emailBuildData.GroupID : sendMessageRequest.GroupID;
                     emailBuildData.RecipientUserID = sendMessageRequest.RecipientUserID;
+                    emailBuildData.RequestID = emailBuildData.RequestID.HasValue ? emailBuildData.RequestID : sendMessageRequest.RequestID;
                     var result = await _connectSendGridService.SendDynamicEmail(mySbMsg.MessageId, sendMessageRequest.TemplateName, message.GetUnsubscriptionGroupName(sendMessageRequest.RecipientUserID), emailBuildData);
                     log.LogInformation($"SendDynamicEmail({sendMessageRequest.TemplateName}) returned {result}");
                     if (result)

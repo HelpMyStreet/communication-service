@@ -1,0 +1,62 @@
+﻿{
+  "Templates": [
+    {
+      "name": "TaskReminder",
+      "subject": "Request reminder",
+      "generation": "dynamic",
+      "versions": [
+        {
+          "name": "Fix link",
+          "subject": "Request reminder"
+        }
+      ]
+    },
+    {
+      "name": "YotiReminder",
+      "subject": "Welcome to HelpMyStreet! Verify your identity to access requests",
+      "generation": "dynamic",
+      "versions": [
+        {
+          "name": "Fix link",
+          "subject": "Welcome to HelpMyStreet! Verify your identity to access requests"
+        }
+      ]
+    },
+    {
+      "name": "Welcome",
+      "subject": "Welcome to HelpMyStreet!",
+      "generation": "dynamic",
+      "versions": [
+        {
+          "name": "Fix link",
+          "subject": "Welcome to HelpMyStreet!"
+        }
+      ]
+    },
+    {
+      "name": "ThanksForVerifying",
+      "subject": "Thanks for verifying your identity with HelpMyStreet!",
+      "generation": "dynamic",
+      "versions": [
+        {
+          "name": "Fix link",
+          "subject": "Thanks for verifying your identity with HelpMyStreet!"
+        }
+      ]
+    },
+    {
+      "name": "TaskNotification",
+      "subject": "A New HelpMyStreet Request Has Been Raised",
+      "generation": "dynamic",
+      "versions": [
+        {
+          "name": "Fix link",
+          "subject": "A New HelpMyStreet Request Has Been Raised"
+        }
+      ]
+    }
+
+  ]
+}
+
+
