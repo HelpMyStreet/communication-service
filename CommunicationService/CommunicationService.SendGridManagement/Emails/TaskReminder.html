@@ -12,14 +12,14 @@
     <p>Have you already completed the request? If so – then thanks so much! It would be great if you could mark it as “Done” <a href="{{BaseUrl}}/link/j/{{EncodedJobID}}">here</a> so that we know.</p>
     <p>Are you having problems? If you’re having technical difficulties or are unsure what you need to do, please do let us know at <a href="mailto:support@helpmystreet.org">support@helpmystreet.org</a> and we’ll do anything we can to help.</p>
     <p>
-        Are you no longer able to complete the task? Please “release” it by clicking the “Can’t Do” button beside it in your <a href="{{BaseUrl}}/link/j/{{EncodedJobID}}">My Accepted Requests</a> tab. This will make it available again for other volunteers to pick up if needed.
+        Are you no longer able to complete the task? Please “release” it by clicking the “Can’t Do” button beside it in your <a href="{{BaseUrl}}/link/j/{{EncodedJobID}}">My Requests</a> tab. This will make it available again for other volunteers to pick up if needed.
     </p>
 {{else}}
     {{#if DueTomorrow}}
         <p><strong>We just wanted to remind you that the help is needed tomorrow {{DueDateString}}.</strong></p>
         <p>You can find all the details you need in the request <a href="{{BaseUrl}}/link/j/{{EncodedJobID}}">here</a>.</p>
         <p>If you’re having problems please get in touch with us at <a href="mailto:support@helpmystreet.org?subject=Request%20{{EncodedJobID}}">support@helpmystreet.org</a>.</p>
-        <p>If you’re no longer able to complete the request, please “release” it by clicking the “Can’t Do” button beside it in your <a href="{{BaseUrl}}/link/j/{{EncodedJobID}}">My Accepted Requests</a> tab. This will make it available again for other volunteers to pick up if needed.</p>
+        <p>If you’re no longer able to complete the request, please “release” it by clicking the “Can’t Do” button beside it in your <a href="{{BaseUrl}}/link/j/{{EncodedJobID}}">My Requests</a> tab. This will make it available again for other volunteers to pick up if needed.</p>
     {{else}}
         <p><strong>{{DueDateMessage}}</strong></p>
         {{#if CanBeCompletedBeforeDueDate}}
@@ -31,7 +31,7 @@
             Are you having problems? If you’re having technical difficulties or are unsure what you need to do, please do let us know at <a href="mailto:support@helpmystreet.org?subject=Request%20{{EncodedJobID}}">support@helpmystreet.org</a> and we’ll do anything we can to help.
         </p>
         <p>
-            Are you no longer able to complete the task? Please “release” it by clicking the “Can’t Do” button beside it in your <a href="{{BaseUrl}}/link/j/{{EncodedJobID}}">My Accepted Requests</a> tab. This will make it available again for other volunteers to pick up if needed.
+            Are you no longer able to complete the task? Please “release” it by clicking the “Can’t Do” button beside it in your <a href="{{BaseUrl}}/link/j/{{EncodedJobID}}">My Requests</a> tab. This will make it available again for other volunteers to pick up if needed.
         </p>
     {{/if}}
 {{/if}}

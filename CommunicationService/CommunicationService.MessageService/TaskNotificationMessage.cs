@@ -78,7 +78,17 @@ namespace CommunicationService.MessageService
                             isFaceMask: supportActivity == SupportActivities.FaceMask
                         ),
                         EmailToAddress = user.UserPersonalDetails.EmailAddress,
-                        EmailToName = $"{user.UserPersonalDetails.FirstName} {user.UserPersonalDetails.LastName}"
+                        EmailToName = $"{user.UserPersonalDetails.FirstName} {user.UserPersonalDetails.LastName}",
+                        RequestID = job.RequestID,
+                        ReferencedJobs = new List<ReferencedJob>()
+                        {
+                            new ReferencedJob()
+                            {
+                                G = job.ReferringGroupID,
+                                R = job.RequestID,
+                                J = job.JobID
+                            }
+                        }
                     };
                 }
 
@@ -89,7 +99,7 @@ namespace CommunicationService.MessageService
 
         private SupportActivities GetSupportActivityFromRequest(GetRequestDetailsResponse request)
         {
-            var activities = request.RequestSummary.JobSummaries.Select(x => x.SupportActivity).Distinct();
+            var activities = request.RequestSummary.JobBasics.Select(x => x.SupportActivity).Distinct();
 
             if(activities.Count()==1)
             {

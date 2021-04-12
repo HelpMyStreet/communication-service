@@ -68,12 +68,12 @@ namespace CommunicationService.MessageService
             _sendMessageRequests = new List<SendMessageRequest>();
         }
 
-        private string GetJobUrl(int jobId)
+        private string GetJobUrl(int jobId, int requestId, int jobCount)
         {
             string baseUrl = _sendGridConfig.Value.BaseUrl;
-            string encodedJobId = Base64Utils.Base64Encode(jobId.ToString());
+            string encodedId = jobCount == 1 ? Base64Utils.Base64Encode(jobId.ToString()) : Base64Utils.Base64Encode(requestId.ToString());
 
-            string tailUrl = $"/link/j/{encodedJobId}";
+            string tailUrl = jobCount == 1 ? $"/link/j/{encodedId}" : $"/link/r/{encodedId}";
             var token = _linkRepository.CreateLink(tailUrl, _linkConfig.Value.ExpiryDays).Result;
             return $"{baseUrl}/link/{token}";
         }
@@ -93,10 +93,10 @@ namespace CommunicationService.MessageService
             bool showJobUrl = false;
             string jobUrl = string.Empty;
             
-            //TODO - This can be written to handle multiple jobs for a standard request
-            if (groupJobs.Count==1 && groupJobs[0].Count==1)
+            //TODO - This can be written to handle multiple jobs for a standard request. Need to tweak when repeat enquiries functionality added
+            if (groupJobs.Count==1)
             {
-                int jobid = response.RequestSummary.JobSummaries[0].JobID;
+                int jobid = response.RequestSummary.JobBasics[0].JobID;
                 GetJobDetailsResponse jobResponse = _connectRequestService.GetJobDetailsAsync(jobid).Result;
 
                 if (jobResponse != null)
@@ -105,7 +105,7 @@ namespace CommunicationService.MessageService
                     showJobUrl = getChangedBy == RequestRoles.Volunteer
                || getChangedBy == RequestRoles.GroupAdmin
                || (getChangedBy == RequestRoles.Requestor && jobResponse.JobSummary.RequestorDefinedByGroup);
-                    jobUrl = showJobUrl ? GetJobUrl(jobid) : string.Empty;
+                    jobUrl = showJobUrl ? GetJobUrl(jobid, response.RequestSummary.RequestID, groupJobs[0].Count) : string.Empty;
 
                     dueDateString = $" - Due Date: <strong>{jobResponse.JobSummary.DueDate.FormatDate(DateTimeFormat.LongDateFormat)}.</strong>";
                 }
@@ -119,7 +119,7 @@ namespace CommunicationService.MessageService
             {
                 requestJobs.Add(new RequestJob(
                     activity: gj.SupportActivity.FriendlyNameShort(),
-                    countString: string.Empty,
+                    countString: gj.Count == 1 ? string.Empty: $" - {gj.Count} volunteers required. ",
                     dueDateString: dueDateString,
                     showJobUrl: showJobUrl,
                     jobUrl: jobUrl
@@ -132,14 +132,14 @@ namespace CommunicationService.MessageService
         {
             List<RequestJob> requestJobs = new List<RequestJob>();
 
-            var locationDetails = _connectAddressService.GetLocationDetails(response.RequestSummary.Shift.Location).Result;
+            var locationDetails = _connectAddressService.GetLocationDetails(response.RequestSummary.Shift.Location, CancellationToken.None).Result;
 
             if(locationDetails ==null)
             {
                 throw new Exception($"Unable to retrieve location details for request {response.RequestSummary.RequestID}");
             }
 
-            string locationName = locationDetails.LocationDetails.ShortName;
+            string locationName = locationDetails.ShortName;
 
             var time = TimeSpan.FromMinutes(response.RequestSummary.Shift.ShiftLength);
 
@@ -164,7 +164,7 @@ namespace CommunicationService.MessageService
         private List<RequestJob> GetJobs(GetRequestDetailsResponse response)
         {
             List<RequestJob> requestJobs = new List<RequestJob>();
-            var groupJobs = response.RequestSummary.JobSummaries
+            var groupJobs = response.RequestSummary.JobBasics
                 .GroupBy(x => x.SupportActivity)
                 .Select(g => new GroupJob(g.Key, g.Count()))
                 .ToList();
@@ -196,13 +196,22 @@ namespace CommunicationService.MessageService
                 BaseDynamicData = new RequestorTaskConfirmationData
                 (
                     firstname: requestDetails.Requestor.FirstName,
-                    statusIsOpen: additionalParameters["PendingApproval"] == true.ToString(),
+                    pendingApproval: additionalParameters["PendingApproval"] == true.ToString(),
                     groupName: group.Group.GroupName,
                     requestJobList: GetJobs(requestDetails)
                 ),
                 EmailToAddress = requestDetails.Requestor.EmailAddress,
                 EmailToName = $"{requestDetails.Requestor.FirstName} {requestDetails.Requestor.LastName}",
                 RecipientUserID = REQUESTOR_DUMMY_USERID,
+                RequestID = requestId,
+                ReferencedJobs = new List<ReferencedJob>()
+                {
+                    new ReferencedJob()
+                    {
+                        G = requestDetails.RequestSummary.ReferringGroupID,
+                        R = requestId.Value
+                    }
+                }
             };
         }
 
