@@ -37,7 +37,6 @@ public class ProcessMessageQueue
         if (emailAlreadySent)
         {
             log.LogInformation($"email already sent for message id: {mySbMsg.MessageId}");
-            AddCommunicationRequestToCosmos(mySbMsg, "email already sent", null, string.Empty);
         }
         else
         {
@@ -47,7 +46,7 @@ public class ProcessMessageQueue
 
                 sendMessageRequest = JsonConvert.DeserializeObject<SendMessageRequest>(converted);
 
-                AddCommunicationRequestToCosmos(mySbMsg, "start", sendMessageRequest, string.Empty);
+                log.LogInformation($"start: {mySbMsg.MessageId}");
 
                 IMessage message = _messageFactory.Create(sendMessageRequest);
 
@@ -63,12 +62,12 @@ public class ProcessMessageQueue
                     log.LogInformation($"SendDynamicEmail({sendMessageRequest.TemplateName}) returned {result}");
                     if (result)
                     {
-                        AddCommunicationRequestToCosmos(mySbMsg, result.ToString(), sendMessageRequest,emailBuildData.EmailToAddress);
+                        log.LogInformation($"messageId: {mySbMsg.MessageId} result: {result.ToString()}");
                     }
                 }
                 else
                 {
-                    AddCommunicationRequestToCosmos(mySbMsg, "no emailBuildData", sendMessageRequest, string.Empty);
+                    log.LogInformation($"no emailBuildData: {mySbMsg.MessageId}");
                 }
             }
             catch (AggregateException exc)
@@ -84,9 +83,7 @@ public class ProcessMessageQueue
             }
         }
 
-        log.LogInformation($"processed message id: {mySbMsg.MessageId}");
-        AddCommunicationRequestToCosmos(mySbMsg, "finished", sendMessageRequest, string.Empty);
-
+        log.LogInformation($"processed message id: {mySbMsg.MessageId} finished");
     }
 
     public void RetryHandler(Message mySbMsg, SendMessageRequest sendMessageRequest, Exception ex, ILogger log)
