@@ -181,47 +181,53 @@ namespace CommunicationService.MessageService
 
             var openShifts = await GetOpenShiftsForUser(user.ID, locations);
 
+            if (openShifts.Count() ==0)
+            {
+                //No email to be sent as there are no open shifts
+                return null;
+            }
+
             List<int> requestsAlreadyNotified = await _cosmosDbService.GetShiftRequestDetailsSent(user.ID);
                         
             openShifts = openShifts.Where(x => !requestsAlreadyNotified.Contains(x.RequestID)).ToList();
 
-            if (openShifts.Count() > 0)
+            if (openShifts.Count() == 0)
             {
-
-                openShifts.GroupBy(x => x.RequestID)
-                    .ToList()
-                    .ForEach(async job =>
-                    {
-                        ExpandoObject o = new ExpandoObject();
-                        o.TryAdd("id", Guid.NewGuid());
-                        o.TryAdd("RequestId", job.Key);
-                        o.TryAdd("RecipientUserId", recipientUserId.Value);
-                        o.TryAdd("TemplateName", templateName);
-                        o.TryAdd("event", "PrepareTemplateData");
-                        await _cosmosDbService.AddItemAsync(o);
-                    });
-
-                SupportActivities? mostCommonActivity = GetMostCommonSupportActivityFromShifts(openShifts);
-
-                return new EmailBuildData()
-                {
-                    BaseDynamicData = new NewRequestNotificationMessageData
-                             (
-                                title: mostCommonActivity.HasValue ? $"New { mostCommonActivity.Value.FriendlyNameShort() } shifts" : string.Empty,
-                                subject: mostCommonActivity.HasValue ? $"New { mostCommonActivity.Value.FriendlyNameShort() } shifts have been added to HelpMyStreet" : "New activities have been added to HelpMyStreet",
-                                firstName: user.UserPersonalDetails.FirstName,
-                                shift: true,
-                                requestList: GetRequestList(openShifts)
-                             ),
-                    EmailToAddress = user.UserPersonalDetails.EmailAddress,
-                    EmailToName = $"{user.UserPersonalDetails.FirstName} {user.UserPersonalDetails.LastName}",
-                    ReferencedJobs = GetReferencedJobs(openShifts)
-                };
-            }
-            else
-            {
+                //No email to be sent as there are open shifts but user has already been notified
                 return null;
             }
+
+            //there are open shifts that the user has not been notified about
+            openShifts.GroupBy(x => x.RequestID)
+                .ToList()
+                .ForEach(async job =>
+                {
+                    ExpandoObject o = new ExpandoObject();
+                    o.TryAdd("id", Guid.NewGuid());
+                    o.TryAdd("RequestId", job.Key);
+                    o.TryAdd("RecipientUserId", recipientUserId.Value);
+                    o.TryAdd("TemplateName", templateName);
+                    o.TryAdd("event", "PrepareTemplateData");
+                    await _cosmosDbService.AddItemAsync(o);
+                });
+
+            SupportActivities? mostCommonActivity = GetMostCommonSupportActivityFromShifts(openShifts);
+
+            return new EmailBuildData()
+            {
+                BaseDynamicData = new NewRequestNotificationMessageData
+                            (
+                            title: mostCommonActivity.HasValue ? $"New { mostCommonActivity.Value.FriendlyNameShort() } shifts" : string.Empty,
+                            subject: mostCommonActivity.HasValue ? $"New { mostCommonActivity.Value.FriendlyNameShort() } shifts have been added to HelpMyStreet" : "New activities have been added to HelpMyStreet",
+                            firstName: user.UserPersonalDetails.FirstName,
+                            shift: true,
+                            requestList: GetRequestList(openShifts)
+                            ),
+                EmailToAddress = user.UserPersonalDetails.EmailAddress,
+                EmailToName = $"{user.UserPersonalDetails.FirstName} {user.UserPersonalDetails.LastName}",
+                ReferencedJobs = GetReferencedJobs(openShifts)
+            };
+            
         }
 
         private List<ReferencedJob> GetReferencedJobs(List<ShiftJob> shiftJobs)
