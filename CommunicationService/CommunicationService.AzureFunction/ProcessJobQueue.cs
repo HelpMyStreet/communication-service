@@ -34,7 +34,6 @@ namespace CommunicationService.AzureFunction
             string converted = Encoding.UTF8.GetString(mySbMsg.Body, 0, mySbMsg.Body.Length);
             
             RequestCommunicationRequest requestCommunicationRequest  = JsonConvert.DeserializeObject<RequestCommunicationRequest>(converted);
-            AddCommunicationRequestToCosmos(mySbMsg, "start", requestCommunicationRequest);
             IMessage message = _messageFactory.Create(requestCommunicationRequest);
             List<SendMessageRequest> messageDetails = await message.IdentifyRecipients(requestCommunicationRequest.RecipientUserID, requestCommunicationRequest.JobID, requestCommunicationRequest.GroupID, requestCommunicationRequest.RequestID, requestCommunicationRequest.AdditionalParameters);
 
@@ -69,7 +68,6 @@ namespace CommunicationService.AzureFunction
             }
 
             log.LogInformation($"End ProcessJobQueue id: {mySbMsg.MessageId}");
-            AddCommunicationRequestToCosmos(mySbMsg, "finished", requestCommunicationRequest);
         }
 
         private void AddCommunicationRequestToCosmos(Message mySbMsg, string status, RequestCommunicationRequest requestCommunicationRequest)
