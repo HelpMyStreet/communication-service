@@ -136,33 +136,6 @@ namespace CommunicationService.MessageService
             }
         }
 
-        private async Task<List<ShiftJob>> GetOpenShiftsForUserMock(int userId, string locations)
-        {
-            List<ShiftJob> shiftJobs = new List<ShiftJob>();
-
-            Random random = new Random();
-            int requestId = random.Next(10, 100);
-
-            for (int i = 1; i < 10; i++)
-            {
-                shiftJobs.Add(new ShiftJob()
-                {
-                    JobID = i,
-                    JobStatus = JobStatuses.Open,
-                    RequestID = requestId,
-                    DistanceInMiles = 1,
-                    Location = Location.RustonsSportsAndSocialClubLincoln,
-                    StartDate = new DateTime(2021, 5, 1),
-                    SupportActivity = SupportActivities.VaccineSupport,
-                    ShiftLength = 240,
-                    DateRequested = DateTime.Now,
-                    RequestType = RequestType.Shift
-                });
-            }
-
-            return shiftJobs;
-        }
-
         private async Task<List<ShiftJob>> GetOpenShiftsForUser(int userId, string locations)
         {
             HelpMyStreet.Contracts.RequestService.Request.LocationsRequest lr = new HelpMyStreet.Contracts.RequestService.Request.LocationsRequest() { Locations = new List<Location>() };

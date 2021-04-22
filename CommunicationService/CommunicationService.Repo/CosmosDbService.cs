@@ -129,9 +129,6 @@ namespace CommunicationService.Repo
 
         public async Task<List<int>> GetShiftRequestDetailsSent(int userID, IEnumerable<int> requests)
         {
-            //var t = shifts.Select(x => x.RequestID).Distinct();
-            //string p = string.Join(",", t);
-
             string queryString = $"SELECT c.RequestId, c.RecipientUserId FROM c where c.TemplateName='RequestNotification' and c.RecipientUserId={userID} and c.RequestId<>null and c.RequestId in ({string.Join(",", requests)}) group by c.RequestId,c.RecipientUserId";
             var query = this._container.GetItemQueryIterator<RequestHistory>(new QueryDefinition(queryString));
             List<RequestHistory> results = new List<RequestHistory>();
