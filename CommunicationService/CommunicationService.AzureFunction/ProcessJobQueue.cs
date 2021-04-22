@@ -3,15 +3,19 @@ using System.Collections.Generic;
 using System.Dynamic;
 using System.Text;
 using System.Threading.Tasks;
+using CommunicationService.Core.Configuration;
 using CommunicationService.Core.Domains;
 using CommunicationService.Core.Interfaces;
 using CommunicationService.Core.Interfaces.Repositories;
 using CommunicationService.Core.Interfaces.Services;
 using HelpMyStreet.Contracts.CommunicationService.Request;
+using HelpMyStreet.Contracts.RequestService.Response;
 using HelpMyStreet.Utils.Enums;
 using Microsoft.Azure.ServiceBus;
 using Microsoft.Azure.WebJobs;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
+using Microsoft.OData.Edm;
 using Newtonsoft.Json;
 
 namespace CommunicationService.AzureFunction
@@ -20,31 +24,42 @@ namespace CommunicationService.AzureFunction
     {
         private readonly IMessageFactory _messageFactory;
         private readonly ICosmosDbService _cosmosDbService;
+        private readonly IOptions<ServiceBusConfig> _serviceBusConfig;
+        private LogDetails _logDetails;
 
-        public ProcessJobQueue(IMessageFactory messageFactory, ICosmosDbService cosmosDbService)
+        public ProcessJobQueue(IMessageFactory messageFactory, ICosmosDbService cosmosDbService, IOptions<ServiceBusConfig> serviceBusConfig)
         {
             _messageFactory = messageFactory;
             _cosmosDbService = cosmosDbService;
+            _serviceBusConfig = serviceBusConfig;
+            _logDetails = new LogDetails() { Queue = "Job" };
+                
         }
 
         [FunctionName("ProcessJobQueue")]
         public async Task Run([ServiceBusTrigger("job", Connection = "ServiceBus")]Message mySbMsg, ILogger log)
         {
-            log.LogInformation($"ProcessJobQueue received message id: {mySbMsg.MessageId} Retry attempt: {mySbMsg.SystemProperties.DeliveryCount}");
+            _logDetails.Started = DateTime.Now;
+            _logDetails.MessageId = mySbMsg.MessageId;
+            _logDetails.DeliveryCount = mySbMsg.SystemProperties.DeliveryCount;
+
             string converted = Encoding.UTF8.GetString(mySbMsg.Body, 0, mySbMsg.Body.Length);
             
             RequestCommunicationRequest requestCommunicationRequest  = JsonConvert.DeserializeObject<RequestCommunicationRequest>(converted);
+
+            _logDetails.Job = Enum.GetName(typeof(CommunicationJobTypes), requestCommunicationRequest.CommunicationJob.CommunicationJobType);
+
             IMessage message = _messageFactory.Create(requestCommunicationRequest);
             List<SendMessageRequest> messageDetails = await message.IdentifyRecipients(requestCommunicationRequest.RecipientUserID, requestCommunicationRequest.JobID, requestCommunicationRequest.GroupID, requestCommunicationRequest.RequestID, requestCommunicationRequest.AdditionalParameters);
 
             if (messageDetails.Count == 0)
             {
                 log.LogInformation("No recipients identified");
-                AddCommunicationRequestToCosmos(mySbMsg, "No recipients identified", requestCommunicationRequest);
+                _logDetails.PotentialRecipientCount = 0;
             }
             else
             {
-                AddCommunicationRequestToCosmos(mySbMsg, $"potential recipients {messageDetails.Count}", requestCommunicationRequest);
+                _logDetails.PotentialRecipientCount = messageDetails.Count;
                 var rec = JsonConvert.SerializeObject(messageDetails);
                 log.LogInformation($"Recipients { rec}");
             }
@@ -65,39 +80,15 @@ namespace CommunicationService.AzureFunction
                     RequestID = m.RequestID,
                     AdditionalParameters =  m.AdditionalParameters
                 });
+                System.Threading.Thread.Sleep(_serviceBusConfig.Value.ProcessQueueSleepInMilliSeconds);
+
             }
 
-            log.LogInformation($"End ProcessJobQueue id: {mySbMsg.MessageId}");
-        }
+            _logDetails.Finished = DateTime.Now;
+            string json = JsonConvert.SerializeObject(_logDetails);
 
-        private void AddCommunicationRequestToCosmos(Message mySbMsg, string status, RequestCommunicationRequest requestCommunicationRequest)
-        {
-            try
-            {
-                dynamic message;
-
-                message = new ExpandoObject();
-                message.id = Guid.NewGuid();
-                message.QueueName = "job";
-                message.MessageId = mySbMsg.MessageId;
-                message.DeliveryCount = mySbMsg.SystemProperties.DeliveryCount;
-                message.Status = status;
-
-                if (requestCommunicationRequest != null)
-                {
-                    message.RecipientUserID = requestCommunicationRequest.RecipientUserID;
-                    message.JobId = requestCommunicationRequest.JobID;
-                    message.CommunicationJob = requestCommunicationRequest.CommunicationJob.CommunicationJobType;
-                    message.GroupId = requestCommunicationRequest.GroupID;
-                    message.RequestId = requestCommunicationRequest.RequestID;
-                }
-
-                _cosmosDbService.AddItemAsync(message);
-            }
-            catch (Exception exc)
-            {
-                string m = exc.ToString();
-            }
+            log.LogInformation(json);
+            await _cosmosDbService.AddItemAsync(_logDetails);
         }
     }
 }

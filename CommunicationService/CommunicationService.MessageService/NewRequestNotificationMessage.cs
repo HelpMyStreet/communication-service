@@ -93,13 +93,22 @@ namespace CommunicationService.MessageService
 
                 if (usersToBeNotified.Count > 0)
                 {
+                    var openRequests = shifts.Select(x => x.RequestID).Distinct();
+                    var shiftsDetailsSent = await _cosmosDbService.GetAllUserShiftDetailsHaveBeenSentTo(openRequests);
+
                     foreach (var userId in usersToBeNotified.GroupBy(g => g.Item1).Select(m => m.Key).ToList())
                     {
-                        List<Location> locations = usersToBeNotified.Where(x => x.Item1 == userId).Select(m => m.Item2).ToList();
-                        string parameter = string.Join(",", locations.Cast<int>().ToArray());
-                        Dictionary<string, string> locationParameters = new Dictionary<string, string>();
-                        locationParameters.Add("locations", parameter);
-                        AddRecipientAndTemplate(TemplateName.RequestNotification, userId, null, null, null, locationParameters);
+                        var requestsThatUserHasAlreadyBeenNotifiedAbout = shiftsDetailsSent.Where(x => x.RecipientUserID == userId).Select(x => x.RequestID);                        
+                        var requestsStillToBeNotifiedAbout = openRequests.Where(s => !requestsThatUserHasAlreadyBeenNotifiedAbout.Contains(s)).ToList();
+
+                        if (requestsStillToBeNotifiedAbout.Count > 0)
+                        {
+                            List<Location> locations = usersToBeNotified.Where(x => x.Item1 == userId).Select(m => m.Item2).ToList();
+                            string parameter = string.Join(",", locations.Cast<int>().ToArray());
+                            Dictionary<string, string> locationParameters = new Dictionary<string, string>();
+                            locationParameters.Add("locations", parameter);
+                            AddRecipientAndTemplate(TemplateName.RequestNotification, userId, null, null, null, locationParameters);
+                        }
                     }
                 }
 
@@ -125,6 +134,33 @@ namespace CommunicationService.MessageService
             {
                 return new List<ShiftJob>();
             }
+        }
+
+        private async Task<List<ShiftJob>> GetOpenShiftsForUserMock(int userId, string locations)
+        {
+            List<ShiftJob> shiftJobs = new List<ShiftJob>();
+
+            Random random = new Random();
+            int requestId = random.Next(10, 100);
+
+            for (int i = 1; i < 10; i++)
+            {
+                shiftJobs.Add(new ShiftJob()
+                {
+                    JobID = i,
+                    JobStatus = JobStatuses.Open,
+                    RequestID = requestId,
+                    DistanceInMiles = 1,
+                    Location = Location.RustonsSportsAndSocialClubLincoln,
+                    StartDate = new DateTime(2021, 5, 1),
+                    SupportActivity = SupportActivities.VaccineSupport,
+                    ShiftLength = 240,
+                    DateRequested = DateTime.Now,
+                    RequestType = RequestType.Shift
+                });
+            }
+
+            return shiftJobs;
         }
 
         private async Task<List<ShiftJob>> GetOpenShiftsForUser(int userId, string locations)
@@ -187,7 +223,7 @@ namespace CommunicationService.MessageService
                 return null;
             }
 
-            List<int> requestsAlreadyNotified = await _cosmosDbService.GetShiftRequestDetailsSent(user.ID);
+            List<int> requestsAlreadyNotified = await _cosmosDbService.GetShiftRequestDetailsSent(user.ID,openShifts.Select(x=> x.RequestID).Distinct());
                         
             openShifts = openShifts.Where(x => !requestsAlreadyNotified.Contains(x.RequestID)).ToList();
 
