@@ -25,6 +25,11 @@ namespace CommunicationService.Repo
         public async Task AddItemAsync(ExpandoObject item)
         {
             await this._container.CreateItemAsync(item);
+            //await AddItemAsync(item);
+        }
+        public async Task AddItemAsync(object obj)
+        {
+            await this._container.CreateItemAsync(obj);
         }
 
         public async Task<object> GetItemAsync(string id)
@@ -122,9 +127,9 @@ namespace CommunicationService.Repo
 
         
 
-        public async Task<List<int>> GetShiftRequestDetailsSent(int userID)
-        { 
-            string queryString = $"SELECT c.RequestId FROM c where c.TemplateName='RequestNotification' and c.RecipientUserId={userID} and c.RequestId<>null group by c.RequestId,c.RecipientUserId";
+        public async Task<List<int>> GetShiftRequestDetailsSent(int userID, IEnumerable<int> requests)
+        {
+            string queryString = $"SELECT c.RequestId, c.RecipientUserId FROM c where c.TemplateName='RequestNotification' and c.RecipientUserId={userID} and c.RequestId<>null and c.RequestId in ({string.Join(",", requests)}) group by c.RequestId,c.RecipientUserId";
             var query = this._container.GetItemQueryIterator<RequestHistory>(new QueryDefinition(queryString));
             List<RequestHistory> results = new List<RequestHistory>();
             while (query.HasMoreResults)
@@ -134,6 +139,20 @@ namespace CommunicationService.Repo
             }
 
             return results.Select(s=> s.RequestID).ToList();
+        }
+
+        public async Task<List<RequestHistory>> GetAllUserShiftDetailsHaveBeenSentTo(IEnumerable<int> requests)
+        {
+            string queryString = $"SELECT c.RequestId, c.RecipientUserId FROM c where c.TemplateName='RequestNotification' and c.RequestId<>null  and c.RequestId in ({string.Join(",", requests)}) group by c.RequestId,c.RecipientUserId";
+            var query = this._container.GetItemQueryIterator<RequestHistory>(new QueryDefinition(queryString));
+            List<RequestHistory> results = new List<RequestHistory>();
+            while (query.HasMoreResults)
+            {
+                var response = await query.ReadNextAsync();
+                results.AddRange(response.ToList());
+            }
+
+            return results;
         }
 
         public async Task<bool> EmailSent(string templateName, int jobId, int recipientUserId)
