@@ -1,4 +1,5 @@
 ﻿using CommunicationService.Core.Configuration;
+using CommunicationService.Core.Domains;
 using CommunicationService.Core.Interfaces.Repositories;
 using CommunicationService.Core.Interfaces.Services;
 using CommunicationService.MessageService;
@@ -38,6 +39,7 @@ namespace CommunicationService.UnitTests.SendGridService
         private GetUserGroupsResponse _getUserGroupsResponse;
         private List<ShiftJob> _shiftJobs;
         private List<int> _requestIds;
+        private List<RequestHistory> _requestHistory;
         private IEqualityComparer<ShiftJob> _shiftJobDedupe_EqualityComparer;
 
         private NewRequestNotificationMessage _classUnderTest;
@@ -170,8 +172,12 @@ namespace CommunicationService.UnitTests.SendGridService
         {
             _cosmosService = new Mock<ICosmosDbService>();
             _requestIds = new List<int>();
-            _cosmosService.Setup(x => x.GetShiftRequestDetailsSent(It.IsAny<int>()))
+            _cosmosService.Setup(x => x.GetShiftRequestDetailsSent(It.IsAny<int>(), It.IsAny<IEnumerable<int>>()))
                 .ReturnsAsync(() => _requestIds);
+
+            _requestHistory = new List<RequestHistory>();
+            _cosmosService.Setup(x => x.GetAllUserShiftDetailsHaveBeenSentTo(It.IsAny<IEnumerable<int>>()))
+                .ReturnsAsync(() => _requestHistory);
         }
 
         [Test]
