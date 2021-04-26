@@ -43,51 +43,64 @@ namespace CommunicationService.AzureFunction
             _logDetails.MessageId = mySbMsg.MessageId;
             _logDetails.DeliveryCount = mySbMsg.SystemProperties.DeliveryCount;
 
-            string converted = Encoding.UTF8.GetString(mySbMsg.Body, 0, mySbMsg.Body.Length);
-            
-            RequestCommunicationRequest requestCommunicationRequest  = JsonConvert.DeserializeObject<RequestCommunicationRequest>(converted);
-
-            _logDetails.Job = Enum.GetName(typeof(CommunicationJobTypes), requestCommunicationRequest.CommunicationJob.CommunicationJobType);
-
-            IMessage message = _messageFactory.Create(requestCommunicationRequest);
-            List<SendMessageRequest> messageDetails = await message.IdentifyRecipients(requestCommunicationRequest.RecipientUserID, requestCommunicationRequest.JobID, requestCommunicationRequest.GroupID, requestCommunicationRequest.RequestID, requestCommunicationRequest.AdditionalParameters);
-
-            if (messageDetails.Count == 0)
+            try
             {
-                log.LogInformation("No recipients identified");
-                _logDetails.PotentialRecipientCount = 0;
-            }
-            else
-            {
-                _logDetails.PotentialRecipientCount = messageDetails.Count;
-                var rec = JsonConvert.SerializeObject(messageDetails);
-                log.LogInformation($"Recipients { rec}");
-            }
 
-            Guid batchId = Guid.NewGuid();
+                string converted = Encoding.UTF8.GetString(mySbMsg.Body, 0, mySbMsg.Body.Length);
 
-            foreach (var m in messageDetails)
-            {
-                await _messageFactory.AddToMessageQueueAsync(new SendMessageRequest()
+                RequestCommunicationRequest requestCommunicationRequest = JsonConvert.DeserializeObject<RequestCommunicationRequest>(converted);
+
+                _logDetails.Job = Enum.GetName(typeof(CommunicationJobTypes), requestCommunicationRequest.CommunicationJob.CommunicationJobType);
+
+                IMessage message = _messageFactory.Create(requestCommunicationRequest);
+                List<SendMessageRequest> messageDetails = await message.IdentifyRecipients(requestCommunicationRequest.RecipientUserID, requestCommunicationRequest.JobID, requestCommunicationRequest.GroupID, requestCommunicationRequest.RequestID, requestCommunicationRequest.AdditionalParameters);
+
+                if (messageDetails.Count == 0)
                 {
-                    BatchID = batchId,
-                    CommunicationJobType = requestCommunicationRequest.CommunicationJob.CommunicationJobType,
-                    TemplateName = m.TemplateName,
-                    RecipientUserID = m.RecipientUserID,
-                    JobID = m.JobID,
-                    GroupID = m.GroupID,
-                    MessageType = MessageTypes.Email,
-                    RequestID = m.RequestID,
-                    AdditionalParameters =  m.AdditionalParameters
-                });
-                System.Threading.Thread.Sleep(_serviceBusConfig.Value.ProcessQueueSleepInMilliSeconds);
+                    log.LogInformation("No recipients identified");
+                    _logDetails.PotentialRecipientCount = 0;
+                }
+                else
+                {
+                    _logDetails.PotentialRecipientCount = messageDetails.Count;
+                    var rec = JsonConvert.SerializeObject(messageDetails);
+                    log.LogInformation($"Recipients { rec}");
+                }
 
+                Guid batchId = Guid.NewGuid();
+
+                foreach (var m in messageDetails)
+                {
+                    await _messageFactory.AddToMessageQueueAsync(new SendMessageRequest()
+                    {
+                        BatchID = batchId,
+                        CommunicationJobType = requestCommunicationRequest.CommunicationJob.CommunicationJobType,
+                        TemplateName = m.TemplateName,
+                        RecipientUserID = m.RecipientUserID,
+                        JobID = m.JobID,
+                        GroupID = m.GroupID,
+                        MessageType = MessageTypes.Email,
+                        RequestID = m.RequestID,
+                        AdditionalParameters = m.AdditionalParameters
+                    });
+                    System.Threading.Thread.Sleep(_serviceBusConfig.Value.ProcessQueueSleepInMilliSeconds);
+
+                }
+            }
+            catch(Exception exc)
+            {
+                await LogAndAddToCosmos(log);
+                throw exc;
             }
 
-            _logDetails.Finished = DateTime.Now;
-            string json = JsonConvert.SerializeObject(_logDetails);
+            await LogAndAddToCosmos(log);
+        }
 
-            log.LogInformation(json);
+        private async Task LogAndAddToCosmos(ILogger log)
+        {
+            _logDetails.Finished = DateTime.Now;
+            string jsonLogging = JsonConvert.SerializeObject(_logDetails);
+            log.LogInformation(jsonLogging);
             await _cosmosDbService.AddItemAsync(_logDetails);
         }
     }
