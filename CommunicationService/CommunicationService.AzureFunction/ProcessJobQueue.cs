@@ -45,9 +45,7 @@ namespace CommunicationService.AzureFunction
 
             try
             {
-
                 string converted = Encoding.UTF8.GetString(mySbMsg.Body, 0, mySbMsg.Body.Length);
-
                 RequestCommunicationRequest requestCommunicationRequest = JsonConvert.DeserializeObject<RequestCommunicationRequest>(converted);
 
                 _logDetails.Job = Enum.GetName(typeof(CommunicationJobTypes), requestCommunicationRequest.CommunicationJob.CommunicationJobType);
