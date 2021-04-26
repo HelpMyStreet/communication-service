@@ -2,6 +2,7 @@ using CommunicationService.Core.Domains;
 using CommunicationService.Core.Interfaces;
 using CommunicationService.Core.Interfaces.Repositories;
 using CommunicationService.Core.Interfaces.Services;
+using HelpMyStreet.Contracts.RequestService.Response;
 using HelpMyStreet.Utils.Exceptions;
 using Microsoft.Azure.ServiceBus;
 using Microsoft.Azure.WebJobs;
@@ -17,18 +18,22 @@ public class ProcessMessageQueue
     private readonly IMessageFactory _messageFactory;
     private readonly ICosmosDbService _cosmosDbService;
     private readonly IConnectSendGridService _connectSendGridService;
+    private LogDetails _logDetails;
 
     public ProcessMessageQueue(IMessageFactory messageFactory, ICosmosDbService cosmosDbService, IConnectSendGridService connectSendGridService)
     {
         _messageFactory = messageFactory;
         _cosmosDbService = cosmosDbService;
         _connectSendGridService = connectSendGridService;
+        _logDetails = new LogDetails() { Queue = "Message" };
     }
 
     [FunctionName("ProcessMessageQueue")]
     public async Task Run([ServiceBusTrigger("message", Connection = "ServiceBus")]Message mySbMsg, ILogger log)
     {
-        log.LogInformation($"ProcessMessageQueue received message id: {mySbMsg.MessageId} Retry attempt: {mySbMsg.SystemProperties.DeliveryCount}");
+        _logDetails.Started = DateTime.Now;
+        _logDetails.MessageId = mySbMsg.MessageId;
+        _logDetails.DeliveryCount = mySbMsg.SystemProperties.DeliveryCount;        
 
         SendMessageRequest sendMessageRequest = null;
 
@@ -36,7 +41,7 @@ public class ProcessMessageQueue
 
         if (emailAlreadySent)
         {
-            log.LogInformation($"email already sent for message id: {mySbMsg.MessageId}");
+            _logDetails.Status = "email already sent";
         }
         else
         {
@@ -46,7 +51,8 @@ public class ProcessMessageQueue
 
                 sendMessageRequest = JsonConvert.DeserializeObject<SendMessageRequest>(converted);
 
-                log.LogInformation($"start: {mySbMsg.MessageId}");
+                _logDetails.Job = Enum.GetName(typeof(CommunicationJobTypes), sendMessageRequest.CommunicationJobType);
+                _logDetails.RecipientUserId = sendMessageRequest.RecipientUserID;
 
                 IMessage message = _messageFactory.Create(sendMessageRequest);
 
@@ -59,15 +65,11 @@ public class ProcessMessageQueue
                     emailBuildData.RecipientUserID = sendMessageRequest.RecipientUserID;
                     emailBuildData.RequestID = emailBuildData.RequestID.HasValue ? emailBuildData.RequestID : sendMessageRequest.RequestID;
                     var result = await _connectSendGridService.SendDynamicEmail(mySbMsg.MessageId, sendMessageRequest.TemplateName, message.GetUnsubscriptionGroupName(sendMessageRequest.RecipientUserID), emailBuildData);
-                    log.LogInformation($"SendDynamicEmail({sendMessageRequest.TemplateName}) returned {result}");
-                    if (result)
-                    {
-                        log.LogInformation($"messageId: {mySbMsg.MessageId} result: {result.ToString()}");
-                    }
+                    _logDetails.Status = $"SendDynamicEmail: {result}";
                 }
                 else
                 {
-                    log.LogInformation($"no emailBuildData: {mySbMsg.MessageId}");
+                    _logDetails.Status = "no emailBuildData";
                 }
             }
             catch (AggregateException exc)
@@ -83,7 +85,10 @@ public class ProcessMessageQueue
             }
         }
 
-        log.LogInformation($"processed message id: {mySbMsg.MessageId} finished");
+        _logDetails.Finished = DateTime.Now;
+        string json = JsonConvert.SerializeObject(_logDetails);
+
+        log.LogInformation(json);
     }
 
     public void RetryHandler(Message mySbMsg, SendMessageRequest sendMessageRequest, Exception ex, ILogger log)
