@@ -82,8 +82,15 @@ namespace CommunicationService.MessageService
                 return null;
             }
 
-            var nationalSupportActivities = new List<SupportActivities>() { SupportActivities.FaceMask, SupportActivities.HomeworkSupport, SupportActivities.PhoneCalls_Anxious, SupportActivities.PhoneCalls_Friendly };
-            var activitySpecificSupportDistancesInMiles = nationalSupportActivities.Where(a => user.SupportActivities.Contains(a)).ToDictionary(a => a, a => (double?)null);
+            Dictionary<SupportActivities, double?> nationalSupportActivities = new Dictionary<SupportActivities, double?>()
+            {
+                { SupportActivities.FaceMask,null},
+                { SupportActivities.HomeworkSupport, null },
+                { SupportActivities.PhoneCalls_Anxious, null },
+                { SupportActivities.PhoneCalls_Friendly, null },
+                { SupportActivities.VaccineSupport, _emailConfig.Value.OpenRequestRadius }
+            };
+            Dictionary<SupportActivities, double?> activitySpecificSupportDistancesInMiles = nationalSupportActivities.Where(a => user.SupportActivities.Contains(a.Key)).ToDictionary(a => a.Key, a => a.Value);
 
             GetAllJobsByFilterResponse openRequests;
             openRequests = await _connectRequestService.GetAllJobsByFilter(new GetAllJobsByFilterRequest()
@@ -94,7 +101,7 @@ namespace CommunicationService.MessageService
                     { JobStatuses.Open}
                 },
                 Postcode = user.PostalCode,
-                DistanceInMiles = _emailConfig.Value.OpenRequestRadius,
+                DistanceInMiles = user.SupportRadiusMiles,
                 ExcludeSiblingsOfJobsAllocatedToUserID = recipientUserId,
                 Groups = new GroupRequest()
                 {
@@ -105,7 +112,7 @@ namespace CommunicationService.MessageService
 
                 
             var openTasks = openRequests.JobSummaries.ToList();
-            var openShifts = openRequests.ShiftJobs.ToList();
+            var openShifts = openRequests.ShiftJobs.Where(x=> user.SupportActivities.Contains(x.SupportActivity)).ToList();
             
             if((openTasks == null || openTasks.Count==0) && (openShifts ==null || openShifts.Count==0 ) )
             {
@@ -122,7 +129,7 @@ namespace CommunicationService.MessageService
             if (openTasks.Count() > 0)
             {
                 criteriaRequestTasks = openTasks
-                    .Where(x => user.SupportActivities.Contains(x.SupportActivity) && x.DistanceInMiles <= user.SupportRadiusMiles)
+                    .Where(x => user.SupportActivities.Contains(x.SupportActivity))
                     .Distinct(_jobSummaryDedupe_EqualityComparer)
                     .ToList();
 
