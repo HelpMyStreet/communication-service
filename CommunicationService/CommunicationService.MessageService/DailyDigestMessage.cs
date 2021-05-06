@@ -101,7 +101,7 @@ namespace CommunicationService.MessageService
                     { JobStatuses.Open}
                 },
                 Postcode = user.PostalCode,
-                DistanceInMiles = user.SupportRadiusMiles,
+                DistanceInMiles = _emailConfig.Value.OpenRequestRadius,
                 ExcludeSiblingsOfJobsAllocatedToUserID = recipientUserId,
                 Groups = new GroupRequest()
                 {
@@ -129,7 +129,7 @@ namespace CommunicationService.MessageService
             if (openTasks.Count() > 0)
             {
                 criteriaRequestTasks = openTasks
-                    .Where(x => user.SupportActivities.Contains(x.SupportActivity))
+                    .Where(x => user.SupportActivities.Contains(x.SupportActivity) && x.DistanceInMiles <= user.SupportRadiusMiles)
                     .Distinct(_jobSummaryDedupe_EqualityComparer)
                     .ToList();
 
