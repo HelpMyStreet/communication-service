@@ -19,6 +19,7 @@ using NUnit.Framework;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace CommunicationService.UnitTests.SendGridService
@@ -37,6 +38,7 @@ namespace CommunicationService.UnitTests.SendGridService
         private User _user;
         private GetPostcodeCoordinatesResponse _getPostcodeCoordinatesResponse;
         private GetAllJobsByFilterResponse _getAllJobsByFilterResponse;
+        private LocationDetails _getLocationDetails;
 
 
         private DailyDigestMessage _classUnderTest;
@@ -107,6 +109,15 @@ namespace CommunicationService.UnitTests.SendGridService
             _addressService = new Mock<IConnectAddressService>();
             _addressService.Setup(x => x.GetPostcodeCoordinates(It.IsAny<GetPostcodeCoordinatesRequest>()))
                 .ReturnsAsync(() => _getPostcodeCoordinatesResponse);
+
+            _getLocationDetails = new LocationDetails()
+            {
+                Location = Location.RustonsSportsAndSocialClubLincoln,
+                Name = "Test"
+            };
+
+            _addressService.Setup(x => x.GetLocationDetails(It.IsAny<Location>(),It.IsAny<CancellationToken>()))
+                .ReturnsAsync(() => _getLocationDetails);
         }
 
         private void SetupCosmosDBService()
@@ -297,7 +308,7 @@ namespace CommunicationService.UnitTests.SendGridService
                 ID = 1,
                 SupportActivities = new List<SupportActivities>() { SupportActivities.Shopping },
                 PostalCode = "NG1 6DQ",
-                SupportRadiusMiles = 20,
+                SupportRadiusMiles = 2,
                 UserPersonalDetails = new UserPersonalDetails()
                 {
                     FirstName = "FIRST NAME",
@@ -319,6 +330,15 @@ namespace CommunicationService.UnitTests.SendGridService
             {
                 JobSummaries = jobSummaries,
                 ShiftJobs = new List<ShiftJob>()
+                {
+                   new ShiftJob()
+                   {
+                       SupportActivity = SupportActivities.VaccineSupport,
+                       StartDate = DateTime.SpecifyKind(DateTime.Now,DateTimeKind.Utc),
+                       ShiftLength = 240,
+                       DistanceInMiles = 2
+                   }
+                }
             };
 
             _getPostcodeCoordinatesResponse = new GetPostcodeCoordinatesResponse()

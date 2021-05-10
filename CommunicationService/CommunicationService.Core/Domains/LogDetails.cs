@@ -22,6 +22,7 @@ namespace CommunicationService.Core.Domains
         public int? RecipientUserId { get; set; }
         public int? PotentialRecipientCount { get; set; }
         public string Status { get; set; }
+        public string ErrorDetails { get; set; }
 
         public double TimeTaken
         {

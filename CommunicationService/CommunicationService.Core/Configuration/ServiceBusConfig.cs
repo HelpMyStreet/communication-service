@@ -8,8 +8,6 @@ namespace CommunicationService.Core.Configuration
     {
         public string ConnectionString { get; set; }
         public string JobQueueName { get; set; }
-        public string MessageQueueName { get; set; }
-        public int ProcessQueueSleepInMilliSeconds { get; set; }
-
+        public string MessageQueueName { get; set; }        
     }
 }
