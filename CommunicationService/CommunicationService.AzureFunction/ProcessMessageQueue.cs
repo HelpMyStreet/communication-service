@@ -63,8 +63,8 @@ public class ProcessMessageQueue
                     emailBuildData.GroupID = emailBuildData.GroupID.HasValue ? emailBuildData.GroupID : sendMessageRequest.GroupID;
                     emailBuildData.RecipientUserID = sendMessageRequest.RecipientUserID;
                     emailBuildData.RequestID = emailBuildData.RequestID.HasValue ? emailBuildData.RequestID : sendMessageRequest.RequestID;
-                    //var result = await _connectSendGridService.SendDynamicEmail(mySbMsg.MessageId, sendMessageRequest.TemplateName, message.GetUnsubscriptionGroupName(sendMessageRequest.RecipientUserID), emailBuildData);
-                    //logDetails.Status = $"SendDynamicEmail: {result}";
+                    var result = await _connectSendGridService.SendDynamicEmail(mySbMsg.MessageId, sendMessageRequest.TemplateName, message.GetUnsubscriptionGroupName(sendMessageRequest.RecipientUserID), emailBuildData);
+                    logDetails.Status = $"SendDynamicEmail: {result}";
                 }
                 else
                 {
