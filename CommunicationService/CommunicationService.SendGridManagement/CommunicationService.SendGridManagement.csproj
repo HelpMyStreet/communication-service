@@ -155,6 +155,7 @@
     <None Remove="Migrations\20210222_163000_FixLinks.json" />
     <None Remove="Migrations\20210223_140000_ShiftReminderEmails.json" />
     <None Remove="Migrations\20210317_111500_CreateUnsubscribeGroup.json" />
+    <None Remove="Migrations\20210317_111500_CreateUnsubscribeGroup %28copy%29.json" />
   </ItemGroup>
 
   <ItemGroup>
@@ -308,6 +309,7 @@
     <EmbeddedResource Include="Migrations\20201229_103000_NewSimplifiedUpdateTaskMessage.json" />
     <EmbeddedResource Include="Migrations\20210105_154100_NewSimplifiedUpdateTaskMessage.json" />
     <EmbeddedResource Include="Migrations\20210112_102900_UpdateTaskDetail.json" />
+    <EmbeddedResource Include="Migrations\20210510_140900_UpdateTaskDetail.json" />
   </ItemGroup>
 
   <ItemGroup>

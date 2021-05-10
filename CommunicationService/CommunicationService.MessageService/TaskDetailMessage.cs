@@ -90,12 +90,13 @@ namespace CommunicationService.MessageService
 
             return new EmailBuildData()
             {
-                BaseDynamicData = new TaskDetailData(                
+                BaseDynamicData = new TaskDetailData(
+                    firstName: user.UserPersonalDetails.FirstName,
                     organisation: job.JobSummary.RecipientOrganisation,
                     activity: job.JobSummary.SupportActivity.FriendlyNameShort(),
                     furtherDetails: otherQuestionsList,
-                    volunteerInstructions : volunteerInstructions,
-                    hasOrganisation : !String.IsNullOrEmpty(job.JobSummary.RecipientOrganisation)
+                    volunteerInstructions: volunteerInstructions,
+                    hasOrganisation: !String.IsNullOrEmpty(job.JobSummary.RecipientOrganisation)
                 ),
                 EmailToAddress = user.UserPersonalDetails.EmailAddress,
                 EmailToName = user.UserPersonalDetails.DisplayName,
