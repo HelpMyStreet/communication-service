@@ -18,22 +18,21 @@ public class ProcessMessageQueue
     private readonly IMessageFactory _messageFactory;
     private readonly ICosmosDbService _cosmosDbService;
     private readonly IConnectSendGridService _connectSendGridService;
-    private LogDetails _logDetails;
 
     public ProcessMessageQueue(IMessageFactory messageFactory, ICosmosDbService cosmosDbService, IConnectSendGridService connectSendGridService)
     {
         _messageFactory = messageFactory;
         _cosmosDbService = cosmosDbService;
-        _connectSendGridService = connectSendGridService;
-        _logDetails = new LogDetails() { Queue = "Message" };
+        _connectSendGridService = connectSendGridService;        
     }
 
     [FunctionName("ProcessMessageQueue")]
     public async Task Run([ServiceBusTrigger("message", Connection = "ServiceBus")]Message mySbMsg, ILogger log)
     {
-        _logDetails.Started = DateTime.Now;
-        _logDetails.MessageId = mySbMsg.MessageId;
-        _logDetails.DeliveryCount = mySbMsg.SystemProperties.DeliveryCount;        
+        LogDetails logDetails = new LogDetails() { Queue = "Message" };
+        logDetails.Started = DateTime.Now;
+        logDetails.MessageId = mySbMsg.MessageId;
+        logDetails.DeliveryCount = mySbMsg.SystemProperties.DeliveryCount;        
 
         SendMessageRequest sendMessageRequest = null;
 
@@ -41,7 +40,7 @@ public class ProcessMessageQueue
 
         if (emailAlreadySent)
         {
-            _logDetails.Status = "email already sent";
+            logDetails.Status = "email already sent";
         }
         else
         {
@@ -51,8 +50,8 @@ public class ProcessMessageQueue
 
                 sendMessageRequest = JsonConvert.DeserializeObject<SendMessageRequest>(converted);
 
-                _logDetails.Job = Enum.GetName(typeof(CommunicationJobTypes), sendMessageRequest.CommunicationJobType);
-                _logDetails.RecipientUserId = sendMessageRequest.RecipientUserID;
+                logDetails.Job = Enum.GetName(typeof(CommunicationJobTypes), sendMessageRequest.CommunicationJobType);
+                logDetails.RecipientUserId = sendMessageRequest.RecipientUserID;
 
                 IMessage message = _messageFactory.Create(sendMessageRequest);
 
@@ -64,12 +63,12 @@ public class ProcessMessageQueue
                     emailBuildData.GroupID = emailBuildData.GroupID.HasValue ? emailBuildData.GroupID : sendMessageRequest.GroupID;
                     emailBuildData.RecipientUserID = sendMessageRequest.RecipientUserID;
                     emailBuildData.RequestID = emailBuildData.RequestID.HasValue ? emailBuildData.RequestID : sendMessageRequest.RequestID;
-                    var result = await _connectSendGridService.SendDynamicEmail(mySbMsg.MessageId, sendMessageRequest.TemplateName, message.GetUnsubscriptionGroupName(sendMessageRequest.RecipientUserID), emailBuildData);
-                    _logDetails.Status = $"SendDynamicEmail: {result}";
+                    //var result = await _connectSendGridService.SendDynamicEmail(mySbMsg.MessageId, sendMessageRequest.TemplateName, message.GetUnsubscriptionGroupName(sendMessageRequest.RecipientUserID), emailBuildData);
+                    //logDetails.Status = $"SendDynamicEmail: {result}";
                 }
                 else
                 {
-                    _logDetails.Status = "no emailBuildData";
+                    logDetails.Status = "no emailBuildData";
                 }
             }
             catch (AggregateException exc)
@@ -85,8 +84,8 @@ public class ProcessMessageQueue
             }
         }
 
-        _logDetails.Finished = DateTime.Now;
-        string json = JsonConvert.SerializeObject(_logDetails);
+        logDetails.Finished = DateTime.Now;
+        string json = JsonConvert.SerializeObject(logDetails);
 
         log.LogInformation(json);
     }
