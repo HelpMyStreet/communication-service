@@ -25,7 +25,7 @@ namespace CommunicationService.AzureFunction
         private readonly IMessageFactory _messageFactory;
         private readonly ICosmosDbService _cosmosDbService;
         private readonly IOptions<ServiceBusConfig> _serviceBusConfig;
-        private LogDetails _logDetails;
+        private LogDetails _logDetails;  // Should this be a local variable within Run()?  I'm not sure when the class is instantiated.
 
         public ProcessJobQueue(IMessageFactory messageFactory, ICosmosDbService cosmosDbService, IOptions<ServiceBusConfig> serviceBusConfig)
         {
@@ -62,7 +62,7 @@ namespace CommunicationService.AzureFunction
                 {
                     _logDetails.PotentialRecipientCount = messageDetails.Count;
                     var rec = JsonConvert.SerializeObject(messageDetails);
-                    log.LogInformation($"Recipients { rec}");
+                    log.LogInformation($"Recipients { rec}");  // Can we see this anywhere?  could be useful for testing one of our theories.
                 }
 
                 Guid batchId = Guid.NewGuid();
@@ -87,7 +87,7 @@ namespace CommunicationService.AzureFunction
             }
             catch(Exception exc)
             {
-                await LogAndAddToCosmos(log);
+                await LogAndAddToCosmos(log);  // Should we also log the exception to Cosmos?
                 throw exc;
             }
 
