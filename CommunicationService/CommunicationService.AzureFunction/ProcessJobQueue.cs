@@ -24,31 +24,27 @@ namespace CommunicationService.AzureFunction
     {
         private readonly IMessageFactory _messageFactory;
         private readonly ICosmosDbService _cosmosDbService;
-        private readonly IOptions<ServiceBusConfig> _serviceBusConfig;
-        private LogDetails _logDetails;  // Should this be a local variable within Run()?  I'm not sure when the class is instantiated.
 
-        public ProcessJobQueue(IMessageFactory messageFactory, ICosmosDbService cosmosDbService, IOptions<ServiceBusConfig> serviceBusConfig)
+        public ProcessJobQueue(IMessageFactory messageFactory, ICosmosDbService cosmosDbService)
         {
             _messageFactory = messageFactory;
             _cosmosDbService = cosmosDbService;
-            _serviceBusConfig = serviceBusConfig;
-            _logDetails = new LogDetails() { Queue = "Job" };
-                
         }
 
         [FunctionName("ProcessJobQueue")]
         public async Task Run([ServiceBusTrigger("job", Connection = "ServiceBus")]Message mySbMsg, ILogger log)
         {
-            _logDetails.Started = DateTime.Now;
-            _logDetails.MessageId = mySbMsg.MessageId;
-            _logDetails.DeliveryCount = mySbMsg.SystemProperties.DeliveryCount;
+            LogDetails logDetails = new LogDetails() { Queue = "Job" };
+            logDetails.Started = DateTime.Now;
+            logDetails.MessageId = mySbMsg.MessageId;
+            logDetails.DeliveryCount = mySbMsg.SystemProperties.DeliveryCount;
 
             try
             {
                 string converted = Encoding.UTF8.GetString(mySbMsg.Body, 0, mySbMsg.Body.Length);
                 RequestCommunicationRequest requestCommunicationRequest = JsonConvert.DeserializeObject<RequestCommunicationRequest>(converted);
 
-                _logDetails.Job = Enum.GetName(typeof(CommunicationJobTypes), requestCommunicationRequest.CommunicationJob.CommunicationJobType);
+                logDetails.Job = Enum.GetName(typeof(CommunicationJobTypes), requestCommunicationRequest.CommunicationJob.CommunicationJobType);
 
                 IMessage message = _messageFactory.Create(requestCommunicationRequest);
                 List<SendMessageRequest> messageDetails = await message.IdentifyRecipients(requestCommunicationRequest.RecipientUserID, requestCommunicationRequest.JobID, requestCommunicationRequest.GroupID, requestCommunicationRequest.RequestID, requestCommunicationRequest.AdditionalParameters);
@@ -56,11 +52,11 @@ namespace CommunicationService.AzureFunction
                 if (messageDetails.Count == 0)
                 {
                     log.LogInformation("No recipients identified");
-                    _logDetails.PotentialRecipientCount = 0;
+                    logDetails.PotentialRecipientCount = 0;
                 }
                 else
                 {
-                    _logDetails.PotentialRecipientCount = messageDetails.Count;
+                    logDetails.PotentialRecipientCount = messageDetails.Count;
                     var rec = JsonConvert.SerializeObject(messageDetails);
                     log.LogInformation($"Recipients { rec}");  // Can we see this anywhere?  could be useful for testing one of our theories.
                 }
@@ -81,25 +77,35 @@ namespace CommunicationService.AzureFunction
                         RequestID = m.RequestID,
                         AdditionalParameters = m.AdditionalParameters
                     });
-                    System.Threading.Thread.Sleep(_serviceBusConfig.Value.ProcessQueueSleepInMilliSeconds);
-
                 }
             }
             catch(Exception exc)
             {
-                await LogAndAddToCosmos(log);  // Should we also log the exception to Cosmos?
+                await LogAndAddToCosmos(log, logDetails, "error", exc);
                 throw exc;
             }
 
-            await LogAndAddToCosmos(log);
+            await LogAndAddToCosmos(log,logDetails);
         }
 
-        private async Task LogAndAddToCosmos(ILogger log)
+        private async Task LogAndAddToCosmos(ILogger log, LogDetails logDetails)
         {
-            _logDetails.Finished = DateTime.Now;
-            string jsonLogging = JsonConvert.SerializeObject(_logDetails);
+            await LogAndAddToCosmos(log, logDetails, "completed");            
+        }
+
+        private async Task LogAndAddToCosmos(ILogger log, LogDetails logDetails, string status, Exception exc = null)
+        {
+            logDetails.Finished = DateTime.Now;
+            logDetails.Status = status;
+
+            if(exc!=null)
+            {
+                logDetails.ErrorDetails = exc.ToString();
+            }
+
+            string jsonLogging = JsonConvert.SerializeObject(logDetails);
             log.LogInformation(jsonLogging);
-            await _cosmosDbService.AddItemAsync(_logDetails);
+            await _cosmosDbService.AddItemAsync(logDetails);
         }
     }
 }
