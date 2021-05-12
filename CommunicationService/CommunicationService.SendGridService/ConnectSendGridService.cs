@@ -170,7 +170,7 @@ namespace CommunicationService.SendGridService
             }            
         }
 
-        public async Task<Template> GetTemplate(string templateName, CancellationToken cancellationToken)
+        public async Task<Template> GetTemplateWithCache(string templateName, CancellationToken cancellationToken)
         {
             return await _memDistCache.GetCachedDataAsync(async (cancellationToken) =>
             {
@@ -192,7 +192,7 @@ namespace CommunicationService.SendGridService
 
         public async Task<bool> SendDynamicEmail(string messageId, string templateName, string groupName, EmailBuildData emailBuildData)
         {
-            var template = await GetTemplate(templateName, CancellationToken.None).ConfigureAwait(false);
+            var template = await GetTemplateWithCache(templateName, CancellationToken.None).ConfigureAwait(false);
             int groupId = await GetGroupId(groupName).ConfigureAwait(false);
             emailBuildData.BaseDynamicData.BaseUrl = _sendGridConfig.Value.BaseUrl;
             Personalization personalization = new Personalization()
