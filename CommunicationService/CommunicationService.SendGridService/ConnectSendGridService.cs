@@ -16,6 +16,8 @@ using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using HelpMyStreet.Contracts.CommunicationService.Request;
+using HelpMyStreet.Cache;
+using System.Threading;
 
 namespace CommunicationService.SendGridService
 {
@@ -23,11 +25,14 @@ namespace CommunicationService.SendGridService
     {
         private readonly IOptions<SendGridConfig> _sendGridConfig;
         private readonly ISendGridClient _sendGridClient;
+        private readonly IMemDistCache<Template> _memDistCache;
+        private const string CACHE_KEY_PREFIX = "sendgrid-";
 
-        public ConnectSendGridService(IOptions<SendGridConfig> sendGridConfig, ISendGridClient sendGridClient)
+        public ConnectSendGridService(IOptions<SendGridConfig> sendGridConfig, ISendGridClient sendGridClient, IMemDistCache<Template> memDistCache)
         {
             _sendGridConfig = sendGridConfig;
             _sendGridClient = sendGridClient;
+            _memDistCache = memDistCache;
         }
 
         public async Task<bool> AddNewMarketingContact(MarketingContact marketingContact)
@@ -134,8 +139,8 @@ namespace CommunicationService.SendGridService
         public async Task<Template> GetTemplate(string templateName)
         {
             var queryParams = @"{
-                'generations': 'dynamic'
-                }";
+            'generations': 'dynamic'
+            }";
             Response response = await _sendGridClient.RequestAsync(SendGridClient.Method.GET, null, queryParams, "templates").ConfigureAwait(false);
 
             if (response != null && response.StatusCode == HttpStatusCode.OK)
@@ -162,7 +167,15 @@ namespace CommunicationService.SendGridService
             else
             {
                 throw new SendGridException("CallingGetTemplateId");
-            }
+            }            
+        }
+
+        public async Task<Template> GetTemplate(string templateName, CancellationToken cancellationToken)
+        {
+            return await _memDistCache.GetCachedDataAsync(async (cancellationToken) =>
+            {
+                return await GetTemplate(templateName);
+            }, $"{CACHE_KEY_PREFIX}-template-{templateName}", RefreshBehaviour.DontWaitForFreshData, cancellationToken);
         }
 
         private string GetReferencedJobs(List<ReferencedJob> referencedJobs)
@@ -179,7 +192,7 @@ namespace CommunicationService.SendGridService
 
         public async Task<bool> SendDynamicEmail(string messageId, string templateName, string groupName, EmailBuildData emailBuildData)
         {
-            var template = await GetTemplate(templateName).ConfigureAwait(false);
+            var template = await GetTemplate(templateName, CancellationToken.None).ConfigureAwait(false);
             int groupId = await GetGroupId(groupName).ConfigureAwait(false);
             emailBuildData.BaseDynamicData.BaseUrl = _sendGridConfig.Value.BaseUrl;
             Personalization personalization = new Personalization()
