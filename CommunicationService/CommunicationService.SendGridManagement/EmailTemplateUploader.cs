@@ -93,7 +93,7 @@ namespace CommunicationService.SendGridManagement
 
             if (templates.createUpdateUnsubscribeGroups?.Length > 0)
             {
-                foreach (UnsubscribeGroups unsubscribeGroups in templates.createUpdateUnsubscribeGroups)
+                foreach (UnsubscribeGroup unsubscribeGroups in templates.createUpdateUnsubscribeGroups)
                 { 
                     int groupId;
                     try
@@ -111,7 +111,7 @@ namespace CommunicationService.SendGridManagement
 
             if (templates.deleteUnsubscribeGroups?.Length > 0)
             {
-                foreach (UnsubscribeGroups unsubscribeGroups in templates.deleteUnsubscribeGroups)
+                foreach (UnsubscribeGroup unsubscribeGroups in templates.deleteUnsubscribeGroups)
                 {
                     int groupId;
                     try
@@ -187,7 +187,7 @@ namespace CommunicationService.SendGridManagement
             if (response != null && response.StatusCode == HttpStatusCode.OK)
             {
                 string body = response.Body.ReadAsStringAsync().Result;
-                var groups = JsonConvert.DeserializeObject<UnsubscribeGroups[]>(body);
+                var groups = JsonConvert.DeserializeObject<UnsubscribeGroup[]>(body);
                 if (groups != null && groups.Length > 0)
                 {
                     var group = groups.Where(x => x.name == groupName).FirstOrDefault();
@@ -211,7 +211,7 @@ namespace CommunicationService.SendGridManagement
             }
         }
 
-        private int CreateNewGroup(UnsubscribeGroups unsubscribeGroups)
+        private int CreateNewGroup(UnsubscribeGroup unsubscribeGroups)
         {
             string requestBody = JsonConvert.SerializeObject(unsubscribeGroups);
 
@@ -220,7 +220,7 @@ namespace CommunicationService.SendGridManagement
             if (response != null && response.StatusCode == HttpStatusCode.Created)
             {
                 string body = response.Body.ReadAsStringAsync().Result;
-                var newGroup = JsonConvert.DeserializeObject<UnsubscribeGroups>(body);
+                var newGroup = JsonConvert.DeserializeObject<UnsubscribeGroup>(body);
 
                 if (newGroup != null)
                 {
@@ -288,7 +288,7 @@ namespace CommunicationService.SendGridManagement
             return false;
         }
 
-        private bool UpdateUnsubscribeGroup(UnsubscribeGroups unsubscribeGroups)
+        private bool UpdateUnsubscribeGroup(UnsubscribeGroup unsubscribeGroups)
         {
             string requestBody = JsonConvert.SerializeObject(unsubscribeGroups);
 

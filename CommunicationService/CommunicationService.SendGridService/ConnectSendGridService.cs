@@ -25,14 +25,17 @@ namespace CommunicationService.SendGridService
     {
         private readonly IOptions<SendGridConfig> _sendGridConfig;
         private readonly ISendGridClient _sendGridClient;
-        private readonly IMemDistCache<Template> _memDistCache;
+        private readonly IMemDistCache<Template> _memDistCacheTemplate;
+        private readonly IMemDistCache<UnsubscribeGroup> _memDistCacheUnsubscribeGroup;
+
         private const string CACHE_KEY_PREFIX = "sendgrid-";
 
-        public ConnectSendGridService(IOptions<SendGridConfig> sendGridConfig, ISendGridClient sendGridClient, IMemDistCache<Template> memDistCache)
+        public ConnectSendGridService(IOptions<SendGridConfig> sendGridConfig, ISendGridClient sendGridClient, IMemDistCache<Template> memDistCacheTemplate, IMemDistCache<UnsubscribeGroup> memDistCacheUnsubscribeGroup)
         {
             _sendGridConfig = sendGridConfig;
             _sendGridClient = sendGridClient;
-            _memDistCache = memDistCache;
+            _memDistCacheTemplate = memDistCacheTemplate;
+            _memDistCacheUnsubscribeGroup = memDistCacheUnsubscribeGroup;
         }
 
         public async Task<bool> AddNewMarketingContact(MarketingContact marketingContact)
@@ -105,20 +108,20 @@ namespace CommunicationService.SendGridService
             return result;
         }
 
-        public async Task<int> GetGroupId(string groupName)
+        public async Task<UnsubscribeGroup> GetUnsubscribeGroup(string groupName)
         {
             Response response = await _sendGridClient.RequestAsync(SendGridClient.Method.GET, null, null, "asm/groups").ConfigureAwait(false);
 
             if (response != null && response.StatusCode == HttpStatusCode.OK)
             {
                 string body = await response.Body.ReadAsStringAsync().ConfigureAwait(false);
-                var groups = JsonConvert.DeserializeObject<UnsubscribeGroups[]>(body);
+                var groups = JsonConvert.DeserializeObject<UnsubscribeGroup[]>(body);
                 if (groups != null && groups.Length > 0)
                 {
                     var group = groups.Where(x => x.name == groupName).FirstOrDefault();
                     if (group != null)
                     {
-                        return group.id;
+                        return group;
                     }
                     else
                     {
@@ -134,6 +137,14 @@ namespace CommunicationService.SendGridService
             {
                 throw new SendGridException("CallingGetGroupId");
             }
+        }
+
+        public async Task<UnsubscribeGroup> GetUnsubscribeGroupWithCache(string groupName, CancellationToken cancellationToken)
+        {
+            return await _memDistCacheUnsubscribeGroup.GetCachedDataAsync(async (cancellationToken) =>
+            {
+                return await GetUnsubscribeGroup(groupName);
+            }, $"{CACHE_KEY_PREFIX}-group-{groupName}", RefreshBehaviour.DontWaitForFreshData, cancellationToken);
         }
 
         public async Task<Template> GetTemplate(string templateName)
@@ -172,7 +183,7 @@ namespace CommunicationService.SendGridService
 
         public async Task<Template> GetTemplateWithCache(string templateName, CancellationToken cancellationToken)
         {
-            return await _memDistCache.GetCachedDataAsync(async (cancellationToken) =>
+            return await _memDistCacheTemplate.GetCachedDataAsync(async (cancellationToken) =>
             {
                 return await GetTemplate(templateName);
             }, $"{CACHE_KEY_PREFIX}-template-{templateName}", RefreshBehaviour.DontWaitForFreshData, cancellationToken);
@@ -193,7 +204,7 @@ namespace CommunicationService.SendGridService
         public async Task<bool> SendDynamicEmail(string messageId, string templateName, string groupName, EmailBuildData emailBuildData)
         {
             var template = await GetTemplateWithCache(templateName, CancellationToken.None).ConfigureAwait(false);
-            int groupId = await GetGroupId(groupName).ConfigureAwait(false);
+            UnsubscribeGroup unsubscribeGroup = await GetUnsubscribeGroupWithCache(groupName, CancellationToken.None).ConfigureAwait(false);
             emailBuildData.BaseDynamicData.BaseUrl = _sendGridConfig.Value.BaseUrl;
             Personalization personalization = new Personalization()
             {
@@ -208,7 +219,7 @@ namespace CommunicationService.SendGridService
                 TemplateId = template.id,
                 Asm = new ASM()
                 {
-                    GroupId = groupId
+                    GroupId = unsubscribeGroup.id
                 },
                 Personalizations = new List<Personalization>()
                 {
