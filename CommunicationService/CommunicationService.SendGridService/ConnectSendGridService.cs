@@ -144,7 +144,7 @@ namespace CommunicationService.SendGridService
             return await _memDistCacheUnsubscribeGroup.GetCachedDataAsync(async (cancellationToken) =>
             {
                 return await GetUnsubscribeGroup(groupName);
-            }, $"{CACHE_KEY_PREFIX}-group-{groupName}", RefreshBehaviour.DontWaitForFreshData, cancellationToken);
+            }, $"{CACHE_KEY_PREFIX}-unsubscribegroup-{groupName}", RefreshBehaviour.DontWaitForFreshData, cancellationToken);
         }
 
         public async Task<Template> GetTemplate(string templateName)
