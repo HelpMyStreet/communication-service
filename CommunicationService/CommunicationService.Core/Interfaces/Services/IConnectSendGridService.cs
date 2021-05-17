@@ -12,7 +12,8 @@ namespace CommunicationService.Core.Interfaces.Services
         Task<Template> GetTemplate(string templateName);
         Task<Template> GetTemplateWithCache(string templateName, CancellationToken cancellationToken);
         Task<bool> SendDynamicEmail(string messageId, string templateName, string groupName, EmailBuildData sendGridData);
-        Task<int> GetGroupId(string groupName);
+        Task<UnsubscribeGroup> GetUnsubscribeGroup(string groupName);
+        Task<UnsubscribeGroup> GetUnsubscribeGroupWithCache(string groupName, CancellationToken cancellationToken);
         Task<bool> AddNewMarketingContact(MarketingContact marketingContact);
         Task<bool> DeleteMarketingContact(string emailAddress);
     }
