@@ -6,6 +6,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Remove="Emails\GroupWelcome.html" />
     <None Remove="Emails\InterUserMessage.html" />
     <None Remove="Emails\Layout.html" />
     <None Remove="Emails\Layout.txt" />
@@ -168,6 +169,7 @@
     <EmbeddedResource Include="Emails\NewCredentials.html" />
     <EmbeddedResource Include="Emails\PartialRegistration.html">
     </EmbeddedResource>
+    <EmbeddedResource Include="Emails\GroupWelcome.html" />
     <EmbeddedResource Include="Emails\Welcome.html">
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\20200618_11229_DeleteGroups.json">
