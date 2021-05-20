@@ -162,5 +162,23 @@ namespace CommunicationService.GroupService
                 return null;
             }
         }
+
+        public async Task<List<KeyValuePair<string, string>>> GetGroupEmailConfiguration(int groupId, GroupEmailVariant groupEmailVariant)
+        {
+            GetGroupEmailConfigurationRequest request = new GetGroupEmailConfigurationRequest() { GroupId = groupId, GroupEmailVariantType = new GroupEmailVariantType() { GroupEmailVariant = groupEmailVariant } };
+            string json = JsonConvert.SerializeObject(request);
+            StringContent data = new StringContent(json, Encoding.UTF8, "application/json");
+
+            using (HttpResponseMessage response = await _httpClientWrapper.PostAsync(HttpClientConfigName.GroupService, "/api/GetGroupEmailConfiguration", data, CancellationToken.None).ConfigureAwait(false))
+            {
+                string jsonResponse = await response.Content.ReadAsStringAsync();
+                var getJobsResponse = JsonConvert.DeserializeObject<ResponseWrapper<GetGroupEmailConfigurationResponse, GroupServiceErrorCode>>(jsonResponse);
+                if (getJobsResponse.HasContent && getJobsResponse.IsSuccessful)
+                {
+                    return getJobsResponse.Content.EmailConfigurations;
+                }
+                return null;
+            }           
+        }
     }
 }
