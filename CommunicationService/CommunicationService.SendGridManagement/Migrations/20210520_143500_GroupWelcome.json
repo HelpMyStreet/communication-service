@@ -1,0 +1,15 @@
+﻿{
+  "Templates": [
+    {
+      "name": "GroupWelcome",
+      "subject": "{{{Subject}}}",
+      "generation": "dynamic",
+      "versions": [
+        {
+          "name": "second draft for group welcome email",
+          "subject": "{{{Subject}}}"
+        }
+      ]
+    }
+  ]
+}

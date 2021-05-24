@@ -1,16 +1,13 @@
 ﻿using CommunicationService.Core.Domains;
 using CommunicationService.Core.Interfaces;
-using CommunicationService.Core.Interfaces.Repositories;
 using CommunicationService.Core.Interfaces.Services;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using HelpMyStreet.Utils.Models;
 using CommunicationService.MessageService.Substitution;
-using HelpMyStreet.Utils.Extensions;
-using HelpMyStreet.Utils.Enums;
 using HelpMyStreet.Utils.Exceptions;
 using System.Linq;
+using HelpMyStreet.Contracts.RequestService.Response;
 
 namespace CommunicationService.MessageService
 {
@@ -32,30 +29,6 @@ namespace CommunicationService.MessageService
             _connectUserService = connectUserService;
             _sendMessageRequests = new List<SendMessageRequest>();
         }
-
-        //private string GetTitleFromDays(int days, DueDateType dueDateType, DateTime dueDate)
-        //{
-        //    if (days == 0)
-        //    {
-        //        return $"A request for help you accepted is due today ({dueDate.FormatDate(DateTimeFormat.ShortDateFormat)})";
-        //    }
-        //    else if (days == 1)
-        //    {                    
-        //        return $"A request for help you accepted is due tomorrow ({dueDate.FormatDate(DateTimeFormat.ShortDateFormat)})";
-        //    }
-        //    else
-        //    {
-        //        switch (dueDateType)
-        //        {
-        //            case DueDateType.Before:
-        //                return $"A request for help you accepted is due within {days} days";
-        //            case DueDateType.On:
-        //                return $"A request for help you accepted is due in {days} days";
-        //            default:
-        //                throw new Exception("Unknown title");
-        //        }
-        //    }
-        //}
 
         public async Task<EmailBuildData> PrepareTemplateData(Guid batchId, int? recipientUserId, int? jobId, int? groupId, int? requestId, Dictionary<string, string> additionalParameters, string templateName)
         {
@@ -83,7 +56,7 @@ namespace CommunicationService.MessageService
                 throw new BadRequestException($"unable to retrieve group details for {groupId.Value}");
             }
 
-            var groupEmailConfiguration = _connectGroupService.GetGroupEmailConfiguration(groupId.Value, GroupEmailVariant.Welcome).Result;
+            var groupEmailConfiguration = _connectGroupService.GetGroupEmailConfiguration(groupId.Value, CommunicationJobTypes.GroupWelcome).Result;
 
             if (groupEmailConfiguration == null)
             {

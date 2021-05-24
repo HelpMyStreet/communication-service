@@ -1,0 +1,21 @@
+﻿{
+  "CreateUpdateUnsubscribeGroups": [
+    {
+      "name": "Welcome",
+      "description": "Unsubscribe group for Welcome Email"
+    }
+  ],
+  "Templates": [
+    {
+      "name": "GroupWelcome",
+      "subject": "{{{Subject}}}",
+      "generation": "dynamic",
+      "versions": [
+        {
+          "name": "first draft for group welcome email",
+          "subject": "{{{Subject}}}"
+        }
+      ]
+    }
+  ]
+}
