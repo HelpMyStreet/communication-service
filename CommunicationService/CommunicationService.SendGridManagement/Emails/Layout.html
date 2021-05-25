@@ -115,9 +115,15 @@
 
             <table align='center' border='0' cellpadding='0' cellspacing='0' role='presentation' style='background:#ffff;background-color:#ffff;width:100%;'>
                 <tr>
+                    {{#if GroupLogoAvailable}}
                     <td style='direction:ltr;font-size:0px;padding:0px 0px 9px 0px;text-align:center;vertical-align:top;'>
-                        <img src='https://www.helpmystreet.org/img/logos/HelpMyStreet_Logo_1154.jpg' alt='HelpMyStreet.org logo' style='border:0;display:block;outline:none;height:auto;width:100%;' width='600' height='136'>
+                        <img src='{{BaseCommunicationUrl}}/Resources?file={{GroupLogo}}' alt='HelpMyStreet.org logo' style='border:0;display:block;outline:none;height:auto;width:100%;' width='600' height='136'>
                     </td>
+                    {{else}}
+                    <td style='direction:ltr;font-size:0px;padding:0px 0px 9px 0px;text-align:center;vertical-align:top;'>
+                        <img src='{{BaseCommunicationUrl}}/Resources?file=hms.jpg' alt='HelpMyStreet.org logo' style='border:0;display:block;outline:none;height:auto;width:100%;' width='600' height='136'>
+                    </td>
+                    {{/if}}
                 </tr>
                 <tr>
                     <td>

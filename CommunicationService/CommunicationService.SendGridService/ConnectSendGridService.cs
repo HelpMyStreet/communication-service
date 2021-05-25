@@ -206,6 +206,7 @@ namespace CommunicationService.SendGridService
             var template = await GetTemplateWithCache(templateName, CancellationToken.None).ConfigureAwait(false);
             UnsubscribeGroup unsubscribeGroup = await GetUnsubscribeGroupWithCache(groupName, CancellationToken.None).ConfigureAwait(false);
             emailBuildData.BaseDynamicData.BaseUrl = _sendGridConfig.Value.BaseUrl;
+            emailBuildData.BaseDynamicData.BaseCommunicationUrl = _sendGridConfig.Value.BaseCommunicationUrl;
             Personalization personalization = new Personalization()
             {
                 Tos = new List<EmailAddress>() { new EmailAddress(emailBuildData.EmailToAddress, emailBuildData.EmailToName) },
