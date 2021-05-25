@@ -12,5 +12,6 @@ namespace CommunicationService.Core.Domains.SendGrid
         public string updated_at { get; set; }
         public Version[] versions { get; set; }
         public string subject { get; set; }
+        public string layout { get; set; }
     }
 }

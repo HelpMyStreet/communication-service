@@ -1,0 +1,25 @@
+﻿HelpMyStreet.org
+
+### {{Title}} ###
+
+
+{{Body}}
+
+https://www.facebook.com/helpmystreets/
+
+HelpMyStreet
+
+HelpMyStreet is working with community organisers to get help and support to people who need to shelter safely at home. Many of
+these people live far from friends and family and don't have a local support network. HelpMyStreet gets the right help to the right
+people so that no one is left out. All volunteers are ID verified so that everyone is safe and secure. Request help or sign up as a
+volunteer at http://helpmystreet.org.
+
+About Us
+HelpMyStreet is a Nottingham-based non-profit established in March 2020. We're a team of doctors, health practitioners, tech and data
+people and community volunteers. HelpMyStreet CIC is registered in England and Wales, company number 12534175, and registered with the
+Information Commissioner's Office.
+
+If you think you have received this email in error please let the HelpMyStreet team know by contacting support@helpmystreet.org.
+
+Click here to unsubscribe: {{{unsubscribe}}}
+
