@@ -7,8 +7,6 @@
 
   <ItemGroup>
     <None Remove="Emails\GroupWelcome.html" />
-    <None Remove="Emails\GroupWelcomeLayout.html" />
-    <None Remove="Emails\GroupWelcomeLayout.txt" />
     <None Remove="Emails\InterUserMessage.html" />
     <None Remove="Emails\Layout.html" />
     <None Remove="Emails\Layout.txt" />
@@ -158,17 +156,10 @@
     <None Remove="Migrations\20210222_163000_FixLinks.json" />
     <None Remove="Migrations\20210223_140000_ShiftReminderEmails.json" />
     <None Remove="Migrations\20210317_111500_CreateUnsubscribeGroup.json" />
-    <None Remove="Migrations\20210520_094500_GroupWelcome.json" />
-    <None Remove="Migrations\20210520_143500_GroupWelcome.json" />
-    <None Remove="Migrations\20210525_103000_GroupWelcome.json" />
-    <None Remove="Migrations\20210525_110000_GroupWelcome.json" />
-    <None Remove="Migrations\20210525_111000_GroupWelcome.json" />
-    <None Remove="Migrations\20210525_112000_GroupWelcome.json" />
+    <None Remove="Migrations\20210525_150000_GroupWelcome.json" />
   </ItemGroup>
 
   <ItemGroup>
-    <EmbeddedResource Include="Emails\GroupWelcomeLayout.html" />
-    <EmbeddedResource Include="Emails\GroupWelcomeLayout.txt" />
     <EmbeddedResource Include="Emails\Layout.txt" />
     <EmbeddedResource Include="Emails\NewTaskPendingApprovalNotification.html" />
     <EmbeddedResource Include="Emails\RequestNotification.html" />
@@ -203,12 +194,7 @@
     <EmbeddedResource Include="Emails\RequestorTaskNotification.html" />
     <EmbeddedResource Include="Migrations\20200709_130700_AddRequestorTaskNotification.json" />
     <EmbeddedResource Include="Migrations\20200717_152400_AddUnsubscribeGroupsDailyDigest.json" />
-    <EmbeddedResource Include="Migrations\20210525_112000_GroupWelcome.json" />
-    <EmbeddedResource Include="Migrations\20210525_111000_GroupWelcome.json" />
-    <EmbeddedResource Include="Migrations\20210525_110000_GroupWelcome.json" />
-    <EmbeddedResource Include="Migrations\20210525_103000_GroupWelcome.json" />
-    <EmbeddedResource Include="Migrations\20210520_143500_GroupWelcome.json" />
-    <EmbeddedResource Include="Migrations\20210520_094500_GroupWelcome.json" />
+    <EmbeddedResource Include="Migrations\20210525_150000_GroupWelcome.json" />
     <EmbeddedResource Include="Migrations\20210317_111500_CreateUnsubscribeGroup.json" />
     <EmbeddedResource Include="Migrations\20210302_133000_DailyDigestEmails.json" />
     <EmbeddedResource Include="Migrations\20210224_151500_UpdateTaskNotificationEmail.json" />

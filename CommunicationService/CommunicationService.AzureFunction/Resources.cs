@@ -14,16 +14,16 @@ using System.Net.Http.Headers;
 
 namespace CommunicationService.AzureFunction
 {
-    public static class Home
+    public static class Resources
     {
         const string staticFilesFolder = "www";
         static string defaultPage =
             string.IsNullOrEmpty(GetEnvironmentVariable("DEFAULT_PAGE")) ?
             "index.html" : GetEnvironmentVariable("DEFAULT_PAGE");
 
-        [FunctionName("Home")]
+        [FunctionName("Resources")]
         public static async Task<HttpResponseMessage> Run(
-            [HttpTrigger(AuthorizationLevel.Anonymous, "get", "post", Route = null)] HttpRequestMessage req,
+            [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = null)] HttpRequestMessage req,
             ILogger log)
         {
             try
