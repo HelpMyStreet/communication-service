@@ -73,22 +73,10 @@ namespace CommunicationService.SendGridManagement
                     {
                         templateId = CreateNewTemplate(template);
                     }
-
-                    string html_content = string.Empty;
-                    string plain_content = string.Empty;
-
-                    if (string.IsNullOrEmpty(template.layout))
-                    {
-                        html_content = GetEmailHtml("Layout").Replace("{{Body}}", GetEmailHtml(template.name));
-                        plain_content = Regex.Replace(GetEmailHtml(template.name), @"<[^>]*>", String.Empty);
-                        plain_content = GetEmailText("Layout").Replace("{{Body}}", plain_content);
-                    }
-                    else
-                    {
-                        html_content = GetEmailHtml(template.layout).Replace("{{Body}}", GetEmailHtml(template.name));
-                        plain_content = Regex.Replace(GetEmailHtml(template.name), @"<[^>]*>", String.Empty);
-                        plain_content = GetEmailText(template.layout).Replace("{{Body}}", plain_content);
-                    }
+                    
+                    string html_content = GetEmailHtml("Layout").Replace("{{Body}}", GetEmailHtml(template.name));
+                    string plain_content = Regex.Replace(GetEmailHtml(template.name), @"<[^>]*>", String.Empty);
+                    plain_content = GetEmailText("Layout").Replace("{{Body}}", plain_content);
 
                     bool success = CreateNewTemplateVersion(new NewTemplateVersion()
                     {
