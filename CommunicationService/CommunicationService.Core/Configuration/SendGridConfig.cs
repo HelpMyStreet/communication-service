@@ -12,5 +12,6 @@ namespace CommunicationService.Core.Configuration
         public string ReplyToEmail { get; set; }
         public string ReplyToName { get; set; }
         public string BaseUrl { get; set; }
+        public string BaseCommunicationUrl { get; set; }
     }
 }

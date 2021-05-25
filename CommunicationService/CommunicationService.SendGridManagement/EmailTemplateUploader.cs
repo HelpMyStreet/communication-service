@@ -73,8 +73,8 @@ namespace CommunicationService.SendGridManagement
                     {
                         templateId = CreateNewTemplate(template);
                     }
-                    string html_content = GetEmailHtml("Layout").Replace("{{Body}}", GetEmailHtml(template.name));
                     
+                    string html_content = GetEmailHtml("Layout").Replace("{{Body}}", GetEmailHtml(template.name));
                     string plain_content = Regex.Replace(GetEmailHtml(template.name), @"<[^>]*>", String.Empty);
                     plain_content = GetEmailText("Layout").Replace("{{Body}}", plain_content);
 

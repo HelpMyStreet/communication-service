@@ -6,6 +6,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Remove="Emails\GroupWelcome.html" />
     <None Remove="Emails\InterUserMessage.html" />
     <None Remove="Emails\Layout.html" />
     <None Remove="Emails\Layout.txt" />
@@ -155,6 +156,7 @@
     <None Remove="Migrations\20210222_163000_FixLinks.json" />
     <None Remove="Migrations\20210223_140000_ShiftReminderEmails.json" />
     <None Remove="Migrations\20210317_111500_CreateUnsubscribeGroup.json" />
+    <None Remove="Migrations\20210525_150000_GroupWelcome.json" />
   </ItemGroup>
 
   <ItemGroup>
@@ -168,6 +170,7 @@
     <EmbeddedResource Include="Emails\NewCredentials.html" />
     <EmbeddedResource Include="Emails\PartialRegistration.html">
     </EmbeddedResource>
+    <EmbeddedResource Include="Emails\GroupWelcome.html" />
     <EmbeddedResource Include="Emails\Welcome.html">
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\20200618_11229_DeleteGroups.json">
@@ -191,6 +194,7 @@
     <EmbeddedResource Include="Emails\RequestorTaskNotification.html" />
     <EmbeddedResource Include="Migrations\20200709_130700_AddRequestorTaskNotification.json" />
     <EmbeddedResource Include="Migrations\20200717_152400_AddUnsubscribeGroupsDailyDigest.json" />
+    <EmbeddedResource Include="Migrations\20210525_150000_GroupWelcome.json" />
     <EmbeddedResource Include="Migrations\20210317_111500_CreateUnsubscribeGroup.json" />
     <EmbeddedResource Include="Migrations\20210302_133000_DailyDigestEmails.json" />
     <EmbeddedResource Include="Migrations\20210224_151500_UpdateTaskNotificationEmail.json" />

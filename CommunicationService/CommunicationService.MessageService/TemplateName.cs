@@ -6,6 +6,7 @@ namespace CommunicationService.MessageService
 {
     public static class TemplateName
     {
+        public const string GroupWelcome = "GroupWelcome";
         public const string Welcome = "Welcome";
         public const string PartialRegistration = "PartialRegistration";
         public const string TaskNotification = "TaskNotification";

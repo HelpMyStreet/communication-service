@@ -14,6 +14,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Text;
 using System;
+using HelpMyStreet.Contracts.CommunicationService.Request;
 
 namespace CommunicationService.GroupService
 {
@@ -161,6 +162,24 @@ namespace CommunicationService.GroupService
                 }
                 return null;
             }
+        }
+
+        public async Task<List<KeyValuePair<string, string>>> GetGroupEmailConfiguration(int groupId, CommunicationJobTypes communicationJobType)
+        {
+            GetGroupEmailConfigurationRequest request = new GetGroupEmailConfigurationRequest() { GroupId = groupId, CommunicationJob = new CommunicationJob() { CommunicationJobType = communicationJobType } };
+            string json = JsonConvert.SerializeObject(request);
+            StringContent data = new StringContent(json, Encoding.UTF8, "application/json");
+
+            using (HttpResponseMessage response = await _httpClientWrapper.PostAsync(HttpClientConfigName.GroupService, "/api/GetGroupEmailConfiguration", data, CancellationToken.None).ConfigureAwait(false))
+            {
+                string jsonResponse = await response.Content.ReadAsStringAsync();
+                var getJobsResponse = JsonConvert.DeserializeObject<ResponseWrapper<GetGroupEmailConfigurationResponse, GroupServiceErrorCode>>(jsonResponse);
+                if (getJobsResponse.HasContent && getJobsResponse.IsSuccessful)
+                {
+                    return getJobsResponse.Content.EmailConfigurations;
+                }
+                return null;
+            }           
         }
     }
 }
