@@ -52,7 +52,7 @@ namespace CommunicationService.AzureFunction
         }
 
         private static string GetScriptPath()
-    => Path.Combine("", "");
+    => Path.Combine(GetEnvironmentVariable("HOME"), @"site\wwwroot");
 
         private static string GetEnvironmentVariable(string name)
             => System.Environment.GetEnvironmentVariable(name, EnvironmentVariableTarget.Process);
