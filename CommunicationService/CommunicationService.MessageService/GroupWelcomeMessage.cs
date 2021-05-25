@@ -64,6 +64,7 @@ namespace CommunicationService.MessageService
             }
 
             var headerRequired = groupEmailConfiguration.Where(x => x.Key == "HeaderRequired").FirstOrDefault();
+            var groupLogo = groupEmailConfiguration.Where(x => x.Key == "GroupLogo").FirstOrDefault();
             var groupContent = groupEmailConfiguration.Where(x => x.Key == "GroupContent").FirstOrDefault();
             var groupSignature = groupEmailConfiguration.Where(x => x.Key == "GroupSignature").FirstOrDefault();
             var groupPS = groupEmailConfiguration.Where(x => x.Key == "GroupPS").FirstOrDefault();
@@ -74,6 +75,8 @@ namespace CommunicationService.MessageService
                     title: $"Welcome to {group.Group.GroupName} on HelpMyStreet!",
                     subject: $"Welcome to {group.Group.GroupName}!",
                     firstName: user.UserPersonalDetails.FirstName,
+                    groupLogoAvailable: !string.IsNullOrEmpty(groupLogo.Value),
+                    groupLogo: groupLogo.Value,
                     groupName: group.Group.GroupName,
                     groupContentAvailable: !string.IsNullOrEmpty(groupContent.Value),
                     groupContent: groupContent.Value,

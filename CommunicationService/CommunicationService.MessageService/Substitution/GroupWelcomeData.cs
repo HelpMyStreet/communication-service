@@ -7,6 +7,8 @@ namespace CommunicationService.MessageService.Substitution
         public string Title { get; private set; }
         public string Subject { get; set; }
         public string FirstName { get; private set; }
+        public bool GroupLogoAvailable { get; private set; }
+        public string GroupLogo { get; private set; }
         public string GroupName { get; private set; }
         public bool GroupContentAvailable { get; private set; }        
         public string GroupContent { get; private set; }
@@ -19,6 +21,8 @@ namespace CommunicationService.MessageService.Substitution
             string title,
             string subject,
             string firstName,
+            bool groupLogoAvailable,
+            string groupLogo,
             string groupName,
             bool groupContentAvailable,
             string groupContent,
@@ -31,6 +35,8 @@ namespace CommunicationService.MessageService.Substitution
             Title = title;
             Subject = subject;
             FirstName = firstName;
+            GroupLogoAvailable = groupLogoAvailable;
+            GroupLogo = groupLogo;
             GroupName = groupName;
             GroupContentAvailable = groupContentAvailable;
             GroupContent = groupContent;
