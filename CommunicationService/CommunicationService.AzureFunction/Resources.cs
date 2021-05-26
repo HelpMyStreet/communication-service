@@ -29,6 +29,7 @@ namespace CommunicationService.AzureFunction
             try
             {
                 var filePath = GetFilePath(req, log);
+                log.LogInformation($"filePath: {filePath}");
 
                 var response = new HttpResponseMessage(HttpStatusCode.OK);
                 var stream = new FileStream(filePath, FileMode.Open);
@@ -37,8 +38,9 @@ namespace CommunicationService.AzureFunction
                     new MediaTypeHeaderValue(GetMimeType(filePath));
                 return response;
             }
-            catch
+            catch (Exception exc)
             {
+                log.LogError($"Resources error { exc.ToString()}");
                 return new HttpResponseMessage(HttpStatusCode.NotFound);
             }
         }
@@ -50,7 +52,7 @@ namespace CommunicationService.AzureFunction
         }
 
         private static string GetScriptPath()
-    => Path.Combine("", "");
+    => Path.Combine(GetEnvironmentVariable("HOME"), @"site\wwwroot");
 
         private static string GetEnvironmentVariable(string name)
             => System.Environment.GetEnvironmentVariable(name, EnvironmentVariableTarget.Process);
