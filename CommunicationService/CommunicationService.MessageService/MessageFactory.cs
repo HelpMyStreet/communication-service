@@ -68,8 +68,6 @@ namespace CommunicationService.MessageService
         {
             switch (communicationJobTypes)
             {
-                case CommunicationJobTypes.PostYotiCommunication:
-                    return new PostYotiCommunicationMessage(_connectUserService, _cosmosDbService);
                 case CommunicationJobTypes.SendRegistrationChasers:
                     return new RegistrationChaserMessage(_connectUserService, _cosmosDbService,_emailConfig);
                 case CommunicationJobTypes.SendNewTaskNotification:
