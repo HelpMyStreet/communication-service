@@ -17,7 +17,6 @@ namespace CommunicationService.MessageService.Substitution
         public bool GroupPSAvailable { get; private set; }
         public string GroupPS { get; private set; }
         public string EncodedGroupId { get; private set; }
-        public string EncodedUserId { get; private set; }
         public bool ShowLinkToProfile { get; private set; }
         public bool ShowGroupRequestFormLink { get; private set; }
 
@@ -35,7 +34,6 @@ namespace CommunicationService.MessageService.Substitution
             bool groupPSAvailable,
             string groupPS,
             string encodedGroupId,
-            string encodedUserId,
             bool showLinkToProfile,
             bool showGroupRequestFormLink
             )
@@ -53,7 +51,6 @@ namespace CommunicationService.MessageService.Substitution
             GroupPSAvailable = groupPSAvailable;
             GroupPS = groupPS;
             EncodedGroupId = encodedGroupId;
-            EncodedUserId = encodedUserId;
             ShowLinkToProfile = showLinkToProfile;
             ShowGroupRequestFormLink = showGroupRequestFormLink;
         }
