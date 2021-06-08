@@ -68,6 +68,10 @@ namespace CommunicationService.MessageService
             var groupContent = groupEmailConfiguration.Where(x => x.Key == "GroupContent").FirstOrDefault();
             var groupSignature = groupEmailConfiguration.Where(x => x.Key == "GroupSignature").FirstOrDefault();
             var groupPS = groupEmailConfiguration.Where(x => x.Key == "GroupPS").FirstOrDefault();
+            string encodeGroupId = HelpMyStreet.Utils.Utils.Base64Utils.Base64Encode(groupId.Value.ToString());
+            string encodedUserId = HelpMyStreet.Utils.Utils.Base64Utils.Base64Encode(recipientUserId.Value.ToString());
+            var showLinkToProfile = groupEmailConfiguration.Where(x => x.Key == "ShowLinkToProfile").FirstOrDefault();
+            var showGroupRequestFormLink = groupEmailConfiguration.Where(x => x.Key == "ShowGroupRequestFormLink").FirstOrDefault();
 
             return new EmailBuildData()
             {
@@ -83,7 +87,11 @@ namespace CommunicationService.MessageService
                     groupSignatureAvailable: !string.IsNullOrEmpty(groupSignature.Value),
                     groupSignature: groupSignature.Value,
                     groupPSAvailable: !string.IsNullOrEmpty(groupPS.Value),
-                    groupPS: groupPS.Value
+                    groupPS: groupPS.Value,
+                    encodedGroupId: encodeGroupId,
+                    encodedUserId: encodedUserId,
+                    showLinkToProfile: string.IsNullOrEmpty(showLinkToProfile.Value) ? false : Convert.ToBoolean(showLinkToProfile.Value),
+                    showGroupRequestFormLink: string.IsNullOrEmpty(showGroupRequestFormLink.Value) ? false : Convert.ToBoolean(showGroupRequestFormLink.Value)
                     ),
                     JobID = jobId,
                     GroupID = groupId,

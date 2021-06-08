@@ -16,6 +16,10 @@ namespace CommunicationService.MessageService.Substitution
         public string GroupSignature { get; private set; }
         public bool GroupPSAvailable { get; private set; }
         public string GroupPS { get; private set; }
+        public string EncodedGroupId { get; private set; }
+        public string EncodedUserId { get; private set; }
+        public bool ShowLinkToProfile { get; private set; }
+        public bool ShowGroupRequestFormLink { get; private set; }
 
         public GroupWelcomeData(
             string title,
@@ -29,7 +33,11 @@ namespace CommunicationService.MessageService.Substitution
             bool groupSignatureAvailable,
             string groupSignature,
             bool groupPSAvailable,
-            string groupPS
+            string groupPS,
+            string encodedGroupId,
+            string encodedUserId,
+            bool showLinkToProfile,
+            bool showGroupRequestFormLink
             )
         {
             Title = title;
@@ -44,6 +52,10 @@ namespace CommunicationService.MessageService.Substitution
             GroupSignature = groupSignature;
             GroupPSAvailable = groupPSAvailable;
             GroupPS = groupPS;
+            EncodedGroupId = encodedGroupId;
+            EncodedUserId = encodedUserId;
+            ShowLinkToProfile = showLinkToProfile;
+            ShowGroupRequestFormLink = showGroupRequestFormLink;
         }
     }
 }
