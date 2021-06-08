@@ -89,7 +89,6 @@ namespace CommunicationService.MessageService
                     groupPSAvailable: !string.IsNullOrEmpty(groupPS.Value),
                     groupPS: groupPS.Value,
                     encodedGroupId: encodeGroupId,
-                    encodedUserId: encodedUserId,
                     showLinkToProfile: string.IsNullOrEmpty(showLinkToProfile.Value) ? false : Convert.ToBoolean(showLinkToProfile.Value),
                     showGroupRequestFormLink: string.IsNullOrEmpty(showGroupRequestFormLink.Value) ? false : Convert.ToBoolean(showGroupRequestFormLink.Value)
                     ),
