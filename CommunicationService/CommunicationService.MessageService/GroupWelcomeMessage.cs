@@ -68,12 +68,20 @@ namespace CommunicationService.MessageService
             }
 
             var groupMember = await _connectGroupService.GetGroupMember((int)HelpMyStreet.Utils.Enums.Groups.Generic, recipientUserId.Value, recipientUserId.Value);
-            var groupLogo = GetValueFromConfig(groupEmailConfiguration, "GroupLogo");
+            var showGroupLogo = GetValueFromConfig(groupEmailConfiguration, "ShowGroupLogo");
             var groupContent = GetValueFromConfig(groupEmailConfiguration, "GroupContent");
             var groupSignature = GetValueFromConfig(groupEmailConfiguration, "GroupSignature");
             var groupPS = GetValueFromConfig(groupEmailConfiguration, "GroupPS");
             string encodeGroupId = HelpMyStreet.Utils.Utils.Base64Utils.Base64Encode(groupId.Value.ToString());
             var showGroupRequestFormLink = GetValueFromConfig(groupEmailConfiguration, "ShowGroupRequestFormLink");
+
+            bool groupLogoAvailable = string.IsNullOrEmpty(showGroupLogo) ? false : Convert.ToBoolean(showGroupLogo);
+            string groupLogo = string.Empty;
+            
+            if(groupLogoAvailable)
+            {
+                groupLogo = $"{group.Group.GroupKey} (partnership).png";
+            }
 
             return new EmailBuildData()
             {
@@ -81,7 +89,7 @@ namespace CommunicationService.MessageService
                     title: $"Welcome to {group.Group.GroupName} on HelpMyStreet!",
                     subject: $"Welcome to {group.Group.GroupName}!",
                     firstName: user.UserPersonalDetails.FirstName,
-                    groupLogoAvailable: !string.IsNullOrEmpty(groupLogo),
+                    groupLogoAvailable: groupLogoAvailable,
                     groupLogo: groupLogo,
                     groupName: group.Group.GroupName,
                     groupContentAvailable: !string.IsNullOrEmpty(groupContent),
