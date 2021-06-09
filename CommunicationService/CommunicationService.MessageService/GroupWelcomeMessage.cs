@@ -80,7 +80,7 @@ namespace CommunicationService.MessageService
             
             if(groupLogoAvailable)
             {
-                groupLogo = $"{group.Group.GroupKey} (partnership).png";
+                groupLogo = $"{group.Group.GroupKey}-partnership.png";
             }
 
             return new EmailBuildData()
