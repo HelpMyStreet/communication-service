@@ -6,18 +6,19 @@
 <p>{{{GroupContent}}}</p>
 {{/if}}
 
-{{#if ShowLinkToProfile}}
+{{#if NeedYotiVerification}}
 <p>
-    If you haven’t done it already, you may like to complete your online ID verification now. We’ve made it as quick and easy as possible with the help of our partner, Yoti. Click <a href="{{BaseUrl}}/account/profile">here</a> to launch your profile and get verified.
-</p>
-<p>
-    Most requests on our platform require ID verification to give people in need of help the confidence you are who you say you are. Some of our partner organisations may also require additional checks, if this is the case we’ll let you know when you click to accept a request.
+    <strong>Need to verify your ID?</strong> Verifying your ID is quick and easy with Yoti, simply click <a href="{{BaseUrl}}/account/profile">here</a> to launch your profile and get verified.
 </p>
 {{/if}}
 
-<p>When you’re ready to start helping, you can view our open requests (and any other open requests near you) in the <a href="{{BaseUrl}}/account/open-requests">Open Requests</a> tab in your profile - make sure to keep an eye on your inbox for email updates.</p>
+<p>
+    When you’re ready to start helping, you can view our open requests (and any other open requests near you) in the <a href="{{BaseUrl}}/account/open-requests">Open Requests</a> tab in your profile. We’ll also send you notifications when new opportunities are available so make sure to keep an eye on your inbox.
+</p>
 
-<p>Once you’ve accepted a request, it will appear in your <a href="{{BaseUrl}}/account/my-requests">My Requests</a> tab. From here, you can mark it as complete, or let us know if there’s a problem by clicking ‘Can’t Do’.</p>
+<p>
+    Once you’ve accepted a request it will appear in your <a href="{{BaseUrl}}/account/my-requests">My Requests</a> tab. From here, you can mark it as complete, or let us know if there’s a problem by clicking ‘Can’t Do’.
+</p>
 
 <p>Thanks again for volunteering with us. We hope you enjoy being a part of {{GroupName}}.</p>
 
@@ -31,8 +32,12 @@
 {{#if GroupPSAvailable}}
 <p>{{{GroupPS}}}</p>
 {{#if ShowGroupRequestFormLink}}
-<p>P.S.Don’t forget that you can submit a request for help at any time if there’s someone far away from home that you're worried about. Complete our <a href="{{BaseUrl}}/request-help/{{EncodedGroupId}}">Request Help form</a> and let us know what they need.</p>
+<p>
+    P.S. Don’t forget that you can submit a request for help at any time. If the person who needs help is in {{GroupLocation}} you can submit a request to {{GroupName}} by completing our <a href="{{BaseUrl}}/request-help/{{EncodedGroupId}}">Request Help form</a>. If they’re further afield, you can <a href="{{BaseUrl}}/request-help">request help from HelpMyStreet</a> (this request will not be managed by {{GroupName}}).
+</p>
 {{/if}}
 {{else}}
-<p>P.S. Don’t forget that you can submit a request for help at any time if there’s someone far away from home that you’re worried about. Complete our <a href="{{BaseUrl}}/request-help">Request Help</a> form and let us know what they need.</p>
+<p>
+    P.S. Don’t forget that you can submit a request for help at any time by completing the HelpMyStreet <a href="{{BaseUrl}}/request-help">Request Help</a> form (this request will be managed by HelpMyStreet and will not be associated with any of their partner organisations).
+</p>
 {{/if}}

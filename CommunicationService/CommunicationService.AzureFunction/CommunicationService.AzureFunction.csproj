@@ -5,8 +5,8 @@
 	</PropertyGroup>
 	<ItemGroup>
 		<PackageReference Include="AzureExtensions.Swashbuckle" Version="3.2.2" />
-		<PackageReference Include="HelpMyStreet.CoreV3.Cache" Version="1.1.741" />
-		<PackageReference Include="HelpMyStreet.CoreV3.Contracts" Version="1.1.741" />
+		<PackageReference Include="HelpMyStreet.CoreV3.Cache" Version="1.1.749" />
+		<PackageReference Include="HelpMyStreet.CoreV3.Contracts" Version="1.1.749" />
 		<PackageReference Include="MediaTypeMap" Version="2.1.0" />
 		<PackageReference Include="Microsoft.Azure.Functions.Extensions" Version="1.0.0" />
 		<PackageReference Include="AutoMapper.Extensions.Microsoft.DependencyInjection" Version="8.0.1" />
@@ -50,16 +50,7 @@
 			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
 			<CopyToPublishDirectory>Never</CopyToPublishDirectory>
 		</None>
-		<None Update="www\ageconnectcardifflogo.png">
-		  <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-		</None>
 		<None Update="www\hms.jpg">
-		  <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-		</None>
-		<None Update="www\northwestkentlogo.png">
-		  <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-		</None>
-		<None Update="www\southkentcoastlogo.png">
 		  <CopyToOutputDirectory>Always</CopyToOutputDirectory>
 		</None>
 	</ItemGroup>
