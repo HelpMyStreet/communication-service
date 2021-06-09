@@ -93,7 +93,7 @@ namespace CommunicationService.MessageService
                 case CommunicationJobTypes.NewTaskPendingApprovalNotification:
                     return new NewTaskPendingApprovalNotification(_connectRequestService, _connectGroupService, _connectUserService, _linkRepository, _linkConfig);
                 case CommunicationJobTypes.GroupWelcome:
-                    return new GroupWelcomeMessage(_connectGroupService, _connectUserService);
+                    return new GroupWelcomeMessage(_connectGroupService, _connectUserService, _sendGridConfig);
                 default:                   
                     throw new Exception("Unknown Email Type");
             }

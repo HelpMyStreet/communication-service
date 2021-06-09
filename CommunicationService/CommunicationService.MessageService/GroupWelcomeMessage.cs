@@ -8,6 +8,8 @@ using CommunicationService.MessageService.Substitution;
 using HelpMyStreet.Utils.Exceptions;
 using System.Linq;
 using HelpMyStreet.Contracts.RequestService.Response;
+using Microsoft.Extensions.Options;
+using CommunicationService.Core.Configuration;
 
 namespace CommunicationService.MessageService
 {
@@ -15,6 +17,7 @@ namespace CommunicationService.MessageService
     {
         private readonly IConnectGroupService _connectGroupService;
         private readonly IConnectUserService _connectUserService;
+        private readonly IOptions<SendGridConfig> _sendGridConfig;
 
         List<SendMessageRequest> _sendMessageRequests;
 
@@ -23,10 +26,11 @@ namespace CommunicationService.MessageService
                 return UnsubscribeGroupName.GroupWelcome;
         }
 
-        public GroupWelcomeMessage(IConnectGroupService connectGroupService, IConnectUserService connectUserService)
+        public GroupWelcomeMessage(IConnectGroupService connectGroupService, IConnectUserService connectUserService, IOptions<SendGridConfig> sendGridConfig)
         {
             _connectGroupService = connectGroupService;
             _connectUserService = connectUserService;
+            _sendGridConfig = sendGridConfig;
             _sendMessageRequests = new List<SendMessageRequest>();
         }
 
@@ -63,15 +67,13 @@ namespace CommunicationService.MessageService
                 throw new BadRequestException($"unable to retrieve group email configuration for {groupId.Value}");
             }
 
-            var headerRequired = groupEmailConfiguration.Where(x => x.Key == "HeaderRequired").FirstOrDefault();
-            var groupLogo = groupEmailConfiguration.Where(x => x.Key == "GroupLogo").FirstOrDefault();
-            var groupContent = groupEmailConfiguration.Where(x => x.Key == "GroupContent").FirstOrDefault();
-            var groupSignature = groupEmailConfiguration.Where(x => x.Key == "GroupSignature").FirstOrDefault();
-            var groupPS = groupEmailConfiguration.Where(x => x.Key == "GroupPS").FirstOrDefault();
+            var groupMember = await _connectGroupService.GetGroupMember((int)HelpMyStreet.Utils.Enums.Groups.Generic, recipientUserId.Value, recipientUserId.Value);
+            var groupLogo = GetValueFromConfig(groupEmailConfiguration, "GroupLogo");
+            var groupContent = GetValueFromConfig(groupEmailConfiguration, "GroupContent");
+            var groupSignature = GetValueFromConfig(groupEmailConfiguration, "GroupSignature");
+            var groupPS = GetValueFromConfig(groupEmailConfiguration, "GroupPS");
             string encodeGroupId = HelpMyStreet.Utils.Utils.Base64Utils.Base64Encode(groupId.Value.ToString());
-            string encodedUserId = HelpMyStreet.Utils.Utils.Base64Utils.Base64Encode(recipientUserId.Value.ToString());
-            var showLinkToProfile = groupEmailConfiguration.Where(x => x.Key == "ShowLinkToProfile").FirstOrDefault();
-            var showGroupRequestFormLink = groupEmailConfiguration.Where(x => x.Key == "ShowGroupRequestFormLink").FirstOrDefault();
+            var showGroupRequestFormLink = GetValueFromConfig(groupEmailConfiguration, "ShowGroupRequestFormLink");
 
             return new EmailBuildData()
             {
@@ -79,18 +81,19 @@ namespace CommunicationService.MessageService
                     title: $"Welcome to {group.Group.GroupName} on HelpMyStreet!",
                     subject: $"Welcome to {group.Group.GroupName}!",
                     firstName: user.UserPersonalDetails.FirstName,
-                    groupLogoAvailable: !string.IsNullOrEmpty(groupLogo.Value),
-                    groupLogo: groupLogo.Value,
+                    groupLogoAvailable: !string.IsNullOrEmpty(groupLogo),
+                    groupLogo: groupLogo,
                     groupName: group.Group.GroupName,
-                    groupContentAvailable: !string.IsNullOrEmpty(groupContent.Value),
-                    groupContent: groupContent.Value,
-                    groupSignatureAvailable: !string.IsNullOrEmpty(groupSignature.Value),
-                    groupSignature: groupSignature.Value,
-                    groupPSAvailable: !string.IsNullOrEmpty(groupPS.Value),
-                    groupPS: groupPS.Value,
+                    groupContentAvailable: !string.IsNullOrEmpty(groupContent),
+                    groupContent: groupContent,
+                    groupSignatureAvailable: !string.IsNullOrEmpty(groupSignature),
+                    groupSignature: groupSignature,
+                    groupPSAvailable: !string.IsNullOrEmpty(groupPS),
+                    groupPS: groupPS,
                     encodedGroupId: encodeGroupId,
-                    showLinkToProfile: string.IsNullOrEmpty(showLinkToProfile.Value) ? false : Convert.ToBoolean(showLinkToProfile.Value),
-                    showGroupRequestFormLink: string.IsNullOrEmpty(showGroupRequestFormLink.Value) ? false : Convert.ToBoolean(showGroupRequestFormLink.Value)
+                    needYotiVerification: !groupMember.UserIsYotiVerified,
+                    groupLocation: group.Group.GeographicName,
+                    showGroupRequestFormLink: string.IsNullOrEmpty(showGroupRequestFormLink) ? false : Convert.ToBoolean(showGroupRequestFormLink)
                     ),
                     JobID = jobId,
                     GroupID = groupId,
@@ -98,6 +101,20 @@ namespace CommunicationService.MessageService
                     EmailToAddress = user.UserPersonalDetails.EmailAddress,
                     EmailToName = $"{user.UserPersonalDetails.FirstName} {user.UserPersonalDetails.LastName}"
             };
+        }
+
+        private string GetValueFromConfig(List<KeyValuePair<string, string>> groupEmailConfiguration, string key)
+        {
+            var result = groupEmailConfiguration.Where(x => x.Key == key).FirstOrDefault();
+
+            if(!string.IsNullOrEmpty(result.Value))
+            {
+                return result.Value.Replace("{{BaseUrl}}", _sendGridConfig.Value.BaseUrl);
+            }
+            else
+            {
+                return string.Empty;
+            }
         }
 
         private void AddRecipientAndTemplate(string templateName, int userId, int? jobId, int? groupId, int? requestId)
