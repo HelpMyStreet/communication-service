@@ -17,8 +17,9 @@ namespace CommunicationService.MessageService.Substitution
         public bool GroupPSAvailable { get; private set; }
         public string GroupPS { get; private set; }
         public string EncodedGroupId { get; private set; }
-        public bool ShowLinkToProfile { get; private set; }
+        public bool NeedYotiVerification { get; private set; }
         public bool ShowGroupRequestFormLink { get; private set; }
+        public string GroupLocation { get; private set; }
 
         public GroupWelcomeData(
             string title,
@@ -29,13 +30,14 @@ namespace CommunicationService.MessageService.Substitution
             string groupName,
             bool groupContentAvailable,
             string groupContent,
+            bool needYotiVerification,
             bool groupSignatureAvailable,
             string groupSignature,
             bool groupPSAvailable,
             string groupPS,
             string encodedGroupId,
-            bool showLinkToProfile,
-            bool showGroupRequestFormLink
+            bool showGroupRequestFormLink,
+            string groupLocation
             )
         {
             Title = title;
@@ -51,7 +53,8 @@ namespace CommunicationService.MessageService.Substitution
             GroupPSAvailable = groupPSAvailable;
             GroupPS = groupPS;
             EncodedGroupId = encodedGroupId;
-            ShowLinkToProfile = showLinkToProfile;
+            NeedYotiVerification = needYotiVerification;
+            GroupLocation = groupLocation;
             ShowGroupRequestFormLink = showGroupRequestFormLink;
         }
     }
