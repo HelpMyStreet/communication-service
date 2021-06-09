@@ -51,8 +51,11 @@ namespace CommunicationService.AzureFunction
             return MimeTypeMap.GetMimeType(fileInfo.Extension);
         }
 
+    //    private static string GetScriptPath()
+    //=> Path.Combine(GetEnvironmentVariable("HOME"), @"site\wwwroot");
+
         private static string GetScriptPath()
-    => Path.Combine(GetEnvironmentVariable("HOME"), @"site\wwwroot");
+    => Path.Combine("", "");
 
         private static string GetEnvironmentVariable(string name)
             => System.Environment.GetEnvironmentVariable(name, EnvironmentVariableTarget.Process);
