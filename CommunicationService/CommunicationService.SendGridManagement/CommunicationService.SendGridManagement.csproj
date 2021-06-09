@@ -163,6 +163,8 @@
     <None Remove="Migrations\20210526_163500_GroupWelcome.json" />
     <None Remove="Migrations\20210526_163600_GroupWelcome.json" />
     <None Remove="Migrations\20210608_163600_GroupWelcome.json" />
+    <None Remove="Migrations\20210609_090000_GroupWelcome.json" />
+    <None Remove="Migrations\20210609_090700_GroupWelcome.json" />
   </ItemGroup>
 
   <ItemGroup>
@@ -200,6 +202,8 @@
     <EmbeddedResource Include="Emails\RequestorTaskNotification.html" />
     <EmbeddedResource Include="Migrations\20200709_130700_AddRequestorTaskNotification.json" />
     <EmbeddedResource Include="Migrations\20200717_152400_AddUnsubscribeGroupsDailyDigest.json" />
+    <EmbeddedResource Include="Migrations\20210609_090700_GroupWelcome.json" />
+    <EmbeddedResource Include="Migrations\20210609_090000_GroupWelcome.json" />
     <EmbeddedResource Include="Migrations\20210608_163600_GroupWelcome.json" />
     <EmbeddedResource Include="Migrations\20210526_163600_GroupWelcome.json" />
     <EmbeddedResource Include="Migrations\20210526_163500_GroupWelcome.json" />

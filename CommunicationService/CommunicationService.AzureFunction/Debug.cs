@@ -160,7 +160,7 @@ namespace CommunicationService.AzureFunction
                 //    _cosmosDbService
                 //    );
 
-                GroupWelcomeMessage message = new GroupWelcomeMessage(_connectGroupService, _connectUserService);
+                GroupWelcomeMessage message = new GroupWelcomeMessage(_connectGroupService, _connectUserService, _sendGridConfig);
 
                 var recipients = await message.IdentifyRecipients(req.RecipientUserID, req.JobID, req.GroupID, req.RequestID, req.AdditionalParameters);
                 recipients = recipients.Take(1).ToList();

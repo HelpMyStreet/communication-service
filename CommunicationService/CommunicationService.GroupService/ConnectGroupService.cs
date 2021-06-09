@@ -181,5 +181,21 @@ namespace CommunicationService.GroupService
                 return null;
             }           
         }
+
+        public async Task<UserInGroup> GetGroupMember(int groupId, int userId, int authorisingUserId)
+        {
+            string path = $"/api/GetGroupMember?groupId={groupId}&userId={userId}&authorisingUserId={authorisingUserId}";
+
+            using (HttpResponseMessage response = await _httpClientWrapper.GetAsync(HttpClientConfigName.GroupService, path, CancellationToken.None).ConfigureAwait(false))
+            {
+                string jsonResponse = await response.Content.ReadAsStringAsync();
+                var getJobsResponse = JsonConvert.DeserializeObject<ResponseWrapper<GetGroupMemberResponse, GroupServiceErrorCode>>(jsonResponse);
+                if (getJobsResponse.HasContent && getJobsResponse.IsSuccessful)
+                {
+                    return getJobsResponse.Content.UserInGroup;
+                }
+                return null;
+            }
+        }
     }
 }
