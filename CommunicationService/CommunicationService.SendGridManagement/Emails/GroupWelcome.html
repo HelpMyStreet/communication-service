@@ -1,6 +1,6 @@
 ﻿<p>Hi {{FirstName}},</p>
 
-<p>Thanks for registering as volunteer with {{GroupName}} – we’re so pleased to have you on the team!!</p>
+<p>Thanks for registering as volunteer with {{GroupName}} – we’re so pleased to have you on the team!</p>
 
 {{#if GroupContentAvailable}}
 <p>{{{GroupContent}}}</p>
@@ -13,7 +13,7 @@
 {{/if}}
 
 <p>
-    When you’re ready to start helping, you can view our open requests (and any other open requests near you) in the <a href="{{BaseUrl}}/account/open-requests">Open Requests</a> tab in your profile. We’ll also send you notifications when new opportunities are available so make sure to keep an eye on your inbox.
+    When you’re ready to start helping, you can view our open requests (and any other open requests near you) in the <a href="{{BaseUrl}}/account/open-requests">Open Requests</a> tab in your profile. We’ll also send you notifications when new opportunities are available - so make sure to keep an eye on your inbox!
 </p>
 
 <p>
@@ -31,13 +31,20 @@
 
 {{#if GroupPSAvailable}}
 <p>{{{GroupPS}}}</p>
-{{#if ShowGroupRequestFormLink}}
-<p>
-    P.S. Don’t forget that you can submit a request for help at any time. If the person who needs help is in {{GroupLocation}} you can submit a request to {{GroupName}} by completing our <a href="{{BaseUrl}}/request-help/{{EncodedGroupId}}">Request Help form</a>. If they’re further afield, you can <a href="{{BaseUrl}}/request-help">request help from HelpMyStreet</a> (this request will not be managed by {{GroupName}}).
-</p>
 {{/if}}
-{{else}}
-<p>
-    P.S. Don’t forget that you can submit a request for help at any time by completing the HelpMyStreet <a href="{{BaseUrl}}/request-help">Request Help</a> form (this request will be managed by HelpMyStreet and will not be associated with any of their partner organisations).
-</p>
-{{/if}}
+
+{{#equals GroupType 0}}
+<p>P.S. Don’t forget that you can submit a request for help at any time. If the person who needs help is in {{GroupLocation}} you can submit a request to {{GroupName}} by completing our <a href="{{BaseUrl}}/request-help/{{EncodedGroupId}}">Request Help</a> form. If they’re further afield (or we don’t have the type of volunteers you need) you can also <a href="{{BaseUrl}}/request-help">Request Help</a> from HelpMyStreet, but please be aware that their requests will be visible to other volunteers and won’t be managed by {{GroupName}}.</p>
+{{/equals}}
+
+{{#equals GroupType 1}}
+<p>P.S. Even though you can’t request help from us online at the moment, don’t forget that you can submit a request to HelpMyStreet by completing their <a href="{{BaseUrl}}/request-help">Request Help</a> form, but please be aware that their requests will be visible to other volunteers and won’t be managed by {{GroupName}}.</p>
+{{/equals}}
+
+{{#equals GroupType 2}}
+<p>P.S. Don’t forget that you can submit a request for help at any time. You can submit a request to {{GroupName}} by completing our <a href="{{BaseUrl}}/request-help/{{EncodedGroupId}}">Request Help</a> form. If we don’t have the type of volunteers you need you can also <a href="{{BaseUrl}}/request-help">Request Help </a> from HelpMyStreet, but please be aware that their requests will be visible to other volunteers and won’t be managed by {{GroupName}}.</p>
+{{/equals}}
+
+{{#equals GroupType 3}}
+<p>P.S. Don’t forget that you can submit a request for help at any time by completing the HelpMyStreet <a href="{{BaseUrl}}/request-help">Request Help</a> form. Please be aware that these requests will be visible to HelpMyStreet volunteers and will not be managed by any of our partner organisations.</p>
+{{/equals}}
