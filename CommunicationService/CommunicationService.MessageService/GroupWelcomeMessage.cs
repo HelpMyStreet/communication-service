@@ -73,8 +73,6 @@ namespace CommunicationService.MessageService
             var groupSignature = GetValueFromConfig(groupEmailConfiguration, "GroupSignature");
             var groupPS = GetValueFromConfig(groupEmailConfiguration, "GroupPS");
             string encodeGroupId = HelpMyStreet.Utils.Utils.Base64Utils.Base64Encode(groupId.Value.ToString());
-            var showGroupRequestFormLink = GetValueFromConfig(groupEmailConfiguration, "ShowGroupRequestFormLink");
-
             bool groupLogoAvailable = string.IsNullOrEmpty(showGroupLogo) ? false : Convert.ToBoolean(showGroupLogo);
             string groupLogo = string.Empty;
             
@@ -86,7 +84,7 @@ namespace CommunicationService.MessageService
             return new EmailBuildData()
             {
                 BaseDynamicData = new GroupWelcomeData(
-                    title: $"Welcome to {group.Group.GroupName} on HelpMyStreet!",
+                    title: group.Group.GroupId == -1 ? $"Welcome to HelpMyStreet!" : $"Welcome to {group.Group.GroupName} on HelpMyStreet!",
                     subject: $"Welcome to {group.Group.GroupName}!",
                     firstName: user.UserPersonalDetails.FirstName,
                     groupLogoAvailable: groupLogoAvailable,
@@ -101,7 +99,7 @@ namespace CommunicationService.MessageService
                     encodedGroupId: encodeGroupId,
                     needYotiVerification: !groupMember.UserIsYotiVerified,
                     groupLocation: group.Group.GeographicName,
-                    showGroupRequestFormLink: string.IsNullOrEmpty(showGroupRequestFormLink) ? false : Convert.ToBoolean(showGroupRequestFormLink)
+                    groupType: (int) group.Group.GroupType
                     ),
                     JobID = jobId,
                     GroupID = groupId,
