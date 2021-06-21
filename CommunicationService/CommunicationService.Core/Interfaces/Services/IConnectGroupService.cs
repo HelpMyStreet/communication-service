@@ -9,6 +9,8 @@ namespace CommunicationService.Core.Interfaces.Services
 {
     public interface IConnectGroupService
     {
+        Task<GetRequestHelpFormVariantResponse> GetRequestHelpFormVariant(int groupId, string source);
+
         Task<UserInGroup> GetGroupMember(int groupId, int userId, int authorisingUserId);
         
         Task<GetGroupCredentialsResponse> GetGroupCredentials(int groupId);

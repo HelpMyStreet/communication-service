@@ -68,6 +68,7 @@ namespace CommunicationService.MessageService
             }
 
             var groupMember = await _connectGroupService.GetGroupMember((int)HelpMyStreet.Utils.Enums.Groups.Generic, recipientUserId.Value, recipientUserId.Value);
+            var requestHelpFormVariant = await _connectGroupService.GetRequestHelpFormVariant(groupId.Value, string.Empty);
             var showGroupLogo = GetValueFromConfig(groupEmailConfiguration, "ShowGroupLogo");
             var groupContent = GetValueFromConfig(groupEmailConfiguration, "GroupContent");
             var groupSignature = GetValueFromConfig(groupEmailConfiguration, "GroupSignature");
@@ -75,10 +76,16 @@ namespace CommunicationService.MessageService
             string encodeGroupId = HelpMyStreet.Utils.Utils.Base64Utils.Base64Encode(groupId.Value.ToString());
             bool groupLogoAvailable = string.IsNullOrEmpty(showGroupLogo) ? false : Convert.ToBoolean(showGroupLogo);
             string groupLogo = string.Empty;
+            bool publicRequestForm = false;
             
             if(groupLogoAvailable)
             {
                 groupLogo = $"group-logos/{group.Group.GroupKey}-partnership.png";
+            }
+
+            if(requestHelpFormVariant!=null)
+            {
+                publicRequestForm = !requestHelpFormVariant.AccessRestrictedByRole;
             }
 
             return new EmailBuildData()
@@ -99,7 +106,8 @@ namespace CommunicationService.MessageService
                     encodedGroupId: encodeGroupId,
                     needYotiVerification: !groupMember.UserIsYotiVerified,
                     groupLocation: group.Group.GeographicName,
-                    groupType: (int) group.Group.GroupType
+                    groupType: (int)group.Group.GroupType,
+                    publicRequestForm: publicRequestForm
                     ),
                     JobID = jobId,
                     GroupID = groupId,
