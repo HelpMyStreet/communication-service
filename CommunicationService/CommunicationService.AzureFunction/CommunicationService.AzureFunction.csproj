@@ -68,6 +68,9 @@
 		<None Update="www\group-logos\ageukwirral-partnership.png">
 		  <CopyToOutputDirectory>Always</CopyToOutputDirectory>
 		</None>
+		<None Update="www\group-logos\apex-pcn-bank-staff-partnership.png">
+		  <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+		</None>
 		<None Update="www\group-logos\apex-pcn-lincoln-partnership.png">
 		  <CopyToOutputDirectory>Always</CopyToOutputDirectory>
 		</None>
