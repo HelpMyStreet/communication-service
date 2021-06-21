@@ -197,5 +197,21 @@ namespace CommunicationService.GroupService
                 return null;
             }
         }
+
+        public async  Task<GetRequestHelpFormVariantResponse> GetRequestHelpFormVariant(int groupId, string source)
+        {
+            string path = $"/api/GetRequestHelpFormVariant?groupId={groupId}&source={source}";
+
+            using (HttpResponseMessage response = await _httpClientWrapper.GetAsync(HttpClientConfigName.GroupService, path, CancellationToken.None).ConfigureAwait(false))
+            {
+                string jsonResponse = await response.Content.ReadAsStringAsync();
+                var getJobsResponse = JsonConvert.DeserializeObject<ResponseWrapper<GetRequestHelpFormVariantResponse, GroupServiceErrorCode>>(jsonResponse);
+                if (getJobsResponse.HasContent && getJobsResponse.IsSuccessful)
+                {
+                    return getJobsResponse.Content;
+                }
+                return null;
+            }
+        }
     }
 }
