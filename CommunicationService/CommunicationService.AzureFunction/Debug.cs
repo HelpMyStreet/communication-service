@@ -36,12 +36,12 @@ namespace CommunicationService.AzureFunction
         private readonly ILinkRepository _linkRepository;
 
         public Debug(
-            IConnectGroupService connectGroupService, 
-            IConnectUserService connectUserService, 
-            IConnectRequestService connectRequestService, 
-            IOptions<EmailConfig> eMailConfig, 
-            IJobFilteringService jobFilteringService, 
-            IConnectAddressService connectAddressService, 
+            IConnectGroupService connectGroupService,
+            IConnectUserService connectUserService,
+            IConnectRequestService connectRequestService,
+            IOptions<EmailConfig> eMailConfig,
+            IJobFilteringService jobFilteringService,
+            IConnectAddressService connectAddressService,
             IConnectSendGridService connectSendGridService,
             ICosmosDbService cosmosDbService,
             IOptions<SendGridConfig> sendGridConfig,
@@ -60,7 +60,7 @@ namespace CommunicationService.AzureFunction
             _linkConfig = linkConfig;
             _linkRepository = linkRepository;
         }
- 
+
 
         [FunctionName("Debug")]
         public async Task<IActionResult> Run(
@@ -176,8 +176,8 @@ namespace CommunicationService.AzureFunction
                     if (emailBuildData != null)
                     {
 
-                        emailBuildData.EmailToAddress = "jawwad.mukhtar@gmail.com";
-                        emailBuildData.EmailToName = "Jawwad";
+                        //emailBuildData.EmailToAddress = "jawwad@factor-50.co.uk";
+                        //emailBuildData.EmailToName = "Jawwad";
                         var json2 = JsonConvert.SerializeObject(emailBuildData.BaseDynamicData);
                         _connectSendGridService.SendDynamicEmail(string.Empty, smr.TemplateName, UnsubscribeGroupName.TaskNotification, emailBuildData);
                     }
