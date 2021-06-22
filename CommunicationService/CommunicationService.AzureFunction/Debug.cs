@@ -176,7 +176,7 @@ namespace CommunicationService.AzureFunction
                     if (emailBuildData != null)
                     {
 
-                        //emailBuildData.EmailToAddress = "jawwad.mukhtar@gmail.com";
+                        //emailBuildData.EmailToAddress = "jawwad@factor-50.co.uk";
                         //emailBuildData.EmailToName = "Jawwad";
                         var json2 = JsonConvert.SerializeObject(emailBuildData.BaseDynamicData);
                         _connectSendGridService.SendDynamicEmail(string.Empty, smr.TemplateName, UnsubscribeGroupName.TaskNotification, emailBuildData);
