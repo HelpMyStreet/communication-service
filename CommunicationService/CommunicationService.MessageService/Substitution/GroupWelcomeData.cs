@@ -18,9 +18,8 @@ namespace CommunicationService.MessageService.Substitution
         public string GroupPS { get; private set; }
         public string EncodedGroupId { get; private set; }
         public bool NeedYotiVerification { get; private set; }
-        public int GroupType { get; private set; }
         public string GroupLocation { get; private set; }
-        public bool PublicRequestForm { get; private set; }
+        public string RequestFormMessage { get; private set; }
 
         public GroupWelcomeData(
             string title,
@@ -37,9 +36,8 @@ namespace CommunicationService.MessageService.Substitution
             bool groupPSAvailable,
             string groupPS,
             string encodedGroupId,
-            int groupType,
             string groupLocation,
-            bool publicRequestForm
+            string requestFormMessage
             )
         {
             Title = title;
@@ -57,8 +55,7 @@ namespace CommunicationService.MessageService.Substitution
             EncodedGroupId = encodedGroupId;
             NeedYotiVerification = needYotiVerification;
             GroupLocation = groupLocation;
-            GroupType = groupType;
-            PublicRequestForm = publicRequestForm;
+            RequestFormMessage = requestFormMessage;
         }
     }
 }
