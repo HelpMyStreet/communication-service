@@ -76,18 +76,35 @@ namespace CommunicationService.MessageService
             string encodeGroupId = HelpMyStreet.Utils.Utils.Base64Utils.Base64Encode(groupId.Value.ToString());
             bool groupLogoAvailable = string.IsNullOrEmpty(showGroupLogo) ? false : Convert.ToBoolean(showGroupLogo);
             string groupLogo = string.Empty;
-            bool publicRequestForm = false;
+            string requestFormMessage = string.Empty;
             
             if(groupLogoAvailable)
             {
                 groupLogo = $"group-logos/{group.Group.GroupKey}-partnership.png";
             }
 
-            if(requestHelpFormVariant!=null)
+            if (group.Group.GroupType == HelpMyStreet.Utils.Enums.GroupTypes.HelpMyStreet)
             {
-                publicRequestForm = !requestHelpFormVariant.AccessRestrictedByRole;
+                requestFormMessage = "HelpMyStreet";
             }
-
+            else
+            {
+                requestFormMessage = "NoPublicRequestForm";
+                if (requestHelpFormVariant != null)
+                {
+                    if (!requestHelpFormVariant.AccessRestrictedByRole)
+                    {
+                        if (string.IsNullOrEmpty(group.Group.GeographicName))
+                        {
+                            requestFormMessage = "PublicRequestFormWithoutGroupLocation";
+                        }
+                        else
+                        {
+                            requestFormMessage = "PublicRequestFormWithGroupLocation";
+                        }
+                    }
+                }
+            }
             return new EmailBuildData()
             {
                 BaseDynamicData = new GroupWelcomeData(
@@ -106,8 +123,7 @@ namespace CommunicationService.MessageService
                     encodedGroupId: encodeGroupId,
                     needYotiVerification: !groupMember.UserIsYotiVerified,
                     groupLocation: group.Group.GeographicName,
-                    groupType: (int)group.Group.GroupType,
-                    publicRequestForm: publicRequestForm
+                    requestFormMessage: requestFormMessage
                     ),
                     JobID = jobId,
                     GroupID = groupId,
