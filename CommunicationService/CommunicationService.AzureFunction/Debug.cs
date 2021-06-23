@@ -73,10 +73,10 @@ namespace CommunicationService.AzureFunction
                 var request = JsonConvert.SerializeObject(req);
                 log.LogInformation($"RequestCommunicationRequest {request}");
 
-                //TaskNotificationMessage message = new TaskNotificationMessage(
-                //    _connectUserService,
-                //    _connectRequestService,
-                //    _connectGroupService);
+                TaskNotificationMessage message = new TaskNotificationMessage(
+                    _connectUserService,
+                    _connectRequestService,
+                    _connectGroupService);
 
                 //TaskDetailMessage message = new TaskDetailMessage(
                 //    _connectGroupService,
@@ -138,14 +138,14 @@ namespace CommunicationService.AzureFunction
 
                 //ShiftReminderMessage message = new ShiftReminderMessage(_connectRequestService, _connectUserService, _connectAddressService, _linkRepository, _linkConfig);
 
-                DailyDigestMessage message = new DailyDigestMessage(
-                    _connectGroupService,
-                    _connectUserService,
-                    _connectRequestService,
-                    _emailConfig,
-                    _connectAddressService,
-                    _cosmosDbService
-                    );
+                //DailyDigestMessage message = new DailyDigestMessage(
+                //    _connectGroupService,
+                //    _connectUserService,
+                //    _connectRequestService,
+                //    _emailConfig,
+                //    _connectAddressService,
+                //    _cosmosDbService
+                //    );
 
                 //NewTaskPendingApprovalNotification message = new NewTaskPendingApprovalNotification(
                 //    _connectRequestService,
