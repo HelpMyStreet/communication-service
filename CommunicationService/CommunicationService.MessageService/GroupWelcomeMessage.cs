@@ -23,7 +23,7 @@ namespace CommunicationService.MessageService
 
         public string GetUnsubscriptionGroupName(int? receipientId)
         {
-                return UnsubscribeGroupName.GroupWelcome;
+                return UnsubscribeGroupName.RegistrationUpdates;
         }
 
         public GroupWelcomeMessage(IConnectGroupService connectGroupService, IConnectUserService connectUserService, IOptions<SendGridConfig> sendGridConfig)
