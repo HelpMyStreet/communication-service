@@ -17,6 +17,5 @@ namespace CommunicationService.MessageService
         public static string NewTaskPendingApprovalNotification = "New Request Pending Approval";
         public static string TaskDetail = "TaskDetail";
         public static string OfflineDetails = "Offline Details";
-        public static string GroupWelcome = "Welcome";
     }
 }
