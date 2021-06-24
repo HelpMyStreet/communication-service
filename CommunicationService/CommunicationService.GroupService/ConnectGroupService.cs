@@ -14,6 +14,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Text;
 using System;
+using HelpMyStreet.Contracts.CommunicationService.Request;
 
 namespace CommunicationService.GroupService
 {
@@ -155,6 +156,56 @@ namespace CommunicationService.GroupService
             {
                 string jsonResponse = await response.Content.ReadAsStringAsync();
                 var getJobsResponse = JsonConvert.DeserializeObject<ResponseWrapper<GetUserGroupsResponse, GroupServiceErrorCode>>(jsonResponse);
+                if (getJobsResponse.HasContent && getJobsResponse.IsSuccessful)
+                {
+                    return getJobsResponse.Content;
+                }
+                return null;
+            }
+        }
+
+        public async Task<List<KeyValuePair<string, string>>> GetGroupEmailConfiguration(int groupId, CommunicationJobTypes communicationJobType)
+        {
+            GetGroupEmailConfigurationRequest request = new GetGroupEmailConfigurationRequest() { GroupId = groupId, CommunicationJob = new CommunicationJob() { CommunicationJobType = communicationJobType } };
+            string json = JsonConvert.SerializeObject(request);
+            StringContent data = new StringContent(json, Encoding.UTF8, "application/json");
+
+            using (HttpResponseMessage response = await _httpClientWrapper.PostAsync(HttpClientConfigName.GroupService, "/api/GetGroupEmailConfiguration", data, CancellationToken.None).ConfigureAwait(false))
+            {
+                string jsonResponse = await response.Content.ReadAsStringAsync();
+                var getJobsResponse = JsonConvert.DeserializeObject<ResponseWrapper<GetGroupEmailConfigurationResponse, GroupServiceErrorCode>>(jsonResponse);
+                if (getJobsResponse.HasContent && getJobsResponse.IsSuccessful)
+                {
+                    return getJobsResponse.Content.EmailConfigurations;
+                }
+                return null;
+            }           
+        }
+
+        public async Task<UserInGroup> GetGroupMember(int groupId, int userId, int authorisingUserId)
+        {
+            string path = $"/api/GetGroupMember?groupId={groupId}&userId={userId}&authorisingUserId={authorisingUserId}";
+
+            using (HttpResponseMessage response = await _httpClientWrapper.GetAsync(HttpClientConfigName.GroupService, path, CancellationToken.None).ConfigureAwait(false))
+            {
+                string jsonResponse = await response.Content.ReadAsStringAsync();
+                var getJobsResponse = JsonConvert.DeserializeObject<ResponseWrapper<GetGroupMemberResponse, GroupServiceErrorCode>>(jsonResponse);
+                if (getJobsResponse.HasContent && getJobsResponse.IsSuccessful)
+                {
+                    return getJobsResponse.Content.UserInGroup;
+                }
+                return null;
+            }
+        }
+
+        public async  Task<GetRequestHelpFormVariantResponse> GetRequestHelpFormVariant(int groupId, string source)
+        {
+            string path = $"/api/GetRequestHelpFormVariant?groupId={groupId}&source={source}";
+
+            using (HttpResponseMessage response = await _httpClientWrapper.GetAsync(HttpClientConfigName.GroupService, path, CancellationToken.None).ConfigureAwait(false))
+            {
+                string jsonResponse = await response.Content.ReadAsStringAsync();
+                var getJobsResponse = JsonConvert.DeserializeObject<ResponseWrapper<GetRequestHelpFormVariantResponse, GroupServiceErrorCode>>(jsonResponse);
                 if (getJobsResponse.HasContent && getJobsResponse.IsSuccessful)
                 {
                     return getJobsResponse.Content;
