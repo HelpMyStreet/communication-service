@@ -16,6 +16,8 @@ using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using HelpMyStreet.Contracts.CommunicationService.Request;
+using HelpMyStreet.Cache;
+using System.Threading;
 
 namespace CommunicationService.SendGridService
 {
@@ -23,11 +25,17 @@ namespace CommunicationService.SendGridService
     {
         private readonly IOptions<SendGridConfig> _sendGridConfig;
         private readonly ISendGridClient _sendGridClient;
+        private readonly IMemDistCache<Template> _memDistCacheTemplate;
+        private readonly IMemDistCache<UnsubscribeGroup> _memDistCacheUnsubscribeGroup;
 
-        public ConnectSendGridService(IOptions<SendGridConfig> sendGridConfig, ISendGridClient sendGridClient)
+        private const string CACHE_KEY_PREFIX = "sendgrid-";
+
+        public ConnectSendGridService(IOptions<SendGridConfig> sendGridConfig, ISendGridClient sendGridClient, IMemDistCache<Template> memDistCacheTemplate, IMemDistCache<UnsubscribeGroup> memDistCacheUnsubscribeGroup)
         {
             _sendGridConfig = sendGridConfig;
             _sendGridClient = sendGridClient;
+            _memDistCacheTemplate = memDistCacheTemplate;
+            _memDistCacheUnsubscribeGroup = memDistCacheUnsubscribeGroup;
         }
 
         public async Task<bool> AddNewMarketingContact(MarketingContact marketingContact)
@@ -100,20 +108,20 @@ namespace CommunicationService.SendGridService
             return result;
         }
 
-        public async Task<int> GetGroupId(string groupName)
+        public async Task<UnsubscribeGroup> GetUnsubscribeGroup(string groupName)
         {
             Response response = await _sendGridClient.RequestAsync(SendGridClient.Method.GET, null, null, "asm/groups").ConfigureAwait(false);
 
             if (response != null && response.StatusCode == HttpStatusCode.OK)
             {
                 string body = await response.Body.ReadAsStringAsync().ConfigureAwait(false);
-                var groups = JsonConvert.DeserializeObject<UnsubscribeGroups[]>(body);
+                var groups = JsonConvert.DeserializeObject<UnsubscribeGroup[]>(body);
                 if (groups != null && groups.Length > 0)
                 {
                     var group = groups.Where(x => x.name == groupName).FirstOrDefault();
                     if (group != null)
                     {
-                        return group.id;
+                        return group;
                     }
                     else
                     {
@@ -131,11 +139,19 @@ namespace CommunicationService.SendGridService
             }
         }
 
+        public async Task<UnsubscribeGroup> GetUnsubscribeGroupWithCache(string groupName, CancellationToken cancellationToken)
+        {
+            return await _memDistCacheUnsubscribeGroup.GetCachedDataAsync(async (cancellationToken) =>
+            {
+                return await GetUnsubscribeGroup(groupName);
+            }, $"{CACHE_KEY_PREFIX}-unsubscribegroup-{groupName}", RefreshBehaviour.DontWaitForFreshData, cancellationToken);
+        }
+
         public async Task<Template> GetTemplate(string templateName)
         {
             var queryParams = @"{
-                'generations': 'dynamic'
-                }";
+            'generations': 'dynamic'
+            }";
             Response response = await _sendGridClient.RequestAsync(SendGridClient.Method.GET, null, queryParams, "templates").ConfigureAwait(false);
 
             if (response != null && response.StatusCode == HttpStatusCode.OK)
@@ -162,7 +178,15 @@ namespace CommunicationService.SendGridService
             else
             {
                 throw new SendGridException("CallingGetTemplateId");
-            }
+            }            
+        }
+
+        public async Task<Template> GetTemplateWithCache(string templateName, CancellationToken cancellationToken)
+        {
+            return await _memDistCacheTemplate.GetCachedDataAsync(async (cancellationToken) =>
+            {
+                return await GetTemplate(templateName);
+            }, $"{CACHE_KEY_PREFIX}-template-{templateName}", RefreshBehaviour.DontWaitForFreshData, cancellationToken);
         }
 
         private string GetReferencedJobs(List<ReferencedJob> referencedJobs)
@@ -179,9 +203,10 @@ namespace CommunicationService.SendGridService
 
         public async Task<bool> SendDynamicEmail(string messageId, string templateName, string groupName, EmailBuildData emailBuildData)
         {
-            var template = await GetTemplate(templateName).ConfigureAwait(false);
-            int groupId = await GetGroupId(groupName).ConfigureAwait(false);
+            var template = await GetTemplateWithCache(templateName, CancellationToken.None).ConfigureAwait(false);
+            UnsubscribeGroup unsubscribeGroup = await GetUnsubscribeGroupWithCache(groupName, CancellationToken.None).ConfigureAwait(false);
             emailBuildData.BaseDynamicData.BaseUrl = _sendGridConfig.Value.BaseUrl;
+            emailBuildData.BaseDynamicData.BaseCommunicationUrl = _sendGridConfig.Value.BaseCommunicationUrl;
             Personalization personalization = new Personalization()
             {
                 Tos = new List<EmailAddress>() { new EmailAddress(emailBuildData.EmailToAddress, emailBuildData.EmailToName) },
@@ -195,7 +220,7 @@ namespace CommunicationService.SendGridService
                 TemplateId = template.id,
                 Asm = new ASM()
                 {
-                    GroupId = groupId
+                    GroupId = unsubscribeGroup.id
                 },
                 Personalizations = new List<Personalization>()
                 {

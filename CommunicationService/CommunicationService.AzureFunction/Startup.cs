@@ -36,6 +36,7 @@ using HelpMyStreet.Utils.CoordinatedResetCache;
 using HelpMyStreet.Cache.Extensions;
 using HelpMyStreet.Cache;
 using HelpMyStreet.Utils.Models;
+using CommunicationService.Core.Domains.SendGrid;
 
 [assembly: FunctionsStartup(typeof(CommunicationService.AzureFunction.Startup))]
 namespace CommunicationService.AzureFunction
@@ -136,6 +137,9 @@ namespace CommunicationService.AzureFunction
             builder.Services.AddSingleton<IPollyMemoryCacheProvider, PollyMemoryCacheProvider>();
             builder.Services.AddMemCache();
             builder.Services.AddSingleton(x => x.GetService<IMemDistCacheFactory<LocationDetails>>().GetCache(new TimeSpan(30, 0, 0, 0), ResetTimeFactory.OnMidday));
+            builder.Services.AddSingleton(x => x.GetService<IMemDistCacheFactory<Template>>().GetCache(new TimeSpan(30, 0, 0, 0), ResetTimeFactory.OnMidday));
+            builder.Services.AddSingleton(x => x.GetService<IMemDistCacheFactory<UnsubscribeGroup>>().GetCache(new TimeSpan(30, 0, 0, 0), ResetTimeFactory.OnMidday));
+
 
             emailTemplateUploader.Migrate().ConfigureAwait(false);
         }

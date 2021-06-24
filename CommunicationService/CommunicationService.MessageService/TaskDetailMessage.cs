@@ -85,7 +85,7 @@ namespace CommunicationService.MessageService
             }
             volunteerInstructions += Markdown.ParseHtmlString(instructions.Close);
 
-            var allQuestions = job.JobSummary.Questions.Where(q => q.ShowOnTaskManagement(false) && !string.IsNullOrEmpty(q.Answer));
+            var allQuestions = job.JobSummary.Questions.Where(q => q.ShowOnTaskManagement(false,false) && !string.IsNullOrEmpty(q.Answer));
             var otherQuestionsList = string.Join("", allQuestions.Select(x => $"<p><strong>{x.FriendlyName()}:</strong><br />{x.Answer.ToHtmlSafeStringWithLineBreaks()}</p>"));
 
             return new EmailBuildData()
