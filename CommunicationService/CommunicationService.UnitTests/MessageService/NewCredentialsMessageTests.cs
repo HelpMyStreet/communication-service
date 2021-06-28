@@ -8,26 +8,22 @@ using System.Threading.Tasks;
 
 namespace CommunicationService.UnitTests.SendGridService
 {
-    public class GroupWelcomeMessageTests
+    public class NewCredentialsMessageTests
     {
         private Mock<IConnectGroupService> _groupService;
         private Mock<IConnectUserService> _userService;
-        private Mock<IOptions<SendGridConfig>> _sendGridConfig;
-        private SendGridConfig _sendGridConfigSettings;
-
-        private GroupWelcomeMessage _classUnderTest;
+        
+        private NewCredentialsMessage _classUnderTest;
 
         [SetUp]
         public void SetUp()
         {
             SetupGroupService();
             SetupUserService();
-            SetupSendGridConfig();
 
-            _classUnderTest = new GroupWelcomeMessage(
-                _groupService.Object,
+            _classUnderTest = new NewCredentialsMessage(
                 _userService.Object,
-                _sendGridConfig.Object) ;
+                _groupService.Object);
         }
 
         private void SetupGroupService()
@@ -40,23 +36,12 @@ namespace CommunicationService.UnitTests.SendGridService
             _userService = new Mock<IConnectUserService>();
         }
 
-        private void SetupSendGridConfig()
-        {
-            _sendGridConfigSettings = new SendGridConfig
-            {
-                BaseCommunicationUrl = string.Empty
-            };
-
-            _sendGridConfig = new Mock<IOptions<SendGridConfig>>();
-            _sendGridConfig.SetupGet(x => x.Value).Returns(_sendGridConfigSettings);
-        }
-
         [Test]
         public async Task GivenEmailIsTriggred_ThenEmailIsSentToCorrectRecipient()
         {
             int? recipientUserId = 1;
             int? jobId = null;
-            int? groupId = null;
+            int? groupId = -1;
             int? requestId = null;
 
             var result = await _classUnderTest.IdentifyRecipients(recipientUserId, jobId, groupId, requestId, null);
