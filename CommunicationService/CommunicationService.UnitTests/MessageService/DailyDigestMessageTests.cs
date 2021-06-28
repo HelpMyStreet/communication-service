@@ -126,6 +126,68 @@ namespace CommunicationService.UnitTests.SendGridService
         }
 
         [Test]
+        public async Task GivenVolWithoutSupportRadius_ThenNoEmailSent()
+        {
+            int? recipientUserId = null;
+            int? jobId = null;
+            int? groupId = null;
+            int? requestId = null;
+
+            List<UserDetails> userDetails = new List<UserDetails>();
+            userDetails.Add(new UserDetails()
+            {
+                SupportRadiusMiles = 1d,
+                UserID = 1
+            });
+
+            userDetails.Add(new UserDetails()
+            {
+                UserID = 2
+            });
+
+            _getUsersResponse = new GetUsersResponse();
+            _getUsersResponse.UserDetails = userDetails;
+
+            var result = await _classUnderTest.IdentifyRecipients(recipientUserId, jobId, groupId, requestId, null);
+            Assert.AreEqual(userDetails.Where(x => x.SupportRadiusMiles.HasValue).Select(x=> x.UserID).ToList(), result.Select(x=> x.RecipientUserID).ToList());
+        }
+
+        [Test]
+        public async Task GivenXVolWithSupportRadius_ThenXEmailSent()
+        {
+            int? recipientUserId = null;
+            int? jobId = null;
+            int? groupId = null;
+            int? requestId = null;
+
+            List<UserDetails> userDetails = new List<UserDetails>();
+            userDetails.Add(new UserDetails()
+            {
+                SupportRadiusMiles = 1d,
+                UserID = 1
+            });
+
+            userDetails.Add(new UserDetails()
+            {
+                UserID = 2
+            });
+
+            userDetails.Add(new UserDetails()
+            {
+                SupportRadiusMiles = 1d,
+                UserID = 3
+            });
+
+            _getUsersResponse = new GetUsersResponse();
+            _getUsersResponse.UserDetails = userDetails;
+
+            var result = await _classUnderTest.IdentifyRecipients(recipientUserId, jobId, groupId, requestId, null);
+            Assert.AreEqual(userDetails.Where(x => x.SupportRadiusMiles.HasValue).Select(x => x.UserID).ToList(), result.Select(x => x.RecipientUserID).ToList());
+            Assert.AreEqual(userDetails.Where(x => x.SupportRadiusMiles.HasValue).Select(x => x.UserID).Count(), result.Select(x => x.RecipientUserID).Count());
+        }
+
+
+        [Test]
         public async Task IdentifyRecipientsBasedOnSupportRadiusMiles_ReturnsCorrectUsers()
         {
             int? recipientUserId = null;
