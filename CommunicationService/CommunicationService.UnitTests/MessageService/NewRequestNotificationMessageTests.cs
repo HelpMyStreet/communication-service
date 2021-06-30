@@ -207,6 +207,56 @@ namespace CommunicationService.UnitTests.SendGridService
             Assert.AreEqual(0, result.Count());
         }
 
+        [Test]
+        public async Task GivenOpenShiftsOnlyVolsWhoHaveNotBeenNotifiedSentEmails()
+        {
+            int? recipientUserId = null;
+            int? jobId = null;
+            int? groupId = null;
+            int? requestId = null;
+
+            List<VolunteerSummary> volunteerSummaries = new List<VolunteerSummary>();
+
+            volunteerSummaries.Add(new VolunteerSummary()
+            {
+                DistanceInMiles = 5,
+                UserID = 1
+            });
+
+            volunteerSummaries.Add(new VolunteerSummary()
+            {
+                DistanceInMiles = 5,
+                UserID = 2
+            });
+
+            _getVolunteersByPostcodeAndActivityResponse = new GetVolunteersByPostcodeAndActivityResponse()
+            {
+                Volunteers = volunteerSummaries
+            };
+
+            _requestHistory = new List<RequestHistory>()
+            {
+                new RequestHistory()
+                {
+                    RequestID = 1,
+                    RecipientUserID = 1
+                },
+                new RequestHistory()
+                {
+                    RequestID = 2,
+                    RecipientUserID = 1
+                }
+            };
+
+            var vols = _getVolunteersByPostcodeAndActivityResponse.Volunteers
+                .Where(x => !_requestHistory.Select(u => u.RecipientUserID).Contains(x.UserID))
+                .Select(s=> s.UserID)
+                .ToList();
+
+
+            List<Core.Domains.SendMessageRequest> result = await _classUnderTest.IdentifyRecipients(recipientUserId, jobId, groupId, requestId, null);
+            Assert.AreEqual(vols, result.Select(x=> x.RecipientUserID).ToList());
+        }
 
         [Test]
         public async Task IdentifyRecipientsReturnsCorrectUsers()
