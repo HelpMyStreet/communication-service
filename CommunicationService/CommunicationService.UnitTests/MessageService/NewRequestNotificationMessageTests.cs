@@ -181,6 +181,34 @@ namespace CommunicationService.UnitTests.SendGridService
         }
 
         [Test]
+        public async Task GivenNoOpenShiftsAndOneVolunteerNoEmailSent()
+        {
+            int? recipientUserId = null;
+            int? jobId = null;
+            int? groupId = null;
+            int? requestId = null;
+
+            List<VolunteerSummary> volunteerSummaries = new List<VolunteerSummary>();
+
+            volunteerSummaries.Add(new VolunteerSummary()
+            {
+                DistanceInMiles = 5,
+                UserID = 1
+            });
+
+            _getVolunteersByPostcodeAndActivityResponse = new GetVolunteersByPostcodeAndActivityResponse()
+            {
+                Volunteers = volunteerSummaries
+            };
+
+            _openShiftJobs = null;
+
+            List<Core.Domains.SendMessageRequest> result = await _classUnderTest.IdentifyRecipients(recipientUserId, jobId, groupId, requestId, null);
+            Assert.AreEqual(0, result.Count());
+        }
+
+
+        [Test]
         public async Task IdentifyRecipientsReturnsCorrectUsers()
         {
             int? recipientUserId = null;
