@@ -82,16 +82,6 @@ namespace CommunicationService.MessageService
                 return null;
             }
 
-            Dictionary<SupportActivities, double?> nationalSupportActivities = new Dictionary<SupportActivities, double?>()
-            {
-                { SupportActivities.FaceMask,null},
-                { SupportActivities.HomeworkSupport, null },
-                { SupportActivities.PhoneCalls_Anxious, null },
-                { SupportActivities.PhoneCalls_Friendly, null },
-                { SupportActivities.VaccineSupport, _emailConfig.Value.OpenRequestRadius }
-            };
-            Dictionary<SupportActivities, double?> activitySpecificSupportDistancesInMiles = nationalSupportActivities.Where(a => user.SupportActivities.Contains(a.Key)).ToDictionary(a => a.Key, a => a.Value);
-
             GetAllJobsByFilterResponse openRequests;
             openRequests = await _connectRequestService.GetAllJobsByFilter(new GetAllJobsByFilterRequest()
             {
@@ -101,13 +91,11 @@ namespace CommunicationService.MessageService
                     { JobStatuses.Open}
                 },
                 Postcode = user.PostalCode,
-                DistanceInMiles = _emailConfig.Value.OpenRequestRadius,
                 ExcludeSiblingsOfJobsAllocatedToUserID = recipientUserId,
                 Groups = new GroupRequest()
                 {
                     Groups = groups.Groups
-                },
-                ActivitySpecificSupportDistancesInMiles = activitySpecificSupportDistancesInMiles
+                }
             });
 
                 
@@ -189,30 +177,23 @@ namespace CommunicationService.MessageService
                 }
             }
 
-            if (chosenRequestTaskList.Count > 0 || shiftItemList.Count > 0)
+            return new EmailBuildData()
             {
-                return new EmailBuildData()
-                {
-                    BaseDynamicData = new DailyDigestData(
-                        title: string.Empty,
-                        firstName: user.UserPersonalDetails.FirstName,
-                        chosenRequestTasks: criteriaRequestTasks.Count(),
-                        otherRequestTasks: otherRequestTasks.Count() > 0,
-                        shiftsAvailable: shiftItemList.Count >0,
-                        shiftCount: shiftItemList.Count,
-                        chosenRequestTaskList: chosenRequestTaskList,
-                        otherRequestTaskList: otherRequestTaskList,
-                        shiftItemList: shiftItemList
-                        ),
-                    EmailToAddress = user.UserPersonalDetails.EmailAddress,
-                    EmailToName = user.UserPersonalDetails.DisplayName,
-                    ReferencedJobs = GetReferencedJobs(criteriaRequestTasks, otherRequestTasks, openShifts),
-                };
-            }
-            else
-            {
-                return null;
-            }
+                BaseDynamicData = new DailyDigestData(
+                    title: string.Empty,
+                    firstName: user.UserPersonalDetails.FirstName,
+                    chosenRequestTasks: criteriaRequestTasks.Count(),
+                    otherRequestTasks: otherRequestTasks.Count() > 0,
+                    shiftsAvailable: shiftItemList.Count >0,
+                    shiftCount: shiftItemList.Count,
+                    chosenRequestTaskList: chosenRequestTaskList,
+                    otherRequestTaskList: otherRequestTaskList,
+                    shiftItemList: shiftItemList
+                    ),
+                EmailToAddress = user.UserPersonalDetails.EmailAddress,
+                EmailToName = user.UserPersonalDetails.DisplayName,
+                ReferencedJobs = GetReferencedJobs(criteriaRequestTasks, otherRequestTasks, openShifts),
+            };
         }
 
         private List<ReferencedJob> GetReferencedJobs(List<JobSummary> criteriaJobs, List<JobSummary> otherJobs, List<ShiftJob> shiftJobs)
