@@ -6,6 +6,7 @@ using CommunicationService.MessageService;
 using HelpMyStreet.Contracts.AddressService.Response;
 using HelpMyStreet.Contracts.GroupService.Response;
 using HelpMyStreet.Contracts.RequestService.Request;
+using HelpMyStreet.Contracts.RequestService.Response;
 using HelpMyStreet.Contracts.UserService.Response;
 using HelpMyStreet.Utils.Enums;
 using HelpMyStreet.Utils.EqualityComparers;
@@ -41,6 +42,8 @@ namespace CommunicationService.UnitTests.SendGridService
         private List<int> _requestIds;
         private List<RequestHistory> _requestHistory;
         private IEqualityComparer<ShiftJob> _shiftJobDedupe_EqualityComparer;
+        private GetAllJobsByFilterResponse _getAllJobsByFilterResponse;
+        private double? _radius;
 
         private NewRequestNotificationMessage _classUnderTest;
 
@@ -71,6 +74,9 @@ namespace CommunicationService.UnitTests.SendGridService
 
             _groupService.Setup(x => x.GetUserGroups(It.IsAny<int>()))
                 .ReturnsAsync(() => _getUserGroupsResponse);
+
+            _groupService.Setup(x => x.GetGroupSupportActivityRadius(It.IsAny<int>(), It.IsAny<SupportActivities>(), It.IsAny<CancellationToken>()))
+                .ReturnsAsync(() => _radius);
         }
 
         private void SetupUserService()
@@ -135,11 +141,11 @@ namespace CommunicationService.UnitTests.SendGridService
                 }
             };
 
-            _requestService.Setup(x => x.GetOpenShiftJobsByFilter(It.IsAny<GetOpenShiftJobsByFilterRequest>()))
-                .ReturnsAsync(() => _openShiftJobs);
-
             _requestService.Setup(x => x.GetUserShiftJobsByFilter(It.IsAny<GetUserShiftJobsByFilterRequest>()))
                 .ReturnsAsync(() => _shiftJobs);
+
+            _requestService.Setup(x => x.GetAllJobsByFilter(It.IsAny<GetAllJobsByFilterRequest>()))
+                .ReturnsAsync(() => _getAllJobsByFilterResponse);
         }
 
         private void SetupAddressService()
@@ -205,6 +211,24 @@ namespace CommunicationService.UnitTests.SendGridService
                 Volunteers = volunteerSummaries
             };
 
+            _getAllJobsByFilterResponse = new GetAllJobsByFilterResponse()
+            {
+                ShiftJobs = new List<ShiftJob>()
+                {
+                    new ShiftJob()
+                    {
+                        RequestID = 5,
+                        JobID = 5,
+                        Location = Location.FranklinHallSpilsby,
+                        SupportActivity = SupportActivities.VaccineSupport,
+                        StartDate = DateTime.UtcNow,
+                        ShiftLength = 60,
+                        ReferringGroupID = -1
+                    }
+                }
+            };
+            _radius = 20d;
+
             List<Core.Domains.SendMessageRequest> result = await _classUnderTest.IdentifyRecipients(recipientUserId, jobId, groupId, requestId, null);
             Assert.AreEqual(_getVolunteersByPostcodeAndActivityResponse.Volunteers.Count(), result.Count());
         }
@@ -237,7 +261,9 @@ namespace CommunicationService.UnitTests.SendGridService
                     LastName = "Test",
                     EmailAddress = "john@test.com"
                 },
-                PostalCode = "NG1 6DQ"
+                PostalCode = "NG1 6DQ",
+                SupportActivities = new List<SupportActivities>()
+                { SupportActivities.VaccineSupport}
             };
 
             _shiftJobs = new List<ShiftJob>()
@@ -256,6 +282,24 @@ namespace CommunicationService.UnitTests.SendGridService
                 }
             };
 
+            _getAllJobsByFilterResponse = new GetAllJobsByFilterResponse()
+            {
+                ShiftJobs = new List<ShiftJob>()
+                {
+                    new ShiftJob()
+                    {
+                        RequestID = 5,
+                        JobID = 5,
+                        Location = Location.FranklinHallSpilsby,
+                        SupportActivity = SupportActivities.VaccineSupport,
+                        StartDate = DateTime.UtcNow,
+                        ShiftLength = 60,
+                        ReferringGroupID = -1
+                    }
+                }
+            };
+            _radius = 20d;
+
             Core.Domains.EmailBuildData result = await _classUnderTest.PrepareTemplateData(
                 Guid.NewGuid(), 
                 recipientUserId, 
@@ -267,9 +311,6 @@ namespace CommunicationService.UnitTests.SendGridService
 
             var dedupedShifts = _openShiftJobs.Distinct(_shiftJobDedupe_EqualityComparer);
             var notMyShifts = dedupedShifts.Where(s => !_shiftJobs.Contains(s, _shiftJobDedupe_EqualityComparer)).ToList();
-
-
-            int i = 1;
         }
     }
 }
