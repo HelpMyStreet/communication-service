@@ -148,31 +148,6 @@ namespace CommunicationService.RequestService
                 throw new Exception($"Unable to retrieve last updated by for job id {getJobDetailsResponse.JobSummary.JobID}");
             }
         }
-
-        public async Task<List<ShiftJob>> GetOpenShiftJobsByFilter(GetOpenShiftJobsByFilterRequest request)
-        {
-            string path = $"/api/GetOpenShiftJobsByFilter";
-            using (HttpResponseMessage response = await _httpClientWrapper.GetAsync(HttpClientConfigName.RequestService, path, request, CancellationToken.None).ConfigureAwait(false))
-            {
-                string jsonResponse = await response.Content.ReadAsStringAsync();
-                var getJobsResponse = JsonConvert.DeserializeObject<ResponseWrapper<GetOpenShiftJobsByFilterResponse, RequestServiceErrorCode>>(jsonResponse);
-                if (getJobsResponse.HasContent && getJobsResponse.IsSuccessful)
-                {
-                    return getJobsResponse.Content.ShiftJobs;
-                }
-                else
-                {
-                    if (response.StatusCode == System.Net.HttpStatusCode.BadRequest)
-                    {
-                        throw new BadRequestException($"GetOpenShiftJobsByFilter Returned a bad request");
-                    }
-                    else
-                    {
-                        throw new InternalServerException($"GetOpenShiftJobsByFilter Returned {jsonResponse}");
-                    }
-                }
-            }
-        }
         public int? GetRelevantVolunteerUserID(GetJobDetailsResponse getJobDetailsResponse)
         {
             int? result = null;
