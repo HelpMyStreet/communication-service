@@ -24,6 +24,7 @@ using UserService.Core.Utils;
 using System.Reflection.Metadata.Ecma335;
 using System.Threading;
 using HelpMyStreet.Utils.EqualityComparers;
+using Newtonsoft.Json;
 
 namespace CommunicationService.MessageService
 {
@@ -98,9 +99,24 @@ namespace CommunicationService.MessageService
                 }
             });
 
+
+            var json = JsonConvert.SerializeObject(new GetAllJobsByFilterRequest()
+            {
+                JobStatuses = new JobStatusRequest()
+                {
+                    JobStatuses = new List<JobStatuses>()
+                    { JobStatuses.Open}
+                },
+                Postcode = user.PostalCode,
+                ExcludeSiblingsOfJobsAllocatedToUserID = recipientUserId,
+                Groups = new GroupRequest()
+                {
+                    Groups = groups.Groups
+                }
+            });
                 
             var openTasks = openRequests.JobSummaries.ToList();
-            var openShifts = openRequests.ShiftJobs.Where(x=> user.SupportActivities.Contains(x.SupportActivity)).ToList();
+            var openShifts = openRequests.ShiftJobs.ToList();
             
             if((openTasks == null || openTasks.Count==0) && (openShifts ==null || openShifts.Count==0 ) )
             {
