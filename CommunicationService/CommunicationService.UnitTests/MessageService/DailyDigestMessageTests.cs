@@ -94,7 +94,6 @@ namespace CommunicationService.UnitTests.SendGridService
             _emailConfigSettings = new EmailConfig()
             {
                 ShowUserIDInEmailTitle = true,
-                OpenRequestRadius = 20,
                 RegistrationChaserMaxTimeInHours = 2,
                 RegistrationChaserMinTimeInMinutes = 30,
                 ServiceBusSleepInMilliseconds = 1000
