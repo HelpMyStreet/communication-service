@@ -97,24 +97,7 @@ namespace CommunicationService.MessageService
                 {
                     Groups = groups.Groups
                 }
-            });
-
-
-            var json = JsonConvert.SerializeObject(new GetAllJobsByFilterRequest()
-            {
-                JobStatuses = new JobStatusRequest()
-                {
-                    JobStatuses = new List<JobStatuses>()
-                    { JobStatuses.Open}
-                },
-                Postcode = user.PostalCode,
-                ExcludeSiblingsOfJobsAllocatedToUserID = recipientUserId,
-                Groups = new GroupRequest()
-                {
-                    Groups = groups.Groups
-                }
-            });
-                
+            });                
             var openTasks = openRequests.JobSummaries.ToList();
             var openShifts = openRequests.ShiftJobs.ToList();
             
