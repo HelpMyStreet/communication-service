@@ -24,6 +24,7 @@ using UserService.Core.Utils;
 using System.Reflection.Metadata.Ecma335;
 using System.Threading;
 using HelpMyStreet.Utils.EqualityComparers;
+using Newtonsoft.Json;
 
 namespace CommunicationService.MessageService
 {
@@ -96,11 +97,9 @@ namespace CommunicationService.MessageService
                 {
                     Groups = groups.Groups
                 }
-            });
-
-                
+            });                
             var openTasks = openRequests.JobSummaries.ToList();
-            var openShifts = openRequests.ShiftJobs.Where(x=> user.SupportActivities.Contains(x.SupportActivity)).ToList();
+            var openShifts = openRequests.ShiftJobs.ToList();
             
             if((openTasks == null || openTasks.Count==0) && (openShifts ==null || openShifts.Count==0 ) )
             {

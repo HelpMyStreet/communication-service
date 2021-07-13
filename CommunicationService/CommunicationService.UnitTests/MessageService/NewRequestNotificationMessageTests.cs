@@ -166,8 +166,7 @@ namespace CommunicationService.UnitTests.SendGridService
                 ShowUserIDInEmailTitle = true,
                 RegistrationChaserMaxTimeInHours = 2,
                 RegistrationChaserMinTimeInMinutes = 30,
-                ServiceBusSleepInMilliseconds = 1000,
-                OpenRequestRadius = 20
+                ServiceBusSleepInMilliseconds = 1000
             };
 
             _emailConfig = new Mock<IOptions<EmailConfig>>();
