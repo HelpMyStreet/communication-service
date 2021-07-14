@@ -24,6 +24,7 @@ using UserService.Core.Utils;
 using System.Reflection.Metadata.Ecma335;
 using System.Threading;
 using HelpMyStreet.Utils.EqualityComparers;
+using Newtonsoft.Json;
 
 namespace CommunicationService.MessageService
 {
@@ -96,11 +97,9 @@ namespace CommunicationService.MessageService
                 {
                     Groups = groups.Groups
                 }
-            });
-
-                
+            });                
             var openTasks = openRequests.JobSummaries.ToList();
-            var openShifts = openRequests.ShiftJobs.Where(x=> user.SupportActivities.Contains(x.SupportActivity)).ToList();
+            var openShifts = openRequests.ShiftJobs.ToList();
             
             if((openTasks == null || openTasks.Count==0) && (openShifts ==null || openShifts.Count==0 ) )
             {
@@ -133,7 +132,7 @@ namespace CommunicationService.MessageService
 
                     chosenRequestTaskList.Add(new DailyDigestDataJob(
                        activity: request.SupportActivity.FriendlyNameShort(),
-                       postCode: request.PostCode,
+                       postCode: request.PostCode.Split(" ").First(),
                        dueDate: request.DueDate.FormatDate(DateTimeFormat.ShortDateFormat),
                        soon: request.DueDate < DateTime.Now.AddDays(1),
                        urgent: request.IsHealthCritical,
@@ -172,7 +171,7 @@ namespace CommunicationService.MessageService
                     string shiftDate = shift.StartDate.FormatDate(DateTimeFormat.LongDateTimeFormat) + " - " + shift.EndDate.FormatDate(DateTimeFormat.TimeFormat);
                     shiftItemList.Add(new ShiftItem($"<strong>{ shift.SupportActivity.FriendlyNameShort() }</strong> " +
                         $"at {location.Name} " +
-                        $"( {Math.Round(shift.DistanceInMiles, 2)} miles away) " +
+                        $"({Math.Round(shift.DistanceInMiles, 2)} miles away) " +
                         $"- {shiftDate}"));
                 }
             }

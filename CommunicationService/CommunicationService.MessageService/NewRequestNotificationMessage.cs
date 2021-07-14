@@ -12,6 +12,7 @@ using HelpMyStreet.Utils.EqualityComparers;
 using HelpMyStreet.Utils.Extensions;
 using HelpMyStreet.Utils.Models;
 using Microsoft.Extensions.Options;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Dynamic;
@@ -306,7 +307,7 @@ namespace CommunicationService.MessageService
 
                 result.Add(new JobDetails(
                     $"<strong>{item.SupportActivity.FriendlyNameShort()}</strong> " +
-                    $"at <strong>{locationDetails.Name}</strong>." +
+                    $"at <strong>{locationDetails.Name}</strong>. " +
                     $"Shift: { item.ShiftDetails }"));
             }
 
