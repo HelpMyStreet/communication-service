@@ -176,23 +176,30 @@ namespace CommunicationService.MessageService
                 }
             }
 
-            return new EmailBuildData()
+            if (chosenRequestTaskList.Count > 0 || shiftItemList.Count > 0)
             {
-                BaseDynamicData = new DailyDigestData(
+                return new EmailBuildData()
+                {
+                    BaseDynamicData = new DailyDigestData(
                     title: string.Empty,
                     firstName: user.UserPersonalDetails.FirstName,
                     chosenRequestTasks: criteriaRequestTasks.Count(),
                     otherRequestTasks: otherRequestTasks.Count() > 0,
-                    shiftsAvailable: shiftItemList.Count >0,
+                    shiftsAvailable: shiftItemList.Count > 0,
                     shiftCount: shiftItemList.Count,
                     chosenRequestTaskList: chosenRequestTaskList,
                     otherRequestTaskList: otherRequestTaskList,
                     shiftItemList: shiftItemList
                     ),
-                EmailToAddress = user.UserPersonalDetails.EmailAddress,
-                EmailToName = user.UserPersonalDetails.DisplayName,
-                ReferencedJobs = GetReferencedJobs(criteriaRequestTasks, otherRequestTasks, openShifts),
-            };
+                    EmailToAddress = user.UserPersonalDetails.EmailAddress,
+                    EmailToName = user.UserPersonalDetails.DisplayName,
+                    ReferencedJobs = GetReferencedJobs(criteriaRequestTasks, otherRequestTasks, openShifts),
+                };
+            }
+            else
+            {
+                return null;
+            }
         }
 
         private List<ReferencedJob> GetReferencedJobs(List<JobSummary> criteriaJobs, List<JobSummary> otherJobs, List<ShiftJob> shiftJobs)
