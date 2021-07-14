@@ -171,7 +171,7 @@ namespace CommunicationService.MessageService
                     string shiftDate = shift.StartDate.FormatDate(DateTimeFormat.LongDateTimeFormat) + " - " + shift.EndDate.FormatDate(DateTimeFormat.TimeFormat);
                     shiftItemList.Add(new ShiftItem($"<strong>{ shift.SupportActivity.FriendlyNameShort() }</strong> " +
                         $"at {location.Name} " +
-                        $"( {Math.Round(shift.DistanceInMiles, 2)} miles away) " +
+                        $"({Math.Round(shift.DistanceInMiles, 2)} miles away) " +
                         $"- {shiftDate}"));
                 }
             }
