@@ -132,7 +132,7 @@ namespace CommunicationService.MessageService
 
                     chosenRequestTaskList.Add(new DailyDigestDataJob(
                        activity: request.SupportActivity.FriendlyNameShort(),
-                       postCode: request.PostCode,
+                       postCode: request.PostCode.Split(" ").First(),
                        dueDate: request.DueDate.FormatDate(DateTimeFormat.ShortDateFormat),
                        soon: request.DueDate < DateTime.Now.AddDays(1),
                        urgent: request.IsHealthCritical,
