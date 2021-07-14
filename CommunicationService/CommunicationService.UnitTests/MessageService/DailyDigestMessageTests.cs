@@ -257,21 +257,24 @@ namespace CommunicationService.UnitTests.SendGridService
             {
                 RequestID = 1,
                 DistanceInMiles = 1,
-                SupportActivity = SupportActivities.Shopping
+                SupportActivity = SupportActivities.Shopping,
+                PostCode = "NG1 6DQ"
             });
 
             jobSummaries.Add(new JobSummary()
             {
                 RequestID = 2,
                 DistanceInMiles = 2,
-                SupportActivity = SupportActivities.Shopping
+                SupportActivity = SupportActivities.Shopping,
+                PostCode = "NG1 6DQ"
             });
 
             jobSummaries.Add(new JobSummary()
             {
                 RequestID = 3,
                 DistanceInMiles = 2,
-                SupportActivity = SupportActivities.CheckingIn
+                SupportActivity = SupportActivities.CheckingIn,
+                PostCode = "NG1 6DQ"
             });
 
             _getAllJobsByFilterResponse = new GetAllJobsByFilterResponse()
@@ -345,7 +348,8 @@ namespace CommunicationService.UnitTests.SendGridService
                 RequestID = 1,
                 DistanceInMiles = 1,
                 SupportActivity = SupportActivities.Shopping,
-                RequestType = RequestType.Task
+                RequestType = RequestType.Task,
+                PostCode = "NG1 6DQ"
             });
 
             jobSummaries.Add(new JobSummary()
@@ -353,7 +357,8 @@ namespace CommunicationService.UnitTests.SendGridService
                 RequestID = 2,
                 DistanceInMiles = 2,
                 SupportActivity = SupportActivities.Shopping,
-                RequestType = RequestType.Task
+                RequestType = RequestType.Task,
+                PostCode = "NG1 6DQ"
             });
 
             jobSummaries.Add(new JobSummary()
@@ -361,7 +366,8 @@ namespace CommunicationService.UnitTests.SendGridService
                 RequestID = 3,
                 DistanceInMiles = 2,
                 SupportActivity = SupportActivities.CheckingIn,
-                RequestType = RequestType.Task
+                RequestType = RequestType.Task,
+                PostCode = "NG1 6DQ"
             });
 
             _getPostcodeCoordinatesResponse = new GetPostcodeCoordinatesResponse()
