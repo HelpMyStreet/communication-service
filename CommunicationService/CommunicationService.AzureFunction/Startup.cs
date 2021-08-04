@@ -139,6 +139,7 @@ namespace CommunicationService.AzureFunction
             builder.Services.AddSingleton(x => x.GetService<IMemDistCacheFactory<LocationDetails>>().GetCache(new TimeSpan(30, 0, 0, 0), ResetTimeFactory.OnMidday));
             builder.Services.AddSingleton(x => x.GetService<IMemDistCacheFactory<Template>>().GetCache(new TimeSpan(30, 0, 0, 0), ResetTimeFactory.OnMidday));
             builder.Services.AddSingleton(x => x.GetService<IMemDistCacheFactory<UnsubscribeGroup>>().GetCache(new TimeSpan(30, 0, 0, 0), ResetTimeFactory.OnMidday));
+            builder.Services.AddSingleton(x => x.GetService<IMemDistCacheFactory<double?>>().GetCache(new TimeSpan(30, 0, 0, 0), ResetTimeFactory.OnMidday));
 
 
             emailTemplateUploader.Migrate().ConfigureAwait(false);

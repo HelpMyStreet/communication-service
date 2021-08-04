@@ -6,11 +6,13 @@ using CommunicationService.Core.Interfaces.Services;
 using CommunicationService.MessageService.Substitution;
 using HelpMyStreet.Contracts.AddressService.Request;
 using HelpMyStreet.Contracts.RequestService.Request;
+using HelpMyStreet.Contracts.RequestService.Response;
 using HelpMyStreet.Utils.Enums;
 using HelpMyStreet.Utils.EqualityComparers;
 using HelpMyStreet.Utils.Extensions;
 using HelpMyStreet.Utils.Models;
 using Microsoft.Extensions.Options;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Dynamic;
@@ -59,20 +61,34 @@ namespace CommunicationService.MessageService
 
         public async Task<List<SendMessageRequest>> IdentifyRecipients(int? recipientUserId, int? jobId, int? groupId, int? requestId, Dictionary<string, string> additionalParameters)
         {
-            GetOpenShiftJobsByFilterRequest request = new GetOpenShiftJobsByFilterRequest();
-            var shifts = await _connectRequestService.GetOpenShiftJobsByFilter(request);
+            GetAllJobsByFilterResponse getAllJobsByFilterResponse;
+            getAllJobsByFilterResponse = await _connectRequestService.GetAllJobsByFilter(new GetAllJobsByFilterRequest()
+            {
+                JobStatuses = new JobStatusRequest()
+                {
+                    JobStatuses = new List<JobStatuses>()
+                    { JobStatuses.Open}
+                },
+                RequestType = new RequestTypeRequest()
+                {
+                    RequestTypes = new List<RequestType>()
+                    { RequestType.Shift}
+                }
+            });
 
             List<Tuple<int, Location>> usersToBeNotified = new List<Tuple<int, Location>>();
 
-            if (shifts != null)
+            if (getAllJobsByFilterResponse != null && getAllJobsByFilterResponse.ShiftJobs.Count>0)
             {
-                var locationsSupportActivities = shifts.GroupBy(d => new { d.Location, d.SupportActivity })
-                    .Select(m => new { m.Key.Location, m.Key.SupportActivity });
+                var shifts = getAllJobsByFilterResponse.ShiftJobs;
+                var locationsSupportActivities = shifts.GroupBy(d => new { d.Location, d.SupportActivity, d.ReferringGroupID })
+                    .Select(m => new { m.Key.Location, m.Key.SupportActivity, m.Key.ReferringGroupID });
 
                 if (locationsSupportActivities != null && locationsSupportActivities.Count() > 0)
                 {
                     foreach (var x in locationsSupportActivities)
                     {
+                        var radius = await _connectGroupService.GetGroupSupportActivityRadius(x.ReferringGroupID, x.SupportActivity, CancellationToken.None);
                         var locations = await _connectAddressService.GetLocationDetails(x.Location, CancellationToken.None);
 
                         if (locations != null)
@@ -80,7 +96,7 @@ namespace CommunicationService.MessageService
                             var users = await _connectUserService.GetVolunteersByPostcodeAndActivity(
                                 locations.Address.Postcode,
                                 new List<SupportActivities>() { x.SupportActivity },
-                                _emailConfig.Value.OpenRequestRadius,
+                                radius.Value,
                                 CancellationToken.None);
 
                             if (users != null && users.Volunteers.Count() > 0)
@@ -138,35 +154,38 @@ namespace CommunicationService.MessageService
 
         private async Task<List<ShiftJob>> GetOpenShiftsForUser(int userId, string locations)
         {
-            HelpMyStreet.Contracts.RequestService.Request.LocationsRequest lr = new HelpMyStreet.Contracts.RequestService.Request.LocationsRequest() { Locations = new List<Location>() };
+            var user = await _connectUserService.GetUserByIdAsync(userId);
+            var groups = await _connectGroupService.GetUserGroups(userId);
 
-            locations.Split(",").ToList()
-                .ForEach(x =>
+            GetAllJobsByFilterResponse openRequests;
+            openRequests = await _connectRequestService.GetAllJobsByFilter(new GetAllJobsByFilterRequest()
+            {
+                JobStatuses = new JobStatusRequest()
                 {
-                    lr.Locations.Add((Location)Enum.Parse(typeof(Location), x));
-                });
+                    JobStatuses = new List<JobStatuses>()
+                    { JobStatuses.Open}
+                },
+                Postcode = user.PostalCode,
+                ExcludeSiblingsOfJobsAllocatedToUserID = userId,
+                Groups = new GroupRequest()
+                {
+                    Groups = groups.Groups
+                },
+                RequestType = new RequestTypeRequest()
+                {
+                    RequestTypes = new List<RequestType>()
+                    { 
+                        RequestType.Shift
+                    }
+                }
+            });
 
-            var userGroups = await _connectGroupService.GetUserGroups(userId);
-            List<int> groups = new List<int>();
-            if (userGroups != null)
-            {
-                groups = userGroups.Groups;
-            }
-
-            GetOpenShiftJobsByFilterRequest getOpenShiftJobsByFilterRequest = new GetOpenShiftJobsByFilterRequest()
-            {
-                Locations = lr,
-                SupportActivities = new SupportActivityRequest { SupportActivities = new List<SupportActivities>() },
-                Groups = new GroupRequest { Groups = groups },
-            };
-
-            var allShifts = await _connectRequestService.GetOpenShiftJobsByFilter(getOpenShiftJobsByFilterRequest);
-            
-            if (allShifts == null)
+            if (openRequests == null)
             {
                 throw new Exception($"No shifts returned from user id {userId}");
             }
-            
+
+            var allShifts = openRequests.ShiftJobs.Where(x => user.SupportActivities.Contains(x.SupportActivity)).ToList();
             var dedupedShifts = allShifts.Distinct(_shiftJobDedupe_EqualityComparer);
             var userShifts = await GetShiftsForUser(userId);            
             var notMyShifts = dedupedShifts.Where(s => !userShifts.Contains(s, _shiftJobDedupe_EqualityComparer)).ToList();
@@ -288,7 +307,7 @@ namespace CommunicationService.MessageService
 
                 result.Add(new JobDetails(
                     $"<strong>{item.SupportActivity.FriendlyNameShort()}</strong> " +
-                    $"at <strong>{locationDetails.Name}</strong>." +
+                    $"at <strong>{locationDetails.Name}</strong>. " +
                     $"Shift: { item.ShiftDetails }"));
             }
 
