@@ -36,12 +36,12 @@ namespace CommunicationService.AzureFunction
         private readonly ILinkRepository _linkRepository;
 
         public Debug(
-            IConnectGroupService connectGroupService, 
-            IConnectUserService connectUserService, 
-            IConnectRequestService connectRequestService, 
-            IOptions<EmailConfig> eMailConfig, 
-            IJobFilteringService jobFilteringService, 
-            IConnectAddressService connectAddressService, 
+            IConnectGroupService connectGroupService,
+            IConnectUserService connectUserService,
+            IConnectRequestService connectRequestService,
+            IOptions<EmailConfig> eMailConfig,
+            IJobFilteringService jobFilteringService,
+            IConnectAddressService connectAddressService,
             IConnectSendGridService connectSendGridService,
             ICosmosDbService cosmosDbService,
             IOptions<SendGridConfig> sendGridConfig,
@@ -60,7 +60,7 @@ namespace CommunicationService.AzureFunction
             _linkConfig = linkConfig;
             _linkRepository = linkRepository;
         }
- 
+
 
         [FunctionName("Debug")]
         public async Task<IActionResult> Run(
