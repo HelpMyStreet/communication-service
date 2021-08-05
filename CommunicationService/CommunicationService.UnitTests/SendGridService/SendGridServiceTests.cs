@@ -2,6 +2,7 @@
 using CommunicationService.Core.Domains.SendGrid;
 using CommunicationService.Core.Exception;
 using CommunicationService.SendGridService;
+using HelpMyStreet.Cache;
 using Microsoft.Extensions.Options;
 using Moq;
 using Newtonsoft.Json;
@@ -21,12 +22,16 @@ namespace CommunicationService.UnitTests.SendGridService
     {
         private Mock<IOptions<SendGridConfig>> _sendGridConfig;
         private Mock<ISendGridClient> _sendGridClient;
+        private Mock<IMemDistCache<Template>> _memCacheTemplate;
+        private Mock<IMemDistCache<UnsubscribeGroup>> _memCacheUnsubscribeGroup;
         private SendGridConfig _sendGridConfigSettings;
         private ConnectSendGridService _classUnderTest;
         private Task<Response> _templatesResponse;
         private Task<Response> _groupsResponse;
         private string _templateId;
         private Task<Response> _sendEmailResponse;
+        private Template _template;
+        private UnsubscribeGroup _unsubscribeGroup;
 
         [SetUp]
         public void SetUp()
@@ -66,8 +71,30 @@ namespace CommunicationService.UnitTests.SendGridService
                   .Returns(() => _templatesResponse
                   );
 
-            UnsubscribeGroups[] groups = new UnsubscribeGroups[1];
-            groups[0] = new UnsubscribeGroups()
+            _memCacheTemplate = new Mock<IMemDistCache<Template>>();
+            _template = template;
+
+            _memCacheTemplate.Setup(x => x.GetCachedDataAsync(
+                It.IsAny<Func<CancellationToken, Task<Template>>>(), 
+                It.IsAny<string>(), It.IsAny<RefreshBehaviour>(),
+                It.IsAny<CancellationToken>(), 
+                It.IsAny<NotInCacheBehaviour>()))
+                .ReturnsAsync(() => _template);
+
+            _memCacheUnsubscribeGroup = new Mock<IMemDistCache<UnsubscribeGroup>>();
+
+            _unsubscribeGroup = new UnsubscribeGroup() { id = -1 };
+
+            _memCacheUnsubscribeGroup.Setup(x => x.GetCachedDataAsync(
+                It.IsAny<Func<CancellationToken, Task<UnsubscribeGroup>>>(),
+                It.IsAny<string>(), It.IsAny<RefreshBehaviour>(),
+                It.IsAny<CancellationToken>(),
+                It.IsAny<NotInCacheBehaviour>()))
+                .ReturnsAsync(() => _unsubscribeGroup);
+
+
+            UnsubscribeGroup[] groups = new UnsubscribeGroup[1];
+            groups[0] = new UnsubscribeGroup()
             {
                 id = 1,
                 name = "KnownGroup",
@@ -91,7 +118,7 @@ namespace CommunicationService.UnitTests.SendGridService
                 It.IsAny<CancellationToken>()
                 )).Returns(() => _sendEmailResponse);
 
-            _classUnderTest = new ConnectSendGridService(_sendGridConfig.Object,_sendGridClient.Object);
+            _classUnderTest = new ConnectSendGridService(_sendGridConfig.Object,_sendGridClient.Object, _memCacheTemplate.Object, _memCacheUnsubscribeGroup.Object);
         }
 
         [Test]

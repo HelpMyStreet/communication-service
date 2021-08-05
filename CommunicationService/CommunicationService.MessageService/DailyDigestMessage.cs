@@ -24,6 +24,7 @@ using UserService.Core.Utils;
 using System.Reflection.Metadata.Ecma335;
 using System.Threading;
 using HelpMyStreet.Utils.EqualityComparers;
+using Newtonsoft.Json;
 
 namespace CommunicationService.MessageService
 {
@@ -82,16 +83,6 @@ namespace CommunicationService.MessageService
                 return null;
             }
 
-            Dictionary<SupportActivities, double?> nationalSupportActivities = new Dictionary<SupportActivities, double?>()
-            {
-                { SupportActivities.FaceMask,null},
-                { SupportActivities.HomeworkSupport, null },
-                { SupportActivities.PhoneCalls_Anxious, null },
-                { SupportActivities.PhoneCalls_Friendly, null },
-                { SupportActivities.VaccineSupport, _emailConfig.Value.OpenRequestRadius }
-            };
-            Dictionary<SupportActivities, double?> activitySpecificSupportDistancesInMiles = nationalSupportActivities.Where(a => user.SupportActivities.Contains(a.Key)).ToDictionary(a => a.Key, a => a.Value);
-
             GetAllJobsByFilterResponse openRequests;
             openRequests = await _connectRequestService.GetAllJobsByFilter(new GetAllJobsByFilterRequest()
             {
@@ -101,18 +92,14 @@ namespace CommunicationService.MessageService
                     { JobStatuses.Open}
                 },
                 Postcode = user.PostalCode,
-                DistanceInMiles = _emailConfig.Value.OpenRequestRadius,
                 ExcludeSiblingsOfJobsAllocatedToUserID = recipientUserId,
                 Groups = new GroupRequest()
                 {
                     Groups = groups.Groups
-                },
-                ActivitySpecificSupportDistancesInMiles = activitySpecificSupportDistancesInMiles
-            });
-
-                
+                }
+            });                
             var openTasks = openRequests.JobSummaries.ToList();
-            var openShifts = openRequests.ShiftJobs.Where(x=> user.SupportActivities.Contains(x.SupportActivity)).ToList();
+            var openShifts = openRequests.ShiftJobs.ToList();
             
             if((openTasks == null || openTasks.Count==0) && (openShifts ==null || openShifts.Count==0 ) )
             {
@@ -145,7 +132,7 @@ namespace CommunicationService.MessageService
 
                     chosenRequestTaskList.Add(new DailyDigestDataJob(
                        activity: request.SupportActivity.FriendlyNameShort(),
-                       postCode: request.PostCode,
+                       postCode: request.PostCode.Split(" ").First(),
                        dueDate: request.DueDate.FormatDate(DateTimeFormat.ShortDateFormat),
                        soon: request.DueDate < DateTime.Now.AddDays(1),
                        urgent: request.IsHealthCritical,
@@ -184,7 +171,7 @@ namespace CommunicationService.MessageService
                     string shiftDate = shift.StartDate.FormatDate(DateTimeFormat.LongDateTimeFormat) + " - " + shift.EndDate.FormatDate(DateTimeFormat.TimeFormat);
                     shiftItemList.Add(new ShiftItem($"<strong>{ shift.SupportActivity.FriendlyNameShort() }</strong> " +
                         $"at {location.Name} " +
-                        $"( {Math.Round(shift.DistanceInMiles, 2)} miles away) " +
+                        $"({Math.Round(shift.DistanceInMiles, 2)} miles away) " +
                         $"- {shiftDate}"));
                 }
             }
@@ -194,16 +181,16 @@ namespace CommunicationService.MessageService
                 return new EmailBuildData()
                 {
                     BaseDynamicData = new DailyDigestData(
-                        title: string.Empty,
-                        firstName: user.UserPersonalDetails.FirstName,
-                        chosenRequestTasks: criteriaRequestTasks.Count(),
-                        otherRequestTasks: otherRequestTasks.Count() > 0,
-                        shiftsAvailable: shiftItemList.Count >0,
-                        shiftCount: shiftItemList.Count,
-                        chosenRequestTaskList: chosenRequestTaskList,
-                        otherRequestTaskList: otherRequestTaskList,
-                        shiftItemList: shiftItemList
-                        ),
+                    title: string.Empty,
+                    firstName: user.UserPersonalDetails.FirstName,
+                    chosenRequestTasks: criteriaRequestTasks.Count(),
+                    otherRequestTasks: otherRequestTasks.Count() > 0,
+                    shiftsAvailable: shiftItemList.Count > 0,
+                    shiftCount: shiftItemList.Count,
+                    chosenRequestTaskList: chosenRequestTaskList,
+                    otherRequestTaskList: otherRequestTaskList,
+                    shiftItemList: shiftItemList
+                    ),
                     EmailToAddress = user.UserPersonalDetails.EmailAddress,
                     EmailToName = user.UserPersonalDetails.DisplayName,
                     ReferencedJobs = GetReferencedJobs(criteriaRequestTasks, otherRequestTasks, openShifts),

@@ -86,7 +86,7 @@ namespace CommunicationService.MessageService
                             isRequestor: false,
                             encodedRequestID: encodedRequestId,
                             activity: supportActivity.FriendlyNameShort(),
-                            postcode: requestDetails.RequestSummary.PostCode,
+                            postcode: requestDetails.RequestSummary.PostCode.Split(" ").First(),
                             distanceFromPostcode: Math.Round(volunteer.DistanceInMiles, 1),
                             dueDate: dueDate,
                             isHealthCritical: job.IsHealthCritical,
