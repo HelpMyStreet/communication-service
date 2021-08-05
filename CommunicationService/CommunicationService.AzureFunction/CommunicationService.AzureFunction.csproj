@@ -5,8 +5,9 @@
 	</PropertyGroup>
 	<ItemGroup>
 		<PackageReference Include="AzureExtensions.Swashbuckle" Version="3.2.2" />
-		<PackageReference Include="HelpMyStreet.CoreV3.Cache" Version="1.1.712" />
-		<PackageReference Include="HelpMyStreet.CoreV3.Contracts" Version="1.1.712" />
+		<PackageReference Include="HelpMyStreet.CoreV3.Cache" Version="1.1.777" />
+		<PackageReference Include="HelpMyStreet.CoreV3.Contracts" Version="1.1.777" />
+		<PackageReference Include="MediaTypeMap" Version="2.1.0" />
 		<PackageReference Include="Microsoft.Azure.Functions.Extensions" Version="1.0.0" />
 		<PackageReference Include="AutoMapper.Extensions.Microsoft.DependencyInjection" Version="8.0.1" />
 		<PackageReference Include="MediatR" Version="8.1.0" />
@@ -48,6 +49,60 @@
 		<None Update="local.settings.json">
 			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
 			<CopyToPublishDirectory>Never</CopyToPublishDirectory>
+		</None>
+		<None Update="www\group-logos\ageconnects-cardiff-partnership.png">
+		  <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+		</None>
+		<None Update="www\group-logos\ageuk-favershamandsittingbourne-partnership.png">
+		  <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+		</None>
+		<None Update="www\group-logos\ageuk-midmersey-partnership.png">
+		  <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+		</None>
+		<None Update="www\group-logos\ageuk-southkentcoast-partnership.png">
+		  <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+		</None>
+		<None Update="www\group-logos\ageuklsl-partnership.png">
+		  <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+		</None>
+		<None Update="www\group-logos\ageuknwkent-partnership.png">
+		  <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+		</None>
+		<None Update="www\group-logos\ageukwirral-partnership.png">
+		  <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+		</None>
+		<None Update="www\group-logos\apex-pcn-bank-staff-partnership.png">
+		  <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+		</None>
+		<None Update="www\group-logos\apex-pcn-lincoln-partnership.png">
+		  <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+		</None>
+		<None Update="www\group-logos\east-lindsey-pcn-partnership.png">
+		  <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+		</None>
+		<None Update="www\group-logos\four-counties-pcn-partnership.png">
+		  <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+		</None>
+		<None Update="www\group-logos\ftlos-partnership.png">
+		  <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+		</None>
+		<None Update="www\group-logos\hlp-partnership.png">
+		  <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+		</None>
+		<None Update="www\group-logos\hms-sandbox-partnership.png">
+		  <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+		</None>
+		<None Update="www\hms.jpg">
+		  <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+		</None>
+		<None Update="www\group-logos\mansfield-cvs-partnership.png">
+		  <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+		</None>
+		<None Update="www\group-logos\meadows-community-helpers-partnership.png">
+		  <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+		</None>
+		<None Update="www\group-logos\southwell-partnership.png">
+		  <CopyToOutputDirectory>Always</CopyToOutputDirectory>
 		</None>
 	</ItemGroup>
 </Project>

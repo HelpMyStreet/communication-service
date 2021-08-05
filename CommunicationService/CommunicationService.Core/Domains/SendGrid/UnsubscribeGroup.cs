@@ -4,7 +4,7 @@ using System.Text;
 
 namespace CommunicationService.Core.Domains.SendGrid
 {
-    public class UnsubscribeGroups
+    public class UnsubscribeGroup
     {
         public int id { get; set; }
         public string name { get; set; }
