@@ -73,10 +73,10 @@ namespace CommunicationService.AzureFunction
                 var request = JsonConvert.SerializeObject(req);
                 log.LogInformation($"RequestCommunicationRequest {request}");
 
-                //TaskNotificationMessage message = new TaskNotificationMessage(
-                //    _connectUserService,
-                //    _connectRequestService,
-                //    _connectGroupService);
+                TaskNotificationMessage message = new TaskNotificationMessage(
+                    _connectUserService,
+                    _connectRequestService,
+                    _connectGroupService);
 
                 //TaskDetailMessage message = new TaskDetailMessage(
                 //    _connectGroupService,
