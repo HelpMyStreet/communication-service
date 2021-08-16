@@ -15,6 +15,7 @@ using Microsoft.Extensions.Options;
 using CommunicationService.Core.Configuration;
 using HelpMyStreet.Utils.Extensions;
 using HelpMyStreet.Utils.Utils;
+using CommunicationService.Core.Helpers;
 
 namespace CommunicationService.MessageService
 {
@@ -313,6 +314,8 @@ namespace CommunicationService.MessageService
 
             // Change summary
             additionalParameters.TryGetValue("FieldUpdated", out string fieldUpdated);
+            additionalParameters.TryGetValue("OldValue", out string oldValue);
+            additionalParameters.TryGetValue("NewValue", out string newValue);
             JobStatuses previousStatus = _connectRequestService.PreviousJobStatus(job);
             RequestRoles changedByRole = GetChangedByRole(job);
             string supportActivity = job.JobSummary.SupportActivity.FriendlyNameShort();
@@ -324,7 +327,16 @@ namespace CommunicationService.MessageService
 
             // First table
             List<TaskDataItem> importantDataList = new List<TaskDataItem>();
-            AddIfNotNullOrEmpty(importantDataList, "Status", job.JobSummary.JobStatus.FriendlyName().ToTitleCase());
+
+            if (fieldUpdated == "Status")
+            {
+                AddIfNotNullOrEmpty(importantDataList, "Status (Updated)", $"{job.JobSummary.JobStatus.FriendlyName().ToTitleCase()}");
+            }
+            else
+            {
+                AddIfNotNullOrEmpty(importantDataList, $"{fieldUpdated} (Updated)", StringHelpers.ToHtmlSafeStringWithLineBreaks(newValue));
+                AddIfNotNullOrEmpty(importantDataList, "Status", job.JobSummary.JobStatus.FriendlyName().ToTitleCase());
+            }
             AddIfNotNullOrEmpty(importantDataList, "Reference", GetReference(emailRecipientRequestRole, job));
 
             // Second table
