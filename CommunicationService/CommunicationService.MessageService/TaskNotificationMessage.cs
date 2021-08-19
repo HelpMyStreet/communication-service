@@ -90,8 +90,7 @@ namespace CommunicationService.MessageService
                             distanceFromPostcode: Math.Round(volunteer.DistanceInMiles, 1),
                             dueDate: dueDate,
                             isHealthCritical: job.IsHealthCritical,
-                            isFaceMask: supportActivity == SupportActivities.FaceMask,
-                            repeatMessage: repeatMessage
+                            isFaceMask: supportActivity == SupportActivities.FaceMask
                         ),
                         EmailToAddress = user.UserPersonalDetails.EmailAddress,
                         EmailToName = $"{user.UserPersonalDetails.FirstName} {user.UserPersonalDetails.LastName}",
