@@ -175,6 +175,7 @@
     <None Remove="Migrations\20210622_081000_GroupWelcome.json" />
     <None Remove="Migrations\20210707_150800_DailyDigest.json" />
     <None Remove="Migrations\20210707_151700_DailyDigest.json" />
+    <None Remove="Migrations\20210819_142000_TaskNotification.json" />
   </ItemGroup>
 
   <ItemGroup>
@@ -214,6 +215,7 @@
     <EmbeddedResource Include="Migrations\20200717_152400_AddUnsubscribeGroupsDailyDigest.json" />
     <EmbeddedResource Include="Migrations\20210325_153000_UpdateTaskNotificationEmail.json" />
     <EmbeddedResource Include="Migrations\20210325_134500_UpdateTaskNotificationEmail.json" />
+    <EmbeddedResource Include="Migrations\20210819_142000_TaskNotification.json" />
     <EmbeddedResource Include="Migrations\20210707_151700_DailyDigest.json" />
     <EmbeddedResource Include="Migrations\20210707_150800_DailyDigest.json" />
     <EmbeddedResource Include="Migrations\20210622_081000_GroupWelcome.json" />
