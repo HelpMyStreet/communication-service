@@ -144,7 +144,7 @@ namespace CommunicationService.SendGridService
             return await _memDistCacheUnsubscribeGroup.GetCachedDataAsync(async (cancellationToken) =>
             {
                 return await GetUnsubscribeGroup(groupName);
-            }, $"{CACHE_KEY_PREFIX}-unsubscribegroup-{groupName}", RefreshBehaviour.DontWaitForFreshData, cancellationToken);
+            }, $"{CACHE_KEY_PREFIX}-unsubscribegroup-{groupName}", RefreshBehaviour.WaitForFreshData, cancellationToken);
         }
 
         public async Task<Template> GetTemplate(string templateName)
@@ -186,7 +186,7 @@ namespace CommunicationService.SendGridService
             return await _memDistCacheTemplate.GetCachedDataAsync(async (cancellationToken) =>
             {
                 return await GetTemplate(templateName);
-            }, $"{CACHE_KEY_PREFIX}-template-{templateName}", RefreshBehaviour.DontWaitForFreshData, cancellationToken);
+            }, $"{CACHE_KEY_PREFIX}-template-{templateName}", RefreshBehaviour.WaitForFreshData, cancellationToken);
         }
 
         private string GetReferencedJobs(List<ReferencedJob> referencedJobs)

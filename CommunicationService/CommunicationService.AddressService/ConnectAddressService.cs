@@ -66,7 +66,7 @@ namespace CommunicationService.AddressService
                         throw new HttpRequestException("Unable to fetch location details");
                     }
                 }                
-            }, $"{CACHE_KEY_PREFIX}-location-{(int)location}", RefreshBehaviour.DontWaitForFreshData, cancellationToken);
+            }, $"{CACHE_KEY_PREFIX}-location-{(int)location}", RefreshBehaviour.WaitForFreshData, cancellationToken);
         }
 
         public async Task<GetLocationsByDistanceResponse> GetLocationsByDistance(string postCode, int maxDistance)
