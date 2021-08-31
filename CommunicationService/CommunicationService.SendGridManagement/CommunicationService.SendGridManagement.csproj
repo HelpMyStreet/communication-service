@@ -156,6 +156,8 @@
     <None Remove="Migrations\20210222_163000_FixLinks.json" />
     <None Remove="Migrations\20210223_140000_ShiftReminderEmails.json" />
     <None Remove="Migrations\20210317_111500_CreateUnsubscribeGroup.json" />
+    <None Remove="Migrations\20210325_134500_UpdateTaskNotificationEmail.json" />
+    <None Remove="Migrations\20210325_153000_UpdateTaskNotificationEmail.json" />
     <None Remove="Migrations\20210525_150000_GroupWelcome.json" />
     <None Remove="Migrations\20210526_140000_GroupWelcome.json" />
     <None Remove="Migrations\20210526_161500_GroupWelcome.json" />
@@ -173,6 +175,7 @@
     <None Remove="Migrations\20210622_081000_GroupWelcome.json" />
     <None Remove="Migrations\20210707_150800_DailyDigest.json" />
     <None Remove="Migrations\20210707_151700_DailyDigest.json" />
+    <None Remove="Migrations\20210819_142000_TaskNotification.json" />
   </ItemGroup>
 
   <ItemGroup>
@@ -210,6 +213,9 @@
     <EmbeddedResource Include="Emails\RequestorTaskNotification.html" />
     <EmbeddedResource Include="Migrations\20200709_130700_AddRequestorTaskNotification.json" />
     <EmbeddedResource Include="Migrations\20200717_152400_AddUnsubscribeGroupsDailyDigest.json" />
+    <EmbeddedResource Include="Migrations\20210325_153000_UpdateTaskNotificationEmail.json" />
+    <EmbeddedResource Include="Migrations\20210325_134500_UpdateTaskNotificationEmail.json" />
+    <EmbeddedResource Include="Migrations\20210819_142000_TaskNotification.json" />
     <EmbeddedResource Include="Migrations\20210707_151700_DailyDigest.json" />
     <EmbeddedResource Include="Migrations\20210707_150800_DailyDigest.json" />
     <EmbeddedResource Include="Migrations\20210622_081000_GroupWelcome.json" />
