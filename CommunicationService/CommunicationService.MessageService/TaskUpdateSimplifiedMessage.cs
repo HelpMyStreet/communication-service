@@ -391,20 +391,6 @@ namespace CommunicationService.MessageService
             };
         }
 
-        private int? GetCreatedByUserID(GetJobDetailsResponse job)
-        {
-            var createdBy = job.History.OrderByDescending(x => x.StatusDate).Take(1).FirstOrDefault();
-
-            if(createdBy !=null)
-            {
-                return createdBy.CreatedByUserID;
-            }
-            else
-            {
-                return null;
-            }
-        }
-
         public async Task<List<SendMessageRequest>> IdentifyRecipients(int? recipientUserId, int? jobId, int? groupId, int? requestId, Dictionary<string, string> additionalParameters)
         {
             var job = await _connectRequestService.GetJobDetailsAsync(jobId.Value);
@@ -449,12 +435,12 @@ namespace CommunicationService.MessageService
             string recipientEmailAddress = job.Recipient?.EmailAddress;
             string requestorEmailAddress = job.Requestor?.EmailAddress;
 
-            var createdByUserID = GetCreatedByUserID(job);
+            var createdByUserID = _connectRequestService.GetLastUpdatedBy(job);
 
             //Now consider the recipient
             if (!string.IsNullOrEmpty(recipientEmailAddress))
             {
-                if (createdByUserID.HasValue && createdByUserID.Value != -1)
+                if (createdByUserID != -1)
                 {
                     var param = new Dictionary<string, string>(additionalParameters)
                     {
@@ -476,7 +462,7 @@ namespace CommunicationService.MessageService
             if (!string.IsNullOrEmpty(requestorEmailAddress)
                 && requestorEmailAddress != volunteerEmailAddress && requestorEmailAddress != recipientEmailAddress)
             {
-                if (createdByUserID.HasValue && createdByUserID.Value != -1)
+                if (createdByUserID != -1)
                 {
                     var param = new Dictionary<string, string>(additionalParameters)
                     {
