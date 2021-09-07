@@ -79,8 +79,8 @@ namespace CommunicationService.MessageService
         private string GetDueDate(GetJobDetailsResponse job)
         {
             string strDaysFromNow = string.Empty;
-            DateTime dueDate = job.JobSummary.DueDate;
-            double daysFromNow = (dueDate.Date - DateTime.Now.Date).TotalDays;
+            DateTime dueDate = job.JobSummary.DueDate.ToUKFromUTCTime();
+            double daysFromNow = (dueDate.Date - DateTime.UtcNow.Date).TotalDays;
 
             switch (job.JobSummary.DueDateType)
             {
