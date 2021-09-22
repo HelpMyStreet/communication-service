@@ -137,16 +137,7 @@ namespace CommunicationService.RequestService
         }
         public int GetLastUpdatedBy(GetJobDetailsResponse getJobDetailsResponse)
         {
-            var lastHistory = getJobDetailsResponse.History.OrderByDescending(x => x.StatusDate).First();
-
-            if (lastHistory != null)
-            {
-                return lastHistory.CreatedByUserID.Value;
-            }
-            else
-            {
-                throw new Exception($"Unable to retrieve last updated by for job id {getJobDetailsResponse.JobSummary.JobID}");
-            }
+            return getJobDetailsResponse.LastUpdatedByUserID.Value;
         }
         public int? GetRelevantVolunteerUserID(GetJobDetailsResponse getJobDetailsResponse)
         {
