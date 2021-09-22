@@ -57,79 +57,98 @@ namespace CommunicationService.SendGridManagement
         }
 
         private async Task AddMigration(string fileName)
-        {
+        {            
             var json = ReadFile(fileName);
             Templates templates = JsonConvert.DeserializeObject<Templates>(json);
-            if (templates.templates?.Length > 0)
+            bool success = false;
+
+            try
             {
-                foreach (Template template in templates.templates)
+                if (templates.templates?.Length > 0)
                 {
-                    string templateId;
-                    try
+                    foreach (Template template in templates.templates)
                     {
-                        templateId = await GetTemplateId(template.name);
-                    }
-                    catch (UnknownTemplateException)
-                    {
-                        templateId = CreateNewTemplate(template);
-                    }
-                    
-                    string html_content = GetEmailHtml("Layout").Replace("{{Body}}", GetEmailHtml(template.name));
-                    string plain_content = Regex.Replace(GetEmailHtml(template.name), @"<[^>]*>", String.Empty);
-                    plain_content = GetEmailText("Layout").Replace("{{Body}}", plain_content);
+                        string templateId;
+                        try
+                        {
+                            templateId = await GetTemplateId(template.name);
+                        }
+                        catch (UnknownTemplateException)
+                        {
+                            templateId = CreateNewTemplate(template);
+                        }
 
-                    bool success = CreateNewTemplateVersion(new NewTemplateVersion()
-                    {
-                        template_id = templateId,
-                        name = template.versions[0].name,
-                        active = 1,
-                        html_content = html_content,
-                        plain_content = plain_content,
-                        subject = template.versions[0].subject
-                    }
-                    );
-                }
-            }
+                        string html_content = GetEmailHtml("Layout").Replace("{{Body}}", GetEmailHtml(template.name));
+                        string plain_content = Regex.Replace(GetEmailHtml(template.name), @"<[^>]*>", String.Empty);
+                        plain_content = GetEmailText("Layout").Replace("{{Body}}", plain_content);
 
-            if (templates.createUpdateUnsubscribeGroups?.Length > 0)
-            {
-                foreach (UnsubscribeGroup unsubscribeGroups in templates.createUpdateUnsubscribeGroups)
-                { 
-                    int groupId;
-                    try
-                    {
-                        groupId = await GetGroupId(unsubscribeGroups.name);
-                        unsubscribeGroups.id = groupId;
-                        UpdateUnsubscribeGroup(unsubscribeGroups);
-                    }
-                    catch (UnknownSubscriptionGroupException)
-                    {
-                        groupId = CreateNewGroup(unsubscribeGroups);
+                        success = CreateNewTemplateVersion(new NewTemplateVersion()
+                        {
+                            template_id = templateId,
+                            name = template.versions[0].name,
+                            active = 1,
+                            html_content = html_content,
+                            plain_content = plain_content,
+                            subject = template.versions[0].subject
+                        }
+                        );
                     }
                 }
-            }
 
-            if (templates.deleteUnsubscribeGroups?.Length > 0)
-            {
-                foreach (UnsubscribeGroup unsubscribeGroups in templates.deleteUnsubscribeGroups)
+                if (templates.createUpdateUnsubscribeGroups?.Length > 0)
                 {
-                    int groupId;
-                    try
+                    foreach (UnsubscribeGroup unsubscribeGroups in templates.createUpdateUnsubscribeGroups)
                     {
-                        groupId = await GetGroupId(unsubscribeGroups.name);
-                        DeleteUnsubscribeGroup(groupId);
+                        int groupId;
+                        try
+                        {
+                            groupId = await GetGroupId(unsubscribeGroups.name);
+                            unsubscribeGroups.id = groupId;
+                            UpdateUnsubscribeGroup(unsubscribeGroups);
+                        }
+                        catch (UnknownSubscriptionGroupException)
+                        {
+                            groupId = CreateNewGroup(unsubscribeGroups);
+                        }
                     }
-                    catch (UnknownSubscriptionGroupException)
+                }
+
+                if (templates.deleteUnsubscribeGroups?.Length > 0)
+                {
+                    foreach (UnsubscribeGroup unsubscribeGroups in templates.deleteUnsubscribeGroups)
                     {
+                        int groupId;
+                        try
+                        {
+                            groupId = await GetGroupId(unsubscribeGroups.name);
+                            DeleteUnsubscribeGroup(groupId);
+                        }
+                        catch (UnknownSubscriptionGroupException)
+                        {
+                        }
                     }
                 }
             }
-
-
-            ExpandoObject o = new ExpandoObject();
-            o.TryAdd("id", Guid.NewGuid());
-            o.TryAdd("MigrationId", fileName);
-            await _cosmosDbService.AddItemAsync(o); 
+            catch (Exception exc)
+            {
+                ExpandoObject o = new ExpandoObject();
+                o.TryAdd("id", Guid.NewGuid());
+                o.TryAdd("FileName", fileName);
+                o.TryAdd("Exception", exc.ToString());
+                await _cosmosDbService.AddItemAsync(o);
+            }
+            finally
+            {
+                ExpandoObject o = new ExpandoObject();
+                o.TryAdd("id", Guid.NewGuid());
+                o.TryAdd("FileName", fileName);               
+                o.TryAdd("Success", success.ToString());
+                if (success)
+                {
+                    o.TryAdd("MigrationId", fileName);
+                }
+                await _cosmosDbService.AddItemAsync(o);
+            }
         }
 
         private string GetEmailHtml(string name)
