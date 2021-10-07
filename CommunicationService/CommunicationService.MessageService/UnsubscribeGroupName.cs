@@ -18,5 +18,6 @@ namespace CommunicationService.MessageService
         public static string TaskDetail = "TaskDetail";
         public static string OfflineDetails = "Offline Details";
         public static string GroupWelcome = "Welcome";
+        public static string NewUserNotification = "New User Notification";
     }
 }
