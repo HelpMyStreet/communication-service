@@ -94,7 +94,6 @@ namespace CommunicationService.UnitTests.SendGridService
             _emailConfigSettings = new EmailConfig()
             {
                 ShowUserIDInEmailTitle = true,
-                OpenRequestRadius = 20,
                 RegistrationChaserMaxTimeInHours = 2,
                 RegistrationChaserMinTimeInMinutes = 30,
                 ServiceBusSleepInMilliseconds = 1000
@@ -258,21 +257,24 @@ namespace CommunicationService.UnitTests.SendGridService
             {
                 RequestID = 1,
                 DistanceInMiles = 1,
-                SupportActivity = SupportActivities.Shopping
+                SupportActivity = SupportActivities.Shopping,
+                PostCode = "NG1 6DQ"
             });
 
             jobSummaries.Add(new JobSummary()
             {
                 RequestID = 2,
                 DistanceInMiles = 2,
-                SupportActivity = SupportActivities.Shopping
+                SupportActivity = SupportActivities.Shopping,
+                PostCode = "NG1 6DQ"
             });
 
             jobSummaries.Add(new JobSummary()
             {
                 RequestID = 3,
                 DistanceInMiles = 2,
-                SupportActivity = SupportActivities.CheckingIn
+                SupportActivity = SupportActivities.CheckingIn,
+                PostCode = "NG1 6DQ"
             });
 
             _getAllJobsByFilterResponse = new GetAllJobsByFilterResponse()
@@ -287,70 +289,6 @@ namespace CommunicationService.UnitTests.SendGridService
 
 
             Assert.AreEqual(chosenJobCount, ddd.ChosenRequestTasks);
-        }
-
-        [Test]
-        public async Task PrepareTemplateData_ReturnsEmailBuildDataAsThereAreNoChosenJobs()
-        {
-            int? recipientUserId = 1;
-            int? jobId = null;
-            int? groupId = null;
-            int? requestId = null;
-            string templateName = string.Empty;
-
-            _getUserGroupsResponse = new GetUserGroupsResponse()
-            {
-                Groups = new List<int>() { 1 }
-            };
-
-            _user = new User()
-            {
-                ID = 1,
-                SupportActivities = new List<SupportActivities>() { SupportActivities.Shopping },
-                PostalCode = "NG1 6DQ",
-                SupportRadiusMiles = 2,
-                UserPersonalDetails = new UserPersonalDetails()
-                {
-                    FirstName = "FIRST NAME",
-                    EmailAddress = "EMAIL ADDRESS",
-                    DisplayName = "DISPLAY NAME"
-                }
-
-            };
-
-            List<JobSummary> jobSummaries = new List<JobSummary>();
-            jobSummaries.Add(new JobSummary()
-            {
-                DistanceInMiles = 2,
-                SupportActivity = SupportActivities.CheckingIn,
-                RequestType = RequestType.Task
-            });
-
-            _getAllJobsByFilterResponse = new GetAllJobsByFilterResponse()
-            {
-                JobSummaries = jobSummaries,
-                ShiftJobs = new List<ShiftJob>()
-                {
-                   new ShiftJob()
-                   {
-                       SupportActivity = SupportActivities.VaccineSupport,
-                       StartDate = DateTime.SpecifyKind(DateTime.Now,DateTimeKind.Utc),
-                       ShiftLength = 240,
-                       DistanceInMiles = 2
-                   }
-                }
-            };
-
-            _getPostcodeCoordinatesResponse = new GetPostcodeCoordinatesResponse()
-            {
-                PostcodeCoordinates = new List<PostcodeCoordinate>()
-                {
-                    new PostcodeCoordinate(){Postcode="DE23 6NY",Latitude=1d,Longitude=1d}
-                }
-            };
-            var chosenJobCount = jobSummaries.Count(x => _user.SupportActivities.Contains(x.SupportActivity) && x.DistanceInMiles < _user.SupportRadiusMiles);
-            var result = await _classUnderTest.PrepareTemplateData(Guid.NewGuid(),recipientUserId, jobId, groupId, requestId, null, templateName);
-            Assert.AreEqual(null, result);
         }
 
         [Test]
@@ -410,7 +348,8 @@ namespace CommunicationService.UnitTests.SendGridService
                 RequestID = 1,
                 DistanceInMiles = 1,
                 SupportActivity = SupportActivities.Shopping,
-                RequestType = RequestType.Task
+                RequestType = RequestType.Task,
+                PostCode = "NG1 6DQ"
             });
 
             jobSummaries.Add(new JobSummary()
@@ -418,7 +357,8 @@ namespace CommunicationService.UnitTests.SendGridService
                 RequestID = 2,
                 DistanceInMiles = 2,
                 SupportActivity = SupportActivities.Shopping,
-                RequestType = RequestType.Task
+                RequestType = RequestType.Task,
+                PostCode = "NG1 6DQ"
             });
 
             jobSummaries.Add(new JobSummary()
@@ -426,7 +366,8 @@ namespace CommunicationService.UnitTests.SendGridService
                 RequestID = 3,
                 DistanceInMiles = 2,
                 SupportActivity = SupportActivities.CheckingIn,
-                RequestType = RequestType.Task
+                RequestType = RequestType.Task,
+                PostCode = "NG1 6DQ"
             });
 
             _getPostcodeCoordinatesResponse = new GetPostcodeCoordinatesResponse()
