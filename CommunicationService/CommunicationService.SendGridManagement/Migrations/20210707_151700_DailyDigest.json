@@ -1,0 +1,15 @@
+﻿{
+  "Templates": [
+    {
+      "name": "DailyDigest",
+      "subject": "Help Needed Near You",
+      "generation": "dynamic",
+      "versions": [
+        {
+          "name": "allow out of criteria only requests to trigger emails",
+          "subject": "Help Needed Near You"
+        }
+      ]
+    }
+  ]
+}
