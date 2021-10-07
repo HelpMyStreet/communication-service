@@ -1,0 +1,22 @@
+﻿{
+  "CreateUpdateUnsubscribeGroups": [
+    {
+      "name": "New User Notification",
+      "description": "New User Notification"
+    }
+  ],
+  "Templates": [
+    {
+      "name": "NewUserNotification",
+      "subject": "{{{Subject}}}",
+      "generation": "dynamic",
+      "versions": [
+        {
+          "name": "first draft for new user notification email",
+          "subject": "{{{Subject}}}"
+        }
+      ],
+      "layout": "GroupWelcomeLayout"
+    }
+  ]
+}
