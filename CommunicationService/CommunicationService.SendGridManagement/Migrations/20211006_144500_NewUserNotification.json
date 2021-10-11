@@ -1,0 +1,16 @@
+﻿{
+  "Templates": [
+    {
+      "name": "NewUserNotification",
+      "subject": "{{{Subject}}}",
+      "generation": "dynamic",
+      "versions": [
+        {
+          "name": "second draft for new user notification email",
+          "subject": "{{{Subject}}}"
+        }
+      ],
+      "layout": "GroupWelcomeLayout"
+    }
+  ]
+}
