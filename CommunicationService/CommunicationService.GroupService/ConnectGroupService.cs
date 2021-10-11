@@ -15,16 +15,20 @@ using System.Threading.Tasks;
 using System.Text;
 using System;
 using HelpMyStreet.Contracts.CommunicationService.Request;
+using HelpMyStreet.Cache;
 
 namespace CommunicationService.GroupService
 {
     public class ConnectGroupService : IConnectGroupService
     {
         private readonly IHttpClientWrapper _httpClientWrapper;
+        private readonly IMemDistCache<double?> _memDistCache;
+        private const string CACHE_KEY_PREFIX = "group-service-";
 
-        public ConnectGroupService(IHttpClientWrapper httpClientWrapper)
+        public ConnectGroupService(IHttpClientWrapper httpClientWrapper, IMemDistCache<double?> memDistCache)
         {
             _httpClientWrapper = httpClientWrapper;
+            _memDistCache = memDistCache;
         }
 
         public async Task<GetGroupCredentialsResponse> GetGroupCredentials(int groupId)
@@ -212,6 +216,30 @@ namespace CommunicationService.GroupService
                 }
                 return null;
             }
+        }
+
+        public async Task<double?> GetGroupSupportActivityRadius(int groupID, SupportActivities supportActivity, CancellationToken cancellationToken)
+        {
+            return await _memDistCache.GetCachedDataAsync(async (cancellationToken) =>
+            {
+                GetGroupSupportActivityRadiusRequest request = new GetGroupSupportActivityRadiusRequest() { GroupId = groupID, SupportActivityType = new SupportActivityType() { SupportActivity = supportActivity } };
+                string json = JsonConvert.SerializeObject(request);
+                StringContent data = new StringContent(json, Encoding.UTF8, "application/json");
+
+                using (HttpResponseMessage response = await _httpClientWrapper.PostAsync(HttpClientConfigName.GroupService, "/api/GetGroupSupportActivityRadius", data, CancellationToken.None))
+                {
+                    string jsonResponse = await response.Content.ReadAsStringAsync();
+                    var getRadiusResponse = JsonConvert.DeserializeObject<ResponseWrapper<GetGroupSupportActivityRadiusResponse, GroupServiceErrorCode>>(jsonResponse);
+                    if (getRadiusResponse.HasContent && getRadiusResponse.IsSuccessful)
+                    {
+                        return getRadiusResponse.Content.SupportRadiusMiles;
+                    }
+                    else
+                    {
+                        throw new HttpRequestException("Unable to fetch radius details");
+                    }
+                }
+            }, $"{CACHE_KEY_PREFIX}-group-{groupID}-sa-{(int)supportActivity}", RefreshBehaviour.DontWaitForFreshData, cancellationToken);
         }
     }
 }
