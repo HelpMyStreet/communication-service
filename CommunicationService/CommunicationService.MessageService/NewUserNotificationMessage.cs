@@ -60,7 +60,7 @@ namespace CommunicationService.MessageService
             }
 
 
-            string volunteerSupportActivities = string.Join(",", volunteer.SupportActivities
+            string volunteerSupportActivities = string.Join(", ", volunteer.SupportActivities
                                  .Select(v => v.FriendlyNameShort()));
 
 
