@@ -1,4 +1,5 @@
 ﻿using CommunicationService.Core.Domains;
+using Microsoft.Azure.ServiceBus;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -15,7 +16,7 @@ namespace CommunicationService.MessageService.Substitution
         public double DistanceFromPostCode { get; private set; }
         public string DueDate { get; private set; }
         public bool IsHealthCritical { get; private set; }
-        public bool IsFaceMask { get; private set; }        
+        public bool IsFaceMask { get; private set; }
 
         public TaskNotificationData(
             string firstname,

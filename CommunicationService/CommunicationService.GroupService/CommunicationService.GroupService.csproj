@@ -5,6 +5,10 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="HelpMyStreet.CoreV3.Cache" Version="1.1.777" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\CommunicationService.Core\CommunicationService.Core.csproj" />
   </ItemGroup>
 
