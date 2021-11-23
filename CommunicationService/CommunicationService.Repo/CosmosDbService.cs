@@ -1,6 +1,7 @@
 ﻿using CommunicationService.Core;
 using CommunicationService.Core.Domains;
 using CommunicationService.Core.Interfaces.Repositories;
+using HelpMyStreet.Contracts.CommunicationService.Response;
 using Microsoft.Azure.Cosmos;
 using System;
 using System.Collections.Generic;
@@ -170,6 +171,20 @@ namespace CommunicationService.Repo
             }
 
             return false;
+        }
+
+        public async Task<List<EmailHistoryDetail>> GetEmailHistoryDetails(int requestId)
+        {
+            string queryString = $"SELECT count(1) as RecipientCount, c.GroupName as EmailType, left(udf.convertTime(c._ts),10) as DateSent, c.event as Event FROM c where c.RequestId = '{requestId}' group by c.GroupName, left(udf.convertTime(c._ts), 10), c.event";
+            var query = this._container.GetItemQueryIterator<EmailHistoryDetail>(new QueryDefinition(queryString));
+            List<EmailHistoryDetail> results = new List<EmailHistoryDetail>();
+            while (query.HasMoreResults)
+            {
+                var response = await query.ReadNextAsync();
+                results.AddRange(response.ToList());
+            }
+
+            return results;
         }
     }
 }
