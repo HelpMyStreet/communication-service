@@ -175,9 +175,29 @@ namespace CommunicationService.Repo
 
         public async Task<List<EmailHistoryDetail>> GetEmailHistoryDetails(int requestId)
         {
-            string queryString = $"SELECT count(1) as RecipientCount, c.GroupName as EmailType, left(udf.convertTime(c._ts),10) as DateSent, c.event as Event FROM c where c.RequestId = '{requestId}' group by c.GroupName, left(udf.convertTime(c._ts), 10), c.event";
-            var query = this._container.GetItemQueryIterator<EmailHistoryDetail>(new QueryDefinition(queryString));
             List<EmailHistoryDetail> results = new List<EmailHistoryDetail>();
+            FeedIterator<EmailHistoryDetail> query;
+            string queryString;
+            
+            queryString = $"SELECT count(1) as RecipientCount, c.TemplateName as EmailType, left(udf.convertTime(c._ts),10) as DateSent " +
+                $"FROM c " +
+                $"WHERE c.event='delivered' and c.RequestId = '{requestId}' " +
+                $"GROUP BY c.TemplateName, left(udf.convertTime(c._ts), 10)";
+            query = this._container.GetItemQueryIterator<EmailHistoryDetail>(new QueryDefinition(queryString));
+            
+            while (query.HasMoreResults)
+            {
+                var response = await query.ReadNextAsync();
+                results.AddRange(response.ToList());
+            }
+
+            queryString = $"SELECT count(1) as RecipientCount, c.TemplateName as EmailType, left(udf.convertTime(c._ts),10) as DateSent " +
+                $"FROM c join id in c.ReferencedJobs " +
+                $"WHERE c.event='delivered' and id.R = {requestId} " +
+                $"GROUP BY c.TemplateName, left(udf.convertTime(c._ts), 10)";
+
+            query = this._container.GetItemQueryIterator<EmailHistoryDetail>(new QueryDefinition(queryString));
+
             while (query.HasMoreResults)
             {
                 var response = await query.ReadNextAsync();
