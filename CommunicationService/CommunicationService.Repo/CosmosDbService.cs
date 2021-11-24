@@ -204,6 +204,10 @@ namespace CommunicationService.Repo
                 results.AddRange(response.ToList());
             }
 
+            results = results.GroupBy(g => new { g.DateSent, g.EmailType, g.RecipientCount })
+                .Select(s => s.FirstOrDefault())
+                .ToList();
+            
             return results;
         }
     }
