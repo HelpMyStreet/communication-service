@@ -320,6 +320,20 @@ namespace CommunicationService.MessageService
             additionalParameters.TryGetValue("NewValue", out string newValue);
             JobStatuses previousStatus = _connectRequestService.PreviousJobStatus(job);
             RequestRoles changedByRole = GetChangedByRole(job);
+            JobStatusChangeReasonCodes? statusChangeReason = job.LastJobStatusChangeReasonCode;
+
+            string lastUpdatedBy;
+            if(statusChangeReason.HasValue && 
+                (statusChangeReason.Value == JobStatusChangeReasonCodes.AutoProgressingJobsPastDueDates || statusChangeReason.Value == JobStatusChangeReasonCodes.AutoProgressingOverdueRepeats)
+                )
+            {
+                lastUpdatedBy = "automatically by HelpMyStreet";
+            }
+            else
+            {
+                lastUpdatedBy = changedByRole == RequestRoles.GroupAdmin ? "by a group administrator" : "by a volunteer";
+            }
+
             string supportActivity = job.JobSummary.SupportActivity.FriendlyNameShort();
 
             bool showJobUrl = emailRecipientRequestRole == RequestRoles.Volunteer 
@@ -362,7 +376,7 @@ namespace CommunicationService.MessageService
                     $"A {supportActivity} request has been updated",
                     $"A {supportActivity} request has been updated",
                     emailToFirstName,
-                    changedByRole == RequestRoles.GroupAdmin ? "group administrator" : "volunteer",
+                    lastUpdatedBy,
                     fieldUpdated.ToLower(),
                     showJobUrl,
                     jobUrl,
@@ -440,7 +454,7 @@ namespace CommunicationService.MessageService
             //Now consider the recipient
             if (!string.IsNullOrEmpty(recipientEmailAddress))
             {
-                if (createdByUserID != -1)
+                if (job.LastJobStatusChangeReasonCode.HasValue && job.LastJobStatusChangeReasonCode.Value.TriggersStatusChangeEmail())
                 {
                     var param = new Dictionary<string, string>(additionalParameters)
                     {
@@ -462,7 +476,7 @@ namespace CommunicationService.MessageService
             if (!string.IsNullOrEmpty(requestorEmailAddress)
                 && requestorEmailAddress != volunteerEmailAddress && requestorEmailAddress != recipientEmailAddress)
             {
-                if (createdByUserID != -1)
+                if (job.LastJobStatusChangeReasonCode.HasValue && job.LastJobStatusChangeReasonCode.Value.TriggersStatusChangeEmail())
                 {
                     var param = new Dictionary<string, string>(additionalParameters)
                     {

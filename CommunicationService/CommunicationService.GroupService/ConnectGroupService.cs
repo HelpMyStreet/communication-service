@@ -241,5 +241,29 @@ namespace CommunicationService.GroupService
                 }
             }, $"{CACHE_KEY_PREFIX}-group-{groupID}-sa-{(int)supportActivity}", RefreshBehaviour.DontWaitForFreshData, cancellationToken);
         }
+
+        public async Task<IEnumerable<VolunteerSummary>> GetEligibleVolunteersForRequest(int referringGroupId, string source, string postCode, SupportActivities supportActivity)
+        {
+            GetEligibleVolunteersForRequestRequest request = new GetEligibleVolunteersForRequestRequest()
+            {
+                ReferringGroupId = referringGroupId,
+                Source = source,
+                PostCode = postCode,
+                SupportActivityType = new SupportActivityType() { SupportActivity = supportActivity }
+            };
+            string json = JsonConvert.SerializeObject(request);
+            StringContent data = new StringContent(json, Encoding.UTF8, "application/json");
+
+            using (HttpResponseMessage response = await _httpClientWrapper.PostAsync(HttpClientConfigName.GroupService, "/api/GetEligibleVolunteersForRequest", data, CancellationToken.None).ConfigureAwait(false))
+            {
+                string jsonResponse = await response.Content.ReadAsStringAsync();
+                var getJobsResponse = JsonConvert.DeserializeObject<ResponseWrapper<GetEligibleVolunteersForRequestResponse, GroupServiceErrorCode>>(jsonResponse);
+                if (getJobsResponse.HasContent && getJobsResponse.IsSuccessful)
+                {
+                    return getJobsResponse.Content.VolunteerSummaries;
+                }
+                return null;
+            }
+        }
     }
 }
