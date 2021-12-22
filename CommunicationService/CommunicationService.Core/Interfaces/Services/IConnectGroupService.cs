@@ -10,6 +10,8 @@ namespace CommunicationService.Core.Interfaces.Services
 {
     public interface IConnectGroupService
     {
+        Task<IEnumerable<VolunteerSummary>> GetEligibleVolunteersForRequest(int referringGroupId, string source, string postCode, SupportActivities supportActivity);
+        
         Task<GetRequestHelpFormVariantResponse> GetRequestHelpFormVariant(int groupId, string source);
 
         Task<UserInGroup> GetGroupMember(int groupId, int userId, int authorisingUserId);

@@ -19,5 +19,8 @@ namespace CommunicationService.MessageService
         public static string OfflineDetails = "Offline Details";
         public static string GroupWelcome = "Welcome";
         public static string NewUserNotification = "New User Notification";
+        public static string InProgressReminder = "In progress reminder";
+        public static string NextDayReminder = "Next day reminder";
+
     }
 }
