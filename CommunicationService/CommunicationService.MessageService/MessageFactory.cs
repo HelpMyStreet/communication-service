@@ -30,14 +30,14 @@ namespace CommunicationService.MessageService
         private readonly IOptions<LinkConfig> _linkConfig;
         private readonly ILinkRepository _linkRepository;
 
-        public MessageFactory(IConnectUserService connectUserService, 
-            IConnectRequestService connectRequestService, 
-            IConnectGroupService connectGroupService, 
-            IQueueClient queueClient, 
-            ICosmosDbService cosmosDbService, 
-            IOptions<EmailConfig> emailConfig, 
-            IJobFilteringService jobFilteringService, 
-            IConnectAddressService connectAddressService, 
+        public MessageFactory(IConnectUserService connectUserService,
+            IConnectRequestService connectRequestService,
+            IConnectGroupService connectGroupService,
+            IQueueClient queueClient,
+            ICosmosDbService cosmosDbService,
+            IOptions<EmailConfig> emailConfig,
+            IJobFilteringService jobFilteringService,
+            IConnectAddressService connectAddressService,
             IOptions<SendGridConfig> sendGridConfig,
             IOptions<LinkConfig> linkConfig,
             ILinkRepository linkRepository)
@@ -96,6 +96,10 @@ namespace CommunicationService.MessageService
                     return new GroupWelcomeMessage(_connectGroupService, _connectUserService, _sendGridConfig);
                 case CommunicationJobTypes.NewUserNotification:
                     return new NewUserNotificationMessage(_connectGroupService, _connectUserService, _sendGridConfig);
+                case CommunicationJobTypes.InProgressReminder:
+                    return new InProgressReminderMessage(_connectRequestService, _connectUserService, _cosmosDbService);
+                case CommunicationJobTypes.JobsDueTomorrow:
+                    return new NextDayReminderMessage(_connectRequestService, _connectUserService, _cosmosDbService, _connectGroupService, _sendGridConfig);
                 default:                   
                     throw new Exception("Unknown Email Type");
             }
