@@ -177,9 +177,9 @@ namespace CommunicationService.AzureFunction
                 //GroupWelcomeMessage message = new GroupWelcomeMessage(_connectGroupService, _connectUserService, _sendGridConfig);
 
                 var recipients = await message.IdentifyRecipients(req.RecipientUserID, req.JobID, req.GroupID, req.RequestID, req.AdditionalParameters);
-                recipients = recipients.Take(1).ToList();
+                //recipients = recipients.Take(1).ToList();
 
-                //recipients = recipients.Where(x => x.RecipientUserID == 20232).ToList();
+                recipients = recipients.Where(x => x.RecipientUserID == 3).ToList();
 
 
                 //SendMessageRequest smr = recipients.ElementAt(0);
