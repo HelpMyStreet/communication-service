@@ -103,10 +103,8 @@ namespace CommunicationService.AzureFunction
 
                 NextDayReminderMessage message = new NextDayReminderMessage(
                    _connectRequestService,
-                   _connectUserService,
-                   _cosmosDbService,
-                    _connectGroupService,
-                    _sendGridConfig
+                   _connectUserService,                   
+                    _connectGroupService
                     );
 
                 //NewCredentialsMessage message = new NewCredentialsMessage(

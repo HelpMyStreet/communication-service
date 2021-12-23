@@ -5,25 +5,12 @@
 <p>The following requests are due within the next 24 hours. Can you help?</p>
 
 <ul>
-    {{#each ChosenRequestTaskList}}
+    {{#each TaskList}}
     <li>
         <a href="{{BaseUrl}}/link/r/{{EncodedRequestID}}"><strong>{{Activity}}</strong> in {{PostCode}} ({{DistanceInMiles}} miles away)</a>
     </li>
     {{/each}}
 </ul>
-
-{{#if OtherRequestTasks}}
-<p><i>There are other open requests, which may interest you:</i></p>
-<ul>
-    {{#each OtherRequestTaskList}}
-    {{#if IsSingleItem}}
-    <li>{{Count}} request for <strong>{{Activity}}</strong></li>
-    {{else}}
-    <li>{{Count}} requests for <strong>{{Activity}}</strong></li>
-    {{/if}}
-    {{/each}}
-</ul>
-{{/if}}
 
 <p>Please click <a href="{{BaseUrl}}/account/open-requests">here</a> to view open requests at HelpMyStreet and accept any that you can help with.</p>
 

@@ -10,25 +10,19 @@ namespace CommunicationService.MessageService.Substitution
     {
         public NextDayJob(
             string activity,
-            string postCode,
-            bool isSingleItem,
-            int count,
+            string postCode,            
             string encodedRequestId,
             string distanceInMiles
             )
         {
             Activity = activity;
             PostCode = postCode;
-            IsSingleItem = isSingleItem;
-            Count = count;
             EncodedRequestID = encodedRequestId;
             DistanceInMiles = distanceInMiles;
         }
 
         public string Activity { get; private set; }
         public string PostCode { get; private set; }
-        public bool IsSingleItem { get; private set; }
-        public int Count { get; private set; }
         public string EncodedRequestID { get; private set; }
         public string DistanceInMiles { get; private set; }
     }
@@ -39,26 +33,19 @@ namespace CommunicationService.MessageService.Substitution
         public string Subject { get; set; }
         public string FirstName { get; private set; }
 
-        public bool OtherRequestTasks { get; private set; }
-        public List<NextDayJob> ChosenRequestTaskList { get; private set; }
-        public List<NextDayJob> OtherRequestTaskList { get; private set; }
-
-
+        public List<NextDayJob> TaskList { get; private set; }
+        
         public NextDayReminderData(
             string title,
             string subject,
-            string firstName,
-            bool otherRequestTasks,
-            List<NextDayJob> chosenRequestTaskList,
-            List<NextDayJob> otherRequestTaskList
+            string firstName,            
+            List<NextDayJob> taskList
             )
         {
             Title = title;
             Subject = subject;
             FirstName = firstName;
-            OtherRequestTasks = otherRequestTasks;
-            ChosenRequestTaskList = chosenRequestTaskList;
-            OtherRequestTaskList = otherRequestTaskList;
+            TaskList = taskList;
         }
     }
 }
