@@ -99,7 +99,7 @@ namespace CommunicationService.MessageService
                 case CommunicationJobTypes.InProgressReminder:
                     return new InProgressReminderMessage(_connectRequestService, _connectUserService, _cosmosDbService);
                 case CommunicationJobTypes.JobsDueTomorrow:
-                    return new NextDayReminderMessage(_connectRequestService, _connectUserService, _cosmosDbService, _connectGroupService, _sendGridConfig);
+                    return new NextDayReminderMessage(_connectRequestService, _connectUserService, _connectGroupService);
                 default:                   
                     throw new Exception("Unknown Email Type");
             }
