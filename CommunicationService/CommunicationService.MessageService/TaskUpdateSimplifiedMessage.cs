@@ -15,7 +15,7 @@ using Microsoft.Extensions.Options;
 using CommunicationService.Core.Configuration;
 using HelpMyStreet.Utils.Extensions;
 using HelpMyStreet.Utils.Utils;
-using CommunicationService.Core.Helpers;
+using HelpMyStreet.Utils.Helpers;
 
 namespace CommunicationService.MessageService
 {
@@ -79,8 +79,8 @@ namespace CommunicationService.MessageService
         private string GetDueDate(GetJobDetailsResponse job)
         {
             string strDaysFromNow = string.Empty;
-            DateTime dueDate = job.JobSummary.DueDate;
-            double daysFromNow = (dueDate.Date - DateTime.Now.Date).TotalDays;
+            DateTime dueDate = job.JobSummary.DueDate.ToUKFromUTCTime();
+            double daysFromNow = (dueDate.Date - DateTime.UtcNow.Date).TotalDays;
 
             switch (job.JobSummary.DueDateType)
             {
@@ -317,7 +317,6 @@ namespace CommunicationService.MessageService
 
             // Change summary
             additionalParameters.TryGetValue("FieldUpdated", out string fieldUpdated);
-            additionalParameters.TryGetValue("OldValue", out string oldValue);
             additionalParameters.TryGetValue("NewValue", out string newValue);
             JobStatuses previousStatus = _connectRequestService.PreviousJobStatus(job);
             RequestRoles changedByRole = GetChangedByRole(job);
@@ -392,20 +391,6 @@ namespace CommunicationService.MessageService
             };
         }
 
-        private int? GetCreatedByUserID(GetJobDetailsResponse job)
-        {
-            var createdBy = job.History.OrderByDescending(x => x.StatusDate).Take(1).FirstOrDefault();
-
-            if(createdBy !=null)
-            {
-                return createdBy.CreatedByUserID;
-            }
-            else
-            {
-                return null;
-            }
-        }
-
         public async Task<List<SendMessageRequest>> IdentifyRecipients(int? recipientUserId, int? jobId, int? groupId, int? requestId, Dictionary<string, string> additionalParameters)
         {
             var job = await _connectRequestService.GetJobDetailsAsync(jobId.Value);
@@ -450,12 +435,12 @@ namespace CommunicationService.MessageService
             string recipientEmailAddress = job.Recipient?.EmailAddress;
             string requestorEmailAddress = job.Requestor?.EmailAddress;
 
-            var createdByUserID = GetCreatedByUserID(job);
+            var createdByUserID = _connectRequestService.GetLastUpdatedBy(job);
 
             //Now consider the recipient
             if (!string.IsNullOrEmpty(recipientEmailAddress))
             {
-                if (createdByUserID.HasValue && createdByUserID.Value != -1)
+                if (createdByUserID != -1)
                 {
                     var param = new Dictionary<string, string>(additionalParameters)
                     {
@@ -477,7 +462,7 @@ namespace CommunicationService.MessageService
             if (!string.IsNullOrEmpty(requestorEmailAddress)
                 && requestorEmailAddress != volunteerEmailAddress && requestorEmailAddress != recipientEmailAddress)
             {
-                if (createdByUserID.HasValue && createdByUserID.Value != -1)
+                if (createdByUserID != -1)
                 {
                     var param = new Dictionary<string, string>(additionalParameters)
                     {

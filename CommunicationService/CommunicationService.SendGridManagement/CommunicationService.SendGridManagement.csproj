@@ -12,6 +12,7 @@
     <None Remove="Emails\Layout.txt" />
     <None Remove="Emails\NewCredentials.html" />
     <None Remove="Emails\NewTaskPendingApprovalNotification.html" />
+    <None Remove="Emails\NewUserNotification.html" />
     <None Remove="Emails\PartialRegistration.html" />
     <None Remove="Emails\RequestNotification.html" />
     <None Remove="Emails\ShiftReminder.html" />
@@ -173,8 +174,13 @@
     <None Remove="Migrations\20210621_140001_GroupWelcome.json" />
     <None Remove="Migrations\20210621_201500_GroupWelcome.json" />
     <None Remove="Migrations\20210622_081000_GroupWelcome.json" />
+    <None Remove="Migrations\20211006_143000_NewUserNotification.json" />
+    <None Remove="Migrations\20211006_144500_NewUserNotification.json" />
+    <None Remove="Migrations\20211006_151500_NewUserNotification.json" />
     <None Remove="Migrations\20210707_150800_DailyDigest.json" />
     <None Remove="Migrations\20210707_151700_DailyDigest.json" />
+    <None Remove="Migrations\20210819_142000_TaskNotification.json" />
+    <None Remove="Migrations\20210831_114500_UpdateSimplifiedUpdateTaskMessage.json" />
   </ItemGroup>
 
   <ItemGroup>
@@ -189,6 +195,7 @@
     <EmbeddedResource Include="Emails\PartialRegistration.html">
     </EmbeddedResource>
     <EmbeddedResource Include="Emails\GroupWelcome.html" />
+    <EmbeddedResource Include="Emails\NewUserNotification.html" />
     <EmbeddedResource Include="Emails\Welcome.html">
     </EmbeddedResource>
     <EmbeddedResource Include="Migrations\20200618_11229_DeleteGroups.json">
@@ -212,8 +219,13 @@
     <EmbeddedResource Include="Emails\RequestorTaskNotification.html" />
     <EmbeddedResource Include="Migrations\20200709_130700_AddRequestorTaskNotification.json" />
     <EmbeddedResource Include="Migrations\20200717_152400_AddUnsubscribeGroupsDailyDigest.json" />
+    <EmbeddedResource Include="Migrations\20211006_151500_NewUserNotification.json" />
+    <EmbeddedResource Include="Migrations\20211006_144500_NewUserNotification.json" />
+    <EmbeddedResource Include="Migrations\20211006_143000_NewUserNotification.json" />
+    <EmbeddedResource Include="Migrations\20210831_114500_UpdateSimplifiedUpdateTaskMessage.json" />
     <EmbeddedResource Include="Migrations\20210325_153000_UpdateTaskNotificationEmail.json" />
     <EmbeddedResource Include="Migrations\20210325_134500_UpdateTaskNotificationEmail.json" />
+    <EmbeddedResource Include="Migrations\20210819_142000_TaskNotification.json" />
     <EmbeddedResource Include="Migrations\20210707_151700_DailyDigest.json" />
     <EmbeddedResource Include="Migrations\20210707_150800_DailyDigest.json" />
     <EmbeddedResource Include="Migrations\20210622_081000_GroupWelcome.json" />

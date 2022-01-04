@@ -78,7 +78,8 @@ namespace CommunicationService.UnitTests.SendGridService
                 It.IsAny<Func<CancellationToken, Task<Template>>>(), 
                 It.IsAny<string>(), It.IsAny<RefreshBehaviour>(),
                 It.IsAny<CancellationToken>(), 
-                It.IsAny<NotInCacheBehaviour>()))
+                It.IsAny<NotInCacheBehaviour>(),
+                It.IsAny<Func<DateTimeOffset, DateTimeOffset>>()))
                 .ReturnsAsync(() => _template);
 
             _memCacheUnsubscribeGroup = new Mock<IMemDistCache<UnsubscribeGroup>>();
@@ -89,7 +90,8 @@ namespace CommunicationService.UnitTests.SendGridService
                 It.IsAny<Func<CancellationToken, Task<UnsubscribeGroup>>>(),
                 It.IsAny<string>(), It.IsAny<RefreshBehaviour>(),
                 It.IsAny<CancellationToken>(),
-                It.IsAny<NotInCacheBehaviour>()))
+                It.IsAny<NotInCacheBehaviour>(),
+                It.IsAny<Func<DateTimeOffset, DateTimeOffset>>()))
                 .ReturnsAsync(() => _unsubscribeGroup);
 
 
