@@ -223,8 +223,6 @@
     <EmbeddedResource Include="Migrations\20211006_144500_NewUserNotification.json" />
     <EmbeddedResource Include="Migrations\20211006_143000_NewUserNotification.json" />
     <EmbeddedResource Include="Migrations\20210831_114500_UpdateSimplifiedUpdateTaskMessage.json" />
-    <EmbeddedResource Include="Migrations\20210325_153000_UpdateTaskNotificationEmail.json" />
-    <EmbeddedResource Include="Migrations\20210325_134500_UpdateTaskNotificationEmail.json" />
     <EmbeddedResource Include="Migrations\20210819_142000_TaskNotification.json" />
     <EmbeddedResource Include="Migrations\20210707_151700_DailyDigest.json" />
     <EmbeddedResource Include="Migrations\20210707_150800_DailyDigest.json" />
@@ -243,8 +241,6 @@
     <EmbeddedResource Include="Migrations\20210526_161500_GroupWelcome.json" />
     <EmbeddedResource Include="Migrations\20210526_140000_GroupWelcome.json" />
     <EmbeddedResource Include="Migrations\20210525_150000_GroupWelcome.json" />
-    <EmbeddedResource Include="Migrations\20210325_153000_UpdateTaskNotificationEmail.json" />
-    <EmbeddedResource Include="Migrations\20210325_134500_UpdateTaskNotificationEmail.json" />
     <EmbeddedResource Include="Migrations\20210317_111500_CreateUnsubscribeGroup.json" />
     <EmbeddedResource Include="Migrations\20210302_133000_DailyDigestEmails.json" />
     <EmbeddedResource Include="Migrations\20210224_151500_UpdateTaskNotificationEmail.json" />
