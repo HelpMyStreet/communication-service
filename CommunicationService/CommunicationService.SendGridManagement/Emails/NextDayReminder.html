@@ -4,6 +4,15 @@
 
 <p>The following requests are due within the next 24 hours. Can you help?</p>
 
+<table>
+    {{#each TaskList}}
+    <tr>
+        <td></td>
+        <td><a href="{{BaseUrl}}/link/r/{{EncodedRequestID}}"><strong>{{Activity}}</strong> in {{PostCode}} ({{DistanceInMiles}} miles away)</a></td>
+    </tr>
+    {{/each}}
+</table>
+
 <ul>
     {{#each TaskList}}
     <li>
