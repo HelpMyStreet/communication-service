@@ -27,7 +27,8 @@ namespace CommunicationService.MessageService
     {
         private readonly IConnectRequestService _connectRequestService;
         private readonly IConnectUserService _connectUserService;        
-        private readonly IConnectGroupService _connectGroupService;        
+        private readonly IConnectGroupService _connectGroupService;
+        private readonly IOptions<SendGridConfig> _sendGridConfig;
 
         public const int REQUESTOR_DUMMY_USERID = -1;
 
@@ -40,11 +41,13 @@ namespace CommunicationService.MessageService
 
         public NextDayReminderMessage(IConnectRequestService connectRequestService, 
             IConnectUserService connectUserService,
-            IConnectGroupService connectGroupService)
+            IConnectGroupService connectGroupService,
+            IOptions<SendGridConfig> sendGridConfig)
         {
             _connectRequestService = connectRequestService;
             _connectUserService = connectUserService;            
             _connectGroupService = connectGroupService;
+            _sendGridConfig = sendGridConfig;
             _sendMessageRequests = new List<SendMessageRequest>();
         }
 
@@ -87,7 +90,7 @@ namespace CommunicationService.MessageService
                 DateTo = DateTime.Now.Date.AddDays(2)
             });
 
-            var openTasks = openRequests.JobSummaries.ToList();
+            List<JobSummary> openTasks = openRequests.JobSummaries.ToList();
 
             if (openTasks == null)
             {
@@ -102,6 +105,7 @@ namespace CommunicationService.MessageService
                 openTasks.ForEach(task =>
                 {                    
                     taskList.Add(new NextDayJob(
+                       groupLogo: $"{ _sendGridConfig.Value.BaseCommunicationUrl}/Resources?file=group-logos/logo/{task.ReferringGroupID}.png",
                        activity: task.SupportActivity.FriendlyNameShort(),
                        postCode: task.PostCode.Split(" ").First(),                       
                        encodedRequestId: Base64Utils.Base64Encode(task.RequestID.ToString()),
