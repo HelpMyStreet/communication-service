@@ -18,14 +18,15 @@ using HelpMyStreet.Utils.Utils;
 using HelpMyStreet.Utils.Helpers;
 using HelpMyStreet.Utils.Models;
 using HelpMyStreet.Utils.Exceptions;
+using HelpMyStreet.Contracts.RequestService.Request;
+using HelpMyStreet.Utils.EqualityComparers;
 
 namespace CommunicationService.MessageService
 {
     public class NextDayReminderMessage : IMessage
     {
         private readonly IConnectRequestService _connectRequestService;
-        private readonly IConnectUserService _connectUserService;
-        private readonly ICosmosDbService _cosmosDbService;
+        private readonly IConnectUserService _connectUserService;        
         private readonly IConnectGroupService _connectGroupService;
         private readonly IOptions<SendGridConfig> _sendGridConfig;
 
@@ -40,120 +41,136 @@ namespace CommunicationService.MessageService
 
         public NextDayReminderMessage(IConnectRequestService connectRequestService, 
             IConnectUserService connectUserService,
-            ICosmosDbService cosmosDbService,
             IConnectGroupService connectGroupService,
             IOptions<SendGridConfig> sendGridConfig)
         {
             _connectRequestService = connectRequestService;
-            _connectUserService = connectUserService;
-            _cosmosDbService = cosmosDbService;
+            _connectUserService = connectUserService;            
             _connectGroupService = connectGroupService;
             _sendGridConfig = sendGridConfig;
-            _sendMessageRequests = new List<SendMessageRequest>();            
-        }
-
-        private string GetValueFromConfig(List<KeyValuePair<string, string>> groupEmailConfiguration, string key)
-        {
-            var result = groupEmailConfiguration.Where(x => x.Key == key).FirstOrDefault();
-
-            if (!string.IsNullOrEmpty(result.Value))
-            {
-                return result.Value.Replace("{{BaseUrl}}", _sendGridConfig.Value.BaseUrl);
-            }
-            else
-            {
-                return string.Empty;
-            }
+            _sendMessageRequests = new List<SendMessageRequest>();
         }
 
         public async Task<EmailBuildData> PrepareTemplateData(Guid batchId, int? recipientUserId, int? jobId, int? groupId, int? requestId, Dictionary<string, string> additionalParameters, string templateName)
         {
-            var job = _connectRequestService.GetJobDetailsAsync(jobId.Value).Result;
-            string encodedRequestID = Base64Utils.Base64Encode(job.RequestSummary.RequestID.ToString());
-            var user = await _connectUserService.GetUserByIdAsync(recipientUserId.Value);
-            additionalParameters.TryGetValue("Distance", out string strDistance);
-
-            var group = _connectGroupService.GetGroup(job.RequestSummary.ReferringGroupID).Result;
-
-            if (group == null)
+            if (recipientUserId == null)
             {
-                throw new BadRequestException($"unable to retrieve group details for {groupId.Value}");
+                throw new BadRequestException("recipientUserId is null");
             }
 
-            var groupEmailConfiguration = _connectGroupService.GetGroupEmailConfiguration(groupId.Value, CommunicationJobTypes.GroupWelcome).Result;
+            var user = _connectUserService.GetUserByIdAsync(recipientUserId.Value).Result;
 
-            if (groupEmailConfiguration == null)
+            if (user == null)
             {
-                throw new BadRequestException($"unable to retrieve group email configuration for {groupId.Value}");
+                throw new BadRequestException($"unable to retrieve user object for {recipientUserId.Value}");
             }
 
-            var showGroupLogo = GetValueFromConfig(groupEmailConfiguration, "ShowGroupLogo");
-            bool groupLogoAvailable = string.IsNullOrEmpty(showGroupLogo) ? false : Convert.ToBoolean(showGroupLogo);
-            string groupLogo = string.Empty;
+            var groups = _connectGroupService.GetUserGroups(recipientUserId.Value).Result;
 
-            if (groupLogoAvailable)
+            if (groups == null || groups.Groups == null || groups.Groups.Count == 0)
             {
-                groupLogo = $"group-logos/{group.Group.GroupKey}-partnership.png";
+                return null;
             }
 
-            return new EmailBuildData()
+            GetAllJobsByFilterResponse openRequests;
+            openRequests = await _connectRequestService.GetAllJobsByFilter(new GetAllJobsByFilterRequest()
             {
-                BaseDynamicData = new NextDayReminderData
-                (
-                    title: "Urgent - help is needed near you in the next 24 hours",
-                    subject: "Urgent - help is needed near you in the next 24 hours",
-                    groupLogoAvailable: groupLogoAvailable,
-                    groupLogo: groupLogo,
-                    firstName: user.UserPersonalDetails.FirstName,
-                    encodedRequestID: encodedRequestID,
-                    supportActivity: job.JobSummary.SupportActivity.FriendlyNameShort().ToLower(),
-                    distanceInMiles: strDistance
+                JobStatuses = new JobStatusRequest()
+                {
+                    JobStatuses = new List<JobStatuses>()
+                    { JobStatuses.Open}
+                },
+                Postcode = user.PostalCode,
+                ExcludeSiblingsOfJobsAllocatedToUserID = recipientUserId,
+                Groups = new GroupRequest()
+                {
+                    Groups = groups.Groups
+                },
+                DateFrom = DateTime.Now.Date.AddDays(1),
+                DateTo = DateTime.Now.Date.AddDays(2)
+            });
 
-                ),
-                EmailToAddress = user.UserPersonalDetails.EmailAddress,
-                EmailToName = $"{user.UserPersonalDetails.FirstName} {user.UserPersonalDetails.LastName}",
-                JobID = job.JobSummary.JobID,
-                RequestID = job.JobSummary.RequestID,
-                GroupID = job.JobSummary.ReferringGroupID,
-                RecipientUserID  = recipientUserId.Value
-            };
+            List<JobSummary> openTasks = openRequests.JobSummaries.ToList();
+
+            if (openTasks == null)
+            {
+                return null;
+            }
+
+            var taskList = new List<NextDayJob>();          
+            List<JobSummary> criteriaRequestTasks = new List<JobSummary>();            
+
+            if (openTasks.Count() > 0)
+            {
+                openTasks.ForEach(task =>
+                {                    
+                    taskList.Add(new NextDayJob(
+                       groupLogo: $"{ _sendGridConfig.Value.BaseCommunicationUrl}/Resources?file=group-logos/logo/{task.ReferringGroupID}.png",
+                       activity: task.SupportActivity.FriendlyNameShort(),
+                       postCode: task.PostCode.Split(" ").First(),                       
+                       encodedRequestId: Base64Utils.Base64Encode(task.RequestID.ToString()),
+                       distanceInMiles: Math.Round(task.DistanceInMiles, 1).ToString()
+                    ));
+                });
+
+                if (taskList.Count > 0)
+                {
+                    return new EmailBuildData()
+                    {
+                        BaseDynamicData = new NextDayReminderData(
+                        title: "Urgent - help is needed near you in the next 24 hours",
+                        subject: "Urgent - help is needed near you in the next 24 hours",
+                        firstName: user.UserPersonalDetails.FirstName,
+                        taskList:taskList
+                        ),
+                        EmailToAddress = user.UserPersonalDetails.EmailAddress,
+                        EmailToName = user.UserPersonalDetails.DisplayName,
+                    };
+                }
+                else
+                {
+                    return null;
+                }
+            }
+
+            return null;
         }
-
         public async Task<List<SendMessageRequest>> IdentifyRecipients(int? recipientUserId, int? jobId, int? groupId, int? requestId, Dictionary<string, string> additionalParameters)
         {
-            GetJobDetailsResponse job = await _connectRequestService.GetJobDetailsAsync(jobId.Value);
-
-            if (job == null)
+            var request = new GetAllJobsByFilterRequest()
             {
-                throw new Exception($"Job details cannot be retrieved for jobId {jobId}");
-            }
+                JobStatuses = new JobStatusRequest()
+                {
+                    JobStatuses = new List<JobStatuses>()
+                    { 
+                        JobStatuses.Open
+                    }
+                }
+                ,DateFrom = DateTime.Now.Date.AddDays(1)
+                ,DateTo = DateTime.Now.Date.AddDays(2)
+            };
 
-            var availableVolunteers = await _connectGroupService.GetEligibleVolunteersForRequest(
-                job.RequestSummary.ReferringGroupID,
-                job.RequestSummary.Source,
-                job.RequestSummary.PostCode,
-                job.JobSummary.SupportActivity
-                );
+            var requestsDueTomorrow = await _connectRequestService.GetAllJobsByFilter(request);
 
-            foreach (VolunteerSummary vs in availableVolunteers)
+            if(requestsDueTomorrow.JobSummaries.Count()>0)
             {
-                if (!_cosmosDbService.EmailSent(TemplateName.NextDayReminder, jobId.Value, vs.UserID).Result)
+                var volunteers = await _connectUserService.GetUsers();
+
+                volunteers.UserDetails = volunteers.UserDetails.Where(x => x.SupportRadiusMiles.HasValue);
+
+                Dictionary<int, string> recipients = new Dictionary<int, string>();
+                foreach (var volunteer in volunteers.UserDetails)
                 {
                     _sendMessageRequests.Add(new SendMessageRequest()
                     {
                         TemplateName = TemplateName.NextDayReminder,
-                        RecipientUserID = vs.UserID,
-                        GroupID = job.RequestSummary.ReferringGroupID,
+                        RecipientUserID = volunteer.UserID,
+                        GroupID = groupId,
                         JobID = jobId,
-                        RequestID = requestId,
-                        AdditionalParameters = new Dictionary<string, string>()
-                        {
-                            { "Distance", Math.Round(vs.DistanceInMiles,1).ToString() }
-                        }
+                        RequestID = requestId
                     });
                 }
-            }
-         
+            }                 
             return _sendMessageRequests;
         }
     }

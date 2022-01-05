@@ -6,36 +6,49 @@ using System.Collections.Generic;
 
 namespace CommunicationService.MessageService.Substitution
 {
+    public struct NextDayJob
+    {
+        public NextDayJob(
+            string groupLogo,
+            string activity,
+            string postCode,            
+            string encodedRequestId,
+            string distanceInMiles
+            )
+        {
+            GroupLogo = groupLogo;
+            Activity = activity;
+            PostCode = postCode;
+            EncodedRequestID = encodedRequestId;
+            DistanceInMiles = distanceInMiles;
+        }
+
+        public string GroupLogo { get; set; }
+        public string Activity { get; private set; }
+        public string PostCode { get; private set; }
+        public string EncodedRequestID { get; private set; }
+        public string DistanceInMiles { get; private set; }
+    }
+
     public class NextDayReminderData : BaseDynamicData
     {
         public string Title { get; private set; }
         public string Subject { get; set; }
-        public bool GroupLogoAvailable { get; private set; }
-        public string GroupLogo { get; private set; }
         public string FirstName { get; private set; }
-        public string EncodedRequestID { get; private set; }
-        public string SupportActivity{ get; set; }
-        public string DistanceInMiles { get; set; }
 
+        public List<NextDayJob> TaskList { get; private set; }
+        
         public NextDayReminderData(
             string title,
             string subject,
-            bool groupLogoAvailable,
-            string groupLogo,
-            string firstName,
-            string encodedRequestID,
-            string supportActivity,
-            string distanceInMiles
+            string firstName,            
+            List<NextDayJob> taskList
             )
         {
             Title = title;
             Subject = subject;
-            GroupLogoAvailable = groupLogoAvailable;
-            GroupLogo = groupLogo;
             FirstName = firstName;
-            EncodedRequestID = encodedRequestID;
-            SupportActivity = supportActivity;
-            DistanceInMiles = distanceInMiles;
+            TaskList = taskList;
         }
     }
 }

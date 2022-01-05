@@ -1,0 +1,21 @@
+﻿{
+  "CreateUpdateUnsubscribeGroups": [
+    {
+      "name": "Next day reminder",
+      "description": "Next day reminder"
+    }
+  ],
+  "Templates": [
+    {
+      "name": "NextDayReminder",
+      "subject": "{{{Subject}}}",
+      "generation": "dynamic",
+      "versions": [
+        {
+          "name": "Fifth draft",
+          "subject": "{{{Subject}}}"
+        }
+      ]
+    }
+  ]
+}
