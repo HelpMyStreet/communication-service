@@ -2,9 +2,18 @@
 
 <p>You're receiving this e-mail because you signed up as a volunteer at HelpMyStreet.org.</p>
 
-<p>A <strong>{{SupportActivity}}</strong> request <strong>{{DistanceInMiles}}</strong> miles away request below is due within the next 24 hours. Can you help?</p>
+<p>The following requests are due within the next 24 hours. Can you help?</p>
 
-<p>Please visit your <a href='{{BaseUrl}}/link/r/{{EncodedRequestID}}'>Open Requests</a> page to view more details of the request and accept it if you’re able to help.</p>
+<table>
+    {{#each TaskList}}
+    <tr>
+        <td><img src='{{GroupLogo}}' width="180"></td>
+        <td><a href="{{BaseUrl}}/link/r/{{EncodedRequestID}}"><strong>{{Activity}}</strong> in {{PostCode}} ({{DistanceInMiles}} miles away)</a></td>
+    </tr>
+    {{/each}}
+</table>
+
+<p>Please click <a href="{{BaseUrl}}/account/open-requests">here</a> to view open requests at HelpMyStreet and accept any that you can help with.</p>
 
 <p>If you have any comments or queries, please get in touch by emailing <a href="mailto:support@helpmystreet.org">support@helpmystreet.org</a>.</p>
 

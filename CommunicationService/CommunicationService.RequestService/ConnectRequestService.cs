@@ -15,6 +15,7 @@ using System.Linq.Expressions;
 using System;
 using HelpMyStreet.Utils.Models;
 using System.Collections.Generic;
+using System.Text;
 
 namespace CommunicationService.RequestService
 {
@@ -68,27 +69,19 @@ namespace CommunicationService.RequestService
         }
         public async Task<GetAllJobsByFilterResponse> GetAllJobsByFilter(GetAllJobsByFilterRequest request)
         {
-            string path = $"/api/GetAllJobsByFilter";
-            using (HttpResponseMessage response = await _httpClientWrapper.GetAsync(HttpClientConfigName.RequestService, path, request, CancellationToken.None).ConfigureAwait(false))
+            string json = JsonConvert.SerializeObject(request);
+            StringContent data = new StringContent(json, Encoding.UTF8, "application/json");
+
+            using (HttpResponseMessage response = await _httpClientWrapper.PostAsync(HttpClientConfigName.RequestService, "/api/GetAllJobsByFilter", data, CancellationToken.None))
             {
                 string jsonResponse = await response.Content.ReadAsStringAsync();
-                var getJobsResponse = JsonConvert.DeserializeObject<ResponseWrapper<GetAllJobsByFilterResponse, RequestServiceErrorCode>>(jsonResponse);
-                if (getJobsResponse.HasContent && getJobsResponse.IsSuccessful)
+                var getAllJobsByFilterResponse = JsonConvert.DeserializeObject<ResponseWrapper<GetAllJobsByFilterResponse, RequestServiceErrorCode>>(jsonResponse);
+                if (getAllJobsByFilterResponse.HasContent && getAllJobsByFilterResponse.IsSuccessful)
                 {
-                    return getJobsResponse.Content;
-                }
-                else
-                {
-                    if (response.StatusCode == System.Net.HttpStatusCode.BadRequest)
-                    {
-                        throw new BadRequestException($"GetAllJobsByFilter Returned a bad request");
-                    }
-                    else
-                    {
-                        throw new InternalServerException($"GetAllJobsByFilter Returned {jsonResponse}");
-                    }
+                    return getAllJobsByFilterResponse.Content;
                 }
             }
+            return null;
         }
 
         public async Task<GetJobsByStatusesResponse> GetJobsByStatuses(GetJobsByStatusesRequest getJobsByStatusesRequest)
