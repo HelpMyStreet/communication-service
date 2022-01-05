@@ -7,19 +7,11 @@
 <table>
     {{#each TaskList}}
     <tr>
-        <td></td>
+        <td><img src='{{GroupLogo}}' width="180"></td>
         <td><a href="{{BaseUrl}}/link/r/{{EncodedRequestID}}"><strong>{{Activity}}</strong> in {{PostCode}} ({{DistanceInMiles}} miles away)</a></td>
     </tr>
     {{/each}}
 </table>
-
-<ul>
-    {{#each TaskList}}
-    <li>
-        <a href="{{BaseUrl}}/link/r/{{EncodedRequestID}}"><strong>{{Activity}}</strong> in {{PostCode}} ({{DistanceInMiles}} miles away)</a>
-    </li>
-    {{/each}}
-</ul>
 
 <p>Please click <a href="{{BaseUrl}}/account/open-requests">here</a> to view open requests at HelpMyStreet and accept any that you can help with.</p>
 

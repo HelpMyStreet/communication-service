@@ -9,18 +9,21 @@ namespace CommunicationService.MessageService.Substitution
     public struct NextDayJob
     {
         public NextDayJob(
+            string groupLogo,
             string activity,
             string postCode,            
             string encodedRequestId,
             string distanceInMiles
             )
         {
+            GroupLogo = groupLogo;
             Activity = activity;
             PostCode = postCode;
             EncodedRequestID = encodedRequestId;
             DistanceInMiles = distanceInMiles;
         }
 
+        public string GroupLogo { get; set; }
         public string Activity { get; private set; }
         public string PostCode { get; private set; }
         public string EncodedRequestID { get; private set; }
