@@ -92,61 +92,64 @@
 		<None Update="www\group-logos\hms-sandbox-partnership.png">
 		  <CopyToOutputDirectory>Always</CopyToOutputDirectory>
 		</None>
-		<None Update="www\group-logos\logo\ageconnects-cardiff.png">
+		<None Update="www\group-logos\logo\-1.png">
 		  <CopyToOutputDirectory>Always</CopyToOutputDirectory>
 		</None>
-		<None Update="www\group-logos\logo\ageuk-favershamandsittingbourne.png">
+		<None Update="www\group-logos\logo\-10.png">
 		  <CopyToOutputDirectory>Always</CopyToOutputDirectory>
 		</None>
-		<None Update="www\group-logos\logo\ageuk-midmersey.png">
+		<None Update="www\group-logos\logo\-11.png">
 		  <CopyToOutputDirectory>Always</CopyToOutputDirectory>
 		</None>
-		<None Update="www\group-logos\logo\ageuk-southkentcoast.png">
+		<None Update="www\group-logos\logo\-12.png">
 		  <CopyToOutputDirectory>Always</CopyToOutputDirectory>
 		</None>
-		<None Update="www\group-logos\logo\ageuklsl.png">
+		<None Update="www\group-logos\logo\-13.png">
 		  <CopyToOutputDirectory>Always</CopyToOutputDirectory>
 		</None>
-		<None Update="www\group-logos\logo\ageuknwkent.png">
+		<None Update="www\group-logos\logo\-14.png">
 		  <CopyToOutputDirectory>Always</CopyToOutputDirectory>
 		</None>
-		<None Update="www\group-logos\logo\ageukwirral.png">
+		<None Update="www\group-logos\logo\-17.png">
 		  <CopyToOutputDirectory>Always</CopyToOutputDirectory>
 		</None>
-		<None Update="www\group-logos\logo\apex-pcn-bank-staff.png">
+		<None Update="www\group-logos\logo\-2.png">
 		  <CopyToOutputDirectory>Always</CopyToOutputDirectory>
 		</None>
-		<None Update="www\group-logos\logo\apex-pcn-lincoln.png">
+		<None Update="www\group-logos\logo\-20.png">
 		  <CopyToOutputDirectory>Always</CopyToOutputDirectory>
 		</None>
-		<None Update="www\group-logos\logo\balderton.png">
+		<None Update="www\group-logos\logo\-22.png">
 		  <CopyToOutputDirectory>Always</CopyToOutputDirectory>
 		</None>
-		<None Update="www\group-logos\logo\east-lindsey-pcn.png">
+		<None Update="www\group-logos\logo\-23.png">
 		  <CopyToOutputDirectory>Always</CopyToOutputDirectory>
 		</None>
-		<None Update="www\group-logos\logo\four-counties-pcn.png">
+		<None Update="www\group-logos\logo\-3.png">
 		  <CopyToOutputDirectory>Always</CopyToOutputDirectory>
 		</None>
-		<None Update="www\group-logos\logo\ftlos.png">
+		<None Update="www\group-logos\logo\-31.png">
 		  <CopyToOutputDirectory>Always</CopyToOutputDirectory>
 		</None>
-		<None Update="www\group-logos\logo\lincs-volunteers.png">
+		<None Update="www\group-logos\logo\-32.png">
 		  <CopyToOutputDirectory>Always</CopyToOutputDirectory>
 		</None>
-		<None Update="www\group-logos\logo\north-muskham.png">
+		<None Update="www\group-logos\logo\-33.png">
 		  <CopyToOutputDirectory>Always</CopyToOutputDirectory>
 		</None>
-		<None Update="www\group-logos\logo\ruddington.png">
+		<None Update="www\group-logos\logo\-5.png">
 		  <CopyToOutputDirectory>Always</CopyToOutputDirectory>
 		</None>
-		<None Update="www\group-logos\logo\sandbox.png">
+		<None Update="www\group-logos\logo\-6.png">
 		  <CopyToOutputDirectory>Always</CopyToOutputDirectory>
 		</None>
-		<None Update="www\group-logos\logo\southwell.png">
+		<None Update="www\group-logos\logo\-7.png">
 		  <CopyToOutputDirectory>Always</CopyToOutputDirectory>
 		</None>
-		<None Update="www\group-logos\logo\tankersley.png">
+		<None Update="www\group-logos\logo\-8.png">
+		  <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+		</None>
+		<None Update="www\group-logos\logo\-9.png">
 		  <CopyToOutputDirectory>Always</CopyToOutputDirectory>
 		</None>
 		<None Update="www\hms.jpg">
@@ -161,8 +164,5 @@
 		<None Update="www\group-logos\southwell-partnership.png">
 		  <CopyToOutputDirectory>Always</CopyToOutputDirectory>
 		</None>
-	</ItemGroup>
-	<ItemGroup>
-	  <Folder Include="www\group-logos\logo\" />
 	</ItemGroup>
 </Project>
