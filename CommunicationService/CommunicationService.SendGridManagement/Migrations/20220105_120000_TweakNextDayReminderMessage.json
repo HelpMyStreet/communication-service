@@ -1,0 +1,15 @@
+﻿{
+  "Templates": [
+    {
+      "name": "NextDayReminder",
+      "subject": "{{{Subject}}}",
+      "generation": "dynamic",
+      "versions": [
+        {
+          "name": "final draft 2",
+          "subject": "{{{Subject}}}"
+        }
+      ]
+    }
+  ]
+}

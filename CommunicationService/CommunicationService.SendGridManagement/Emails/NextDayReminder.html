@@ -7,8 +7,8 @@
 <table>
     {{#each TaskList}}
     <tr>
-        <td><img src='{{GroupLogo}}' width="180"></td>
-        <td><a href="{{BaseUrl}}/link/r/{{EncodedRequestID}}"><strong>{{Activity}}</strong> in {{PostCode}} ({{DistanceInMiles}} miles away)</a></td>
+        <td><img src='{{GroupLogo}}' style='height:35px' height="35"></td>
+        <td style='vertical-align:top;padding-left:5px'><a href="{{BaseUrl}}/link/r/{{EncodedRequestID}}"><strong>{{Activity}}</strong> in {{PostCode}}</a> ({{DistanceInMiles}} miles away)</td>
     </tr>
     {{/each}}
 </table>

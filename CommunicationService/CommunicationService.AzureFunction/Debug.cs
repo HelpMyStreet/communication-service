@@ -178,7 +178,7 @@ namespace CommunicationService.AzureFunction
                 var recipients = await message.IdentifyRecipients(req.RecipientUserID, req.JobID, req.GroupID, req.RequestID, req.AdditionalParameters);
                 //recipients = recipients.Take(1).ToList();
 
-                recipients = recipients.Where(x => x.RecipientUserID == 3).ToList();
+                recipients = recipients.Where(x => x.RecipientUserID == 20299).ToList();
 
 
                 //SendMessageRequest smr = recipients.ElementAt(0);
@@ -189,8 +189,8 @@ namespace CommunicationService.AzureFunction
                     if (emailBuildData != null)
                     {
 
-                        emailBuildData.EmailToAddress = "jawwad.mukhtar@gmail.com";
-                        emailBuildData.EmailToName = "Jawwad";
+                        emailBuildData.EmailToAddress = "mike@factor-50.co.uk";
+                        emailBuildData.EmailToName = "Mike";
                         var json2 = JsonConvert.SerializeObject(emailBuildData.BaseDynamicData);
                         _connectSendGridService.SendDynamicEmail(string.Empty, smr.TemplateName, UnsubscribeGroupName.TaskNotification, emailBuildData);
                     }
