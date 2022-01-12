@@ -36,6 +36,7 @@ namespace CommunicationService.MessageService
         private readonly IOptions<EmailConfig> _emailConfig;
         private readonly IConnectAddressService _connectAddressService;
         private readonly ICosmosDbService _cosmosDbService;
+        private readonly IOptions<SendGridConfig> _sendGridConfig;
         private const string CACHEKEY_OPEN_REQUESTS = "openRequests";
         private const string CACHEKEY_OPEN_ADDRESS = "openAddresses";
         private IEqualityComparer<JobSummary> _jobSummaryDedupe_EqualityComparer;
@@ -48,7 +49,14 @@ namespace CommunicationService.MessageService
             return UnsubscribeGroupName.DailyDigests;
         }
 
-        public DailyDigestMessage(IConnectGroupService connectGroupService, IConnectUserService connectUserService, IConnectRequestService connectRequestService, IOptions<EmailConfig> eMailConfig, IConnectAddressService connectAddressService, ICosmosDbService cosmosDbService)
+        public DailyDigestMessage(
+            IConnectGroupService connectGroupService, 
+            IConnectUserService connectUserService, 
+            IConnectRequestService connectRequestService, 
+            IOptions<EmailConfig> eMailConfig, 
+            IConnectAddressService connectAddressService, 
+            ICosmosDbService cosmosDbService,
+            IOptions<SendGridConfig> sendGridConfig)
         {
             _connectGroupService = connectGroupService;
             _connectUserService = connectUserService;
@@ -56,6 +64,7 @@ namespace CommunicationService.MessageService
             _emailConfig = eMailConfig;
             _connectAddressService = connectAddressService;
             _cosmosDbService = cosmosDbService;
+            _sendGridConfig = sendGridConfig;
             _sendMessageRequests = new List<SendMessageRequest>();
             _jobSummaryDedupe_EqualityComparer = new JobBasicDedupe_EqualityComparer();
             _shiftJobDedupe_EqualityComparer = new JobBasicDedupe_EqualityComparer();
@@ -131,6 +140,7 @@ namespace CommunicationService.MessageService
                     string encodedRequestId = HelpMyStreet.Utils.Utils.Base64Utils.Base64Encode(request.RequestID.ToString());
 
                     chosenRequestTaskList.Add(new DailyDigestDataJob(
+                       groupLogo: $"{ _sendGridConfig.Value.BaseCommunicationUrl}/Resources?file=group-logos/logo/{request.ReferringGroupID}.png",
                        activity: request.SupportActivity.FriendlyNameShort(),
                        postCode: request.PostCode.Split(" ").First(),
                        dueDate: request.DueDate.FormatDate(DateTimeFormat.ShortDateFormat),
@@ -146,6 +156,7 @@ namespace CommunicationService.MessageService
                 foreach (var request in otherRequestTasksStats)
                 {
                     otherRequestTaskList.Add(new DailyDigestDataJob(
+                        groupLogo: string.Empty,
                         activity: request.Key.FriendlyNameShort(),
                         postCode: string.Empty, //not used in the other task component of the email
                         dueDate: request.Min.FormatDate(DateTimeFormat.ShortDateFormat),

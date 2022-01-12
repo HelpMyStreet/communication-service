@@ -192,6 +192,10 @@
     <None Remove="Migrations\20211223_120000_TweakNextDayReminderMessage.json" />
     <None Remove="Migrations\20211223_133000_TweakNextDayReminderMessage.json" />
     <None Remove="Migrations\20220105_101500_TweakTwoEmails.json" />
+    <None Remove="Migrations\20220112_150000_TweakNextDayReminderMessage.json" />
+    <None Remove="Migrations\20220112_151000_TweakNextDayReminderMessage.json" />
+    <None Remove="Migrations\20220112_151200_TweakNextDayReminderMessage.json" />
+    <None Remove="Migrations\20220112_154500_DailyDigest.json" />
   </ItemGroup>
 
   <ItemGroup>
@@ -232,7 +236,11 @@
     <EmbeddedResource Include="Emails\RequestorTaskNotification.html" />
     <EmbeddedResource Include="Migrations\20200709_130700_AddRequestorTaskNotification.json" />
     <EmbeddedResource Include="Migrations\20200717_152400_AddUnsubscribeGroupsDailyDigest.json" />
+    <EmbeddedResource Include="Migrations\20220112_154500_DailyDigest.json" />
     <EmbeddedResource Include="Migrations\20211220_122000_CreateInProgressReminderMessage.json" />
+    <EmbeddedResource Include="Migrations\20220112_151200_TweakNextDayReminderMessage.json" />
+    <EmbeddedResource Include="Migrations\20220112_151000_TweakNextDayReminderMessage.json" />
+    <EmbeddedResource Include="Migrations\20220112_150000_TweakNextDayReminderMessage.json" />
     <EmbeddedResource Include="Migrations\20220105_101500_TweakTwoEmails.json" />
     <EmbeddedResource Include="Migrations\20211223_133000_TweakNextDayReminderMessage.json" />
     <EmbeddedResource Include="Migrations\20211223_120000_TweakNextDayReminderMessage.json" />
