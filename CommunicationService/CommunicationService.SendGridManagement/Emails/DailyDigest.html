@@ -13,14 +13,19 @@
 <p><i>There are currently {{ChosenJobs}} open requests in your area that meet the criteria you signed up for:</i></p>
 {{/greaterThan}}
 
-<ul>
+{{#greaterThan ChosenRequestTasks 0}}
+<table cellspacing="5" style='border-collapse:initial;margin-top:25px;margin-bottom:25px'>
     {{#each ChosenRequestTaskList}}
-    <li>
-        <a href="{{BaseUrl}}/link/r/{{EncodedRequestID}}"><strong>{{Activity}}</strong> in {{PostCode}} ({{DistanceInMiles}} miles away) - {{#if Soon}}<span style="color: #ff4e00">{{else}}<span>{{/if}}Due {{DueDate}}</span></a>
-        {{#if Urgent}}<strong> - CRITICAL</strong>{{/if}}
-    </li>
+    <tr>
+        <td><img src='{{GroupLogo}}' style='height:35px;margin-right:25px;' height="35"></td>
+        <td>
+            <a href="{{BaseUrl}}/link/r/{{EncodedRequestID}}"><strong>{{Activity}}</strong> in {{PostCode}} ({{DistanceInMiles}} miles away) - {{#if Soon}}<span style="color: #ff4e00">{{else}}<span>{{/if}}Due {{DueDate}}</span></a>
+            {{#if Urgent}}<strong> - CRITICAL</strong>{{/if}}
+        </td>
+    </tr>
     {{/each}}
-</ul>
+</table>
+{{/greaterThan}}
 
 {{#equals ShiftCount 1 }}
 <p>There is currently 1 open shift in your area:</p>
