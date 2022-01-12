@@ -32,6 +32,8 @@ namespace CommunicationService.UnitTests.SendGridService
         private Mock<IOptions<EmailConfig>> _emailConfig;
         private Mock<IConnectAddressService> _addressService;
         private Mock<ICosmosDbService> _cosmosDbService;
+        private Mock<IOptions<SendGridConfig>> _sendGridConfig;
+        private SendGridConfig _sendGridConfigSettings;
         private EmailConfig _emailConfigSettings;
         private GetUsersResponse _getUsersResponse;
         private GetUserGroupsResponse _getUserGroupsResponse;
@@ -52,6 +54,7 @@ namespace CommunicationService.UnitTests.SendGridService
             SetupEmailConfig();
             SetupAddressService();
             SetupCosmosDBService();
+            SetupSendGridConfig();
 
             _classUnderTest = new DailyDigestMessage(
                 _groupService.Object,
@@ -59,7 +62,9 @@ namespace CommunicationService.UnitTests.SendGridService
                 _requestService.Object,
                 _emailConfig.Object,
                 _addressService.Object,
-                _cosmosDbService.Object) ;
+                _cosmosDbService.Object,
+                _sendGridConfig.Object
+                );
         }
 
         private void SetupGroupService()
@@ -101,6 +106,17 @@ namespace CommunicationService.UnitTests.SendGridService
 
             _emailConfig = new Mock<IOptions<EmailConfig>>();
             _emailConfig.SetupGet(x => x.Value).Returns(_emailConfigSettings);
+        }
+
+        private void SetupSendGridConfig()
+        {
+            _sendGridConfigSettings = new SendGridConfig
+            {
+                BaseCommunicationUrl = string.Empty
+            };
+
+            _sendGridConfig = new Mock<IOptions<SendGridConfig>>();
+            _sendGridConfig.SetupGet(x => x.Value).Returns(_sendGridConfigSettings);
         }
 
         private void SetupAddressService()
