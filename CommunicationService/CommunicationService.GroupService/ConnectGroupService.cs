@@ -240,6 +240,6 @@ namespace CommunicationService.GroupService
                     }
                 }
             }, $"{CACHE_KEY_PREFIX}-group-{groupID}-sa-{(int)supportActivity}", RefreshBehaviour.DontWaitForFreshData, cancellationToken);
-        }
+        }        
     }
 }

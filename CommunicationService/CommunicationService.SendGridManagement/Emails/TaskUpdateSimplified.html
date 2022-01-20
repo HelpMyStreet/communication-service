@@ -1,6 +1,6 @@
 ﻿<p>Hi {{Recipient}},</p>
 
-<p>We just wanted to let you know that your request has been updated by a {{UpdatedBy}}. Take a look at the latest details below.</p>
+<p>We just wanted to let you know that your request has been updated {{UpdatedBy}}. Take a look at the latest details below.</p>
 
 {{#if ShowJobUrl}}
 <p>To view the request on our website, <a href='{{{JobUrl}}}'>click here</a>.</p>
@@ -39,7 +39,7 @@
 {{/if}}
 
 {{#if StatusNowCancelled}}
-<p>This request has been cancelled. It may be because the help is no longer needed, or because the help cannot be provided.</p>
+<p>This request has been cancelled. It may be because the help is no longer needed, or because the help cannot be provided. If help is still required and the request is suitable for a volunteer please submit a new request for help.</p>
 {{/if}}
 
 {{{FeedbackForm}}}

@@ -1,0 +1,21 @@
+﻿{
+  "CreateUpdateUnsubscribeGroups": [
+    {
+      "name": "In progress reminder",
+      "description": "In progress reminder"
+    }
+  ],
+  "Templates": [
+    {
+      "name": "InProgressReminder",
+      "subject": "{{{Subject}}}",
+      "generation": "dynamic",
+      "versions": [
+        {
+          "name": "First draft",
+          "subject": "{{{Subject}}}"
+        }
+      ]
+    }
+  ]
+}
