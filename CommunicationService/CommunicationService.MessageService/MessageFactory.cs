@@ -30,14 +30,14 @@ namespace CommunicationService.MessageService
         private readonly IOptions<LinkConfig> _linkConfig;
         private readonly ILinkRepository _linkRepository;
 
-        public MessageFactory(IConnectUserService connectUserService, 
-            IConnectRequestService connectRequestService, 
-            IConnectGroupService connectGroupService, 
-            IQueueClient queueClient, 
-            ICosmosDbService cosmosDbService, 
-            IOptions<EmailConfig> emailConfig, 
-            IJobFilteringService jobFilteringService, 
-            IConnectAddressService connectAddressService, 
+        public MessageFactory(IConnectUserService connectUserService,
+            IConnectRequestService connectRequestService,
+            IConnectGroupService connectGroupService,
+            IQueueClient queueClient,
+            ICosmosDbService cosmosDbService,
+            IOptions<EmailConfig> emailConfig,
+            IJobFilteringService jobFilteringService,
+            IConnectAddressService connectAddressService,
             IOptions<SendGridConfig> sendGridConfig,
             IOptions<LinkConfig> linkConfig,
             ILinkRepository linkRepository)
@@ -77,7 +77,7 @@ namespace CommunicationService.MessageService
                 case CommunicationJobTypes.SendTaskStateChangeUpdate:
                     return new TaskUpdateSimplifiedMessage(_connectRequestService, _connectUserService, _connectGroupService, _linkRepository, _linkConfig, _sendGridConfig, _connectAddressService);
                 case CommunicationJobTypes.SendOpenTaskDigest:
-                    return new DailyDigestMessage(_connectGroupService, _connectUserService, _connectRequestService, _emailConfig,_connectAddressService, _cosmosDbService);
+                    return new DailyDigestMessage(_connectGroupService, _connectUserService, _connectRequestService, _emailConfig,_connectAddressService, _cosmosDbService, _sendGridConfig);
                 case CommunicationJobTypes.SendTaskReminder:
                     return new TaskReminderMessage(_connectRequestService, _connectUserService, _cosmosDbService);
                 case CommunicationJobTypes.SendShiftReminder:
@@ -96,6 +96,10 @@ namespace CommunicationService.MessageService
                     return new GroupWelcomeMessage(_connectGroupService, _connectUserService, _sendGridConfig);
                 case CommunicationJobTypes.NewUserNotification:
                     return new NewUserNotificationMessage(_connectGroupService, _connectUserService, _sendGridConfig);
+                case CommunicationJobTypes.InProgressReminder:
+                    return new InProgressReminderMessage(_connectRequestService, _connectUserService, _cosmosDbService);
+                case CommunicationJobTypes.JobsDueTomorrow:
+                    return new NextDayReminderMessage(_connectRequestService, _connectUserService, _connectGroupService, _sendGridConfig);
                 default:                   
                     throw new Exception("Unknown Email Type");
             }

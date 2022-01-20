@@ -21,6 +21,8 @@ namespace CommunicationService.MessageService
         public const string NewTaskPendingApprovalNotification = "NewTaskPendingApprovalNotification";
         public const string TaskDetail = "TaskDetail";
         public const string NewUserNotification = "NewUserNotification";
+        public const string InProgressReminder = "InProgressReminder";
+        public const string NextDayReminder = "NextDayReminder";
     }
 }
 

@@ -73,10 +73,10 @@ namespace CommunicationService.AzureFunction
                 var request = JsonConvert.SerializeObject(req);
                 log.LogInformation($"RequestCommunicationRequest {request}");
 
-                TaskNotificationMessage message = new TaskNotificationMessage(
-                    _connectUserService,
-                    _connectRequestService,
-                    _connectGroupService);
+                //TaskNotificationMessage message = new TaskNotificationMessage(
+                //    _connectUserService,
+                //    _connectRequestService,
+                //    _connectGroupService);
 
                 //TaskDetailMessage message = new TaskDetailMessage(
                 //    _connectGroupService,
@@ -94,6 +94,19 @@ namespace CommunicationService.AzureFunction
                 //    _linkConfig,
                 //    _sendGridConfig,
                 //    _connectAddressService);
+
+                //InProgressReminderMessage message = new InProgressReminderMessage(
+                //    _connectRequestService,
+                //    _connectUserService,
+                //    _cosmosDbService
+                //    );
+
+                NextDayReminderMessage message = new NextDayReminderMessage(
+                   _connectRequestService,
+                   _connectUserService,                   
+                    _connectGroupService,
+                   _sendGridConfig
+                    );
 
                 //NewCredentialsMessage message = new NewCredentialsMessage(
                 //    _connectUserService,
@@ -163,9 +176,9 @@ namespace CommunicationService.AzureFunction
                 //GroupWelcomeMessage message = new GroupWelcomeMessage(_connectGroupService, _connectUserService, _sendGridConfig);
 
                 var recipients = await message.IdentifyRecipients(req.RecipientUserID, req.JobID, req.GroupID, req.RequestID, req.AdditionalParameters);
-                recipients = recipients.Take(1).ToList();
+                //recipients = recipients.Take(1).ToList();
 
-                //recipients = recipients.Where(x => x.RecipientUserID == 20232).ToList();
+                recipients = recipients.Where(x => x.RecipientUserID == 3).ToList();
 
 
                 //SendMessageRequest smr = recipients.ElementAt(0);
@@ -176,8 +189,8 @@ namespace CommunicationService.AzureFunction
                     if (emailBuildData != null)
                     {
 
-                        //emailBuildData.EmailToAddress = "jawwad@factor-50.co.uk";
-                        //emailBuildData.EmailToName = "Jawwad";
+                        emailBuildData.EmailToAddress = "jawwad.mukhtar@gmail.com";
+                        emailBuildData.EmailToName = "Jawwad";
                         var json2 = JsonConvert.SerializeObject(emailBuildData.BaseDynamicData);
                         _connectSendGridService.SendDynamicEmail(string.Empty, smr.TemplateName, UnsubscribeGroupName.TaskNotification, emailBuildData);
                     }
