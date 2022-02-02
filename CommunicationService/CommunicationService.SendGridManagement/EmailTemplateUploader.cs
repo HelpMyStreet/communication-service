@@ -46,6 +46,43 @@ namespace CommunicationService.SendGridManagement
             }
         }
 
+        public async Task EnsureOnlyMaxTwoVersionsOfEmailsExist()
+        {
+            var templates = await GetTemplatesAsync();
+
+            List<(string templateName, string template_id, string version_name, string version_id)> emailVersionsToDelete = new List<(string templateName, string template_id, string version_name, string version_id)>();
+
+            templates.templates.Where(x=> x.versions.Count()>2).ToList()
+                .ForEach(item =>
+                {
+                    var itemsToNotDelete = item.versions.OrderByDescending(o => o.updated_at)
+                        .Take(2);
+
+                    item.versions.Except(itemsToNotDelete)
+                        .ToList()
+                        .ForEach(async version => 
+                        {
+                            emailVersionsToDelete.Add((item.name, version.template_id, version.name, version.id));
+                            bool success = await DeleteTemplateVersion(version.template_id, version.id);
+                        });
+
+                });
+        }
+
+        private async Task<bool> DeleteTemplateVersion(string template_id, string version_id)
+        {
+            Response response = _sendGridClient.RequestAsync(SendGridClient.Method.DELETE, null, null, $"/templates/{template_id}/versions/{version_id}").Result;
+
+            if (response != null && response.StatusCode == HttpStatusCode.NoContent)
+            {
+                return true;
+            }
+            else
+            {
+                throw new Exception("Unable to update unsubscribe group");
+            }
+        }
+
         private string ReadFile(string resourceName)
         {
             var assembly = Assembly.GetExecutingAssembly();
@@ -146,7 +183,7 @@ namespace CommunicationService.SendGridManagement
             return html;
         }
 
-        private async Task<string> GetTemplateId(string templateName)
+        private async Task<Templates> GetTemplatesAsync()
         {
             var queryParams = @"{
                 'generations': 'dynamic'
@@ -157,26 +194,33 @@ namespace CommunicationService.SendGridManagement
             {
                 string body = response.Body.ReadAsStringAsync().Result;
                 var templates = JsonConvert.DeserializeObject<Templates>(body);
-                if (templates != null && templates.templates.Length > 0)
+
+                if(templates==null && templates.templates.Length==0)
                 {
-                    var template = templates.templates.Where(x => x.name == templateName).FirstOrDefault();
-                    if (template != null)
-                    {
-                        return template.id;
-                    }
-                    else
-                    {
-                        throw new UnknownTemplateException($"{templateName} cannot be found in templates");
-                    }
+                    throw new UnknownTemplateException("No templates found");
                 }
                 else
                 {
-                    throw new UnknownTemplateException("No templates found");
+                    return templates;
                 }
             }
             else
             {
-                throw new SendGridException();
+                throw new SendGridException($"Unable to retrieve templates. StatusCode:{ response.StatusCode}");
+            }
+        }
+
+        private async Task<string> GetTemplateId(string templateName)
+        {
+            var templates = await GetTemplatesAsync();
+            var template = templates.templates.Where(x => x.name == templateName).FirstOrDefault();
+            if (template != null)
+            {
+                return template.id;
+            }
+            else
+            {
+                throw new UnknownTemplateException($"{templateName} cannot be found in templates");
             }
         }
 
