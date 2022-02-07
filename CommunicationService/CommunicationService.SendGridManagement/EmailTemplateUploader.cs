@@ -14,13 +14,14 @@ using CommunicationService.Core.Exception;
 using System.Reflection;
 using System.Security;
 using System.Text.RegularExpressions;
+using Microsoft.Extensions.Logging;
 
 namespace CommunicationService.SendGridManagement
 {
     public class EmailTemplateUploader
     {
         private readonly ICosmosDbService _cosmosDbService;
-        private readonly ISendGridClient _sendGridClient;
+        private readonly ISendGridClient _sendGridClient;        
 
         public EmailTemplateUploader(ISendGridClient sendGridClient, ICosmosDbService cosmosDbService)
         {
@@ -49,21 +50,20 @@ namespace CommunicationService.SendGridManagement
         public async Task EnsureOnlyMaxTwoVersionsOfEmailsExist()
         {
             var templates = await GetTemplatesAsync();
-
-            List<(string templateName, string template_id, string version_name, string version_id)> emailVersionsToDelete = new List<(string templateName, string template_id, string version_name, string version_id)>();
-
             templates.templates.Where(x=> x.versions.Count()>2).ToList()
                 .ForEach(item =>
                 {
                     var itemsToNotDelete = item.versions.OrderByDescending(o => o.updated_at)
-                        .Take(2);
+                        .Take(3);
 
                     item.versions.Except(itemsToNotDelete)
                         .ToList()
                         .ForEach(async version => 
                         {
-                            emailVersionsToDelete.Add((item.name, version.template_id, version.name, version.id));
-                            bool success = await DeleteTemplateVersion(version.template_id, version.id);
+                            if (version.active == 0) //Only attempt to delete versions that are not set to active
+                            {
+                                bool success = await DeleteTemplateVersion(version.template_id, version.id);
+                            }
                         });
 
                 });
@@ -79,7 +79,7 @@ namespace CommunicationService.SendGridManagement
             }
             else
             {
-                throw new Exception("Unable to update unsubscribe group");
+                throw new Exception($"Unable to delete template version template_id:{template_id} and version_id:{version_id} StatusCode:{ response.StatusCode}");
             }
         }
 
@@ -195,7 +195,7 @@ namespace CommunicationService.SendGridManagement
                 string body = response.Body.ReadAsStringAsync().Result;
                 var templates = JsonConvert.DeserializeObject<Templates>(body);
 
-                if(templates==null && templates.templates.Length==0)
+                if(templates==null || templates.templates.Length==0)
                 {
                     throw new UnknownTemplateException("No templates found");
                 }
@@ -251,7 +251,7 @@ namespace CommunicationService.SendGridManagement
             }
             else
             {
-                throw new SendGridException("CallingGetGroupId");
+                throw new SendGridException($"Calling GetGroupId { response.StatusCode }");
             }
         }
 
@@ -277,7 +277,7 @@ namespace CommunicationService.SendGridManagement
             }
             else
             {
-                throw new Exception("Invalid response from create group");
+                throw new Exception($"Invalid response from create group { unsubscribeGroups.name}");
             }
         }
 
@@ -344,7 +344,7 @@ namespace CommunicationService.SendGridManagement
             }
             else
             {
-                throw new Exception("Unable to update unsubscribe group");
+                throw new Exception($"Unable to update unsubscribe group {unsubscribeGroups.name}");
             }
         }
 
@@ -358,7 +358,7 @@ namespace CommunicationService.SendGridManagement
             }
             else
             {
-                throw new Exception("Unable to update unsubscribe group");
+                throw new Exception($"Unable to update unsubscribe group {groupId}");
             }
         }
     }
