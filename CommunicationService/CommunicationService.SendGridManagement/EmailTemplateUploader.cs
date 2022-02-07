@@ -62,7 +62,7 @@ namespace CommunicationService.SendGridManagement
                         {
                             if (version.active == 0) //Only attempt to delete versions that are not set to active
                             {
-                                bool success = await DeleteTemplateVersion(version.template_id, version.id);
+                                await DeleteTemplateVersion(version.template_id, version.id);
                             }
                         });
 
