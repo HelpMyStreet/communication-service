@@ -35,46 +35,6 @@ namespace CommunicationService.UnitTests.SendGridManagement
         private void SetupSendGridClient()
         {
             _sendGridClient = new Mock<ISendGridClient>();
-
-            //_templates = new Templates();            
-            //_templates.templates = new Template[1]
-            //{
-            //    new Template()
-            //    {
-            //        id = "testTemplateId",
-            //        name = "KnownTemplate",
-            //        versions = new Core.Domains.SendGrid.Version[]
-            //        {
-            //            new Core.Domains.SendGrid.Version()
-            //            {
-            //                template_id = "testTemplateId",
-            //                active = 1,
-            //                updated_at = "2022-02-01"
-            //            },
-            //            new Core.Domains.SendGrid.Version()
-            //            {
-            //                template_id = "testTemplateId",
-            //                active = 0,
-            //                updated_at = "2022-01-31"
-            //            },
-            //            new Core.Domains.SendGrid.Version()
-            //            {
-            //                template_id = "testTemplateId",
-            //                active = 0,
-            //                updated_at = "2022-01-30"
-            //            },
-            //            new Core.Domains.SendGrid.Version()
-            //            {
-            //                template_id = "testTemplateId",
-            //                active = 0,
-            //                updated_at = "2022-01-29"
-            //            }
-            //        }
-            //    }
-            //};
-            //string responseBody = JsonConvert.SerializeObject(_templates);
-            //_response = Task.FromResult(new Response(System.Net.HttpStatusCode.OK, new StringContent(responseBody), null));
-
             _sendGridClient.Setup(x => x.RequestAsync(
                 SendGridClient.Method.GET,
                 It.IsAny<string>(),
@@ -111,13 +71,6 @@ namespace CommunicationService.UnitTests.SendGridManagement
 
             _classUnderTest = new EmailTemplateUploader(_sendGridClient.Object,_cosmosDbService.Object);
         }
-
-        //[Test]
-        //public async Task GetTemplateId_ReturnsID_WhenTemplateNameIsKnown()
-        //{
-        //    _history = new List<MigrationHistory>();
-        //    await _classUnderTest.Migrate();
-        //}
 
         [Test]
         public async Task WhenMoreThanThreeVersionsExist_DeleteOtherInactiveTemplates()
