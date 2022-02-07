@@ -25,10 +25,10 @@ namespace CommunicationService.UnitTests.SendGridManagement
     {
         private Mock<ISendGridClient> _sendGridClient;
         private Mock<ICosmosDbService> _cosmosDbService;
-        private List<MigrationHistory> _history;
-        private string[] _directoryFiles;
-        private string _file;
+        private List<MigrationHistory> _history; 
         private Task<Response> _response;
+        private Task<Response> _deleteResponse;
+        private Templates _templates;
 
         private EmailTemplateUploader _classUnderTest;
 
@@ -36,26 +36,62 @@ namespace CommunicationService.UnitTests.SendGridManagement
         {
             _sendGridClient = new Mock<ISendGridClient>();
 
-            Templates templates = new Templates();
-            Template template = new Template()
-            {
-                id = "testTemplateId",
-                name = "KnownTemplate"
-            };
-            templates.templates = new Template[1]
-            {
-                template
-            };
-            string responseBody = JsonConvert.SerializeObject(templates);
-            _response = Task.FromResult(new Response(System.Net.HttpStatusCode.Created, new StringContent(responseBody), null));
+            //_templates = new Templates();            
+            //_templates.templates = new Template[1]
+            //{
+            //    new Template()
+            //    {
+            //        id = "testTemplateId",
+            //        name = "KnownTemplate",
+            //        versions = new Core.Domains.SendGrid.Version[]
+            //        {
+            //            new Core.Domains.SendGrid.Version()
+            //            {
+            //                template_id = "testTemplateId",
+            //                active = 1,
+            //                updated_at = "2022-02-01"
+            //            },
+            //            new Core.Domains.SendGrid.Version()
+            //            {
+            //                template_id = "testTemplateId",
+            //                active = 0,
+            //                updated_at = "2022-01-31"
+            //            },
+            //            new Core.Domains.SendGrid.Version()
+            //            {
+            //                template_id = "testTemplateId",
+            //                active = 0,
+            //                updated_at = "2022-01-30"
+            //            },
+            //            new Core.Domains.SendGrid.Version()
+            //            {
+            //                template_id = "testTemplateId",
+            //                active = 0,
+            //                updated_at = "2022-01-29"
+            //            }
+            //        }
+            //    }
+            //};
+            //string responseBody = JsonConvert.SerializeObject(_templates);
+            //_response = Task.FromResult(new Response(System.Net.HttpStatusCode.OK, new StringContent(responseBody), null));
 
             _sendGridClient.Setup(x => x.RequestAsync(
-                It.IsAny<SendGridClient.Method>(),
+                SendGridClient.Method.GET,
                 It.IsAny<string>(),
                 It.IsAny<string>(),
                 It.IsAny<string>(),
                 It.IsAny<CancellationToken>()))
                   .Returns(() => _response
+                  );
+
+            _deleteResponse = Task.FromResult(new Response(System.Net.HttpStatusCode.NoContent, new StringContent(string.Empty), null));
+            _sendGridClient.Setup(x => x.RequestAsync(
+                SendGridClient.Method.DELETE,
+                It.IsAny<string>(),
+                It.IsAny<string>(),
+                It.IsAny<string>(),
+                It.IsAny<CancellationToken>()))
+                  .Returns(() => _deleteResponse
                   );
 
         }
@@ -82,5 +118,158 @@ namespace CommunicationService.UnitTests.SendGridManagement
         //    _history = new List<MigrationHistory>();
         //    await _classUnderTest.Migrate();
         //}
+
+        [Test]
+        public async Task WhenMoreThanThreeVersionsExist_DeleteOtherInactiveTemplates()
+        {
+            string templateId = "testTemplateId";
+            string templateName = "KnownTemplate";
+            _templates = new Templates();
+            _templates.templates = new Template[1]
+            {
+                new Template()
+                {
+                    id = templateId,
+                    name = templateName,
+                    versions = new Core.Domains.SendGrid.Version[]
+                    {
+                        new Core.Domains.SendGrid.Version()
+                        {
+                            template_id = templateId,
+                            active = 1,
+                            updated_at = "2022-02-01"
+                        },
+                        new Core.Domains.SendGrid.Version()
+                        {
+                            template_id = templateId,
+                            active = 0,
+                            updated_at = "2022-01-31"
+                        },
+                        new Core.Domains.SendGrid.Version()
+                        {
+                            template_id = templateId,
+                            active = 0,
+                            updated_at = "2022-01-30"
+                        },
+                        new Core.Domains.SendGrid.Version()
+                        {
+                            template_id = templateId,
+                            active = 0,
+                            updated_at = "2022-01-29"
+                        },
+                        new Core.Domains.SendGrid.Version()
+                        {
+                            template_id = "testTemplateId",
+                            active = 0,
+                            updated_at = "2022-01-28"
+                        }
+                    }
+                }
+            };
+
+            string responseBody = JsonConvert.SerializeObject(_templates);
+            _response = Task.FromResult(new Response(System.Net.HttpStatusCode.OK, new StringContent(responseBody), null));
+
+            await _classUnderTest.EnsureOnlyMaxTwoVersionsOfEmailsExist();
+            _sendGridClient.Verify(x => x.RequestAsync(BaseClient.Method.DELETE, It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<CancellationToken>()), Times.Exactly(2));                
+        }
+
+        [Test]
+        public async Task WhenLessThanThreeVersionsExist_DoNotDeleteAnyVersions()
+        {
+            string templateId = "testTemplateId";
+            string templateName = "KnownTemplate";
+            _templates = new Templates();
+            _templates.templates = new Template[1]
+            {
+                new Template()
+                {
+                    id = templateId,
+                    name = templateName,
+                    versions = new Core.Domains.SendGrid.Version[]
+                    {
+                        new Core.Domains.SendGrid.Version()
+                        {
+                            template_id = templateId,
+                            active = 1,
+                            updated_at = "2022-02-01"
+                        },
+                        new Core.Domains.SendGrid.Version()
+                        {
+                            template_id = templateId,
+                            active = 0,
+                            updated_at = "2022-01-31"
+                        },
+                        new Core.Domains.SendGrid.Version()
+                        {
+                            template_id = templateId,
+                            active = 0,
+                            updated_at = "2022-01-30"
+                        }
+                    }
+                }
+            };
+
+            string responseBody = JsonConvert.SerializeObject(_templates);
+            _response = Task.FromResult(new Response(System.Net.HttpStatusCode.OK, new StringContent(responseBody), null));
+
+            await _classUnderTest.EnsureOnlyMaxTwoVersionsOfEmailsExist();
+            _sendGridClient.Verify(x => x.RequestAsync(BaseClient.Method.DELETE, It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<CancellationToken>()), Times.Exactly(0));
+        }
+
+        [Test]
+        public async Task WhenMoreThanThreeVersionsExistButAllAreActive_DoNotDeleteAnyVersions()
+        {
+            string templateId = "testTemplateId";
+            string templateName = "KnownTemplate";
+            _templates = new Templates();
+            _templates.templates = new Template[1]
+            {
+                new Template()
+                {
+                    id = templateId,
+                    name = templateName,
+                    versions = new Core.Domains.SendGrid.Version[]
+                    {
+                        new Core.Domains.SendGrid.Version()
+                        {
+                            template_id = templateId,
+                            active = 1,
+                            updated_at = "2022-02-01"
+                        },
+                        new Core.Domains.SendGrid.Version()
+                        {
+                            template_id = templateId,
+                            active = 1,
+                            updated_at = "2022-01-31"
+                        },
+                        new Core.Domains.SendGrid.Version()
+                        {
+                            template_id = templateId,
+                            active = 1,
+                            updated_at = "2022-01-30"
+                        },                        
+                        new Core.Domains.SendGrid.Version()
+                        {
+                            template_id = templateId,
+                            active = 1,
+                            updated_at = "2022-01-29"
+                        },
+                        new Core.Domains.SendGrid.Version()
+                        {
+                            template_id = templateId,
+                            active = 1,
+                            updated_at = "2022-01-28"
+                        }
+                    }
+                }
+            };
+
+            string responseBody = JsonConvert.SerializeObject(_templates);
+            _response = Task.FromResult(new Response(System.Net.HttpStatusCode.OK, new StringContent(responseBody), null));
+
+            await _classUnderTest.EnsureOnlyMaxTwoVersionsOfEmailsExist();
+            _sendGridClient.Verify(x => x.RequestAsync(BaseClient.Method.DELETE, It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<CancellationToken>()), Times.Exactly(0));
+        }
     }
 }
