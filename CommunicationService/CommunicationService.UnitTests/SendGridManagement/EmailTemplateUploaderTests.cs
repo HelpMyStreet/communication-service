@@ -90,31 +90,36 @@ namespace CommunicationService.UnitTests.SendGridManagement
                         {
                             template_id = templateId,
                             active = 1,
-                            updated_at = "2022-02-01"
+                            updated_at = "2022-02-01",
+                            id = "1"
                         },
                         new Core.Domains.SendGrid.Version()
                         {
                             template_id = templateId,
                             active = 0,
-                            updated_at = "2022-01-31"
+                            updated_at = "2022-01-31",
+                            id = "2"
                         },
                         new Core.Domains.SendGrid.Version()
                         {
                             template_id = templateId,
                             active = 0,
-                            updated_at = "2022-01-30"
+                            updated_at = "2022-01-30",
+                            id = "3"
                         },
                         new Core.Domains.SendGrid.Version()
                         {
                             template_id = templateId,
                             active = 0,
-                            updated_at = "2022-01-29"
+                            updated_at = "2022-01-29",
+                            id = "4"
                         },
                         new Core.Domains.SendGrid.Version()
                         {
                             template_id = "testTemplateId",
                             active = 0,
-                            updated_at = "2022-01-28"
+                            updated_at = "2022-01-28",
+                            id = "5"
                         }
                     }
                 }
@@ -124,7 +129,11 @@ namespace CommunicationService.UnitTests.SendGridManagement
             _response = Task.FromResult(new Response(System.Net.HttpStatusCode.OK, new StringContent(responseBody), null));
 
             await _classUnderTest.EnsureOnlyMaxTwoVersionsOfEmailsExist();
-            _sendGridClient.Verify(x => x.RequestAsync(BaseClient.Method.DELETE, It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<CancellationToken>()), Times.Exactly(2));                
+            _sendGridClient.Verify(x => x.RequestAsync(BaseClient.Method.DELETE, It.IsAny<string>(), It.IsAny<string>(), $"/templates/{templateId}/versions/1", It.IsAny<CancellationToken>()), Times.Exactly(0));
+            _sendGridClient.Verify(x => x.RequestAsync(BaseClient.Method.DELETE, It.IsAny<string>(), It.IsAny<string>(), $"/templates/{templateId}/versions/2", It.IsAny<CancellationToken>()), Times.Exactly(0));
+            _sendGridClient.Verify(x => x.RequestAsync(BaseClient.Method.DELETE, It.IsAny<string>(), It.IsAny<string>(), $"/templates/{templateId}/versions/3", It.IsAny<CancellationToken>()), Times.Exactly(0));
+            _sendGridClient.Verify(x => x.RequestAsync(BaseClient.Method.DELETE, It.IsAny<string>(), It.IsAny<string>(), $"/templates/{templateId}/versions/4", It.IsAny<CancellationToken>()), Times.Exactly(1));
+            _sendGridClient.Verify(x => x.RequestAsync(BaseClient.Method.DELETE, It.IsAny<string>(), It.IsAny<string>(), $"/templates/{templateId}/versions/5", It.IsAny<CancellationToken>()), Times.Exactly(1));
         }
 
         [Test]
