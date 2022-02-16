@@ -9,6 +9,7 @@ namespace CommunicationService.MessageService.Substitution
     public struct DailyDigestDataJob
     {
         public DailyDigestDataJob(
+            string groupLogo,
             string activity,
             string postCode,
             string dueDate,
@@ -20,6 +21,7 @@ namespace CommunicationService.MessageService.Substitution
             string distanceInMiles
             )
         {
+            GroupLogo = groupLogo;
             Activity = activity;
             PostCode = postCode;
             DueDate = dueDate;
@@ -31,6 +33,7 @@ namespace CommunicationService.MessageService.Substitution
             DistanceInMiles = distanceInMiles;
         }
 
+        public string GroupLogo { get; set; }
         public string Activity { get; private set; }
         public string PostCode { get; private set; }
         public string DueDate { get; private set; }
