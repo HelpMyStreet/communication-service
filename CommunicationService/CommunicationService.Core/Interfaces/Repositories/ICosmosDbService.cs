@@ -1,4 +1,5 @@
 ﻿using CommunicationService.Core.Domains;
+using HelpMyStreet.Contracts.CommunicationService.Response;
 using System.Collections.Generic;
 using System.Dynamic;
 using System.Threading.Tasks;
@@ -7,6 +8,7 @@ namespace CommunicationService.Core.Interfaces.Repositories
 {
     public interface ICosmosDbService
     {
+        Task<List<EmailHistoryDetail>> GetEmailHistoryDetails(int requestId);
         Task<IEnumerable<object>> GetItemsAsync(string query);
         Task<object> GetItemAsync(string id);
         Task AddItemAsync(ExpandoObject item);

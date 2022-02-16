@@ -1,6 +1,7 @@
 ﻿using CommunicationService.Core;
 using CommunicationService.Core.Domains;
 using CommunicationService.Core.Interfaces.Repositories;
+using HelpMyStreet.Contracts.CommunicationService.Response;
 using Microsoft.Azure.Cosmos;
 using System;
 using System.Collections.Generic;
@@ -170,6 +171,44 @@ namespace CommunicationService.Repo
             }
 
             return false;
+        }
+
+        public async Task<List<EmailHistoryDetail>> GetEmailHistoryDetails(int requestId)
+        {
+            List<EmailHistoryDetail> results = new List<EmailHistoryDetail>();
+            FeedIterator<EmailHistoryDetail> query;
+            string queryString;
+            
+            queryString = $"SELECT count(1) as RecipientCount, c.TemplateName as EmailType, left(udf.convertTime(c._ts),10) as DateSent " +
+                $"FROM c " +
+                $"WHERE c.event='delivered' and c.RequestId = '{requestId}' " +
+                $"GROUP BY c.TemplateName, left(udf.convertTime(c._ts), 10)";
+            query = this._container.GetItemQueryIterator<EmailHistoryDetail>(new QueryDefinition(queryString));
+            
+            while (query.HasMoreResults)
+            {
+                var response = await query.ReadNextAsync();
+                results.AddRange(response.ToList());
+            }
+
+            queryString = $"SELECT count(1) as RecipientCount, c.TemplateName as EmailType, left(udf.convertTime(c._ts),10) as DateSent " +
+                $"FROM c join id in c.ReferencedJobs " +
+                $"WHERE c.event='delivered' and id.R = {requestId} " +
+                $"GROUP BY c.TemplateName, left(udf.convertTime(c._ts), 10)";
+
+            query = this._container.GetItemQueryIterator<EmailHistoryDetail>(new QueryDefinition(queryString));
+
+            while (query.HasMoreResults)
+            {
+                var response = await query.ReadNextAsync();
+                results.AddRange(response.ToList());
+            }
+
+            results = results.GroupBy(g => new { g.DateSent, g.EmailType, g.RecipientCount })
+                .Select(s => s.FirstOrDefault())
+                .ToList();
+            
+            return results;
         }
     }
 }

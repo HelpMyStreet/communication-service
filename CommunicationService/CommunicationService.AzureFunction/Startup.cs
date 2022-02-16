@@ -143,6 +143,7 @@ namespace CommunicationService.AzureFunction
 
 
             emailTemplateUploader.Migrate().ConfigureAwait(false);
+            emailTemplateUploader.EnsureOnlyMaxTwoVersionsOfEmailsExist().ConfigureAwait(false);
         }
 
         private static CosmosDbService InitializeCosmosClientInstance(CosmosConfig cosmosConfig)
