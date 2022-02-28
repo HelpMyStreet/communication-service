@@ -334,7 +334,7 @@ namespace CommunicationService.MessageService
                 lastUpdatedBy = changedByRole == RequestRoles.GroupAdmin ? "by a group administrator" : "by a volunteer";
             }
 
-            string supportActivity = job.JobSummary.SupportActivity.FriendlyNameShort();
+            string supportActivity = job.JobSummary.GetSupportActivityName;
 
             bool showJobUrl = emailRecipientRequestRole == RequestRoles.Volunteer 
                 || emailRecipientRequestRole == RequestRoles.GroupAdmin

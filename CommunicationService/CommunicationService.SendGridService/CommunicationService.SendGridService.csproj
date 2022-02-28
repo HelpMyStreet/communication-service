@@ -5,8 +5,8 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="HelpMyStreet.CoreV3.Cache" Version="1.1.866" />
-    <PackageReference Include="HelpMyStreet.CoreV3.Contracts" Version="1.1.866" />
+    <PackageReference Include="HelpMyStreet.CoreV3.Cache" Version="1.1.903" />
+    <PackageReference Include="HelpMyStreet.CoreV3.Contracts" Version="1.1.903" />
     <PackageReference Include="SendGrid" Version="9.21.0" />
   </ItemGroup>
 
