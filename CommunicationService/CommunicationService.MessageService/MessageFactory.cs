@@ -100,6 +100,8 @@ namespace CommunicationService.MessageService
                     return new InProgressReminderMessage(_connectRequestService, _connectUserService, _cosmosDbService);
                 case CommunicationJobTypes.JobsDueTomorrow:
                     return new NextDayReminderMessage(_connectRequestService, _connectUserService, _connectGroupService, _sendGridConfig);
+                case CommunicationJobTypes.TaskAppliedForNotification:
+                    return new TaskAppliedForNotificationMessage(_connectRequestService, _connectGroupService, _connectUserService, _linkRepository, _linkConfig);
                 default:                   
                     throw new Exception("Unknown Email Type");
             }

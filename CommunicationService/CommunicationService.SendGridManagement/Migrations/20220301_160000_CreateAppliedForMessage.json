@@ -1,0 +1,21 @@
+﻿{
+  "CreateUpdateUnsubscribeGroups": [
+    {
+      "name": "Request Applied For",
+      "description": "Request Applied For"
+    }
+  ],
+  "Templates": [
+    {
+      "name": "TaskAppliedForNotification",
+      "subject": "{{{Subject}}}",
+      "generation": "dynamic",
+      "versions": [
+        {
+          "name": "First draft",
+          "subject": "{{{Subject}}}"
+        }
+      ]
+    }
+  ]
+}

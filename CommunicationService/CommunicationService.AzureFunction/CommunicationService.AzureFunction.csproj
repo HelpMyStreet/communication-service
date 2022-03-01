@@ -5,8 +5,8 @@
 	</PropertyGroup>
 	<ItemGroup>
 		<PackageReference Include="AzureExtensions.Swashbuckle" Version="3.2.2" />
-		<PackageReference Include="HelpMyStreet.CoreV3.Cache" Version="1.1.903" />
-		<PackageReference Include="HelpMyStreet.CoreV3.Contracts" Version="1.1.903" />
+		<PackageReference Include="HelpMyStreet.CoreV3.Cache" Version="1.1.908" />
+		<PackageReference Include="HelpMyStreet.CoreV3.Contracts" Version="1.1.908" />
 		<PackageReference Include="MediaTypeMap" Version="2.1.0" />
 		<PackageReference Include="Microsoft.Azure.Functions.Extensions" Version="1.0.0" />
 		<PackageReference Include="AutoMapper.Extensions.Microsoft.DependencyInjection" Version="8.0.1" />

@@ -5,7 +5,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="HelpMyStreet.CoreV3.Cache" Version="1.1.903" />
+    <PackageReference Include="HelpMyStreet.CoreV3.Cache" Version="1.1.908" />
   </ItemGroup>
 
   <ItemGroup>

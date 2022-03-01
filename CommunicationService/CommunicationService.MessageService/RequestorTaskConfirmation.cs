@@ -197,7 +197,7 @@ namespace CommunicationService.MessageService
         private List<RequestJob> GetJobs(GetRequestDetailsResponse response)
         {
             List<RequestJob> requestJobs = new List<RequestJob>();
-            var groupJobs = response.RequestSummary.JobSummaries
+            var groupJobs = response.RequestSummary.JobBasics
                 .GroupBy(x => new { x.SupportActivity, x.DueDate, x.GetSupportActivityName })
                 .Select(g => new GroupJob(g.Key.SupportActivity, g.Key.GetSupportActivityName, g.Key.DueDate, g.Count()))
                 .ToList();
