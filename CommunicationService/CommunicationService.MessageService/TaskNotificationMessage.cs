@@ -44,13 +44,13 @@ namespace CommunicationService.MessageService
         {
             var requestDetails = await _connectRequestService.GetRequestDetailsAsync(requestId.Value);
             string encodedRequestId = HelpMyStreet.Utils.Utils.Base64Utils.Base64Encode(requestDetails.RequestSummary.RequestID.ToString());
-            SupportActivities supportActivity = GetSupportActivityFromRequest(requestDetails);            
+            var supportActivityDetails = GetSupportActivityFromRequest(requestDetails);            
 
             var user = await _connectUserService.GetUserByIdAsync(recipientUserId.Value);
             var volunteers = _connectUserService.GetVolunteersByPostcodeAndActivity
                 (
                     requestDetails.RequestSummary.PostCode,
-                    new List<SupportActivities>() { supportActivity },
+                    new List<SupportActivities>() { supportActivityDetails.activity },
                     null,
                     CancellationToken.None
                 ).Result;
@@ -85,12 +85,12 @@ namespace CommunicationService.MessageService
                             firstname: user.UserPersonalDetails.FirstName,
                             isRequestor: false,
                             encodedRequestID: encodedRequestId,
-                            activity: supportActivity.FriendlyNameShort(),
+                            activity: supportActivityDetails.activityName,
                             postcode: requestDetails.RequestSummary.PostCode.Split(" ").First(),
                             distanceFromPostcode: Math.Round(volunteer.DistanceInMiles, 1),
                             dueDate: dueDate,
                             isHealthCritical: job.IsHealthCritical,
-                            isFaceMask: supportActivity == SupportActivities.FaceMask
+                            isFaceMask: supportActivityDetails.activity == SupportActivities.FaceMask
                         ),
                         EmailToAddress = user.UserPersonalDetails.EmailAddress,
                         EmailToName = $"{user.UserPersonalDetails.FirstName} {user.UserPersonalDetails.LastName}",
@@ -112,9 +112,9 @@ namespace CommunicationService.MessageService
             throw new Exception("unable to retrieve user details");
         }
 
-        private SupportActivities GetSupportActivityFromRequest(GetRequestDetailsResponse request)
+        private (SupportActivities activity,  string activityName) GetSupportActivityFromRequest(GetRequestDetailsResponse request)
         {
-            var activities = request.RequestSummary.JobBasics.Select(x => x.SupportActivity).Distinct();
+            var activities = request.RequestSummary.JobSummaries.Select(x => (x.SupportActivity, x.GetSupportActivityName)).Distinct();
 
             if(activities.Count()==1)
             {
@@ -155,7 +155,7 @@ namespace CommunicationService.MessageService
             List<SupportActivities> supportActivities = new List<SupportActivities>();
             if (requestDetails != null)
             {
-                supportActivities.Add(GetSupportActivityFromRequest(requestDetails));
+                supportActivities.Add(GetSupportActivityFromRequest(requestDetails).activity);
                 var volunteers = await _connectUserService.GetVolunteersByPostcodeAndActivity(requestDetails.RequestSummary.PostCode, supportActivities, null, CancellationToken.None);
 
                 if (volunteers != null)
