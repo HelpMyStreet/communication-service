@@ -114,7 +114,7 @@ namespace CommunicationService.MessageService
 
         private (SupportActivities activity,  string activityName) GetSupportActivityFromRequest(GetRequestDetailsResponse request)
         {
-            var activities = request.RequestSummary.JobSummaries.Select(x => (x.SupportActivity, x.GetSupportActivityName)).Distinct();
+            var activities = request.RequestSummary.JobBasics.Select(x => (x.SupportActivity, x.GetSupportActivityName)).Distinct();
 
             if(activities.Count()==1)
             {
