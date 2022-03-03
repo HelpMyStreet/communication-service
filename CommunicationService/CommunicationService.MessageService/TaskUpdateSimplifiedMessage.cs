@@ -369,6 +369,15 @@ namespace CommunicationService.MessageService
             if (!helpRecipient.Equals(requestedBy)) { AddIfNotNullOrEmpty(otherDataList, "Recipient", helpRecipient); }
             AddIfNotNullOrEmpty(otherDataList, "Volunteer", await GetVolunteer(emailRecipientRequestRole, job));
 
+            bool previouStatusCompleteAndNowInProgress = false;
+            bool previousStatusAppliedForAndNowOpen = false;
+
+            if(emailRecipientRequestRole == RequestRoles.Volunteer)
+            {
+                previouStatusCompleteAndNowInProgress = previousStatus == JobStatuses.AppliedFor && job.JobSummary.JobStatus == JobStatuses.InProgress;
+                previousStatusAppliedForAndNowOpen = previousStatus == JobStatuses.AppliedFor && job.JobSummary.JobStatus == JobStatuses.Open;
+            }
+
             return new EmailBuildData()
             {
                 BaseDynamicData = new TaskUpdateSimplifiedData
@@ -386,7 +395,9 @@ namespace CommunicationService.MessageService
                     previouStatusCompleteAndNowInProgress: previousStatus == JobStatuses.Done && job.JobSummary.JobStatus == JobStatuses.InProgress,
                     previouStatusInProgressAndNowOpen: previousStatus == JobStatuses.InProgress && job.JobSummary.JobStatus == JobStatuses.Open,
                     statusNowCancelled: job.JobSummary.JobStatus == JobStatuses.Cancelled,
-                    GetFeedback(job, emailRecipientRequestRole)
+                    feedbackForm: GetFeedback(job, emailRecipientRequestRole),
+                    previousStatusAppliedForAndNowInProgress: previouStatusCompleteAndNowInProgress,
+                    previousStatusAppliedForAndNowOpen: previousStatusAppliedForAndNowOpen
                 ),
                 EmailToAddress = emailToAddress,
                 EmailToName = emailToFullName,

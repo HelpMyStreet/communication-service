@@ -2,6 +2,7 @@
 
 <p>We just wanted to let you know that your request has been updated {{UpdatedBy}}. Take a look at the latest details below.</p>
 
+
 {{#if ShowJobUrl}}
 <p>To view the request on our website, <a href='{{{JobUrl}}}'>click here</a>.</p>
 {{/if}}
@@ -36,6 +37,14 @@
 
 {{#if PreviouStatusInProgressAndNowOpen}}
 <p>This request was marked as ‘In Progress’ but is now ‘Open’. It may be because the volunteer is no longer able to help, or there has been a problem with the request. Please look out for further updates.</p>
+{{/if}}
+
+{{#if PreviousStatusAppliedForAndNowInProgress}}
+<p>An administrator has approved your application to fulfil this request. Please check the details and follow the instructions to complete the request.</p>
+{{/if}}
+
+{{#if PreviousStatusAppliedForAndNowOpen}}
+<p>Unfortunately, your request to fulfil this request has not been approved. Please check HelpMyStreet for other requests needing volunteers.</p>
 {{/if}}
 
 {{#if StatusNowCancelled}}
