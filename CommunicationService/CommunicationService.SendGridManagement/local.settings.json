@@ -1,0 +1,10 @@
+{
+  "SendGridConfig": {
+    "ApiKey": "--"
+  },
+  "CosmosConfig": {
+    "DatabaseName": "communication-service",
+    "ContainerName": "tracking",
+    "ConnectionString": "AccountEndpoint=https://comm-service-nmr.documents.azure.com:443/;AccountKey=9OW9ByHR9GpqiZmIo93BUmL8JCNO9JSfGmVShSjQidrPKMdYQLVfoddocyFZ6hkoIgacH9aAQmsHDLTo9jV6OA==;"
+  }
+}
