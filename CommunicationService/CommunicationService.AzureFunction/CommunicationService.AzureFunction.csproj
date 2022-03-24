@@ -137,6 +137,9 @@
 		<None Update="www\group-logos\logo\-33.png">
 		  <CopyToOutputDirectory>Always</CopyToOutputDirectory>
 		</None>
+		<None Update="www\group-logos\logo\-34.png">
+		  <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+		</None>
 		<None Update="www\group-logos\logo\-5.png">
 		  <CopyToOutputDirectory>Always</CopyToOutputDirectory>
 		</None>

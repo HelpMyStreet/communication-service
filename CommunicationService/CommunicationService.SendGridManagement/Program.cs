@@ -29,6 +29,7 @@ namespace CommunicationService.SendGridManagement
                 );
 
             await emailTemplateUploader.Migrate();
+            await emailTemplateUploader.EnsureOnlyMaxTwoVersionsOfEmailsExist();
         }
 
         private static CosmosDbService InitializeCosmosClientInstance(CosmosConfig cosmosConfig)

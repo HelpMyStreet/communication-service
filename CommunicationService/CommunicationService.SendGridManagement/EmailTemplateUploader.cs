@@ -14,6 +14,7 @@ using CommunicationService.Core.Exception;
 using System.Reflection;
 using System.Security;
 using System.Text.RegularExpressions;
+using Microsoft.Extensions.Logging;
 
 namespace CommunicationService.SendGridManagement
 {
@@ -43,6 +44,42 @@ namespace CommunicationService.SendGridManagement
                 {
                     await AddMigration(s);
                 }
+            }
+        }
+      
+        public async Task EnsureOnlyMaxTwoVersionsOfEmailsExist()
+        {
+            var templates = await GetTemplatesAsync();
+            templates.templates.Where(x=> x.versions.Count()>2).ToList()
+                .ForEach(item =>
+                {
+                    var itemsToNotDelete = item.versions.OrderByDescending(o => o.updated_at)
+                        .Take(3);
+
+                    item.versions.Except(itemsToNotDelete)
+                        .ToList()
+                        .ForEach(async version => 
+                        {
+                            if (version.active == 0) //Only attempt to delete versions that are not set to active
+                            {
+                                await DeleteTemplateVersion(version.template_id, version.id);
+                            }
+                        });
+
+                });
+        }
+
+        private async Task<bool> DeleteTemplateVersion(string template_id, string version_id)
+        {
+            Response response = _sendGridClient.RequestAsync(SendGridClient.Method.DELETE, null, null, $"/templates/{template_id}/versions/{version_id}").Result;
+
+            if (response != null && response.StatusCode == HttpStatusCode.NoContent)
+            {
+                return true;
+            }
+            else
+            {
+                throw new Exception($"Unable to delete template version template_id:{template_id} and version_id:{version_id} StatusCode:{ response.StatusCode}");
             }
         }
 
@@ -157,6 +194,7 @@ namespace CommunicationService.SendGridManagement
             {
                 string body = response.Body.ReadAsStringAsync().Result;
                 var templates = JsonConvert.DeserializeObject<Templates>(body);
+
                 if (templates != null && templates.templates.Length > 0)
                 {
                     var template = templates.templates.Where(x => x.name == templateName).FirstOrDefault();
@@ -207,7 +245,7 @@ namespace CommunicationService.SendGridManagement
             }
             else
             {
-                throw new SendGridException("CallingGetGroupId");
+                throw new SendGridException($"Calling GetGroupId { response.StatusCode }");
             }
         }
 
@@ -233,7 +271,7 @@ namespace CommunicationService.SendGridManagement
             }
             else
             {
-                throw new Exception("Invalid response from create group");
+                throw new Exception($"Invalid response from create group { unsubscribeGroups.name}");
             }
         }
 
@@ -300,7 +338,7 @@ namespace CommunicationService.SendGridManagement
             }
             else
             {
-                throw new Exception("Unable to update unsubscribe group");
+                throw new Exception($"Unable to update unsubscribe group {unsubscribeGroups.name}");
             }
         }
 
@@ -314,7 +352,7 @@ namespace CommunicationService.SendGridManagement
             }
             else
             {
-                throw new Exception("Unable to update unsubscribe group");
+                throw new Exception($"Unable to update unsubscribe group {groupId}");
             }
         }
     }
