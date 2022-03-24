@@ -21,7 +21,7 @@ namespace CommunicationService.SendGridManagement
     public class EmailTemplateUploader
     {
         private readonly ICosmosDbService _cosmosDbService;
-        private readonly ISendGridClient _sendGridClient;        
+        private readonly ISendGridClient _sendGridClient;
 
         public EmailTemplateUploader(ISendGridClient sendGridClient, ICosmosDbService cosmosDbService)
         {
@@ -46,7 +46,7 @@ namespace CommunicationService.SendGridManagement
                 }
             }
         }
-
+      
         public async Task EnsureOnlyMaxTwoVersionsOfEmailsExist()
         {
             var templates = await GetTemplatesAsync();
@@ -195,7 +195,7 @@ namespace CommunicationService.SendGridManagement
                 string body = response.Body.ReadAsStringAsync().Result;
                 var templates = JsonConvert.DeserializeObject<Templates>(body);
 
-                if(templates==null || templates.templates.Length==0)
+                if (templates == null || templates.templates.Length == 0)
                 {
                     throw new UnknownTemplateException("No templates found");
                 }
@@ -209,18 +209,38 @@ namespace CommunicationService.SendGridManagement
                 throw new SendGridException($"Unable to retrieve templates. StatusCode:{ response.StatusCode}");
             }
         }
-
         private async Task<string> GetTemplateId(string templateName)
         {
-            var templates = await GetTemplatesAsync();
-            var template = templates.templates.Where(x => x.name == templateName).FirstOrDefault();
-            if (template != null)
+            var queryParams = @"{
+                'generations': 'dynamic'
+                }";
+            Response response = await _sendGridClient.RequestAsync(SendGridClient.Method.GET, null, queryParams, "templates");
+
+            if (response != null && response.StatusCode == HttpStatusCode.OK)
             {
-                return template.id;
+                string body = response.Body.ReadAsStringAsync().Result;
+                var templates = JsonConvert.DeserializeObject<Templates>(body);
+
+                if (templates != null && templates.templates.Length > 0)
+                {
+                    var template = templates.templates.Where(x => x.name == templateName).FirstOrDefault();
+                    if (template != null)
+                    {
+                        return template.id;
+                    }
+                    else
+                    {
+                        throw new UnknownTemplateException($"{templateName} cannot be found in templates");
+                    }
+                }
+                else
+                {
+                    throw new UnknownTemplateException("No templates found");
+                }
             }
             else
             {
-                throw new UnknownTemplateException($"{templateName} cannot be found in templates");
+                throw new SendGridException();
             }
         }
 

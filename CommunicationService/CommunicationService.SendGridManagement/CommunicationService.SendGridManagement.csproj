@@ -406,5 +406,9 @@
   <ItemGroup>
     <EmbeddedResource Include="Emails\TaskDetail.html" />
   </ItemGroup>
-
+  <ItemGroup>
+    <None Update="appsettings.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
 </Project>
