@@ -183,6 +183,32 @@ namespace CommunicationService.SendGridManagement
             return html;
         }
 
+        private async Task<Templates> GetTemplatesAsync()
+        {
+            var queryParams = @"{
+                'generations': 'dynamic'
+                }";
+            Response response = await _sendGridClient.RequestAsync(SendGridClient.Method.GET, null, queryParams, "templates");
+
+            if (response != null && response.StatusCode == HttpStatusCode.OK)
+            {
+                string body = response.Body.ReadAsStringAsync().Result;
+                var templates = JsonConvert.DeserializeObject<Templates>(body);
+
+                if (templates == null || templates.templates.Length == 0)
+                {
+                    throw new UnknownTemplateException("No templates found");
+                }
+                else
+                {
+                    return templates;
+                }
+            }
+            else
+            {
+                throw new SendGridException($"Unable to retrieve templates. StatusCode:{ response.StatusCode}");
+            }
+        }
         private async Task<string> GetTemplateId(string templateName)
         {
             var queryParams = @"{

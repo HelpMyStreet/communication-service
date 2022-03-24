@@ -29,6 +29,7 @@ namespace CommunicationService.UnitTests.SendGridManagement
         private string[] _directoryFiles;
         private string _file;
         private Task<Response> _response;
+        private Task<Response> _deleteResponse;
         private Templates _templates;
 
         private EmailTemplateUploader _classUnderTest;
