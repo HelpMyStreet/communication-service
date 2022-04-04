@@ -208,3 +208,4 @@ namespace CommunicationService.AzureFunction
         }
     }
 }
+
