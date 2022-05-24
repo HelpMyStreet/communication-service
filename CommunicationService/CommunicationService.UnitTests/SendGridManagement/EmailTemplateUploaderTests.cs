@@ -25,7 +25,9 @@ namespace CommunicationService.UnitTests.SendGridManagement
     {
         private Mock<ISendGridClient> _sendGridClient;
         private Mock<ICosmosDbService> _cosmosDbService;
-        private List<MigrationHistory> _history; 
+        private List<MigrationHistory> _history;
+        private string[] _directoryFiles;
+        private string _file;
         private Task<Response> _response;
         private Task<Response> _deleteResponse;
         private Templates _templates;
@@ -35,6 +37,20 @@ namespace CommunicationService.UnitTests.SendGridManagement
         private void SetupSendGridClient()
         {
             _sendGridClient = new Mock<ISendGridClient>();
+
+            Templates templates = new Templates();
+            Template template = new Template()
+            {
+                id = "testTemplateId",
+                name = "KnownTemplate"
+            };
+            templates.templates = new Template[1]
+            {
+                template
+            };
+            string responseBody = JsonConvert.SerializeObject(templates);
+            _response = Task.FromResult(new Response(System.Net.HttpStatusCode.Created, new StringContent(responseBody), null));
+
             _sendGridClient.Setup(x => x.RequestAsync(
                 SendGridClient.Method.GET,
                 It.IsAny<string>(),
@@ -43,7 +59,7 @@ namespace CommunicationService.UnitTests.SendGridManagement
                 It.IsAny<CancellationToken>()))
                   .Returns(() => _response
                   );
-
+          
             _deleteResponse = Task.FromResult(new Response(System.Net.HttpStatusCode.NoContent, new StringContent(string.Empty), null));
             _sendGridClient.Setup(x => x.RequestAsync(
                 SendGridClient.Method.DELETE,
@@ -53,7 +69,6 @@ namespace CommunicationService.UnitTests.SendGridManagement
                 It.IsAny<CancellationToken>()))
                   .Returns(() => _deleteResponse
                   );
-
         }
 
         private void SetupCosmosDbService()

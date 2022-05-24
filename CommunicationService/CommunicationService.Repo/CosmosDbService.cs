@@ -172,7 +172,7 @@ namespace CommunicationService.Repo
 
             return false;
         }
-
+        
         public async Task<List<EmailHistoryDetail>> GetEmailHistoryDetails(int requestId)
         {
             List<EmailHistoryDetail> results = new List<EmailHistoryDetail>();
@@ -190,20 +190,7 @@ namespace CommunicationService.Repo
                 var response = await query.ReadNextAsync();
                 results.AddRange(response.ToList());
             }
-
-            queryString = $"SELECT count(1) as RecipientCount, c.TemplateName as EmailType, left(udf.convertTime(c._ts),10) as DateSent " +
-                $"FROM c join id in c.ReferencedJobs " +
-                $"WHERE c.event='delivered' and id.R = {requestId} " +
-                $"GROUP BY c.TemplateName, left(udf.convertTime(c._ts), 10)";
-
-            query = this._container.GetItemQueryIterator<EmailHistoryDetail>(new QueryDefinition(queryString));
-
-            while (query.HasMoreResults)
-            {
-                var response = await query.ReadNextAsync();
-                results.AddRange(response.ToList());
-            }
-
+            
             results = results.GroupBy(g => new { g.DateSent, g.EmailType, g.RecipientCount })
                 .Select(s => s.FirstOrDefault())
                 .ToList();
