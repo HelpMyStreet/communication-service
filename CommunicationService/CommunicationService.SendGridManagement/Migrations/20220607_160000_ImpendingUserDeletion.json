@@ -1,0 +1,15 @@
+﻿{
+  "Templates": [
+    {
+      "name": "ImpendingUserDeletion",
+      "subject": "Your HelpMyStreet account is due to be deleted",
+      "generation": "dynamic",
+      "versions": [
+        {
+          "name": "second draft",
+          "subject": "Your HelpMyStreet account is due to be deleted"
+        }
+      ]
+    }
+  ]
+}

@@ -20,5 +20,6 @@ namespace CommunicationService.Core.Interfaces.Repositories
         Task<List<int>> GetShiftRequestDetailsSent(int userID, IEnumerable<int> requests);
         Task<List<RequestHistory>> GetAllUserShiftDetailsHaveBeenSentTo(IEnumerable<int> requests);
         Task<bool> EmailSent(string templateName, int jobId, int recipientUserId);
+        Task<bool> EmailSent(string templateName, int recipientUserId);
     }
 }

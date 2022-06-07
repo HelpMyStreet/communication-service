@@ -197,5 +197,22 @@ namespace CommunicationService.Repo
             
             return results;
         }
+
+        public async Task<bool> EmailSent(string templateName, int recipientUserId)
+        {
+            string queryString = $"SELECT c.id, c.TemplateName FROM c where c.TemplateName='{templateName}' and c.RecipientUserID='{recipientUserId}' and c.event='delivered'";
+            var query = this._container.GetItemQueryIterator<MigrationHistory>(new QueryDefinition(queryString));
+
+            if (query.HasMoreResults)
+            {
+                var response = await query.ReadNextAsync();
+                if (response.Count > 0)
+                {
+                    return true;
+                }
+            }
+
+            return false;
+        }
     }
 }

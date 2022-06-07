@@ -7,6 +7,7 @@
 
   <ItemGroup>
     <None Remove="Emails\GroupWelcome.html" />
+    <None Remove="Emails\ImpendingUserDeletion.html" />
     <None Remove="Emails\InProgressReminder.html" />
     <None Remove="Emails\InterUserMessage.html" />
     <None Remove="Emails\Layout.html" />
@@ -196,9 +197,13 @@
     <None Remove="Migrations\20220112_151000_TweakNextDayReminderMessage.json" />
     <None Remove="Migrations\20220112_151200_TweakNextDayReminderMessage.json" />
     <None Remove="Migrations\20220112_154500_DailyDigest.json" />
+    <None Remove="Migrations\20220607_113000_ImpendingUserDeletion.json" />
+    <None Remove="Migrations\20220607_160000_ImpendingUserDeletion.json" />
+    <None Remove="Migrations\20220607_162000_ImpendingUserDeletion.json" />
   </ItemGroup>
 
   <ItemGroup>
+    <EmbeddedResource Include="Emails\ImpendingUserDeletion.html" />
     <EmbeddedResource Include="Emails\NextDayReminder.html" />
     <EmbeddedResource Include="Emails\Layout.txt" />
     <EmbeddedResource Include="Emails\NewTaskPendingApprovalNotification.html" />
@@ -236,6 +241,9 @@
     <EmbeddedResource Include="Emails\RequestorTaskNotification.html" />
     <EmbeddedResource Include="Migrations\20200709_130700_AddRequestorTaskNotification.json" />
     <EmbeddedResource Include="Migrations\20200717_152400_AddUnsubscribeGroupsDailyDigest.json" />
+    <EmbeddedResource Include="Migrations\20220607_162000_ImpendingUserDeletion.json" />
+    <EmbeddedResource Include="Migrations\20220607_160000_ImpendingUserDeletion.json" />
+    <EmbeddedResource Include="Migrations\20220607_113000_ImpendingUserDeletion.json" />
     <EmbeddedResource Include="Migrations\20220112_154500_DailyDigest.json" />
     <EmbeddedResource Include="Migrations\20211220_122000_CreateInProgressReminderMessage.json" />
     <EmbeddedResource Include="Migrations\20220112_151200_TweakNextDayReminderMessage.json" />

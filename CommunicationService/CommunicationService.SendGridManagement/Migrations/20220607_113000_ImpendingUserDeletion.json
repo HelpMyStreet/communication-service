@@ -1,0 +1,21 @@
+﻿{
+  "CreateUpdateUnsubscribeGroups": [
+    {
+      "name": "Delete User",
+      "description": "Delete User"
+    }
+  ],
+  "Templates": [
+    {
+      "name": "ImpendingUserDeletion",
+      "subject": "Your HelpMyStreet account is due to be deleted",
+      "generation": "dynamic",
+      "versions": [
+        {
+          "name": "first draft",
+          "subject": "Your HelpMyStreet account is due to be deleted"
+        }
+      ]
+    }
+  ]
+}
