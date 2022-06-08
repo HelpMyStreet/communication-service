@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using CommunicationService.MessageService.Substitution;
 using HelpMyStreet.Utils.Extensions;
 using CommunicationService.Core.Interfaces.Repositories;
+using System.Linq;
 
 namespace CommunicationService.MessageService
 {
@@ -61,7 +62,18 @@ namespace CommunicationService.MessageService
 
         public async Task<List<SendMessageRequest>> IdentifyRecipients(int? recipientUserId, int? jobId, int? groupId, int? requestId, Dictionary<string, string> additionalParameters)
         {
-            bool emailSent = await _cosmosDbService.EmailSent(TemplateName.ImpendingUserDeletion, recipientUserId.Value);
+            bool emailSent = false;
+            var emailHistory = await _cosmosDbService.GetEmailHistory(TemplateName.ImpendingUserDeletion, recipientUserId.Value.ToString());
+
+            if(emailHistory.Count>0)
+            {
+                var maxDateTime = emailHistory.Max(x => x.LastSent).Date;
+
+                if((DateTime.Now.Date - maxDateTime).TotalDays<60)
+                {
+                    emailSent = true;
+                }
+            }
 
             if (!emailSent)
             {
