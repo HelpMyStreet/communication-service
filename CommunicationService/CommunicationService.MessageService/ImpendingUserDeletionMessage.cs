@@ -8,6 +8,7 @@ using CommunicationService.MessageService.Substitution;
 using HelpMyStreet.Utils.Extensions;
 using CommunicationService.Core.Interfaces.Repositories;
 using System.Linq;
+using HelpMyStreet.Utils.Enums;
 
 namespace CommunicationService.MessageService
 {
@@ -19,8 +20,7 @@ namespace CommunicationService.MessageService
 
         public string GetUnsubscriptionGroupName(int? recipientId)
         {
-
-                return UnsubscribeGroupName.ImpendingDeleteUser;
+            return UnsubscribeGroupName.ImpendingDeleteUser;
         }
 
         public ImpendingUserDeletionMessage(IConnectUserService connectUserService,ICosmosDbService cosmosDbService)
@@ -52,7 +52,7 @@ namespace CommunicationService.MessageService
                     title: "Your HelpMyStreet account is due to be deleted",
                     subject: "Your HelpMyStreet account is due to be deleted",
                     firstName : user.UserPersonalDetails.FirstName,
-                    dateToDelete: dateToDelete.ToString("dd/MM/yyyy")
+                    dateToDelete: dateToDelete.FormatDate(DateTimeFormat.ShortDateFormat)
                     ),
                 RecipientUserID = recipientUserId.Value,
                 EmailToAddress = user.UserPersonalDetails.EmailAddress,
