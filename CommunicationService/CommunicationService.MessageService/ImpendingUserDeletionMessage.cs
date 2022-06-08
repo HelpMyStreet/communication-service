@@ -20,7 +20,7 @@ namespace CommunicationService.MessageService
 
         public string GetUnsubscriptionGroupName(int? recipientId)
         {
-            return UnsubscribeGroupName.ImpendingDeleteUser;
+            return UnsubscribeGroupName.NotUnsubscribable;
         }
 
         public ImpendingUserDeletionMessage(IConnectUserService connectUserService,ICosmosDbService cosmosDbService)
@@ -65,11 +65,11 @@ namespace CommunicationService.MessageService
             bool emailSent = false;
             var emailHistory = await _cosmosDbService.GetEmailHistory(TemplateName.ImpendingUserDeletion, recipientUserId.Value.ToString());
 
-            if(emailHistory.Count>0)
+            if (emailHistory.Count > 0)
             {
                 var maxDateTime = emailHistory.Max(x => x.LastSent).Date;
 
-                if((DateTime.Now.Date - maxDateTime).TotalDays<60)
+                if ((DateTime.Now.Date - maxDateTime).TotalDays < 60)
                 {
                     emailSent = true;
                 }

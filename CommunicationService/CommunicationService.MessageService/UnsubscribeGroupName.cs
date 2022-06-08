@@ -21,7 +21,7 @@ namespace CommunicationService.MessageService
         public static string NewUserNotification = "New User Notification";
         public static string InProgressReminder = "In progress reminder";
         public static string NextDayReminder = "Next day reminder";
-        public static string ImpendingDeleteUser = "Delete User";
+        public static string NotUnsubscribable = "NotUnsubscribable";
 
     }
 }

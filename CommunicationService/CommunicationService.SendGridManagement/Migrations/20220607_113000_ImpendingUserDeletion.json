@@ -1,10 +1,4 @@
 ﻿{
-  "CreateUpdateUnsubscribeGroups": [
-    {
-      "name": "Delete User",
-      "description": "Delete User"
-    }
-  ],
   "Templates": [
     {
       "name": "ImpendingUserDeletion",
