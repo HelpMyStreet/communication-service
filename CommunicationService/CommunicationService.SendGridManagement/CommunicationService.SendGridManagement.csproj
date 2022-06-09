@@ -22,6 +22,7 @@
     <None Remove="Emails\TaskDetail.html" />
     <None Remove="Emails\TaskReminder.html" />
     <None Remove="Emails\TaskUpdateSimplified.html" />
+    <None Remove="Emails\UserDeleted.html" />
     <None Remove="Emails\Welcome.html" />
     <None Remove="Migrations\20200617_084300_AmendTemplates.json" />
     <None Remove="Migrations\20200617_084300_PostYotiCommunication.json" />
@@ -200,9 +201,11 @@
     <None Remove="Migrations\20220607_113000_ImpendingUserDeletion.json" />
     <None Remove="Migrations\20220607_160000_ImpendingUserDeletion.json" />
     <None Remove="Migrations\20220607_162000_ImpendingUserDeletion.json" />
+    <None Remove="Migrations\20220609_152000_UserDeleted.json" />
   </ItemGroup>
 
   <ItemGroup>
+    <EmbeddedResource Include="Emails\UserDeleted.html" />
     <EmbeddedResource Include="Emails\ImpendingUserDeletion.html" />
     <EmbeddedResource Include="Emails\NextDayReminder.html" />
     <EmbeddedResource Include="Emails\Layout.txt" />
@@ -241,6 +244,7 @@
     <EmbeddedResource Include="Emails\RequestorTaskNotification.html" />
     <EmbeddedResource Include="Migrations\20200709_130700_AddRequestorTaskNotification.json" />
     <EmbeddedResource Include="Migrations\20200717_152400_AddUnsubscribeGroupsDailyDigest.json" />
+    <EmbeddedResource Include="Migrations\20220609_152000_UserDeleted.json" />
     <EmbeddedResource Include="Migrations\20220607_162000_ImpendingUserDeletion.json" />
     <EmbeddedResource Include="Migrations\20220607_160000_ImpendingUserDeletion.json" />
     <EmbeddedResource Include="Migrations\20220607_113000_ImpendingUserDeletion.json" />

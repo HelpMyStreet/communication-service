@@ -12,7 +12,7 @@ using HelpMyStreet.Utils.Enums;
 
 namespace CommunicationService.MessageService
 {
-    public class ImpendingUserDeletionMessage : IMessage
+    public class UserDeletedMessage : IMessage
     {
         private readonly IConnectUserService _connectUserService;
         List<SendMessageRequest> _sendMessageRequests;
@@ -22,7 +22,7 @@ namespace CommunicationService.MessageService
             return UnsubscribeGroupName.NotUnsubscribable;
         }
 
-        public ImpendingUserDeletionMessage(IConnectUserService connectUserService)
+        public UserDeletedMessage(IConnectUserService connectUserService)
         {
             _connectUserService = connectUserService;
             _sendMessageRequests = new List<SendMessageRequest>();
@@ -42,15 +42,12 @@ namespace CommunicationService.MessageService
                 throw new Exception($"unable to retrieve user object for {recipientUserId.Value}");
             }
 
-            DateTime dateToDelete = DateTime.SpecifyKind(DateTime.Now.Date.AddDays(31), DateTimeKind.Utc);
-
             return new EmailBuildData()
             {
-                BaseDynamicData = new ImpendingUserDeletionData(
-                    title: "Your HelpMyStreet account is due to be deleted",
-                    subject: "Your HelpMyStreet account is due to be deleted",
-                    firstName : user.UserPersonalDetails.FirstName,
-                    dateToDelete: dateToDelete.FormatDate(DateTimeFormat.ShortDateFormat)
+                BaseDynamicData = new UserDeletedData(
+                    title: "Your account has been deleted",
+                    subject: "Your account has been deleted",
+                    firstName : user.UserPersonalDetails.FirstName
                     ),
                 RecipientUserID = recipientUserId.Value,
                 EmailToAddress = user.UserPersonalDetails.EmailAddress,
@@ -62,7 +59,7 @@ namespace CommunicationService.MessageService
         {
             _sendMessageRequests.Add(new SendMessageRequest()
             {
-                TemplateName = TemplateName.ImpendingUserDeletion,
+                TemplateName = TemplateName.UserDeleted,
                 RecipientUserID = recipientUserId.Value,
                 GroupID = groupId,
                 JobID = jobId,
