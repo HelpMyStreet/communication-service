@@ -62,32 +62,16 @@ namespace CommunicationService.MessageService
 
         public async Task<List<SendMessageRequest>> IdentifyRecipients(int? recipientUserId, int? jobId, int? groupId, int? requestId, Dictionary<string, string> additionalParameters)
         {
-            bool emailSent = false;
-            var emailHistory = await _cosmosDbService.GetEmailHistory(TemplateName.ImpendingUserDeletion, recipientUserId.Value.ToString());
-
-            if (emailHistory.Count > 0)
+            _sendMessageRequests.Add(new SendMessageRequest()
             {
-                var maxDateTime = emailHistory.Max(x => x.LastSent).Date;
-
-                if ((DateTime.Now.Date - maxDateTime).TotalDays < 60)
-                {
-                    emailSent = true;
-                }
-            }
-
-            if (!emailSent)
-            {
-                _sendMessageRequests.Add(new SendMessageRequest()
-                {
-                    TemplateName = TemplateName.ImpendingUserDeletion,
-                    RecipientUserID = recipientUserId.Value,
-                    GroupID = groupId,
-                    JobID = jobId,
-                    RequestID = requestId,
-                    AdditionalParameters = additionalParameters
-                });
-            }
-
+                TemplateName = TemplateName.ImpendingUserDeletion,
+                RecipientUserID = recipientUserId.Value,
+                GroupID = groupId,
+                JobID = jobId,
+                RequestID = requestId,
+                AdditionalParameters = additionalParameters
+            });
+            
             return _sendMessageRequests;
         }
     }
