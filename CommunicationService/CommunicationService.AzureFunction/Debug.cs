@@ -176,9 +176,11 @@ namespace CommunicationService.AzureFunction
                 //GroupWelcomeMessage message = new GroupWelcomeMessage(_connectGroupService, _connectUserService, _sendGridConfig);
 
 
-                ImpendingUserDeletionMessage message = new ImpendingUserDeletionMessage(
-                    _connectUserService,
-                    _cosmosDbService);
+                //ImpendingUserDeletionMessage message = new ImpendingUserDeletionMessage(
+                //    _connectUserService);
+
+                UserDeletedMessage message = new UserDeletedMessage(
+                    _connectUserService);
 
                 var recipients = await message.IdentifyRecipients(req.RecipientUserID, req.JobID, req.GroupID, req.RequestID, req.AdditionalParameters);
                 //recipients = recipients.Take(1).ToList();
@@ -197,7 +199,7 @@ namespace CommunicationService.AzureFunction
                         emailBuildData.EmailToAddress = "jawwad.mukhtar@gmail.com";
                         emailBuildData.EmailToName = "Jawwad";
                         var json2 = JsonConvert.SerializeObject(emailBuildData.BaseDynamicData);
-                        _connectSendGridService.SendDynamicEmail(string.Empty, smr.TemplateName, string.Empty, emailBuildData);
+                        _connectSendGridService.SendDynamicEmail(string.Empty, smr.TemplateName, UnsubscribeGroupName.NotUnsubscribable, emailBuildData);
                     }
                 }
 
