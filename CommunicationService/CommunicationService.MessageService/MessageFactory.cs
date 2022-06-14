@@ -100,6 +100,10 @@ namespace CommunicationService.MessageService
                     return new InProgressReminderMessage(_connectRequestService, _connectUserService, _cosmosDbService);
                 case CommunicationJobTypes.JobsDueTomorrow:
                     return new NextDayReminderMessage(_connectRequestService, _connectUserService, _connectGroupService, _sendGridConfig);
+                case CommunicationJobTypes.ImpendingUserDeletion:
+                    return new ImpendingUserDeletionMessage(_connectUserService);
+                case CommunicationJobTypes.UserDeleted:
+                    return new UserDeletedMessage(_connectUserService);
                 default:                   
                     throw new Exception("Unknown Email Type");
             }
