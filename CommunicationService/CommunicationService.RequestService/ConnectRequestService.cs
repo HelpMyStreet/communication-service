@@ -146,7 +146,7 @@ namespace CommunicationService.RequestService
                 if (history.Count >= 2)
                 {
                     var previousState = history.ElementAt(1);
-                    if ((previousState.JobStatus == JobStatuses.InProgress || previousState.JobStatus == JobStatuses.Accepted) && previousState.VolunteerUserID.HasValue)
+                    if ((previousState.JobStatus == JobStatuses.InProgress || previousState.JobStatus == JobStatuses.Accepted || previousState.JobStatus == JobStatuses.AppliedFor) && previousState.VolunteerUserID.HasValue)
                     {
                         result = previousState.VolunteerUserID.Value;
                     }
