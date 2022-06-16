@@ -101,12 +101,12 @@ namespace CommunicationService.AzureFunction
                 //    _cosmosDbService
                 //    );
 
-                NextDayReminderMessage message = new NextDayReminderMessage(
-                   _connectRequestService,
-                   _connectUserService,                   
-                    _connectGroupService,
-                   _sendGridConfig
-                    );
+                //NextDayReminderMessage message = new NextDayReminderMessage(
+                //   _connectRequestService,
+                //   _connectUserService,                   
+                //    _connectGroupService,
+                //   _sendGridConfig
+                //    );
 
                 //NewCredentialsMessage message = new NewCredentialsMessage(
                 //    _connectUserService,
@@ -151,14 +151,15 @@ namespace CommunicationService.AzureFunction
 
                 //ShiftReminderMessage message = new ShiftReminderMessage(_connectRequestService, _connectUserService, _connectAddressService, _linkRepository, _linkConfig);
 
-                //DailyDigestMessage message = new DailyDigestMessage(
-                //    _connectGroupService,
-                //    _connectUserService,
-                //    _connectRequestService,
-                //    _emailConfig,
-                //    _connectAddressService,
-                //    _cosmosDbService
-                //    );
+                DailyDigestMessage message = new DailyDigestMessage(
+                    _connectGroupService,
+                    _connectUserService,
+                    _connectRequestService,
+                    _emailConfig,
+                    _connectAddressService,
+                    _cosmosDbService,
+                    _sendGridConfig
+                    );
 
                 //NewTaskPendingApprovalNotification message = new NewTaskPendingApprovalNotification(
                 //    _connectRequestService,
@@ -178,22 +179,30 @@ namespace CommunicationService.AzureFunction
                 var recipients = await message.IdentifyRecipients(req.RecipientUserID, req.JobID, req.GroupID, req.RequestID, req.AdditionalParameters);
                 //recipients = recipients.Take(1).ToList();
 
-                recipients = recipients.Where(x => x.RecipientUserID == 3).ToList();
+                //recipients = recipients.Where(x => x.RecipientUserID == 26).ToList();
 
 
                 //SendMessageRequest smr = recipients.ElementAt(0);
                 foreach (SendMessageRequest smr in recipients)
                 {
-                    var emailBuildData = await message.PrepareTemplateData(Guid.NewGuid(), smr.RecipientUserID, smr.JobID, smr.GroupID, smr.RequestID, smr.AdditionalParameters, smr.TemplateName);
-
-                    if (emailBuildData != null)
+                    try
                     {
+                        var emailBuildData = await message.PrepareTemplateData(Guid.NewGuid(), smr.RecipientUserID, smr.JobID, smr.GroupID, smr.RequestID, smr.AdditionalParameters, smr.TemplateName);
 
-                        emailBuildData.EmailToAddress = "jawwad.mukhtar@gmail.com";
-                        emailBuildData.EmailToName = "Jawwad";
-                        var json2 = JsonConvert.SerializeObject(emailBuildData.BaseDynamicData);
-                        _connectSendGridService.SendDynamicEmail(string.Empty, smr.TemplateName, UnsubscribeGroupName.TaskNotification, emailBuildData);
+                        if (emailBuildData != null)
+                        {
+
+                            emailBuildData.EmailToAddress = "jawwad.mukhtar@gmail.com";
+                            emailBuildData.EmailToName = "Jawwad";
+                            var json2 = JsonConvert.SerializeObject(emailBuildData.BaseDynamicData);
+                            _connectSendGridService.SendDynamicEmail(string.Empty, smr.TemplateName, UnsubscribeGroupName.TaskNotification, emailBuildData);
+                        }
                     }
+                    catch(Exception exc)
+                    {
+                        log.LogError(exc, $"Error in creating PrepareTemplateData for TemplateName:{ smr.TemplateName } RecipientUserId:{ smr.RecipientUserID}");
+                    }
+
                 }
 
                 int i = 1;
