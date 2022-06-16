@@ -16,6 +16,7 @@ using System;
 using HelpMyStreet.Utils.Models;
 using System.Collections.Generic;
 using System.Text;
+using HelpMyStreet.Contracts.RequestService.Extensions;
 
 namespace CommunicationService.RequestService
 {
@@ -79,6 +80,17 @@ namespace CommunicationService.RequestService
                 if (getAllJobsByFilterResponse.HasContent && getAllJobsByFilterResponse.IsSuccessful)
                 {
                     return getAllJobsByFilterResponse.Content;
+                }
+                else if(getAllJobsByFilterResponse.HasErrors)
+                {
+                    var firstError = getAllJobsByFilterResponse.Errors.First();
+
+                    if (!firstError.ErrorCode.Retry())
+                        throw new BadRequestException(firstError.ErrorMessage);
+                    else
+                    {
+                        throw new Exception(firstError.ErrorMessage);
+                    }
                 }
             }
             return null;
