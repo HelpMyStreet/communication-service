@@ -93,7 +93,7 @@ namespace CommunicationService.RequestService
                     }
                 }
             }
-            return null;
+            throw new Exception("Unexpected error in GetAllJobsByFilter");
         }
 
         public async Task<GetJobsByStatusesResponse> GetJobsByStatuses(GetJobsByStatusesRequest getJobsByStatusesRequest)
