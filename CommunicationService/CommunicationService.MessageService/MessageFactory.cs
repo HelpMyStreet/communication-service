@@ -102,6 +102,10 @@ namespace CommunicationService.MessageService
                     return new NextDayReminderMessage(_connectRequestService, _connectUserService, _connectGroupService, _sendGridConfig);
                 case CommunicationJobTypes.TaskAppliedForNotification:
                     return new TaskAppliedForNotificationMessage(_connectRequestService, _connectGroupService, _connectUserService, _linkRepository, _linkConfig);
+                case CommunicationJobTypes.ImpendingUserDeletion:
+                    return new ImpendingUserDeletionMessage(_connectUserService);
+                case CommunicationJobTypes.UserDeleted:
+                    return new UserDeletedMessage(_connectUserService);
                 default:                   
                     throw new Exception("Unknown Email Type");
             }

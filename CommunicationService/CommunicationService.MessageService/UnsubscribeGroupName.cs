@@ -22,6 +22,6 @@ namespace CommunicationService.MessageService
         public static string InProgressReminder = "In progress reminder";
         public static string NextDayReminder = "Next day reminder";
         public static string TaskAppliedForNotification = "Request Applied For";
-
+        public static string NotUnsubscribable = "NotUnsubscribable";
     }
 }
