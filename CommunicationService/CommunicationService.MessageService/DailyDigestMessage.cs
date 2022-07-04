@@ -106,9 +106,10 @@ namespace CommunicationService.MessageService
                 {
                     Groups = groups.Groups
                 }
-            });                
-            var openTasks = openRequests.JobSummaries.ToList();
-            var openShifts = openRequests.ShiftJobs.ToList();
+            });
+
+            var openTasks = openRequests?.JobSummaries.ToList();
+            var openShifts = openRequests?.ShiftJobs.ToList();
             
             if((openTasks == null || openTasks.Count==0) && (openShifts ==null || openShifts.Count==0 ) )
             {
@@ -132,7 +133,7 @@ namespace CommunicationService.MessageService
                 criteriaRequestTasks = criteriaRequestTasks.OrderBy(x => x.DueDate).ToList();
 
                 otherRequestTasks = openTasks.Where(x => !criteriaRequestTasks.Contains(x, _jobSummaryDedupe_EqualityComparer)).ToList();
-                var otherRequestTasksStats = otherRequestTasks.GroupBy(x => x.SupportActivity, x => x.DueDate, (activity, dueDate) => new { Key = activity, Count = dueDate.Count(), Min = dueDate.Min() });
+                var otherRequestTasksStats = otherRequestTasks.GroupBy(x => x.GetSupportActivityName,  x => x.DueDate, (activity, dueDate) => (Key: activity, Count: dueDate.Count(), Min: dueDate.Min()));
                 otherRequestTasksStats = otherRequestTasksStats.OrderByDescending(x => x.Count);
 
                 foreach (var request in criteriaRequestTasks)
@@ -157,7 +158,7 @@ namespace CommunicationService.MessageService
                 {
                     otherRequestTaskList.Add(new DailyDigestDataJob(
                         groupLogo: string.Empty,
-                        activity: request.Key.FriendlyNameShort(),
+                        activity: request.Key,
                         postCode: string.Empty, //not used in the other task component of the email
                         dueDate: request.Min.FormatDate(DateTimeFormat.ShortDateFormat),
                         soon: false, //not used in the other task component of the email

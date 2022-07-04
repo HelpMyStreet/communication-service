@@ -334,7 +334,7 @@ namespace CommunicationService.MessageService
                 lastUpdatedBy = changedByRole == RequestRoles.GroupAdmin ? "by a group administrator" : "by a volunteer";
             }
 
-            string supportActivity = job.JobSummary.SupportActivity.FriendlyNameShort();
+            string supportActivity = job.JobSummary.GetSupportActivityName;
 
             bool showJobUrl = emailRecipientRequestRole == RequestRoles.Volunteer 
                 || emailRecipientRequestRole == RequestRoles.GroupAdmin
@@ -369,24 +369,46 @@ namespace CommunicationService.MessageService
             if (!helpRecipient.Equals(requestedBy)) { AddIfNotNullOrEmpty(otherDataList, "Recipient", helpRecipient); }
             AddIfNotNullOrEmpty(otherDataList, "Volunteer", await GetVolunteer(emailRecipientRequestRole, job));
 
+            bool previouStatusCompleteAndNowInProgress = false;
+            bool previousStatusAppliedForAndNowOpen = false;
+
+            if(emailRecipientRequestRole == RequestRoles.Volunteer)
+            {
+                previouStatusCompleteAndNowInProgress = previousStatus == JobStatuses.AppliedFor && job.JobSummary.JobStatus == JobStatuses.InProgress;
+                previousStatusAppliedForAndNowOpen = previousStatus == JobStatuses.AppliedFor && job.JobSummary.JobStatus == JobStatuses.Open;
+            }
+
+
+            string subject = "A ";
+
+
+            if(supportActivity.Substring(0,1).ToLower()=="a")
+            {
+                subject = "An ";
+            }
+
+            subject += supportActivity + " request has been updated"; 
+
             return new EmailBuildData()
             {
                 BaseDynamicData = new TaskUpdateSimplifiedData
                 (
-                    $"A {supportActivity} request has been updated",
-                    $"A {supportActivity} request has been updated",
-                    emailToFirstName,
-                    lastUpdatedBy,
-                    fieldUpdated.ToLower(),
-                    showJobUrl,
-                    jobUrl,
-                    importantDataList,
-                    otherDataList,
+                    title: subject,
+                    subject: subject,
+                    recipient: emailToFirstName,
+                    updatedBy: lastUpdatedBy,
+                    fieldUpdated: fieldUpdated.ToLower(),
+                    showJobUrl: showJobUrl,
+                    jobUrl: jobUrl,
+                    importantDataList: importantDataList,
+                    otherDataList: otherDataList,
                     faceCoveringComplete: job.JobSummary.SupportActivity == SupportActivities.FaceMask && job.JobSummary.JobStatus == JobStatuses.Done,
                     previouStatusCompleteAndNowInProgress: previousStatus == JobStatuses.Done && job.JobSummary.JobStatus == JobStatuses.InProgress,
                     previouStatusInProgressAndNowOpen: previousStatus == JobStatuses.InProgress && job.JobSummary.JobStatus == JobStatuses.Open,
                     statusNowCancelled: job.JobSummary.JobStatus == JobStatuses.Cancelled,
-                    GetFeedback(job, emailRecipientRequestRole)
+                    feedbackForm: GetFeedback(job, emailRecipientRequestRole),
+                    previousStatusAppliedForAndNowInProgress: previouStatusCompleteAndNowInProgress,
+                    previousStatusAppliedForAndNowOpen: previousStatusAppliedForAndNowOpen
                 ),
                 EmailToAddress = emailToAddress,
                 EmailToName = emailToFullName,

@@ -26,17 +26,32 @@ namespace CommunicationService.MessageService
     {
         public GroupJob(
             SupportActivities supportActivity,
+            string supportActivityName,
             DateTime dueDate,
             int count
             )
         {
             SupportActivity = supportActivity;
+            SupportActivityName = supportActivityName;
             DueDate = dueDate;
             Count = count;
         }
+        public GroupJob(
+            SupportActivities supportActivity,
+            DateTime dueDate,
+            int count
+            )
+        {
+            SupportActivity = supportActivity;
+            SupportActivityName = string.Empty;
+            DueDate = dueDate;
+            Count = count;
+        }
+
         public SupportActivities SupportActivity { get; private set; }
         public DateTime DueDate { get; private set; }
-        public int Count { get; private set; }        
+        public int Count { get; private set; }
+        public string SupportActivityName { get; set; }
     }
 
     public class RequestorTaskConfirmation : IMessage
@@ -118,7 +133,7 @@ namespace CommunicationService.MessageService
                 foreach (GroupJob gj in groupJobs)
                 {
                     requestJobs.Add(new RequestJob(
-                        activity: gj.SupportActivity.FriendlyNameShort(),
+                        activity: gj.SupportActivityName,
                         countString: gj.Count == 1 ? string.Empty : $" - {gj.Count} volunteers required. ",
                         dueDateString: dueDateString,
                         showJobUrl: showJobUrl,
@@ -136,7 +151,7 @@ namespace CommunicationService.MessageService
                 string countString = groupJobs[0].Count == 1 ? string.Empty : $" - {groupJobs[0].Count} volunteers required";
 
                 requestJobs.Add(new RequestJob(
-                        activity: jobResponse.JobSummary.SupportActivity.FriendlyNameShort(),
+                        activity: jobResponse.JobSummary.GetSupportActivityName,
                         countString: $"{countString}{repeatString}",
                         dueDateString: dueDateString,
                         showJobUrl: showJobUrl,
@@ -183,8 +198,8 @@ namespace CommunicationService.MessageService
         {
             List<RequestJob> requestJobs = new List<RequestJob>();
             var groupJobs = response.RequestSummary.JobBasics
-                .GroupBy(x => new { x.SupportActivity, x.DueDate })
-                .Select(g => new GroupJob(g.Key.SupportActivity, g.Key.DueDate, g.Count()))
+                .GroupBy(x => new { x.SupportActivity, x.DueDate, x.GetSupportActivityName })
+                .Select(g => new GroupJob(g.Key.SupportActivity, g.Key.GetSupportActivityName, g.Key.DueDate, g.Count()))
                 .ToList();
 
             switch (response.RequestSummary.RequestType)

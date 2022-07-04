@@ -151,14 +151,15 @@ namespace CommunicationService.AzureFunction
 
                 //ShiftReminderMessage message = new ShiftReminderMessage(_connectRequestService, _connectUserService, _connectAddressService, _linkRepository, _linkConfig);
 
-                //DailyDigestMessage message = new DailyDigestMessage(
-                //    _connectGroupService,
-                //    _connectUserService,
-                //    _connectRequestService,
-                //    _emailConfig,
-                //    _connectAddressService,
-                //    _cosmosDbService
-                //    );
+                DailyDigestMessage message = new DailyDigestMessage(
+                    _connectGroupService,
+                    _connectUserService,
+                    _connectRequestService,
+                    _emailConfig,
+                    _connectAddressService,
+                    _cosmosDbService,
+                    _sendGridConfig
+                    );
 
                 //NewTaskPendingApprovalNotification message = new NewTaskPendingApprovalNotification(
                 //    _connectRequestService,
@@ -179,8 +180,8 @@ namespace CommunicationService.AzureFunction
                 //ImpendingUserDeletionMessage message = new ImpendingUserDeletionMessage(
                 //    _connectUserService);
 
-                UserDeletedMessage message = new UserDeletedMessage(
-                    _connectUserService);
+                //UserDeletedMessage message = new UserDeletedMessage(
+                //    _connectUserService);
 
                 var recipients = await message.IdentifyRecipients(req.RecipientUserID, req.JobID, req.GroupID, req.RequestID, req.AdditionalParameters);
                 //recipients = recipients.Take(1).ToList();
@@ -191,16 +192,23 @@ namespace CommunicationService.AzureFunction
                 //SendMessageRequest smr = recipients.ElementAt(0);
                 foreach (SendMessageRequest smr in recipients)
                 {
-                    var emailBuildData = await message.PrepareTemplateData(Guid.NewGuid(), smr.RecipientUserID, smr.JobID, smr.GroupID, smr.RequestID, smr.AdditionalParameters, smr.TemplateName);
-
-                    if (emailBuildData != null)
+                    try
                     {
+                        var emailBuildData = await message.PrepareTemplateData(Guid.NewGuid(), smr.RecipientUserID, smr.JobID, smr.GroupID, smr.RequestID, smr.AdditionalParameters, smr.TemplateName);
+                        if (emailBuildData != null)
+                        {
 
-                        emailBuildData.EmailToAddress = "jawwad.mukhtar@gmail.com";
-                        emailBuildData.EmailToName = "Jawwad";
-                        var json2 = JsonConvert.SerializeObject(emailBuildData.BaseDynamicData);
-                        _connectSendGridService.SendDynamicEmail(string.Empty, smr.TemplateName, UnsubscribeGroupName.NotUnsubscribable, emailBuildData);
+                            emailBuildData.EmailToAddress = "jawwad.mukhtar@gmail.com";
+                            emailBuildData.EmailToName = "Jawwad";
+                            var json2 = JsonConvert.SerializeObject(emailBuildData.BaseDynamicData);
+                            _connectSendGridService.SendDynamicEmail(string.Empty, smr.TemplateName, UnsubscribeGroupName.TaskNotification, emailBuildData);
+                        }
                     }
+                    catch(Exception exc)
+                    {
+                        log.LogError(exc, $"Error in creating PrepareTemplateData for TemplateName:{ smr.TemplateName } RecipientUserId:{ smr.RecipientUserID}");
+                    }
+
                 }
 
                 int i = 1;

@@ -23,6 +23,7 @@ namespace CommunicationService.MessageService
         public const string NewUserNotification = "NewUserNotification";
         public const string InProgressReminder = "InProgressReminder";
         public const string NextDayReminder = "NextDayReminder";
+        public const string TaskAppliedForNotification = "TaskAppliedForNotification";
         public const string ImpendingUserDeletion = "ImpendingUserDeletion";
         public const string UserDeleted = "UserDeleted";
     }

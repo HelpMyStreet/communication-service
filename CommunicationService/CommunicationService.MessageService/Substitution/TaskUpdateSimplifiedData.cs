@@ -33,6 +33,8 @@ namespace CommunicationService.MessageService.Substitution
         public bool PreviouStatusInProgressAndNowOpen { get; private set; }
         public bool StatusNowCancelled { get; private set; }
         public string FeedbackForm { get; private set; }
+        public bool PreviousStatusAppliedForAndNowInProgress { get; set; }
+        public bool PreviousStatusAppliedForAndNowOpen { get; set; }
 
         public TaskUpdateSimplifiedData(
             string title,
@@ -48,7 +50,9 @@ namespace CommunicationService.MessageService.Substitution
             bool previouStatusCompleteAndNowInProgress,
             bool previouStatusInProgressAndNowOpen,
             bool statusNowCancelled,
-            string feedbackForm
+            string feedbackForm,
+            bool previousStatusAppliedForAndNowInProgress,
+            bool previousStatusAppliedForAndNowOpen
             )
         {
             Title = title;
@@ -64,7 +68,9 @@ namespace CommunicationService.MessageService.Substitution
             PreviouStatusCompleteAndNowInProgress = previouStatusCompleteAndNowInProgress;
             PreviouStatusInProgressAndNowOpen = previouStatusInProgressAndNowOpen;
             StatusNowCancelled = statusNowCancelled;
-            FeedbackForm = feedbackForm; 
+            FeedbackForm = feedbackForm;
+            PreviousStatusAppliedForAndNowInProgress = previousStatusAppliedForAndNowInProgress;
+            PreviousStatusAppliedForAndNowOpen = previousStatusAppliedForAndNowOpen;
         }
     }
 }
