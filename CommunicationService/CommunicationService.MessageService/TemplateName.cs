@@ -24,6 +24,7 @@ namespace CommunicationService.MessageService
         public const string InProgressReminder = "InProgressReminder";
         public const string NextDayReminder = "NextDayReminder";
         public const string TaskAppliedForNotification = "TaskAppliedForNotification";
+        public const string TaskApplicationRejected = "TaskApplicationRejected";
     }
 }
 
