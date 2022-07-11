@@ -7,6 +7,7 @@
 
   <ItemGroup>
     <None Remove="Emails\GroupWelcome.html" />
+    <None Remove="Emails\ImpendingUserDeletion.html" />
     <None Remove="Emails\InProgressReminder.html" />
     <None Remove="Emails\InterUserMessage.html" />
     <None Remove="Emails\Layout.html" />
@@ -23,6 +24,7 @@
     <None Remove="Emails\TaskDetail.html" />
     <None Remove="Emails\TaskReminder.html" />
     <None Remove="Emails\TaskUpdateSimplified.html" />
+    <None Remove="Emails\UserDeleted.html" />
     <None Remove="Emails\Welcome.html" />
     <None Remove="Migrations\20200617_084300_AmendTemplates.json" />
     <None Remove="Migrations\20200617_084300_PostYotiCommunication.json" />
@@ -208,6 +210,15 @@
 
   <ItemGroup>
     <EmbeddedResource Include="Emails\TaskAppliedForNotification.html" />
+    <None Remove="Migrations\20220607_113000_ImpendingUserDeletion.json" />
+    <None Remove="Migrations\20220607_160000_ImpendingUserDeletion.json" />
+    <None Remove="Migrations\20220607_162000_ImpendingUserDeletion.json" />
+    <None Remove="Migrations\20220609_152000_UserDeleted.json" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Include="Emails\UserDeleted.html" />
+    <EmbeddedResource Include="Emails\ImpendingUserDeletion.html" />
     <EmbeddedResource Include="Emails\NextDayReminder.html" />
     <EmbeddedResource Include="Emails\Layout.txt" />
     <EmbeddedResource Include="Emails\NewTaskPendingApprovalNotification.html" />
@@ -252,6 +263,10 @@
     <EmbeddedResource Include="Migrations\20220707_145500_TaskApplicationRejectedMessage.json" />
     <EmbeddedResource Include="Migrations\20220303_113000_UpdateSimplifiedUpdateTaskMessage.json" />
     <EmbeddedResource Include="Migrations\20220301_160000_CreateAppliedForMessage.json" />
+    <EmbeddedResource Include="Migrations\20220609_152000_UserDeleted.json" />
+    <EmbeddedResource Include="Migrations\20220607_162000_ImpendingUserDeletion.json" />
+    <EmbeddedResource Include="Migrations\20220607_160000_ImpendingUserDeletion.json" />
+    <EmbeddedResource Include="Migrations\20220607_113000_ImpendingUserDeletion.json" />
     <EmbeddedResource Include="Migrations\20220112_154500_DailyDigest.json" />
     <EmbeddedResource Include="Migrations\20211220_122000_CreateInProgressReminderMessage.json" />
     <EmbeddedResource Include="Migrations\20220112_151200_TweakNextDayReminderMessage.json" />

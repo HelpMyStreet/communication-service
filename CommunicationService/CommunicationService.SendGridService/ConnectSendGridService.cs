@@ -18,6 +18,7 @@ using System.Threading.Tasks;
 using HelpMyStreet.Contracts.CommunicationService.Request;
 using HelpMyStreet.Cache;
 using System.Threading;
+using CommunicationService.MessageService;
 
 namespace CommunicationService.SendGridService
 {
@@ -204,7 +205,6 @@ namespace CommunicationService.SendGridService
         public async Task<bool> SendDynamicEmail(string messageId, string templateName, string groupName, EmailBuildData emailBuildData)
         {
             var template = await GetTemplateWithCache(templateName, CancellationToken.None).ConfigureAwait(false);
-            UnsubscribeGroup unsubscribeGroup = await GetUnsubscribeGroupWithCache(groupName, CancellationToken.None).ConfigureAwait(false);
             emailBuildData.BaseDynamicData.BaseUrl = _sendGridConfig.Value.BaseUrl;
             emailBuildData.BaseDynamicData.BaseCommunicationUrl = _sendGridConfig.Value.BaseCommunicationUrl;
             Personalization personalization = new Personalization()
@@ -218,10 +218,6 @@ namespace CommunicationService.SendGridService
                 From = new EmailAddress(_sendGridConfig.Value.FromEmail, _sendGridConfig.Value.FromName),
                 ReplyTo = new EmailAddress(_sendGridConfig.Value.ReplyToEmail, _sendGridConfig.Value.ReplyToName),
                 TemplateId = template.id,
-                Asm = new ASM()
-                {
-                    GroupId = unsubscribeGroup.id
-                },
                 Personalizations = new List<Personalization>()
                 {
                     personalization
@@ -239,6 +235,32 @@ namespace CommunicationService.SendGridService
                     { "ReferencedJobs", GetReferencedJobs(emailBuildData.ReferencedJobs)}
                 }
             };
+
+            if (groupName == UnsubscribeGroupName.NotUnsubscribable)
+            {
+                eml.MailSettings = new MailSettings()
+                {
+                    BypassListManagement = new BypassListManagement()
+                    {
+                        Enable = true
+                    }
+                };
+                eml.TrackingSettings = new TrackingSettings()
+                {
+                    SubscriptionTracking = new SubscriptionTracking()
+                    {
+                        Enable = false
+                    }
+                };
+            }
+            else
+            {
+                UnsubscribeGroup unsubscribeGroup = await GetUnsubscribeGroupWithCache(groupName, CancellationToken.None).ConfigureAwait(false);
+                eml.Asm = new ASM()
+                {
+                    GroupId = unsubscribeGroup.id
+                };
+            }
 
             Response response = await _sendGridClient.SendEmailAsync(eml).ConfigureAwait(false);
             if (response.StatusCode == HttpStatusCode.OK || response.StatusCode == HttpStatusCode.Accepted)
