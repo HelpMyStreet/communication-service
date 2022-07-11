@@ -19,6 +19,7 @@
     <None Remove="Emails\PartialRegistration.html" />
     <None Remove="Emails\RequestNotification.html" />
     <None Remove="Emails\ShiftReminder.html" />
+    <None Remove="Emails\TaskApplicationRejected.html" />
     <None Remove="Emails\TaskAppliedForNotification.html" />
     <None Remove="Emails\TaskDetail.html" />
     <None Remove="Emails\TaskReminder.html" />
@@ -201,6 +202,10 @@
     <None Remove="Migrations\20220112_154500_DailyDigest.json" />
     <None Remove="Migrations\20220301_160000_CreateAppliedForMessage.json" />
     <None Remove="Migrations\20220303_113000_UpdateSimplifiedUpdateTaskMessage.json" />
+    <None Remove="Migrations\20220707_145500_TaskApplicationRejectedMessage.json" />
+    <None Remove="Migrations\20220707_150600_TaskApplicationRejectedMessage.json" />
+    <None Remove="Migrations\20220711_123000_UpdateSimplifiedUpdateTaskMessage.json" />
+    <None Remove="Migrations\20220711_123200_TaskApplicationRejectedMessage.json" />
   </ItemGroup>
 
   <ItemGroup>
@@ -221,6 +226,7 @@
     <EmbeddedResource Include="Emails\ShiftReminder.html" />
     <EmbeddedResource Include="Emails\TaskReminder.html" />
     <EmbeddedResource Include="Emails\InProgressReminder.html" />
+    <EmbeddedResource Include="Emails\TaskApplicationRejected.html" />
     <EmbeddedResource Include="Emails\TaskUpdateSimplified.html" />
     <EmbeddedResource Include="Emails\InterUserMessage.html" />
     <EmbeddedResource Include="Emails\NewCredentials.html" />
@@ -251,6 +257,10 @@
     <EmbeddedResource Include="Emails\RequestorTaskNotification.html" />
     <EmbeddedResource Include="Migrations\20200709_130700_AddRequestorTaskNotification.json" />
     <EmbeddedResource Include="Migrations\20200717_152400_AddUnsubscribeGroupsDailyDigest.json" />
+    <EmbeddedResource Include="Migrations\20220711_123200_TaskApplicationRejectedMessage.json" />
+    <EmbeddedResource Include="Migrations\20220711_123000_UpdateSimplifiedUpdateTaskMessage.json" />
+    <EmbeddedResource Include="Migrations\20220707_150600_TaskApplicationRejectedMessage.json" />
+    <EmbeddedResource Include="Migrations\20220707_145500_TaskApplicationRejectedMessage.json" />
     <EmbeddedResource Include="Migrations\20220303_113000_UpdateSimplifiedUpdateTaskMessage.json" />
     <EmbeddedResource Include="Migrations\20220301_160000_CreateAppliedForMessage.json" />
     <EmbeddedResource Include="Migrations\20220609_152000_UserDeleted.json" />
