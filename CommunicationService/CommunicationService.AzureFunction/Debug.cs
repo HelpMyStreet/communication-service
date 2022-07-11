@@ -176,10 +176,17 @@ namespace CommunicationService.AzureFunction
 
                 //GroupWelcomeMessage message = new GroupWelcomeMessage(_connectGroupService, _connectUserService, _sendGridConfig);
 
+
+                //ImpendingUserDeletionMessage message = new ImpendingUserDeletionMessage(
+                //    _connectUserService);
+
+                //UserDeletedMessage message = new UserDeletedMessage(
+                //    _connectUserService);
+
                 var recipients = await message.IdentifyRecipients(req.RecipientUserID, req.JobID, req.GroupID, req.RequestID, req.AdditionalParameters);
                 //recipients = recipients.Take(1).ToList();
 
-                //recipients = recipients.Where(x => x.RecipientUserID == 26).ToList();
+                //recipients = recipients.Where(x => x.RecipientUserID == 3).ToList();
 
 
                 //SendMessageRequest smr = recipients.ElementAt(0);
@@ -188,7 +195,6 @@ namespace CommunicationService.AzureFunction
                     try
                     {
                         var emailBuildData = await message.PrepareTemplateData(Guid.NewGuid(), smr.RecipientUserID, smr.JobID, smr.GroupID, smr.RequestID, smr.AdditionalParameters, smr.TemplateName);
-
                         if (emailBuildData != null)
                         {
 

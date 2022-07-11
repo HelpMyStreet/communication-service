@@ -1,0 +1,15 @@
+﻿{
+  "Templates": [
+    {
+      "name": "UserDeleted",
+      "subject": "Your account has been deleted",
+      "generation": "dynamic",
+      "versions": [
+        {
+          "name": "first draft",
+          "subject": "Your account has been deleted"
+        }
+      ]
+    }
+  ]
+}
