@@ -392,18 +392,14 @@ namespace CommunicationService.MessageService
                 if (!helpRecipient.Equals(requestedBy)) { AddIfNotNullOrEmpty(otherDataList, "Recipient", helpRecipient); }
                 AddIfNotNullOrEmpty(otherDataList, "Volunteer", await GetVolunteer(emailRecipientRequestRole, job));
 
-                bool previouStatusCompleteAndNowInProgress = false;
-                bool previousStatusAppliedForAndNowOpen = false;
+                bool approved = false;
 
                 if (emailRecipientRequestRole == RequestRoles.Volunteer)
                 {
-                    previouStatusCompleteAndNowInProgress = previousStatus == JobStatuses.AppliedFor && job.JobSummary.JobStatus == JobStatuses.InProgress;
-                    previousStatusAppliedForAndNowOpen = previousStatus == JobStatuses.AppliedFor && job.JobSummary.JobStatus == JobStatuses.Open;
+                    approved  = job.JobSummary.JobStatus == JobStatuses.Approved;
                 }
 
-
                 string subject = "A ";
-
 
                 if (supportActivity.Substring(0, 1).ToLower() == "a")
                 {
@@ -430,8 +426,7 @@ namespace CommunicationService.MessageService
                         previouStatusInProgressAndNowOpen: previousStatus == JobStatuses.InProgress && job.JobSummary.JobStatus == JobStatuses.Open,
                         statusNowCancelled: job.JobSummary.JobStatus == JobStatuses.Cancelled,
                         feedbackForm: GetFeedback(job, emailRecipientRequestRole),
-                        previousStatusAppliedForAndNowInProgress: previouStatusCompleteAndNowInProgress,
-                        previousStatusAppliedForAndNowOpen: previousStatusAppliedForAndNowOpen
+                        approved: approved
                     ),
                     EmailToAddress = emailToAddress,
                     EmailToName = emailToFullName,
