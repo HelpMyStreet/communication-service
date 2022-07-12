@@ -287,153 +287,122 @@ namespace CommunicationService.MessageService
         public async Task<EmailBuildData> PrepareTemplateData(Guid batchId, int? recipientUserId, int? jobId, int? groupId, int? requestId, Dictionary<string, string> additionalParameters, string templateName)
         {
             GetJobDetailsResponse job = _connectRequestService.GetJobDetailsAsync(jobId.Value).Result;
+            
+            // Recipient
+            RequestRoles emailRecipientRequestRole = (RequestRoles)Enum.Parse(typeof(RequestRoles), additionalParameters["RequestRole"]);
 
-            if (templateName == TemplateName.TaskApplicationRejected)
+            string emailToAddress = string.Empty;
+            string emailToFullName = string.Empty;
+            string emailToFirstName = string.Empty;
+
+            switch (emailRecipientRequestRole)
             {
-                var group = await _connectGroupService.GetGroup(job.JobSummary.ReferringGroupID);
-                var user = await _connectUserService.GetUserByIdAsync(recipientUserId.Value);
-                return new EmailBuildData()
-                {
-                    BaseDynamicData = new TaskApplicationRejectedData
-                    (
-                        title: "Your application to volunteer has been updated",
-                        subject: "Your application to volunteer has been updated",
-                        recipient: user.UserPersonalDetails.FirstName,
-                        activityName: job.JobSummary.GetSupportActivityName,
-                        requestor: job.Requestor.FullName(),
-                        groupName: group.Group.GroupName
-                    ),
-                    EmailToAddress = user.UserPersonalDetails.EmailAddress,
-                    EmailToName = user.UserPersonalDetails.FirstName,
-                    GroupID = group.Group.GroupId,
-                    JobID = jobId.Value
-                };
+                case RequestRoles.Volunteer:
+                    var user = await _connectUserService.GetUserByIdAsync(recipientUserId.Value);
+                    emailToFirstName = user.UserPersonalDetails.FirstName;
+                    emailToAddress = user.UserPersonalDetails.EmailAddress;
+                    emailToFullName = $"{user.UserPersonalDetails.FirstName} {user.UserPersonalDetails.LastName}";
+                    break;
+                case RequestRoles.Requestor:
+                    emailToFirstName = job.Requestor.FirstName;
+                    emailToAddress = job.Requestor.EmailAddress;
+                    emailToFullName = $"{job.Requestor.FirstName} {job.Requestor.LastName}";
+                    break;
+                case RequestRoles.Recipient:
+                    emailToFirstName = job.Recipient.FirstName;
+                    emailToAddress = job.Recipient.EmailAddress;
+                    emailToFullName = $"{job.Recipient.FirstName} {job.Recipient.LastName}";
+                    break;
+            }
+
+            // Change summary
+            additionalParameters.TryGetValue("FieldUpdated", out string fieldUpdated);
+            additionalParameters.TryGetValue("NewValue", out string newValue);
+            JobStatuses previousStatus = _connectRequestService.PreviousJobStatus(job);
+            RequestRoles changedByRole = GetChangedByRole(job);
+            JobStatusChangeReasonCodes? statusChangeReason = job.LastJobStatusChangeReasonCode;
+
+            string lastUpdatedBy;
+            if (statusChangeReason.HasValue &&
+                (statusChangeReason.Value == JobStatusChangeReasonCodes.AutoProgressingJobsPastDueDates || statusChangeReason.Value == JobStatusChangeReasonCodes.AutoProgressingOverdueRepeats)
+                )
+            {
+                lastUpdatedBy = "automatically by HelpMyStreet";
             }
             else
             {
-                // Recipient
-                RequestRoles emailRecipientRequestRole = (RequestRoles)Enum.Parse(typeof(RequestRoles), additionalParameters["RequestRole"]);
+                lastUpdatedBy = changedByRole == RequestRoles.GroupAdmin ? "by a group administrator" : "by a volunteer";
+            }
 
-                string emailToAddress = string.Empty;
-                string emailToFullName = string.Empty;
-                string emailToFirstName = string.Empty;
+            string supportActivity = job.JobSummary.GetSupportActivityName;
 
-                switch (emailRecipientRequestRole)
-                {
-                    case RequestRoles.Volunteer:
-                        var user = await _connectUserService.GetUserByIdAsync(recipientUserId.Value);
-                        emailToFirstName = user.UserPersonalDetails.FirstName;
-                        emailToAddress = user.UserPersonalDetails.EmailAddress;
-                        emailToFullName = $"{user.UserPersonalDetails.FirstName} {user.UserPersonalDetails.LastName}";
-                        break;
-                    case RequestRoles.Requestor:
-                        emailToFirstName = job.Requestor.FirstName;
-                        emailToAddress = job.Requestor.EmailAddress;
-                        emailToFullName = $"{job.Requestor.FirstName} {job.Requestor.LastName}";
-                        break;
-                    case RequestRoles.Recipient:
-                        emailToFirstName = job.Recipient.FirstName;
-                        emailToAddress = job.Recipient.EmailAddress;
-                        emailToFullName = $"{job.Recipient.FirstName} {job.Recipient.LastName}";
-                        break;
-                }
+            bool showJobUrl = emailRecipientRequestRole == RequestRoles.Volunteer
+                || emailRecipientRequestRole == RequestRoles.GroupAdmin
+                || (emailRecipientRequestRole == RequestRoles.Requestor && job.JobSummary.RequestorDefinedByGroup);
+            string jobUrl = showJobUrl ? GetJobUrl(jobId.Value) : string.Empty;
 
-                // Change summary
-                additionalParameters.TryGetValue("FieldUpdated", out string fieldUpdated);
-                additionalParameters.TryGetValue("NewValue", out string newValue);
-                JobStatuses previousStatus = _connectRequestService.PreviousJobStatus(job);
-                RequestRoles changedByRole = GetChangedByRole(job);
-                JobStatusChangeReasonCodes? statusChangeReason = job.LastJobStatusChangeReasonCode;
+            // First table
+            List<TaskDataItem> importantDataList = new List<TaskDataItem>();
 
-                string lastUpdatedBy;
-                if (statusChangeReason.HasValue &&
-                    (statusChangeReason.Value == JobStatusChangeReasonCodes.AutoProgressingJobsPastDueDates || statusChangeReason.Value == JobStatusChangeReasonCodes.AutoProgressingOverdueRepeats)
-                    )
-                {
-                    lastUpdatedBy = "automatically by HelpMyStreet";
-                }
-                else
-                {
-                    lastUpdatedBy = changedByRole == RequestRoles.GroupAdmin ? "by a group administrator" : "by a volunteer";
-                }
+            if (fieldUpdated == "Status")
+            {
+                AddIfNotNullOrEmpty(importantDataList, "Status (Updated)", $"{job.JobSummary.JobStatus.FriendlyName().ToTitleCase()}");
+            }
+            else
+            {
+                AddIfNotNullOrEmpty(importantDataList, $"{fieldUpdated} (Updated)", StringHelpers.ToHtmlSafeStringWithLineBreaks(newValue));
+                AddIfNotNullOrEmpty(importantDataList, "Status", job.JobSummary.JobStatus.FriendlyName().ToTitleCase());
+            }
+            AddIfNotNullOrEmpty(importantDataList, "Reference", GetReference(emailRecipientRequestRole, job));
 
-                string supportActivity = job.JobSummary.GetSupportActivityName;
+            // Second table
+            string requestedBy = GetRequestedBy(emailRecipientRequestRole, job);
+            string helpRecipient = GetHelpRecipient(emailRecipientRequestRole, job);
 
-                bool showJobUrl = emailRecipientRequestRole == RequestRoles.Volunteer
-                    || emailRecipientRequestRole == RequestRoles.GroupAdmin
-                    || (emailRecipientRequestRole == RequestRoles.Requestor && job.JobSummary.RequestorDefinedByGroup);
-                string jobUrl = showJobUrl ? GetJobUrl(jobId.Value) : string.Empty;
+            List<TaskDataItem> otherDataList = new List<TaskDataItem>();
+            AddIfNotNullOrEmpty(otherDataList, "Request type", supportActivity.ToTitleCase());
+            AddIfNotNullOrEmpty(otherDataList, "Help needed", GetDueDate(job));
+            AddIfNotNullOrEmpty(otherDataList, "Help needed", GetShiftDetails(job));
+            AddIfNotNullOrEmpty(otherDataList, "Location", GetLocationDetails(job));
+            AddIfNotNullOrEmpty(otherDataList, "Requested by", requestedBy);
+            AddIfNotNullOrEmpty(otherDataList, "Help requested from", await GetHelpRequestedFrom(job));
+            if (!helpRecipient.Equals(requestedBy)) { AddIfNotNullOrEmpty(otherDataList, "Recipient", helpRecipient); }
+            AddIfNotNullOrEmpty(otherDataList, "Volunteer", await GetVolunteer(emailRecipientRequestRole, job));
 
-                // First table
-                List<TaskDataItem> importantDataList = new List<TaskDataItem>();
+            string subject = "A ";
 
-                if (fieldUpdated == "Status")
-                {
-                    AddIfNotNullOrEmpty(importantDataList, "Status (Updated)", $"{job.JobSummary.JobStatus.FriendlyName().ToTitleCase()}");
-                }
-                else
-                {
-                    AddIfNotNullOrEmpty(importantDataList, $"{fieldUpdated} (Updated)", StringHelpers.ToHtmlSafeStringWithLineBreaks(newValue));
-                    AddIfNotNullOrEmpty(importantDataList, "Status", job.JobSummary.JobStatus.FriendlyName().ToTitleCase());
-                }
-                AddIfNotNullOrEmpty(importantDataList, "Reference", GetReference(emailRecipientRequestRole, job));
+            if (supportActivity.Substring(0, 1).ToLower() == "a")
+            {
+                subject = "An ";
+            }
 
-                // Second table
-                string requestedBy = GetRequestedBy(emailRecipientRequestRole, job);
-                string helpRecipient = GetHelpRecipient(emailRecipientRequestRole, job);
+            subject += supportActivity + " request has been updated";
 
-                List<TaskDataItem> otherDataList = new List<TaskDataItem>();
-                AddIfNotNullOrEmpty(otherDataList, "Request type", supportActivity.ToTitleCase());
-                AddIfNotNullOrEmpty(otherDataList, "Help needed", GetDueDate(job));
-                AddIfNotNullOrEmpty(otherDataList, "Help needed", GetShiftDetails(job));
-                AddIfNotNullOrEmpty(otherDataList, "Location", GetLocationDetails(job));
-                AddIfNotNullOrEmpty(otherDataList, "Requested by", requestedBy);
-                AddIfNotNullOrEmpty(otherDataList, "Help requested from", await GetHelpRequestedFrom(job));
-                if (!helpRecipient.Equals(requestedBy)) { AddIfNotNullOrEmpty(otherDataList, "Recipient", helpRecipient); }
-                AddIfNotNullOrEmpty(otherDataList, "Volunteer", await GetVolunteer(emailRecipientRequestRole, job));
-
-                bool approved = false;
-
-                if (emailRecipientRequestRole == RequestRoles.Volunteer)
-                {
-                    approved  = job.JobSummary.JobStatus == JobStatuses.Approved;
-                }
-
-                string subject = "A ";
-
-                if (supportActivity.Substring(0, 1).ToLower() == "a")
-                {
-                    subject = "An ";
-                }
-
-                subject += supportActivity + " request has been updated";
-
-                return new EmailBuildData()
-                {
-                    BaseDynamicData = new TaskUpdateSimplifiedData
-                    (
-                        title: subject,
-                        subject: subject,
-                        recipient: emailToFirstName,
-                        updatedBy: lastUpdatedBy,
-                        fieldUpdated: fieldUpdated.ToLower(),
-                        showJobUrl: showJobUrl,
-                        jobUrl: jobUrl,
-                        importantDataList: importantDataList,
-                        otherDataList: otherDataList,
-                        faceCoveringComplete: job.JobSummary.SupportActivity == SupportActivities.FaceMask && job.JobSummary.JobStatus == JobStatuses.Done,
-                        previouStatusCompleteAndNowInProgress: previousStatus == JobStatuses.Done && job.JobSummary.JobStatus == JobStatuses.InProgress,
-                        previouStatusInProgressAndNowOpen: previousStatus == JobStatuses.InProgress && job.JobSummary.JobStatus == JobStatuses.Open,
-                        statusNowCancelled: job.JobSummary.JobStatus == JobStatuses.Cancelled,
-                        feedbackForm: GetFeedback(job, emailRecipientRequestRole),
-                        approved: approved
-                    ),
-                    EmailToAddress = emailToAddress,
-                    EmailToName = emailToFullName,
-                    JobID = job.JobSummary.JobID,
-                    RequestID = job.JobSummary.RequestID,
-                    GroupID = job.JobSummary.ReferringGroupID,
-                    ReferencedJobs = new List<ReferencedJob>()
+            return new EmailBuildData()
+            {
+                BaseDynamicData = new TaskUpdateSimplifiedData
+                (
+                    title: subject,
+                    subject: subject,
+                    recipient: emailToFirstName,
+                    updatedBy: lastUpdatedBy,
+                    fieldUpdated: fieldUpdated.ToLower(),
+                    showJobUrl: showJobUrl,
+                    jobUrl: jobUrl,
+                    importantDataList: importantDataList,
+                    otherDataList: otherDataList,
+                    faceCoveringComplete: job.JobSummary.SupportActivity == SupportActivities.FaceMask && job.JobSummary.JobStatus == JobStatuses.Done,
+                    previouStatusCompleteAndNowInProgress: previousStatus == JobStatuses.Done && job.JobSummary.JobStatus == JobStatuses.InProgress,
+                    previouStatusInProgressAndNowOpen: previousStatus == JobStatuses.InProgress && job.JobSummary.JobStatus == JobStatuses.Open,
+                    statusNowCancelled: job.JobSummary.JobStatus == JobStatuses.Cancelled,
+                    feedbackForm: GetFeedback(job, emailRecipientRequestRole)
+                ),
+                EmailToAddress = emailToAddress,
+                EmailToName = emailToFullName,
+                JobID = job.JobSummary.JobID,
+                RequestID = job.JobSummary.RequestID,
+                GroupID = job.JobSummary.ReferringGroupID,
+                ReferencedJobs = new List<ReferencedJob>()
                 {
                     new ReferencedJob()
                     {
@@ -442,8 +411,8 @@ namespace CommunicationService.MessageService
                         J = job.JobSummary.JobID
                     }
                 }
-                };
             };
+            
         }
 
         public async Task<List<SendMessageRequest>> IdentifyRecipients(int? recipientUserId, int? jobId, int? groupId, int? requestId, Dictionary<string, string> additionalParameters)
@@ -471,9 +440,6 @@ namespace CommunicationService.MessageService
 
             if (currentOrLastVolunteerUserID.HasValue && changedByRole != RequestRoles.Volunteer)
             {
-                JobStatuses previousStatus = _connectRequestService.PreviousJobStatus(job);
-                bool previousStatusAppliedForAndNowOpen = previousStatus == JobStatuses.AppliedFor && job.JobSummary.JobStatus == JobStatuses.Open;
-                
                 var param = new Dictionary<string, string>(additionalParameters)
                 {
                     { "RequestRole", RequestRoles.Volunteer.ToString() }
@@ -481,7 +447,7 @@ namespace CommunicationService.MessageService
                 //We send an email to the volunteer as they did not make this change
                 _sendMessageRequests.Add(new SendMessageRequest()
                 {
-                    TemplateName = previousStatusAppliedForAndNowOpen ? TemplateName.TaskApplicationRejected : TemplateName.TaskUpdateSimplified,
+                    TemplateName = TemplateName.TaskUpdateSimplified,
                     RecipientUserID = currentOrLastVolunteerUserID.Value,
                     GroupID = groupId,
                     JobID = jobId,
