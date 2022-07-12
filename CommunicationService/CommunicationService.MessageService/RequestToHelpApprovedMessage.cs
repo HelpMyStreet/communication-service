@@ -51,8 +51,8 @@ namespace CommunicationService.MessageService
             {
                 BaseDynamicData = new TaskApplicationApprovedData
                 (
-                    title: "Your application to volunteer has been updated",
-                    subject: "Your application to volunteer has been updated",
+                    title: "Your application to volunteer has been approved",
+                    subject: "Your application to volunteer has been approved",
                     recipient: user.UserPersonalDetails.FirstName,
                     activityName: job.JobSummary.GetSupportActivityName,
                     requestor: job.Requestor.FullName(),
