@@ -19,6 +19,7 @@
     <None Remove="Emails\PartialRegistration.html" />
     <None Remove="Emails\RequestNotification.html" />
     <None Remove="Emails\ShiftReminder.html" />
+    <None Remove="Emails\TaskApplicationApproved.html" />
     <None Remove="Emails\TaskApplicationRejected.html" />
     <None Remove="Emails\TaskAppliedForNotification.html" />
     <None Remove="Emails\TaskDetail.html" />
@@ -206,9 +207,11 @@
     <None Remove="Migrations\20220707_150600_TaskApplicationRejectedMessage.json" />
     <None Remove="Migrations\20220711_123000_UpdateSimplifiedUpdateTaskMessage.json" />
     <None Remove="Migrations\20220711_123200_TaskApplicationRejectedMessage.json" />
+    <None Remove="Migrations\20220712_123000_TaskApplicationRejectedMessage.json" />
   </ItemGroup>
 
   <ItemGroup>
+    <EmbeddedResource Include="Emails\TaskApplicationApproved.html" />
     <EmbeddedResource Include="Emails\TaskAppliedForNotification.html" />
     <None Remove="Migrations\20220607_113000_ImpendingUserDeletion.json" />
     <None Remove="Migrations\20220607_160000_ImpendingUserDeletion.json" />
@@ -257,6 +260,7 @@
     <EmbeddedResource Include="Emails\RequestorTaskNotification.html" />
     <EmbeddedResource Include="Migrations\20200709_130700_AddRequestorTaskNotification.json" />
     <EmbeddedResource Include="Migrations\20200717_152400_AddUnsubscribeGroupsDailyDigest.json" />
+    <EmbeddedResource Include="Migrations\20220712_123000_TaskApplicationRejectedMessage.json" />
     <EmbeddedResource Include="Migrations\20220711_123200_TaskApplicationRejectedMessage.json" />
     <EmbeddedResource Include="Migrations\20220711_123000_UpdateSimplifiedUpdateTaskMessage.json" />
     <EmbeddedResource Include="Migrations\20220707_150600_TaskApplicationRejectedMessage.json" />
