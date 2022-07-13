@@ -1,0 +1,15 @@
+﻿{
+  "Templates": [
+    {
+      "name": "TaskApplicationRejected",
+      "subject": "{{{Subject}}}",
+      "generation": "dynamic",
+      "versions": [
+        {
+          "name": "Third Draft",
+          "subject": "{{{Subject}}}"
+        }
+      ]
+    }
+  ]
+}

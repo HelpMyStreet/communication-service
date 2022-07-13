@@ -106,7 +106,11 @@ namespace CommunicationService.MessageService
                     return new ImpendingUserDeletionMessage(_connectUserService);
                 case CommunicationJobTypes.UserDeleted:
                     return new UserDeletedMessage(_connectUserService);
-                default:                   
+                case CommunicationJobTypes.RequestToHelpApproved:
+                    return new RequestToHelpApprovedMessage(_connectRequestService, _connectUserService, _connectGroupService);
+                case CommunicationJobTypes.RequestToHelpDeclined:
+                    return new RequestToHelpDeclinedMessage(_connectRequestService, _connectUserService, _connectGroupService);
+                default:
                     throw new Exception("Unknown Email Type");
             }
         }

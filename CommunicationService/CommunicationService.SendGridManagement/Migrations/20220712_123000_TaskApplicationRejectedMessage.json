@@ -1,0 +1,26 @@
+﻿{
+  "Templates": [
+    {
+      "name": "TaskApplicationApproved",
+      "subject": "{{{Subject}}}",
+      "generation": "dynamic",
+      "versions": [
+        {
+          "name": "Third Draft",
+          "subject": "{{{Subject}}}"
+        }
+      ]
+    },
+    {
+      "name": "TaskUpdateSimplified",
+      "subject": "{{{Subject}}}",
+      "generation": "dynamic",
+      "versions": [
+        {
+          "name": "removed approved",
+          "subject": "{{{Subject}}}"
+        }
+      ]
+    }
+  ]
+}

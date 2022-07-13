@@ -26,6 +26,8 @@ namespace CommunicationService.MessageService
         public const string TaskAppliedForNotification = "TaskAppliedForNotification";
         public const string ImpendingUserDeletion = "ImpendingUserDeletion";
         public const string UserDeleted = "UserDeleted";
+        public const string TaskApplicationRejected = "TaskApplicationRejected";
+        public const string TaskApplicationApproved = "TaskApplicationApproved";
     }
 }
 

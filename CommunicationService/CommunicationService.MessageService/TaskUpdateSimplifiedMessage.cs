@@ -286,8 +286,8 @@ namespace CommunicationService.MessageService
 
         public async Task<EmailBuildData> PrepareTemplateData(Guid batchId, int? recipientUserId, int? jobId, int? groupId, int? requestId, Dictionary<string, string> additionalParameters, string templateName)
         {
-            var job = _connectRequestService.GetJobDetailsAsync(jobId.Value).Result;
-
+            GetJobDetailsResponse job = _connectRequestService.GetJobDetailsAsync(jobId.Value).Result;
+            
             // Recipient
             RequestRoles emailRecipientRequestRole = (RequestRoles)Enum.Parse(typeof(RequestRoles), additionalParameters["RequestRole"]);
 
@@ -323,7 +323,7 @@ namespace CommunicationService.MessageService
             JobStatusChangeReasonCodes? statusChangeReason = job.LastJobStatusChangeReasonCode;
 
             string lastUpdatedBy;
-            if(statusChangeReason.HasValue && 
+            if (statusChangeReason.HasValue &&
                 (statusChangeReason.Value == JobStatusChangeReasonCodes.AutoProgressingJobsPastDueDates || statusChangeReason.Value == JobStatusChangeReasonCodes.AutoProgressingOverdueRepeats)
                 )
             {
@@ -336,7 +336,7 @@ namespace CommunicationService.MessageService
 
             string supportActivity = job.JobSummary.GetSupportActivityName;
 
-            bool showJobUrl = emailRecipientRequestRole == RequestRoles.Volunteer 
+            bool showJobUrl = emailRecipientRequestRole == RequestRoles.Volunteer
                 || emailRecipientRequestRole == RequestRoles.GroupAdmin
                 || (emailRecipientRequestRole == RequestRoles.Requestor && job.JobSummary.RequestorDefinedByGroup);
             string jobUrl = showJobUrl ? GetJobUrl(jobId.Value) : string.Empty;
@@ -369,25 +369,14 @@ namespace CommunicationService.MessageService
             if (!helpRecipient.Equals(requestedBy)) { AddIfNotNullOrEmpty(otherDataList, "Recipient", helpRecipient); }
             AddIfNotNullOrEmpty(otherDataList, "Volunteer", await GetVolunteer(emailRecipientRequestRole, job));
 
-            bool previouStatusCompleteAndNowInProgress = false;
-            bool previousStatusAppliedForAndNowOpen = false;
-
-            if(emailRecipientRequestRole == RequestRoles.Volunteer)
-            {
-                previouStatusCompleteAndNowInProgress = previousStatus == JobStatuses.AppliedFor && job.JobSummary.JobStatus == JobStatuses.InProgress;
-                previousStatusAppliedForAndNowOpen = previousStatus == JobStatuses.AppliedFor && job.JobSummary.JobStatus == JobStatuses.Open;
-            }
-
-
             string subject = "A ";
 
-
-            if(supportActivity.Substring(0,1).ToLower()=="a")
+            if (supportActivity.Substring(0, 1).ToLower() == "a")
             {
                 subject = "An ";
             }
 
-            subject += supportActivity + " request has been updated"; 
+            subject += supportActivity + " request has been updated";
 
             return new EmailBuildData()
             {
@@ -406,9 +395,7 @@ namespace CommunicationService.MessageService
                     previouStatusCompleteAndNowInProgress: previousStatus == JobStatuses.Done && job.JobSummary.JobStatus == JobStatuses.InProgress,
                     previouStatusInProgressAndNowOpen: previousStatus == JobStatuses.InProgress && job.JobSummary.JobStatus == JobStatuses.Open,
                     statusNowCancelled: job.JobSummary.JobStatus == JobStatuses.Cancelled,
-                    feedbackForm: GetFeedback(job, emailRecipientRequestRole),
-                    previousStatusAppliedForAndNowInProgress: previouStatusCompleteAndNowInProgress,
-                    previousStatusAppliedForAndNowOpen: previousStatusAppliedForAndNowOpen
+                    feedbackForm: GetFeedback(job, emailRecipientRequestRole)
                 ),
                 EmailToAddress = emailToAddress,
                 EmailToName = emailToFullName,
@@ -425,6 +412,7 @@ namespace CommunicationService.MessageService
                     }
                 }
             };
+            
         }
 
         public async Task<List<SendMessageRequest>> IdentifyRecipients(int? recipientUserId, int? jobId, int? groupId, int? requestId, Dictionary<string, string> additionalParameters)
@@ -437,7 +425,7 @@ namespace CommunicationService.MessageService
             }
 
             int? currentOrLastVolunteerUserID = _connectRequestService.GetRelevantVolunteerUserID(job);
-            RequestRoles changedByRole = GetChangedByRole(job);
+            RequestRoles changedByRole = GetChangedByRole(job); 
 
             string volunteerEmailAddress = string.Empty;
             if (currentOrLastVolunteerUserID.HasValue)
@@ -466,6 +454,7 @@ namespace CommunicationService.MessageService
                     RequestID = requestId,
                     AdditionalParameters = param
                 });
+                
             }
 
             string recipientEmailAddress = job.Recipient?.EmailAddress;
