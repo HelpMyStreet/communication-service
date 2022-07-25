@@ -105,7 +105,7 @@ namespace CommunicationService.MessageService
                 case CommunicationJobTypes.ImpendingUserDeletion:
                     return new ImpendingUserDeletionMessage(_connectUserService);
                 case CommunicationJobTypes.UserDeleted:
-                    return new UserDeletedMessage(_connectUserService);
+                    return new UserDeletedMessage();
                 case CommunicationJobTypes.RequestToHelpApproved:
                     return new RequestToHelpApprovedMessage(_connectRequestService, _connectUserService, _connectGroupService);
                 case CommunicationJobTypes.RequestToHelpDeclined:

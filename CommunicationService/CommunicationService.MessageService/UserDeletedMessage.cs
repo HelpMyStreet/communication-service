@@ -14,7 +14,6 @@ namespace CommunicationService.MessageService
 {
     public class UserDeletedMessage : IMessage
     {
-        private readonly IConnectUserService _connectUserService;
         List<SendMessageRequest> _sendMessageRequests;
 
         public string GetUnsubscriptionGroupName(int? recipientId)
@@ -22,9 +21,8 @@ namespace CommunicationService.MessageService
             return UnsubscribeGroupName.NotUnsubscribable;
         }
 
-        public UserDeletedMessage(IConnectUserService connectUserService)
+        public UserDeletedMessage()
         {
-            _connectUserService = connectUserService;
             _sendMessageRequests = new List<SendMessageRequest>();
         }
 
@@ -35,11 +33,23 @@ namespace CommunicationService.MessageService
                 throw new Exception("RecipientUserID is null");
             }
 
-            HelpMyStreet.Utils.Models.User user = _connectUserService.GetUserByIdAsync(recipientUserId.Value).Result;
+            string emailAddress = additionalParameters["EmailAddress"];
+            string recipientName = additionalParameters["RecipientDisplayName"];
+            string recipientFirstName = additionalParameters["RecipientFirstName"];
 
-            if (user == null)
+            if (string.IsNullOrEmpty(emailAddress))
             {
-                throw new Exception($"unable to retrieve user object for {recipientUserId.Value}");
+                throw new Exception($" no emailAddress supplied");
+            }
+
+            if (string.IsNullOrEmpty(recipientName))
+            {
+                throw new Exception($" no recipientName supplied");
+            }
+
+            if (string.IsNullOrEmpty(recipientFirstName))
+            {
+                throw new Exception($" no recipientFirstName supplied");
             }
 
             return new EmailBuildData()
@@ -47,11 +57,11 @@ namespace CommunicationService.MessageService
                 BaseDynamicData = new UserDeletedData(
                     title: "Your account has been deleted",
                     subject: "Your account has been deleted",
-                    firstName : user.UserPersonalDetails.FirstName
+                    firstName : recipientFirstName
                     ),
                 RecipientUserID = recipientUserId.Value,
-                EmailToAddress = user.UserPersonalDetails.EmailAddress,
-                EmailToName = user.UserPersonalDetails.DisplayName
+                EmailToAddress = emailAddress,
+                EmailToName = recipientName
             };
         }
 
