@@ -183,7 +183,7 @@ namespace CommunicationService.MessageService
             foreach (GroupJob gj in groupJobs)
             {
                 requestJobs.Add(new RequestJob(
-                    activity: gj.SupportActivity.FriendlyNameShort(),
+                    activity: gj.SupportActivityName,
                     countString: gj.Count == 1 ? $" - 1 volunteer required. " : $" - {gj.Count} volunteers required. ",
                     dueDateString: dueDateString,
                     showJobUrl: false,

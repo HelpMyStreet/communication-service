@@ -292,9 +292,10 @@ namespace CommunicationService.MessageService
 
         private List<JobDetails> GetRequestList(List<ShiftJob> jobs)
         {
-            var summary = jobs.GroupBy(x => new { x.SupportActivity, x.StartDate, x.EndDate, x.ShiftLength, x.Location })
+            var summary = jobs.GroupBy(x => new { x.SupportActivity, x.GetSupportActivityName, x.StartDate, x.EndDate, x.ShiftLength, x.Location })
                 .OrderBy(o => o.Key.StartDate)
                 .Select(m => new {
+                    SupportActivityName = m.Key.GetSupportActivityName,
                     SupportActivity = m.Key.SupportActivity,
                     Location = m.Key.Location,
                     ShiftDetails = $"{m.Key.StartDate.FormatDate(DateTimeFormat.LongDateTimeFormat)} - {m.Key.EndDate.FormatDate(DateTimeFormat.TimeFormat)}",
@@ -306,7 +307,7 @@ namespace CommunicationService.MessageService
                 var locationDetails = _connectAddressService.GetLocationDetails(item.Location, CancellationToken.None).Result;
 
                 result.Add(new JobDetails(
-                    $"<strong>{item.SupportActivity.FriendlyNameShort()}</strong> " +
+                    $"<strong>{item.SupportActivityName}</strong> " +
                     $"at <strong>{locationDetails.Name}</strong>. " +
                     $"Shift: { item.ShiftDetails }"));
             }

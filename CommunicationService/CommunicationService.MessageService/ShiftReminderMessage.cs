@@ -75,7 +75,7 @@ namespace CommunicationService.MessageService
                     title: "Volunteer shift reminder",
                     subject: "Volunteer shift reminder",
                     firstname: user.UserPersonalDetails.FirstName,
-                    activity: job.SupportActivity.FriendlyNameShort(),
+                    activity: job.GetSupportActivityName,
                     location: location.Name,
                     shiftStartDateString: FormatDate(request.RequestSummary.Shift.StartDate),
                     shiftEndDateString: FormatDate(request.RequestSummary.Shift.EndDate),

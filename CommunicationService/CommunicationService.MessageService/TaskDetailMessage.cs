@@ -92,7 +92,7 @@ namespace CommunicationService.MessageService
             {
                 BaseDynamicData = new TaskDetailData(                
                     organisation: job.JobSummary.RecipientOrganisation,
-                    activity: job.JobSummary.SupportActivity.FriendlyNameShort(),
+                    activity: job.JobSummary.GetSupportActivityName,
                     furtherDetails: otherQuestionsList,
                     volunteerInstructions : volunteerInstructions,
                     hasOrganisation : !String.IsNullOrEmpty(job.JobSummary.RecipientOrganisation)

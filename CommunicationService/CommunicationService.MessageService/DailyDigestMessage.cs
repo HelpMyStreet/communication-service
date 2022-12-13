@@ -142,7 +142,7 @@ namespace CommunicationService.MessageService
 
                     chosenRequestTaskList.Add(new DailyDigestDataJob(
                        groupLogo: $"{ _sendGridConfig.Value.BaseCommunicationUrl}/Resources?file=group-logos/logo/{request.ReferringGroupID}.png",
-                       activity: request.SupportActivity.FriendlyNameShort(),
+                       activity: request.GetSupportActivityName,
                        postCode: request.PostCode.Split(" ").First(),
                        dueDate: request.DueDate.FormatDate(DateTimeFormat.ShortDateFormat),
                        soon: request.DueDate < DateTime.Now.AddDays(1),

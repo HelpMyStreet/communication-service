@@ -106,7 +106,7 @@ namespace CommunicationService.MessageService
                 {                    
                     taskList.Add(new NextDayJob(
                        groupLogo: $"{ _sendGridConfig.Value.BaseCommunicationUrl}/Resources?file=group-logos/logo/{task.ReferringGroupID}.png",
-                       activity: task.SupportActivity.FriendlyNameShort(),
+                       activity: task.GetSupportActivityName,
                        postCode: task.PostCode.Split(" ").First(),                       
                        encodedRequestId: Base64Utils.Base64Encode(task.RequestID.ToString()),
                        distanceInMiles: Math.Round(task.DistanceInMiles, 1).ToString()
