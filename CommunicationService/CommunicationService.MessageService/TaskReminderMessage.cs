@@ -92,7 +92,7 @@ namespace CommunicationService.MessageService
                     encodedJobId,
                     GetTitleFromDays(job.JobSummary.DueDays, job.JobSummary.DueDateType, job.JobSummary.DueDate),
                     user.UserPersonalDetails.FirstName,
-                    job.JobSummary.SupportActivity.FriendlyNameShort(),
+                    job.JobSummary.GetSupportActivityName,
                     job.JobSummary.PostCode,
                     job.JobSummary.DueDays == 0 ? true : false,
                     job.JobSummary.DueDays == 1 ? true : false,
