@@ -149,14 +149,28 @@ namespace CommunicationService.MessageService
 
         private void AddRecipientAndTemplate(string templateName, int userId, int? jobId, int? groupId, int? requestId)
         {
-            _sendMessageRequests.Add(new SendMessageRequest()
+            var groupEmailConfiguration = _connectGroupService.GetGroupEmailConfiguration(groupId.Value, CommunicationJobTypes.GroupWelcome).Result;
+
+            if (groupEmailConfiguration == null)
             {
-                TemplateName = templateName,
-                RecipientUserID = userId,
-                JobID = jobId,
-                GroupID = groupId,
-                RequestID = requestId
-            });
+                throw new BadRequestException($"unable to retrieve group email configuration for {groupId.Value}");
+            }
+
+            var dontSendEmailSetting = GetValueFromConfig(groupEmailConfiguration, "DontSendEmail");
+
+            bool sendEmail = string.IsNullOrEmpty(dontSendEmailSetting) ? true : !Convert.ToBoolean(dontSendEmailSetting);
+
+            if (sendEmail)
+            {
+                _sendMessageRequests.Add(new SendMessageRequest()
+                {
+                    TemplateName = templateName,
+                    RecipientUserID = userId,
+                    JobID = jobId,
+                    GroupID = groupId,
+                    RequestID = requestId
+                });
+            }
         }
 
         public async Task<List<SendMessageRequest>> IdentifyRecipients(int? recipientUserId, int? jobId, int? groupId, int? requestId, Dictionary<string, string> additionalParameters)
