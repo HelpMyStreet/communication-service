@@ -1,0 +1,26 @@
+﻿{
+  "Templates": [
+    {
+      "name": "TaskApplicationApproved",
+      "subject": "{{{Subject}}}",
+      "generation": "dynamic",
+      "versions": [
+        {
+          "name": "Tweak wordings",
+          "subject": "{{{Subject}}}"
+        }
+      ]
+    },
+    {
+      "name": "TaskApplicationRejected",
+      "subject": "{{{Subject}}}",
+      "generation": "dynamic",
+      "versions": [
+        {
+          "name": "Tweak wordings",
+          "subject": "{{{Subject}}}"
+        }
+      ]
+    }
+  ]
+}
