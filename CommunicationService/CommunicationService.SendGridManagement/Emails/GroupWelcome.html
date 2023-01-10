@@ -1,26 +1,26 @@
 ﻿<p>Hi {{FirstName}},</p>
 
-<p>Thanks for registering as volunteer with {{GroupName}} – we’re so pleased to have you on the team!</p>
+<p>Thanks for registering as a volunteer with {{GroupName}} – we’re so pleased to have you on the team!</p>
 
 {{#if GroupContentAvailable}}
 <p>{{{GroupContent}}}</p>
-{{/if}}
-
-{{#if NeedYotiVerification}}
-<p>
-    <strong>Need to verify your ID?</strong> Verifying your ID is quick and easy with Yoti, simply click <a href="{{BaseUrl}}/account/profile">here</a> to launch your profile and get verified.
-</p>
 {{/if}}
 
 <p>
     When you’re ready to start helping, you can view our open requests (and any other open requests near you) in the <a href="{{BaseUrl}}/account/open-requests">Open Requests</a> tab in your profile. We’ll also send you notifications when new opportunities are available - so make sure to keep an eye on your inbox!
 </p>
 
+{{#if NeedYotiVerification}}
 <p>
-    Once you’ve accepted a request it will appear in your <a href="{{BaseUrl}}/account/my-requests">My Requests</a> tab. From here, you can mark it as complete, or let us know if there’s a problem by clicking ‘Can’t Do’.
+    Some opportunities will require you to verify your ID. Verifying your ID is quick and easy with Yoti, simply click <a href="{{BaseUrl}}/account/profile">here</a> to launch your profile and get verified.
+</p>
+{{/if}}
+
+<p>
+    Once you’ve accepted or enquired about a request it will appear in your <a href="{{BaseUrl}}/account/my-requests">My Requests</a> tab. From here, you can mark it as complete, or let us know if there’s a problem by clicking ‘Can’t Do’.
 </p>
 
-<p>Thanks again for volunteering with us. We hope you enjoy being a part of {{GroupName}}.</p>
+<p>Thanks again for your interest in volunteering with us. We hope you enjoy being a part of {{GroupName}}.</p>
 
 {{#if GroupSignatureAvailable}}
 <p>{{{GroupSignature}}}</p>

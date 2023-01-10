@@ -208,6 +208,7 @@
     <None Remove="Migrations\20220711_123000_UpdateSimplifiedUpdateTaskMessage.json" />
     <None Remove="Migrations\20220711_123200_TaskApplicationRejectedMessage.json" />
     <None Remove="Migrations\20220712_123000_TaskApplicationRejectedMessage.json" />
+    <None Remove="Migrations\20230110_133000_GroupWelcome.json" />
   </ItemGroup>
 
   <ItemGroup>
@@ -260,6 +261,7 @@
     <EmbeddedResource Include="Emails\RequestorTaskNotification.html" />
     <EmbeddedResource Include="Migrations\20200709_130700_AddRequestorTaskNotification.json" />
     <EmbeddedResource Include="Migrations\20200717_152400_AddUnsubscribeGroupsDailyDigest.json" />
+    <EmbeddedResource Include="Migrations\20230110_133000_GroupWelcome.json" />
     <EmbeddedResource Include="Migrations\20220712_123000_TaskApplicationRejectedMessage.json" />
     <EmbeddedResource Include="Migrations\20220711_123200_TaskApplicationRejectedMessage.json" />
     <EmbeddedResource Include="Migrations\20220711_123000_UpdateSimplifiedUpdateTaskMessage.json" />
